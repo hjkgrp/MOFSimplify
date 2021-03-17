@@ -249,6 +249,9 @@ TODO list:
     </div>
 </div>
 
+<div class="molecule"></div> <!-- Gianmarco Terrones addition --> <!-- TODO maybe remove if imolecule thing doesn't work -->
+
+
 <div class="navbar navbar-expand-lg navbar-dark bg-primary" style="margin-top: 50px;">
   <div class="container">
       <ul class="navbar-nav">
@@ -498,12 +501,28 @@ $(function() {
     $('#loading').text('');
       $.get("/get_example_mol", dataType='text').done(
         function(response) {
-      data.geometry = response;
-      viewer.clear();
-      viewer.addModel(data.geometry, "xyz");
-      viewer.setStyle({}, {stick:{radius:0.25}});
-      viewer.zoomTo();
-      viewer.render();
+          // data.geometry = response;
+          // viewer.clear();
+          // viewer.addModel(data.geometry, "xyz");
+          // viewer.setStyle({}, {stick:{radius:0.25}});
+          // viewer.zoomTo();
+          // viewer.render();
+          
+          console.log('check 1')
+          //console.log(convert(response, 'xyz', 'json'))
+          //console.log('check 2')
+
+          console.log(response)
+
+          // imolecule.create(viewer) // <!-- Gianmarco Terrones addition -->
+          // imolecule.draw(convert(response, 'xyz', 'json')); // <!-- Gianmarco Terrones addition -->  convert is from imolecule
+          imolecule.create('.molecule');
+                $.getJSON(response, function (mof) {
+                    imolecule.draw(mof);
+                });
+      
+      console.log('check 2')
+
       $('#metal').val('fe')
       $('#ox').val('2')
       updateSpins()

@@ -1,0 +1,583 @@
+<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. A lot of the current code still has metal complex stuff, which will need to be removed/tweaked later.
+
+
+TODO list:
+  visualize .cifs, without the .xyz workaround I have temporarily used
+  featurize MOFS with RACs and Zeo++ to make predictions, and display this predictions to the user
+
+-->
+
+
+<!-- Import 3Dmol, jQuery, and Bootstrap libaries --> 
+<script src="libraries/3Dmol-min.js"></script>
+<script src="libraries/jquery-3.4.1.min.js"></script>
+<script src="libraries/booststrap.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-1.3.4.min.js"></script>
+
+<!-- Import CSS -->
+<link rel="stylesheet" href="libraries/bootstrap.min.css">
+<link rel="stylesheet" href="libraries/bootstrap_custom.min.css">
+
+
+<!-- Set up the size of the 3D viewer (.mol-container) and other styles -->
+<!-- Custom CSS code is placed within the <style> tag: -->
+<style>
+.btn {
+  margin-top: 3px;
+}
+.mol-container {
+  width: 100%;
+  height: 400px;
+  position: relative;
+}
+
+.form-control {
+  margin-bottom:0.1cm;
+}
+
+</style>
+
+
+<!-- Empty head section: place meta tags and favicon here -->
+<head>
+
+<title>mofSimplify</title> 
+<meta name="description" content="mofSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
+<meta property="og:type" content="website" />
+<meta property="og:description" content="mofSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
+<meta property="og:title" content="mofSimplify" /> 
+<meta property="og:image" content="https://molsimplify.mit.edu/logo.png" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:image" content="https://molsimplify.mit.edu/logo.png" />
+
+</head>
+
+
+<body>
+    <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+      <div class="container">
+        <a href="../" class="navbar-brand">molSimplify</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="about.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/hjkgrp/molSimplify">Source Code</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://molsimplify.readthedocs.io/en/latest/Installation.html">Installation Instructions</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://hjkgrp.mit.edu/molSimplify-tutorials">Tutorials</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://molsimplify.readthedocs.io/en/latest/">Documentation</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="how_to_cite.html">How to Cite</a>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="page-header" id="banner">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <!-- Title -->
+            <h1>mofSimplify <span style="font-size: 24px;">  (powered by <a href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
+            <!-- Subtitle -->
+            <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
+            
+            <!-- Lead text -->
+            <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a href="about.html">About</a> tab.</p>
+          </div>
+        </div>
+      </div>
+
+  <div class='row'>
+    <!-- Create a column containing 3DMol viewer and buttons -->
+    <div class='col-lg-6'>
+        <div id="container-01" class="mol-container" style='border-style:solid;border-width:1px;'></div>
+        <div style="margin-bottom:0.5cm;"></div>
+        <button class='btn btn-primary' id='load' type="button">Load example MOF</button>
+        <button class='btn btn-primary' id='reset' type="button">Reset zoom level</button>
+    </div>
+    
+    <!-- Create a column containing selection boxes and buttons -->
+    <div class='col-lg-6'>
+
+        <div style="margin-bottom:0.5cm;"></div>
+
+        <!-- Selection box for metal -->
+        <div>
+        Metal
+        <select class='form-control locksMetrics' id="metal">
+          <option value='cr'>Chromium</option>
+          <option value='mn'>Manganese</option>
+          <option value='fe'>Iron</option>
+          <option value='co'>Cobalt</option>
+          <option value='mo'>Molybdenum</option>
+          <option value='tc'>Technetium</option>
+          <option value='ru'>Ruthenium</option>
+          <option value='rh'>Rhodium</option>
+        </select>
+        </div>
+
+        <!-- Selection box for Axial Ligand 1 (gets replaced immediately by JavaScript code) -->
+        <div>
+        Axial Ligand 1 (selection or SMILES string)
+        <input id="ligand_ax1" class='form-control locksMetrics' list="ligands_ax" onmousedown="value = '';" />
+        </div>
+
+        <!-- Selection box for Axial Ligand 2 (gets replaced immediately by JavaScript code) -->
+        <div>
+        Axial Ligand 2 (selection or SMILES string)
+        <input id="ligand_ax2" class='form-control locksMetrics' list="ligands_ax" onmousedown="value = '';" />
+        </div>
+
+        <!-- Selection box for Equatorial Ligand (gets replaced immediately by JavaScript code) -->
+        <div>
+        Equatorial Ligand (selection or SMILES string)
+        <input id="ligand_eq" class='form-control locksMetrics' list="ligands_eq" onmousedown="value = '';" />
+        </div>
+
+        <!-- Default Axial Ligands-->
+        <datalist id="ligands_ax">
+          <option value="water">
+          <option value="ammonia">
+          <option value="cyanide">
+          <option value="pyridine">
+          <option value="carbonyl">
+          <option value="methyl isocyanide">
+          <option value="isothiocyanate">
+          <option value="thiocyanate">
+          <option value="fluoride">
+          <option value="chloride">
+          <option value="cyanide">
+          <option value="phosphine">
+          <option value="acetonitrile">
+          <option value='phenyl isocyanide'>
+        </datalist>
+
+        <!-- Default Equatorial Ligands-->
+        <datalist id="ligands_eq">
+          <option value="water">
+          <option value="ammonia">
+          <option value="cyanide">
+          <option value="pyridine">
+          <option value="carbonyl">
+          <option value="methyl isocyanide">
+          <option value="isothiocyanate">
+          <option value="thiocyanate">
+          <option value="fluoride">
+          <option value="chloride">
+          <option value="cyanide">
+          <option value="phosphine">
+          <option value="acetonitrile">
+          <option value='phenyl isocyanide'>
+          <option value='porphyrin'>
+          <option value='acetylacetonate'>
+          <option value='bipyridine'>
+        </datalist>
+
+        <!-- Selection box for oxidation state -->
+        <div>
+        Oxidation State
+        <select class='form-control locksMetrics' id="ox">
+          <option value="2">II</option>
+          <option value="3">III</option>
+        </select>
+        </div>
+
+        <button style='margin-top: 10px' class='btn btn-info' data-toggle='collapse' data-target='#advanced' aria-expanded='false' aria-controls='advanced' id='show_advanced' type="button">Show/hide advanced parameters</button>
+        
+        <div style='margin-top: 10px' id='advanced' class='collapse'>
+            <!-- Selection box for HFX -->
+            Hartree-Fock Exchange Fraction
+            <select class='form-control locksMetrics' id="hfx">
+              <option value='0.10'>10%</option>
+              <option value='0.20'>20%</option>
+              <option value='0.30'>30%</option>
+            </select>
+            <!-- Selection box for spin -->
+            <div>
+            Spin Multiplicity
+            <select class='form-control locksMetrics' id="spin">
+              <option value="1">1</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom:0.5cm;"></div>
+        <!-- Button for uploading MOF cif file -->
+        <button class='btn btn-primary' id='upload' type="button">Upload MOF cif File</button>
+        
+        <!-- Button for generating molecule -->
+        <!-- <button class='btn btn-primary' id='generate' type="button">Generate!</button> -->
+        <!-- Button for downloading generated molecule -->
+        <!-- <button class='btn btn-primary' id='download' type="button">Download XYZ File</button> -->
+
+        <!-- Button for predicting solvent removal stability of MOF -->
+        <button class='btn btn-primary' id='predict_s' type="button">Predict stability upon solvent removal</button> <!-- Gianmarco Terrones addition -->
+        <!-- Button for predicting thermal stability of MOF -->
+        <button class='btn btn-primary' id='predict_t' type="button">Predict thermal stability</button> <!-- Gianmarco Terrones addition -->
+
+        <!-- Button for plotting spin-splitting of generated molecule -->
+        <!-- <button class='btn btn-primary' id='plot' type="button" disabled="true">Plot ΔE<sub>H-L</sub></button> -->
+        <!-- Button for plotting PCA of generated molecule-->
+        <!-- <button class='btn btn-primary' id='plot_pca' type="button" disabled="true">PCA ΔE<sub>H-L</sub></sub></button> -->
+        </div>
+    </div>
+        <!-- Empty spot where the MOF prediction text is placed. -->
+        <div class='row' style='margin-top: 1cm;'>
+            <div class='col-12' id='upload_status'></div> <!-- Gianmarco Terrones addition -->
+            <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
+            <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
+            <div class='col-6' id='loading'></div>
+            <div class='col-6' id='chart'></div>
+    </div>
+</div>
+
+<div class="navbar navbar-expand-lg navbar-dark bg-primary" style="margin-top: 50px;">
+  <div class="container">
+      <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</a>
+          </li>
+      </ul>
+  </div>
+</div>
+
+<!-- For cif file upload -->
+ <input id="fileinput" type="file" name="fileinput" style="display:none"/>  <!-- Gianmarco Terrones addition -->
+
+
+</body>
+
+
+
+<!-- Begin JavaScript section -->
+<script>
+
+$(function() {
+
+  // Define global variables
+  metal_spin_dict = {'cr': {2: [1, 5], 3: [2, 4]},
+ 'mn': {2: [2, 6], 3: [1, 5]},
+ 'fe': {2: [1, 5], 3: [2, 6]},
+ 'co': {2: [2, 4], 3: [1, 5]},
+ 'mo': {2: [1, 5], 3: [2, 4]},
+ 'tc': {2: [2, 6], 3: [1, 5]},
+ 'ru': {2: [1, 5], 3: [2, 6]},
+ 'rh': {2: [2, 4], 3: [1, 5]}};
+
+//   monodentate_ligs = {'pyr': 'pyridine',
+//  'carbonyl': 'carbonyl',
+//  'misc': 'methyl isocyanide',
+//  'water': 'water',
+//  'ammonia': 'ammonia',
+//  'isothiocyanate': 'isothiocyanate',
+//  'pisc': 'phenyl isocyanide',
+//  'chloride': 'chloride',
+//  'cyanide': 'cyanide',
+//  'thiocyanate': 'thiocyanate',
+//  'fluoride': 'fluoride',
+//  'phosphine': 'phosphine',
+//  'acetonitrile': 'acetonitrile'}
+
+  // Set up 3Dmol viewer
+  let element = $('#container-01');
+  let config = { backgroundColor: 'white' };
+  let viewer = $3Dmol.createViewer( element, config );
+  data = {};
+
+  // // Function that repopulates the ligand dropdown
+  // ligand_elements = ['#ligand_ax1', '#ligand_ax2', '#ligand_eq'];
+  // for(var lig_idx=0; lig_idx<ligand_elements.length; lig_idx++) {
+  //     curr_element_name = ligand_elements[lig_idx];
+  //     lig_dropdown = $(curr_element_name).empty();
+  //     for(var i=0; i<Object.keys(monodentate_ligs).length; i++) {
+  //         var option = $('<option></option>').attr("value", Object.keys(monodentate_ligs)[i]).text(Object.values(monodentate_ligs)[i]);
+  //         lig_dropdown.append(option);
+  //     };
+  // };
+
+  // Populate the spin dropdown
+  updateSpins = function() {
+    valid_spins = metal_spin_dict[$('#metal').val()][$('#ox').val()];
+    spin_dropdown = $("#spin").empty()
+    for(var i=0; i<valid_spins.length; i++) {
+        var option = $('<option></option>').attr("value", valid_spins[i].toString()).text(valid_spins[i]);
+        spin_dropdown.append(option);
+    };
+  };
+
+  // Populate the oxidation state dropdown (triggers spin dropdown repopulation)
+  updateOx = function() {
+    valid_oxs = Object.keys(metal_spin_dict['cr'])
+    ox_strs = {2: 'II', 3: 'III'}
+    ox_dropdown = $("#ox").empty()
+    for(var i=0; i<valid_oxs.length; i++) {
+        var option = $('<option></option>').attr("value", valid_oxs[i].toString()).text(ox_strs[valid_oxs[i]]);
+        ox_dropdown.append(option);
+    };
+    updateSpins()
+  };
+
+  // Prevents user from downloading molecule and making NN predictions
+  lockMetrics = function() {
+    $('#download').prop('disabled', true)
+    $('#predict_s').prop('disabled', true)
+    $('#predict_t').prop('disabled', true)
+    $('#plot').prop('disabled', true)
+    $('#plot_pca').prop('disabled', true)
+    viewer.clear();
+    $('#loading').text('');
+    $('#chart').text('');
+  }
+
+  // Re-allows user to download molecule or make NN predictions
+  unlockMetrics = function() {
+    $('#download').prop('disabled', false)
+    $('#predict_s').prop('disabled', false)
+    $('#predict_t').prop('disabled', false)
+  }
+
+  // Locks the plotting ability
+  lockPlot = function() {
+    $('#plot').prop('disabled', true)
+    $('#plot_pca').prop('disabled', true)
+  }
+
+  // Unlocks the plotting ability
+  unlockPlot = function() {
+    $('#plot').prop('disabled', false)
+    $('#plot_pca').prop('disabled', false)
+  }
+  // Set callbacks
+  $('#metal').change(updateOx);
+  $('#ox').change(updateSpins);
+  $('.locksMetrics').change(lockMetrics);
+
+  // Upload MOF cif file  <!-- Gianmarco Terrones addition -->
+  $(function() {
+    $('#upload').on('click', function() { // button triggers upload
+      $('#fileinput').trigger('click'); // OS file selection
+    });
+  });
+
+
+  // Used for ensuring that only .cif files are uploaded  <!-- Gianmarco Terrones addition -->
+  function getExtension(filename) {
+    var parts = filename.split('.');
+    return parts[parts.length - 1];
+  }
+
+  // Used for ensuring that only .cif files are uploaded   <!-- Gianmarco Terrones addition -->
+  function isCif(filename) {
+    var ext = getExtension(filename);
+    return ext == 'cif';
+  }
+
+  $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
+      // clearing previous predictions
+      $('#solvent_stability_prediction').text('');
+      $('#thermal_stability_prediction').text('');
+      
+      // check if uploaded file is a .cif
+      if (! isCif(this.value)) {
+          this.value = ""; // clear the non-cif file
+          $('#upload_status').text(''); // now nothing is uploaded
+          alert("Must be a cif file.");
+          return;      
+      }
+      
+      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+
+      // myFile.text() is a promise
+      myFile.text().then(function(result){
+        // result is the text of the inputted file
+        console.log('Printing the JSON of the text of the cif file, and the text of the cif file.')
+        console.log(JSON.stringify(result)); // checking to see what we have
+        console.log(result); 
+      })
+
+
+      viewer.clear();
+      $('#upload_status').text('File uploaded: ' + myFile.name);
+      $('#loading').text('');
+      $('#chart').text('');
+
+  });
+
+  // Generate solvent removal stability prediction
+  $('#predict_s').click(function() {  // <!-- Gianmarco Terrones addition -->
+    // check if a cif is uploaded
+    let myFile = document.getElementById('fileinput').files[0];
+
+    if (myFile==undefined) {
+      alert("Must upload a cif file first.");
+      return;  
+    }
+
+    // myFile.text() is a promise
+    myFile.text().then(function(result){
+      // result is the text of the loaded .cif file
+      $.post("/predict_solvent_stability", JSON.stringify(result)).done(
+          function(response) {
+                // TODO Implement an actual prediction on the backend
+                $('#solvent_stability_prediction').text(response); 
+          });
+    })
+  });
+
+  // Generate thermal stability prediction
+  $('#predict_t').click(function() {  // <!-- Gianmarco Terrones addition -->
+    // check if a cif is uploaded
+    let myFile = document.getElementById('fileinput').files[0];
+
+    if (myFile==undefined) {
+      alert("Must upload a cif file first.");
+      return;  
+    }
+
+    // myFile.text() is a promise
+    myFile.text().then(function(result){
+      // result is the text of the loaded .cif file
+      $.post("/predict_thermal_stability", JSON.stringify(result)).done(
+          function(response) {
+                // TODO Implement an actual prediction on the backend
+                $('#thermal_stability_prediction').text(response); 
+          });
+    })
+  });
+
+
+  // Generate molecule
+  $('#generate').click(function() {
+    viewer.clear();
+    $('#loading').text('');
+    $('#chart').text('');
+    $('#generate').prop('disabled', true);
+    data.ox = $('#ox').val()
+    data.hfx = $('#hfx').val()
+    data.metal = $('#metal').val()
+    data.ax1 = $('#ligand_ax1').val()
+    data.ax2 = $('#ligand_ax2').val()
+    data.eq = $('#ligand_eq').val()
+    data.spin = $('#spin').val()
+    $.post("/generate", JSON.stringify(data)).done(
+        function(response) {
+              data.geometry = response.geometry;
+              viewer.clear();
+              viewer.addModel(data.geometry, "xyz");
+              viewer.setStyle({}, {stick:{radius:0.25}});
+              viewer.zoomTo();
+              viewer.render();
+              unlockMetrics();
+              // For testing
+              // unlockPlot();
+              $("#loading").html(response.message)
+              $('#generate').prop('disabled', false);
+        });
+  });
+  
+  // Load example MOF
+  $('#load').click(function() {
+    $('#loading').text('');
+      $.get("/get_example_mol", dataType='text').done(
+        function(response) {
+      data.geometry = response;
+      viewer.clear();
+      viewer.addModel(data.geometry, "xyz");
+      viewer.setStyle({}, {stick:{radius:0.25}});
+      viewer.zoomTo();
+      viewer.render();
+      $('#metal').val('fe')
+      $('#ox').val('2')
+      updateSpins()
+      $('#ligand_ax1').val('water')
+      $('#ligand_ax2').val('water')
+      $('#ligand_eq').val('water')
+      $('#spin').val('1')
+      $('#hfx').val('0.20')
+      unlockMetrics()
+      });
+  });
+
+  // Reset zoom level
+  $('#reset').click(function() {
+    viewer.zoomTo();
+  })
+
+  // Make a neural network prediction (the display text is defined in app.py)
+  $('#predict').click(function() {
+    data.ox = $('#ox').val()
+    data.hfx = $('#hfx').val()
+    data.metal = $('#metal').val()
+    data.ax1 = $('#ligand').val()
+    data.ax2 = $('#ligand').val()
+    data.eq = $('#ligand').val()
+    data.spin = $('#spin').val()
+    $('#loading').html('loading...');
+    $.post("/nn_predict", JSON.stringify(data)).done(function(response){
+      data.sseplot = response.result; // Set the sseplot value used for plotting
+      if (data.sseplot != 'Error') {
+        unlockPlot();
+      }
+      $("#loading").html(response.resulttext);
+      document.getElementById('loading').scrollIntoView();
+      });
+  });
+
+  // Define the behavior of the download button
+  $('#download').click(function() {
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+    download('mol.xyz', data.geometry);
+  });
+
+  // Start up page by virtually clicking the "Load example MOF" button
+  $('#load').click();
+});
+
+
+$('#plot').click(function() {
+  // For testing.
+  // data.sseplot = -15 
+  $.post("/plot", JSON.stringify(data)).done(function(response) { 
+    $('#chart').html(response)
+  })
+});
+
+$('#plot_pca').click(function() {
+  // For testing
+  // data.ox = -2
+  // data.hfx = 0.2
+  // data.sseplot = -15
+  $.post("/plotpca", JSON.stringify(data)).done(function(response) { 
+    $('#chart').html(response)
+  })
+});
+
+</script>

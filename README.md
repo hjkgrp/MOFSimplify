@@ -1,7 +1,8 @@
-# mofSimplify
-The MOF website for property prediction and community engagement.
+# MolSimplify Lite
 
-### How to run mofSimplify (tested on Python 3.8.5):
+![screenshot](screenshot.png)
+
+### How to run molSimplify Lite (tested on Python 2.7.16):
 - Install Flask, molSimplify, and any other necessary dependencies.
 - Run `app.py` to start a server instance.
 - Go to `http://localhost:8000/` in your browser (or whatever address `app.py` prints)

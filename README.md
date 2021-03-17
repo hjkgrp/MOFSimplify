@@ -1,6 +1,6 @@
 # MolSimplify Lite
 
-![screenshot](screenshot.png)
+The MOF website for property prediction and community engagement.
 
 ### How to run molSimplify Lite (tested on Python 2.7.16):
 - Install Flask, molSimplify, and any other necessary dependencies.

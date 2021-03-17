@@ -36,11 +36,19 @@ TODO list:
   margin-bottom:0.1cm;
 }
 
+.molecule {
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
 </style>
 
 
 <!-- Empty head section: place meta tags and favicon here -->
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition, debugging -->
+
 
 <title>mofSimplify</title> 
 <meta name="description" content="mofSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
@@ -249,10 +257,13 @@ TODO list:
     </div>
 </div>
 
-<div class="molecule"></div> <!-- Gianmarco Terrones addition --> <!-- TODO maybe remove if imolecule thing doesn't work -->
+
+<!-- For imolecule display -->
+<div class="molecule"> <!-- Gianmarco Terrones addition --> <!-- TODO remove if imolecule thing doesn't work -->
+</div> 
 
 
-<div class="navbar navbar-expand-lg navbar-dark bg-primary" style="margin-top: 50px;">
+<div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px;">
   <div class="container">
       <ul class="navbar-nav">
           <li class="nav-item">
@@ -495,6 +506,10 @@ $(function() {
               $('#generate').prop('disabled', false);
         });
   });
+
+
+  // Getting the imolecule viewer ready
+  imolecule.create('.molecule');
   
   // Load example MOF
   $('#load').click(function() {
@@ -508,30 +523,29 @@ $(function() {
           // viewer.zoomTo();
           // viewer.render();
           
-          console.log('check 1')
-          //console.log(convert(response, 'xyz', 'json'))
-          //console.log('check 2')
+          console.log('check')  //debugging
+          console.log(response)   //debugging
 
-          console.log(response)
 
           // imolecule.create(viewer) // <!-- Gianmarco Terrones addition -->
           // imolecule.draw(convert(response, 'xyz', 'json')); // <!-- Gianmarco Terrones addition -->  convert is from imolecule
-          imolecule.create('.molecule');
-                $.getJSON(response, function (mof) {
-                    imolecule.draw(mof);
-                });
-      
-      console.log('check 2')
+          imolecule.clear();
+          console.log('drawing');
+          imolecule.draw(response);
 
-      $('#metal').val('fe')
-      $('#ox').val('2')
-      updateSpins()
-      $('#ligand_ax1').val('water')
-      $('#ligand_ax2').val('water')
-      $('#ligand_eq').val('water')
-      $('#spin').val('1')
-      $('#hfx').val('0.20')
-      unlockMetrics()
+                /*$.getJSON(response, function (mof) {
+                    imolecule.draw(mof);
+                });*/
+        
+          $('#metal').val('fe')
+          $('#ox').val('2')
+          updateSpins()
+          $('#ligand_ax1').val('water')
+          $('#ligand_ax2').val('water')
+          $('#ligand_eq').val('water')
+          $('#spin').val('1')
+          $('#hfx').val('0.20')
+          unlockMetrics()
       });
   });
 

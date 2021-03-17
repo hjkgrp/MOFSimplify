@@ -16,7 +16,7 @@ import pickle
 import molSimplify.Classes.mol3D as ms_mol3D
 import molSimplify.Informatics.RACassemble as ms_RAC
 import molSimplify.python_nn.tf_ANN as ms_ANN
-import imolecule.format_converter as format_converter
+import imolecule.format_converter
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -71,7 +71,7 @@ with open('data/rac_names.txt','r') as file1:
     lines = file1.readlines()
 pca_variables = [x.strip('\n') for x in lines]
 # pca_model = pickle.load(open('data/PCA_model.pkl','rb')) # removed
-with open('data/PCA_model.pkl','rb') as f: # next 4 lines were added by GT, for Python 3
+with open('data/PCA_model.pkl','rb') as f: # next 4 lines were added by Gianmarco Terrones, for Python 3
     u = pickle._Unpickler(f)
     u.encoding = 'latin1'
     pca_model = u.load()
@@ -178,13 +178,18 @@ def serve_library_files(path):
 
 @app.route('/get_example_mol')
 def serve_example_mol():
-    print('testing testing') # debugging
-    subprocess.run('pwd') # debugging
+    #print('testing testing') # debugging
+    #subprocess.run('pwd') # debugging
+    #subprocess.run('ls') # debugging
+
 
     # Returns an example molecule
     # for imolecule's convert to work, need to install openbabel
-    return format_converter.convert('NaX', 'cif', 'json')  # Gianmarco Terrones change
+    # Gianmarco Terrones change
+    with open('mof examples/NaX.cif') as f:
+        return imolecule.format_converter.convert(f.read(), 'cif', 'json') # convert cif file to json
 
+    
 @app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
 def ss_predict():
     # Generates solvent stability prediction TODO

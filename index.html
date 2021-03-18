@@ -448,6 +448,9 @@ $(function() {
     // myFile.text() is a promise
     myFile.text().then(function(result){
       // result is the text of the loaded .cif file
+
+      // console.log(JSON.stringify(result)); // debugging
+
       $.post("/predict_solvent_stability", JSON.stringify(result)).done(
           function(response) {
                 // TODO Implement an actual prediction on the backend

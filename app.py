@@ -193,6 +193,49 @@ def serve_example_mol():
 @app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
 def ss_predict():
     # Generates solvent stability prediction TODO
+
+    # Grab data
+    mydata = json.loads(flask.request.get_data())
+
+    # Write the data back to a cif file
+    cif_file = open('temp_cif.cif', 'w')
+    cif_file.write(mydata)
+    cif_file.close()
+
+    # # debugging; checking to see if writing was successful
+    # log = open("temp_cif.cif", "r")
+    # for line in log:
+    #     print(line)
+
+    # Next, running MOF featurization
+    # Write a python script to run MOF_descriptors.get_MOF_descriptors
+    py_file = open('featurize.py', 'w')
+    py_file.write('from molSimplify.Informatics.MOF.MOF_descriptors import *\n')
+    py_file.write('get_primitive(\'temp_cif.cif\', \'temp_cif_primitive.cif\')\n')
+    py_file.write('full_names, full_descriptors = get_MOF_descriptors(\'temp_cif_primitive.cif\',3,path=\'/\', xyzpath=\'temp_cif.xyz\')\n')
+    py_file.close()
+
+    # debugging
+    #current_directory = subprocess.run('pwd');
+    #print('test')
+    #print(current_directory)
+    current_directory = subprocess.check_output('pwd')
+    print(current_directory)
+
+    # subprocess.run()
+
+    # debuggging; setting writable permission to folder
+    subprocess.run(['chmod', '-R', '777', current_directory])  # TODO flask documentation on writing to folders   # possible app.route
+        # TODO possible instead make sessions
+
+    # Next, run featurize.py
+    os.system('python featurize.py')
+
+    print('check')
+
+    # Next, run Zeo++
+    # subprocess.run(['./network', '-ha', '-res', 'temp_cif_primitive.cif'])
+
     return 'test ss_predict'
 
 @app.route('/predict_thermal_stability', methods=['POST']) # Gianmarco Terrones addition

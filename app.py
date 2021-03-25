@@ -16,7 +16,6 @@ import pickle
 import molSimplify.Classes.mol3D as ms_mol3D
 import molSimplify.Informatics.RACassemble as ms_RAC
 import molSimplify.python_nn.tf_ANN as ms_ANN
-import imolecule.format_converter
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -182,12 +181,9 @@ def serve_example_mol():
     #subprocess.run('pwd') # debugging
     #subprocess.run('ls') # debugging
 
+    # TODO
+    return 'meep'
 
-    # Returns an example molecule
-    # for imolecule's convert to work, need to install openbabel
-    # Gianmarco Terrones change
-    with open('mof examples/NaX.cif') as f:
-        return imolecule.format_converter.convert(f.read(), 'cif', 'json') # convert cif file to json
 
     
 @app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
@@ -224,7 +220,7 @@ def ss_predict():
 
     # subprocess.run()
 
-    # debuggging; setting writable permission to folder
+    # debugging; setting writable permission to folder
     subprocess.run(['chmod', '-R', '777', current_directory])  # TODO flask documentation on writing to folders   # possible app.route
         # TODO possible instead make sessions
 

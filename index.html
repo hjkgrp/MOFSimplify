@@ -8,12 +8,16 @@ TODO list:
 -->
 
 
-<!-- Import 3Dmol, jQuery, and Bootstrap libaries --> 
+<!-- Import 3Dmol, jQuery, and Bootstrap libaries  TODO update this comment--> 
+<script type="text/javascript" src="libraries/ngl.js"></script>
+<script type="text/javascript" src="libraries/webGavrog/runtime.js"></script>
+<script type="text/javascript" src="libraries/webGavrog/vendors.js"></script>
+<script type="text/javascript" src="libraries/webGavrog/main.js"></script>
 <script src="libraries/3Dmol-min.js"></script>
 <script src="libraries/jquery-3.4.1.min.js"></script>
-<script src="libraries/booststrap.min.js"></script>
-<script src="libraries/imolecule.min.js"></script>  <!-- Gianmarco Terrones addition -->
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-1.3.4.min.js"></script>
+<!-- <script src="libraries/booststrap.min.js"></script> -->
+<!-- <script src="https://cdn.bokeh.org/bokeh/release/bokeh-1.3.4.min.js"></script>
+ --><!-- <script type="text/javascript" src="ngl.js"></script> Gianmarco Terrones addition, from sbu.html -->
 
 <!-- Import CSS -->
 <link rel="stylesheet" href="libraries/bootstrap.min.css">
@@ -26,7 +30,8 @@ TODO list:
 .btn {
   margin-top: 3px;
 }
-.mol-container {
+
+.mol-container { /* Gianmarco Terrones: will not be needed later */
   width: 100%;
   height: 400px;
   position: relative;
@@ -36,11 +41,7 @@ TODO list:
   margin-bottom:0.1cm;
 }
 
-.molecule {
-  height: 100%;
-  position: relative;
-  width: 100%;
-}
+#viewportwrapper { grid-area: viz; } /* Gianmarco Terrones addition, for MOF visualization */
 
 </style>
 
@@ -63,6 +64,7 @@ TODO list:
 
 
 <body>
+
     <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
     <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
       <div class="container">
@@ -258,9 +260,10 @@ TODO list:
 </div>
 
 
-<!-- For imolecule display -->
-<div class="molecule"> <!-- Gianmarco Terrones addition --> <!-- TODO remove if imolecule thing doesn't work -->
-</div> 
+<div id="viewportwrapper" style="width:400px;" class="content inactive"> <!-- Gianmarco Terrones addition -->
+  <div id="viewportnote" style="position: relative; left: 1em; top: 1em; z-index: 2;">(MOFs are visualized here)</div>
+  <div id="cifviewport" style="width:400px; height:300px;"></div>
+</div>
 
 
 <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px;">
@@ -283,6 +286,399 @@ TODO list:
 
 <!-- Begin JavaScript section -->
 <script>
+  // lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization
+
+  // beginning of section with a lot of copied code
+
+
+  var stage;
+
+  var lsdir = function(path) {
+    return FS.readdir(path).filter(function(e) {
+      return !['..', '.'].includes(e);  // filter out current and parent dirs
+    }).sort();
+  };
+
+  // Adapted from examples at http://nglviewer.org/ngl/api/manual/usage/embedding.html
+  // and https://codepen.io/pen?template=JNLMXb and http://nglviewer.org/ngldev/api/manual/snippets.html
+  document.addEventListener("DOMContentLoaded", function () {
+    stage = new NGL.Stage("cifviewport");
+    stage.setParameters( {backgroundColor: "white"} );
+  });
+
+  var runMOFidCode = function(cifdata) {
+    C_obcode = Module.cwrap(
+      'analyzeMOFc', 'null', ['string', 'number', 'number']
+    );
+
+    if(!FS.analyzePath('/Output').exists) {
+      FS.mkdir('/Output');  // See also docs on filesystem API: https://kripken.github.io/emscripten-site/docs/api_reference/Filesystem-API.html
+      // Ideally, the C_obcode executable would automatically make all of the directories,
+      // but it's broken at least in an old version of Emscripten.
+      FS.mkdir('/Output/MetalOxo');
+      FS.mkdir('/Output/SingleNode');
+      FS.mkdir('/Output/AllNode');
+      FS.mkdir('/Output/StandardIsolated');
+    }
+
+    var buflen = 65536;
+    var ptr = Module._malloc(buflen);
+    var buffer= new Uint8Array(Module.HEAPU8.buffer, ptr, buflen); // Get a bytes view on the newly allocated buffer.
+    C_obcode(cifdata, ptr, buflen);
+    var ans = Module.UTF8ToString(ptr);
+    Module._free(ptr);
+    return ans;
+  };
+
+  var analyzeMOF = function(input_cif_str, cif_name) {
+    // Get relevant MOFid/MOFkey information from an input string of CIF-formatted coordinates
+    var raw_mofid_output = runMOFidCode(input_cif_str);
+    var single_node_topology = getTopology("/Output/SingleNode/topology.cgd");
+    var all_node_topology = getTopology("/Output/AllNode/topology.cgd");
+
+    // Extract the MOFid, per run_mofid.py:cif2mofid
+    const fragment_info = _extractFragments(raw_mofid_output);
+    let mofid_topology = '';
+    if (fragment_info.cat == null) {
+      mofid_topology = 'NA'
+    } else if (single_node_topology == all_node_topology) {
+      mofid_topology = single_node_topology;
+    } else {
+      mofid_topology = single_node_topology + ',' + all_node_topology;
+    }
+
+    let mof_name = cif_name;
+    if (cif_name.endsWith('.cif') || cif_name.endsWith('.CIF')) {
+      mof_name = cif_name.substring(0, cif_name.length - 4);
+    }
+    const all_fragments = fragment_info.nodes.concat(fragment_info.linkers);
+    all_fragments.sort();
+
+    // Assembling the MOFid from id_constructor.py:assemble_mofid
+    let mofid = all_fragments.join('.');
+    mofid += ' MOFid-v1.';
+    mofid += mofid_topology + '.';
+    if (fragment_info.cat == 'no_mof') {
+      mofid += fragment_info.cat
+    } else if (fragment_info.cat != null) {
+      mofid += 'cat' + fragment_info.cat;
+    } else {
+      mofid += 'NA';
+    }
+    if (mofid.startsWith(' ')) {  // Null linkers.  Make .smi compatible
+      mofid = '*' + mofid + 'no_mof';
+    }
+    mofid += ';' + mof_name;
+
+    // Extract the MOFkey
+    var base_mofkey = "";
+    if (fragment_info.parsed) {
+      base_mofkey = FS.readFile("/Output/MetalOxo/mofkey_no_topology.txt", {'encoding': 'utf8'});
+    }
+    var mofkey = base_mofkey.replace('MOFkey-v1', 'MOFkey-v1.' + single_node_topology);
+
+    return {
+      raw_output: raw_mofid_output,
+      mofid: mofid,
+      mofkey: mofkey,
+      fragments: fragment_info
+    };
+  }
+
+  var _extractFragments = function(raw_mofid_output) {
+    // Parse the MOFid output, per id_constructor.py:extract_fragments
+    let all_fragments = raw_mofid_output.trim().split(/\r\n|\r|\n/g);
+    all_fragments = all_fragments.map(a => a.trim());
+    if (all_fragments == '') {
+      return {nodes: ['*'], linkers: [], cat: cat, parsed: false};
+    }
+
+    const cat_num_line = all_fragments.pop();
+    let cat = null;
+    if (cat_num_line.includes('simplified net(s)')) {
+      cat = (parseInt(cat_num_line[8]) - 1).toString();  // '# Found x simplified net(s)'
+      if (cat == '-1') {
+        cat = null;
+      }
+    } else {
+      all_fragments = ['*'];
+    }
+
+    // Parse node/linker fragment notation
+    if (all_fragments[0] != '# Nodes:') {
+      return {nodes: ['*'], linkers: [], cat: cat, parsed: false};
+    }
+    all_fragments.shift();
+    const linker_flag_loc = all_fragments.findIndex(line => (line == "# Linkers:"));
+    const node_fragments = all_fragments.slice(0, linker_flag_loc);
+    const linker_fragments = all_fragments.slice(linker_flag_loc+1);
+    node_fragments.sort();
+    linker_fragments.sort();
+
+    return {nodes: node_fragments, linkers: linker_fragments, cat: cat, parsed: true};
+  }
+
+  var rawToSmiles = function(raw_mofid) {
+    // Converts the raw output from the MOFid code to a parseable SMILES format
+    var lines = raw_mofid.replace(/\t/g, '').split(/\r\n|\r|\n/g);  // remove trailing tabs before splitting
+    lines.pop();  // remove line about number of simplified nets
+    return lines.join('.');
+  }
+
+  handleInput = function() {
+    var ciffile = document.getElementById("fileinput").files[0];
+    //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
+    var cifreader = new FileReader();
+    cifreader.onload = function(event) {
+      var mofid_results = analyzeMOF(event.target.result, ciffile.name);
+      if (mofid_results.fragments.parsed) {
+        const mofid_html = "<div>MOFid:<br /><code>" + mofid_results.mofid + "</code></div>";
+        const mofkey_html = "<div>MOFkey:<br /><code>" + mofid_results.mofkey + "</code></div>";
+        //document.getElementById("obresults").innerHTML = mofid_html + mofkey_html;
+
+        //clearDropdown("cifdownload");
+        updateFileLists();  // populate the initial list of files
+        //document.getElementById("folderdownload").selectedIndex = "0";  // back to the orig_mol
+
+        //document.getElementById("resultsdownload").classList.remove("inactive");
+        document.getElementById("viewportnote").style.display = "none";
+        document.getElementById("viewportwrapper").classList.remove("inactive");
+
+        clearViewer(stage);
+        drawEmPDB(stage, "/Output/orig_mol.pdb");
+      } else {
+        //document.getElementById("obresults").innerHTML = "<pre>Failed to calculate MOFid components</pre>";
+        //document.getElementById("resultsdownload").classList.add("inactive");
+        document.getElementById("viewportwrapper").classList.add("inactive");
+      }
+    };
+    cifreader.readAsText(ciffile);
+  }
+
+  getTopology = function(path_to_cgd) {
+    // Extract topology from a generated CGD simplified net
+    const raw_rcsr_extract = FS.readFile("/RCSRnets.arc", {'encoding': 'utf8'});
+    const raw_cgd = FS.readFile(path_to_cgd, {'encoding': 'utf8'});
+    if (!raw_cgd.includes('NODE')) {
+      return "ERROR";  // not a MOF: no node building blocks found!
+    } else {
+      return webGavrog.getRawRCSRTopology(raw_cgd, raw_rcsr_extract);
+    }
+  }
+
+  // clearDropdown = function(select_id) {
+  //   // Clear out the listed options from a <select> tag
+  //   var select_tag = document.getElementById(select_id);
+  //   while (select_tag.firstChild) {
+  //     select_tag.removeChild(select_tag.firstChild);
+  //   }
+  // }
+
+  updateFileLists = function() {
+    //clearDropdown("cifdownload");
+    var folder_name = "";//getInputValue("folderdownload");
+    var selected_view_index = "none";//document.getElementById("view_type").selectedIndex;
+
+    var filelist;
+    var view_value_list = ["original", "nodes_and_linkers", "simplified_net"];
+    var view_name_list = ["Original MOF", "Nodes + Linkers", "Simplified topology"];
+    if (folder_name == "") {  // original base directory
+      filelist = ["orig_mol.cif", "orig_mol.pdb"];
+      // Only keeping the original MOF in the viewer types:
+      view_value_list = [view_value_list[0]];
+      view_name_list = [view_name_list[0]];
+      selected_view_index = "0";
+    } else {
+      filelist = lsdir("/Output/" + folder_name);
+      // Removing the original MOF from the viewer types:
+      view_value_list.shift();
+      view_name_list.shift();
+    }
+    if (folder_name == "AllNode") {
+      // Separate linkers into branches + branch points for the AllNode algorithm
+      view_value_list[0] = "nodes_and_branches";
+    }
+    // filelist.forEach(function(file) {
+    //   var option = document.createElement("option");
+    //   option.text = file;
+    //   option.value = file;
+    //   document.getElementById("cifdownload").appendChild(option);
+    // });
+
+    //clearDropdown("view_type");
+    // for (var i=0; i<view_value_list.length; i++) {
+    //   var option = document.createElement("option");
+    //   option.text = view_name_list[i];
+    //   option.value = view_value_list[i];
+    //   document.getElementById("view_type").appendChild(option);
+    // }
+    // document.getElementById("view_type").selectedIndex = selected_view_index;
+  }
+
+  getInputValue = function(html_id) {
+    var input_tag = document.getElementById(html_id);
+    return input_tag.options[input_tag.selectedIndex].value;
+  }
+
+  updateAlgorithmSelection = function() {
+    updateFileLists();
+    updateAlgorithmView();
+  }
+
+  updateAlgorithmView = function() {
+    var view_name = "original"; //getInputValue("view_type");
+    var folder_name = ""; //getInputValue("folderdownload");
+    clearViewer(stage);
+    if (view_name == "original") {
+      drawEmPDB(stage, "/Output/orig_mol.pdb", "element");
+    } else if (view_name == "nodes_and_linkers" || view_name == "nodes_and_branches") {
+      drawEmPDB(stage, "/Output/" + folder_name + "/nodes.pdb", UniformColor(0xFF9155));
+      drawEmPDB(stage, "/Output/" + folder_name + "/node_bridges.pdb", UniformColor(0xFF9155));
+      if (view_name == "nodes_and_linkers") {
+        drawEmPDB(stage, "/Output/" + folder_name + "/linkers.pdb", UniformColor(0x2298FE));
+      } else {
+        drawEmPDB(stage, "/Output/" + folder_name + "/branches.pdb", UniformColor(0x2298FE));
+        drawEmPDB(stage, "/Output/" + folder_name + "/branch_points.pdb", UniformColor(0x2298FE));
+      }
+    } else if (view_name == "simplified_net") {
+      //drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", UniformColor(0x888888));
+      drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", "element");
+    } else {
+      throw "Unknown view name: " + view_name;
+    }
+  }
+
+  clearViewer = function(ngl_stage) {
+    ngl_stage.removeAllComponents();
+  }
+
+  addPDBtoViewer = function(ngl_stage, path_to_cif, color_scheme = "element") {
+    var component;
+    ngl_stage.loadFile(path_to_cif, {ext: "pdb"}).then( function( o ){
+      o.addRepresentation("ball+stick", {colorScheme: color_scheme});
+      o.addRepresentation( "unitcell" );
+      o.autoView();
+      /* See class documentation at http://nglviewer.org/ngl/api/class/src/stage/stage.js~Stage.html */
+      /* See also the general documentation at http://nglviewer.org/ngl/api/manual/ */
+    } );
+    return component;
+  }
+
+  drawEmPDB = function(ngl_stage, emscripten_path, color_scheme = "element") {
+    var cif_string = FS.readFile(emscripten_path, {'encoding': 'utf8'});
+    var temp_file = new Blob([cif_string], {type: 'chemical/x-cif'});
+    return addPDBtoViewer(ngl_stage, temp_file, color_scheme);
+  }
+
+  UniformColor = function(hex_color = 0x000000) {
+    return NGL.ColormakerRegistry.addScheme(function(params) {
+      this.atomColor = function(atom) {
+        return hex_color;
+      }
+    });
+  }
+
+  // handleDownload = function() {
+  //   var folder_input = document.getElementById("folderdownload");
+  //   var download_input = document.getElementById("cifdownload");
+  //   var folder_name = folder_input.options[folder_input.selectedIndex].value;
+  //   var filename = download_input.options[download_input.selectedIndex].value;
+  //   var filepath = "Output/" + folder_name + "/" + filename;  // Set in deconstructor.h:DEFAULT_OUTPUT_PATH
+
+  //   var contents = FS.readFile(filepath, {'encoding': 'utf8'});
+  //   var download_contents = "data:text/plain;base64," + btoa(contents);
+
+  //   // Open download dialog using a temporary hidden link
+  //   var fakelink = document.createElement("a");
+  //   fakelink.setAttribute("href", download_contents);
+  //   fakelink.setAttribute("download", filename);
+  //   fakelink.style.display = "none";
+  //   document.body.appendChild(fakelink);
+  //   fakelink.click();
+  //   document.body.removeChild(fakelink);
+  // }
+
+
+
+
+
+  //var statusElement = document.getElementById('status');
+  //var progressElement = document.getElementById('progress');
+  //var spinnerElement = document.getElementById('spinner');
+
+  var Module = {
+    preRun: [],
+    postRun: [], 
+    print: (function() {
+      var element = document.getElementById('output');
+      if (element) element.value = ''; // clear browser cache
+      return function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        // These replacements are necessary if you render to raw HTML
+        //text = text.replace(/&/g, "&amp;");
+        //text = text.replace(/</g, "&lt;");
+        //text = text.replace(/>/g, "&gt;");
+        //text = text.replace('\n', '<br>', 'g');
+        console.log(text);
+        if (element) {
+          element.value += text + "\n";
+          element.scrollTop = element.scrollHeight; // focus on bottom
+        }
+      };
+    })(),
+    printErr: function(text) {
+      if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+      if (0) { // XXX disabled for safety typeof dump == 'function') {
+        dump(text + '\n'); // fast, straight to the real console
+      } else {
+        console.error(text);
+      }
+    },
+    canvas: (function() {
+
+      // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+      // application robust, you may want to override this behavior before shipping!
+      // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+
+      return null;
+    })(),
+    setStatus: function(text) {
+      if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+      if (text === Module.setStatus.text) return;
+      var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+      var now = Date.now();
+      if (m && now - Date.now() < 30) return; // if this is a progress update, skip it if too soon
+      if (m) {
+        text = m[1];
+        //progressElement.value = parseInt(m[2])*100;
+        //progressElement.max = parseInt(m[4])*100;
+        //progressElement.hidden = false;
+        //spinnerElement.hidden = false;
+      } //else {
+        //progressElement.value = null;
+        //progressElement.max = null;
+        //progressElement.hidden = true;
+        //if (!text) spinnerElement.style.display = 'none';
+      //}
+      //statusElement.innerHTML = text;
+    },
+    totalDependencies: 0,
+    monitorRunDependencies: function(left) {
+      this.totalDependencies = Math.max(this.totalDependencies, left);
+      Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+    }
+  };
+  Module.setStatus('Downloading...');
+  window.onerror = function(event) {
+    // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+    Module.setStatus('Exception thrown, see JavaScript console');
+    //spinnerElement.style.display = 'none';
+    Module.setStatus = function(text) {
+      if (text) Module.printErr('[post-exception status] ' + text);
+    };
+  };
+
+  // end of section with a lot of copied code
 
 $(function() {
 
@@ -296,36 +692,13 @@ $(function() {
  'ru': {2: [1, 5], 3: [2, 6]},
  'rh': {2: [2, 4], 3: [1, 5]}};
 
-//   monodentate_ligs = {'pyr': 'pyridine',
-//  'carbonyl': 'carbonyl',
-//  'misc': 'methyl isocyanide',
-//  'water': 'water',
-//  'ammonia': 'ammonia',
-//  'isothiocyanate': 'isothiocyanate',
-//  'pisc': 'phenyl isocyanide',
-//  'chloride': 'chloride',
-//  'cyanide': 'cyanide',
-//  'thiocyanate': 'thiocyanate',
-//  'fluoride': 'fluoride',
-//  'phosphine': 'phosphine',
-//  'acetonitrile': 'acetonitrile'}
 
-  // Set up 3Dmol viewer
+  // Set up 3Dmol viewer  // TODO we won't need this once MOF visualizer is set up
   let element = $('#container-01');
   let config = { backgroundColor: 'white' };
   let viewer = $3Dmol.createViewer( element, config );
   data = {};
 
-  // // Function that repopulates the ligand dropdown
-  // ligand_elements = ['#ligand_ax1', '#ligand_ax2', '#ligand_eq'];
-  // for(var lig_idx=0; lig_idx<ligand_elements.length; lig_idx++) {
-  //     curr_element_name = ligand_elements[lig_idx];
-  //     lig_dropdown = $(curr_element_name).empty();
-  //     for(var i=0; i<Object.keys(monodentate_ligs).length; i++) {
-  //         var option = $('<option></option>').attr("value", Object.keys(monodentate_ligs)[i]).text(Object.values(monodentate_ligs)[i]);
-  //         lig_dropdown.append(option);
-  //     };
-  // };
 
   // Populate the spin dropdown
   updateSpins = function() {
@@ -417,18 +790,12 @@ $(function() {
           return;      
       }
       
+
+      handleInput(); // handles visualization
+
       let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
 
-      // myFile.text() is a promise
-      myFile.text().then(function(result){
-        // result is the text of the inputted file
-        console.log('Printing the JSON of the text of the cif file, and the text of the cif file.')
-        console.log(JSON.stringify(result)); // checking to see what we have
-        console.log(result); 
-      })
-
-
-      viewer.clear();
+      viewer.clear(); // Gianmarco Terrones, will not be needed later
       $('#upload_status').text('File uploaded: ' + myFile.name);
       $('#loading').text('');
       $('#chart').text('');
@@ -511,8 +878,6 @@ $(function() {
   });
 
 
-  // Getting the imolecule viewer ready
-  imolecule.create('.molecule');
   
   // Load example MOF
   $('#load').click(function() {
@@ -531,9 +896,9 @@ $(function() {
 
           // imolecule.create(viewer) // <!-- Gianmarco Terrones addition -->
           // imolecule.draw(convert(response, 'xyz', 'json')); // <!-- Gianmarco Terrones addition -->  convert is from imolecule
-          imolecule.clear();
-          console.log('drawing');
-          imolecule.draw(response);
+          //imolecule.clear();
+          //console.log('drawing');
+          //imolecule.draw(response);
 
                 /*$.getJSON(response, function (mof) {
                     imolecule.draw(mof);
@@ -617,3 +982,6 @@ $('#plot_pca').click(function() {
 });
 
 </script>
+
+<script async type="text/javascript" src="libraries/sbu.js"></script>
+

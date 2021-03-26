@@ -175,14 +175,14 @@ def serve_library_files(path):
     # Serves libraries
     return flask.send_from_directory('libraries', path)
 
-@app.route('/get_example_mol')
-def serve_example_mol():
-    #print('testing testing') # debugging
-    #subprocess.run('pwd') # debugging
-    #subprocess.run('ls') # debugging
+# @app.route('/get_example_mol')
+# def serve_example_mol():
+#     #print('testing testing') # debugging
+#     #subprocess.run('pwd') # debugging
+#     #subprocess.run('ls') # debugging
 
-    # TODO
-    return 'example placeholder'
+#     # TODO
+#     return 'example placeholder'
 
 
     

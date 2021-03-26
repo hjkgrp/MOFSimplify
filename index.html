@@ -280,6 +280,9 @@ TODO list:
  <input id="fileinput" type="file" name="fileinput" style="display:none"/>  <!-- Gianmarco Terrones addition -->
 
 
+<!-- For example MOF file -->
+<p id="exampleholder"> </p>
+
 </body>
 
 
@@ -426,7 +429,14 @@ TODO list:
   }
 
   handleInput = function() {
-    var ciffile = document.getElementById("fileinput").files[0];
+    if (! document.getElementById("fileinput").files[0] === undefined) {
+      var ciffile = document.getElementById("fileinput").files[0];
+    }
+    else {
+      var ciffile = document.getElementById("exampleholder").value;
+    }
+
+    
     //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
     var cifreader = new FileReader();
     cifreader.onload = function(event) {
@@ -784,22 +794,29 @@ $(function() {
       $('#thermal_stability_prediction').text('');
       
       // check if uploaded file is a .cif
-      if (! isCif(this.value)) {
+      if (! isCif(this.value)) { // if the uploaded file is not a cif
           this.value = ""; // clear the non-cif file
           $('#upload_status').text(''); // now nothing is uploaded
+          document.getElementById('exampleholder').value = ''; // clears example cif as well
           alert("Must be a cif file.");
           return;      
       }
 
       let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
       $('#upload_status').text('File uploaded: ' + myFile.name);
+      console.log('check C');
+      console.log(myFile);
       clearViewer(stage);
 
   });
 
   $("#visualize").on('click', function() {
       let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-      if (myFile === undefined) {
+      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+      console.log('check G');
+      console.log(myFile);
+      console.log(myFile2);
+      if (myFile === undefined && myFile2 === undefined) {
         alert("Must upload a cif file first.");
         return;
       }
@@ -900,11 +917,38 @@ $(function() {
     $('#thermal_stability_prediction').text('');
     $('#upload_status').text('File uploaded: Example MOF cif file');
 
-    fetch('/mof examples/LIWVIY_clean.cif').then(function(response){
-      console.log('check F');
-      console.log(response);
-      $('#fileinput').value = response;
-    })
+    console.log('check F0')
+    console.log(document.getElementById('exampleholder').value);
+
+    fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => response.blob()) // host the example cif files with the terminal command: node node.js
+    .then(blob => {
+      var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()});
+      document.getElementById('fileinput').files[0] = myFile;
+      console.log('check F')
+      console.log(myFile);
+      console.log('check F2')
+      console.log(document.getElementById('fileinput').files[0])
+
+
+      console.log('check F3')
+      let dummyVar = document.getElementById('fileinput').files[0]; // the uploaded file
+      console.log(dummyVar === undefined)
+      if (dummyVar === undefined) {
+        alert("file is undefined.");
+        return;
+      }
+
+      console.log('check F4')
+      document.getElementById('exampleholder').value = myFile;
+      console.log(document.getElementById('exampleholder').value);
+
+    }); // function(response){
+
+
+
+      // $('#fileinput').value = response;
+      // console.log(document.getElementById('fileinput').files[0]);
+    //})
 
       // $.get("/get_example_mol", dataType='text').done(
       //   function(response) {
@@ -923,12 +967,16 @@ $(function() {
       //     // $('#hfx').val('0.20')
       //     unlockMetrics()
       // });
+
+
   });
 
   // // Reset zoom level
   // $('#reset').click(function() {
   //   viewer.zoomTo();
   // })
+
+
 
   // Make a neural network prediction (the display text is defined in app.py)
   $('#predict').click(function() {

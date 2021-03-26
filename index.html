@@ -900,6 +900,12 @@ $(function() {
     $('#thermal_stability_prediction').text('');
     $('#upload_status').text('File uploaded: Example MOF cif file');
 
+    fetch('/mof examples/LIWVIY_clean.cif').then(function(response){
+      console.log('check F');
+      console.log(response);
+      $('#fileinput').value = response;
+    })
+
       // $.get("/get_example_mol", dataType='text').done(
       //   function(response) {
 

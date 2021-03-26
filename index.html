@@ -1,41 +1,30 @@
-<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. A lot of the current code still has metal complex stuff, which will need to be removed/tweaked later.
+<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. A lot of the current code still has metal complex stuff, which will need to be removed/tweaked later. Visualization now can be done directly from an uploaded cif file (I get it to work by using Safari and using Develop -> Disable Cross-Origin Restrictions). An example MOF is prepared by default, using fetch and a node hosting of local files. 
 
 
 TODO list:
-  visualize .cifs, without the .xyz workaround I have temporarily used
   featurize MOFS with RACs and Zeo++ to make predictions, and display this predictions to the user
-
+    Sessions? In order to have write permissions for the many folders that will be created
 -->
 
 
-<!-- Import 3Dmol, jQuery, and Bootstrap libaries  TODO update this comment--> 
+<!-- Import NGL, webGavrog, and Bootstrap libaries--> 
 <script type="text/javascript" src="libraries/ngl.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/runtime.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/vendors.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/main.js"></script>
 <script src="libraries/3Dmol-min.js"></script>
 <script src="libraries/jquery-3.4.1.min.js"></script>
-<!-- <script src="libraries/booststrap.min.js"></script> -->
-<!-- <script src="https://cdn.bokeh.org/bokeh/release/bokeh-1.3.4.min.js"></script>
- --><!-- <script type="text/javascript" src="ngl.js"></script> Gianmarco Terrones addition, from sbu.html -->
 
 <!-- Import CSS -->
 <link rel="stylesheet" href="libraries/bootstrap.min.css">
 <link rel="stylesheet" href="libraries/bootstrap_custom.min.css">
 
 
-<!-- Set up the size of the 3D viewer (.mol-container) and other styles -->
 <!-- Custom CSS code is placed within the <style> tag: -->
 <style>
 .btn {
   margin-top: 3px;
 }
-
-/*.mol-container {  Gianmarco Terrones: will not be needed later 
-  width: 100%;
-  height: 400px;
-  position: relative;
-}*/
 
 .form-control {
   margin-bottom:0.1cm;
@@ -114,7 +103,7 @@ TODO list:
       </div>
 
   <div class='row'>
-    <!-- Create a column containing 3DMol viewer and buttons  TODO edit comment-->
+    <!-- Create a column containing MOF viewer and buttons -->
     <div class='col-lg-6'>
 <!--         <div id="container-01" class="mol-container" style='border-style:solid;border-width:1px;'></div> -->
 

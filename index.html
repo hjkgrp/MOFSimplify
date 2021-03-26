@@ -418,11 +418,11 @@ TODO list:
   }
 
   handleInput = function() {
-    if (! document.getElementById("fileinput").files[0] === undefined) {
-      var ciffile = document.getElementById("fileinput").files[0];
+    if (document.getElementById("fileinput").files[0] == null) {
+      var ciffile = document.getElementById("exampleholder").value;
     }
     else {
-      var ciffile = document.getElementById("exampleholder").value;
+      var ciffile = document.getElementById("fileinput").files[0];
     }
 
     
@@ -515,38 +515,38 @@ TODO list:
     // document.getElementById("view_type").selectedIndex = selected_view_index;
   }
 
-  getInputValue = function(html_id) {
-    var input_tag = document.getElementById(html_id);
-    return input_tag.options[input_tag.selectedIndex].value;
-  }
+  // getInputValue = function(html_id) {
+  //   var input_tag = document.getElementById(html_id);
+  //   return input_tag.options[input_tag.selectedIndex].value;
+  // }
 
-  updateAlgorithmSelection = function() {
-    updateFileLists();
-    updateAlgorithmView();
-  }
+  // updateAlgorithmSelection = function() {
+  //   updateFileLists();
+  //   updateAlgorithmView();
+  // }
 
-  updateAlgorithmView = function() {
-    var view_name = "original"; //getInputValue("view_type");
-    var folder_name = ""; //getInputValue("folderdownload");
-    clearViewer(stage);
-    if (view_name == "original") {
-      drawEmPDB(stage, "/Output/orig_mol.pdb", "element");
-    } else if (view_name == "nodes_and_linkers" || view_name == "nodes_and_branches") {
-      drawEmPDB(stage, "/Output/" + folder_name + "/nodes.pdb", UniformColor(0xFF9155));
-      drawEmPDB(stage, "/Output/" + folder_name + "/node_bridges.pdb", UniformColor(0xFF9155));
-      if (view_name == "nodes_and_linkers") {
-        drawEmPDB(stage, "/Output/" + folder_name + "/linkers.pdb", UniformColor(0x2298FE));
-      } else {
-        drawEmPDB(stage, "/Output/" + folder_name + "/branches.pdb", UniformColor(0x2298FE));
-        drawEmPDB(stage, "/Output/" + folder_name + "/branch_points.pdb", UniformColor(0x2298FE));
-      }
-    } else if (view_name == "simplified_net") {
-      //drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", UniformColor(0x888888));
-      drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", "element");
-    } else {
-      throw "Unknown view name: " + view_name;
-    }
-  }
+  // updateAlgorithmView = function() {
+  //   var view_name = "original"; //getInputValue("view_type");
+  //   var folder_name = ""; //getInputValue("folderdownload");
+  //   clearViewer(stage);
+  //   if (view_name == "original") {
+  //     drawEmPDB(stage, "/Output/orig_mol.pdb", "element");
+  //   } else if (view_name == "nodes_and_linkers" || view_name == "nodes_and_branches") {
+  //     drawEmPDB(stage, "/Output/" + folder_name + "/nodes.pdb", UniformColor(0xFF9155));
+  //     drawEmPDB(stage, "/Output/" + folder_name + "/node_bridges.pdb", UniformColor(0xFF9155));
+  //     if (view_name == "nodes_and_linkers") {
+  //       drawEmPDB(stage, "/Output/" + folder_name + "/linkers.pdb", UniformColor(0x2298FE));
+  //     } else {
+  //       drawEmPDB(stage, "/Output/" + folder_name + "/branches.pdb", UniformColor(0x2298FE));
+  //       drawEmPDB(stage, "/Output/" + folder_name + "/branch_points.pdb", UniformColor(0x2298FE));
+  //     }
+  //   } else if (view_name == "simplified_net") {
+  //     //drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", UniformColor(0x888888));
+  //     drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", "element");
+  //   } else {
+  //     throw "Unknown view name: " + view_name;
+  //   }
+  // }
 
   clearViewer = function(ngl_stage) {
     ngl_stage.removeAllComponents();
@@ -680,352 +680,357 @@ TODO list:
 
   // end of section with a lot of copied code
 
-$(function() {
 
-  // Define global variables
-  metal_spin_dict = {'cr': {2: [1, 5], 3: [2, 4]},
- 'mn': {2: [2, 6], 3: [1, 5]},
- 'fe': {2: [1, 5], 3: [2, 6]},
- 'co': {2: [2, 4], 3: [1, 5]},
- 'mo': {2: [1, 5], 3: [2, 4]},
- 'tc': {2: [2, 6], 3: [1, 5]},
- 'ru': {2: [1, 5], 3: [2, 6]},
- 'rh': {2: [2, 4], 3: [1, 5]}};
-
-
-  // Set up 3Dmol viewer  // TODO we won't need this once MOF visualizer is set up
-  let element = $('#container-01');
-  let config = { backgroundColor: 'white' };
-  let viewer = $3Dmol.createViewer( element, config );
-  data = {};
-
-
-  // Populate the spin dropdown
-  updateSpins = function() {
-    valid_spins = metal_spin_dict[$('#metal').val()][$('#ox').val()];
-    spin_dropdown = $("#spin").empty()
-    for(var i=0; i<valid_spins.length; i++) {
-        var option = $('<option></option>').attr("value", valid_spins[i].toString()).text(valid_spins[i]);
-        spin_dropdown.append(option);
-    };
-  };
-
-  // Populate the oxidation state dropdown (triggers spin dropdown repopulation)
-  updateOx = function() {
-    valid_oxs = Object.keys(metal_spin_dict['cr'])
-    ox_strs = {2: 'II', 3: 'III'}
-    ox_dropdown = $("#ox").empty()
-    for(var i=0; i<valid_oxs.length; i++) {
-        var option = $('<option></option>').attr("value", valid_oxs[i].toString()).text(ox_strs[valid_oxs[i]]);
-        ox_dropdown.append(option);
-    };
-    updateSpins()
-  };
-
-  // Prevents user from downloading molecule and making NN predictions
-  lockMetrics = function() {
-    $('#download').prop('disabled', true)
-    $('#predict_s').prop('disabled', true)
-    $('#predict_t').prop('disabled', true)
-    $('#plot').prop('disabled', true)
-    $('#plot_pca').prop('disabled', true)
-    viewer.clear();
-    $('#loading').text('');
-    $('#chart').text('');
-  }
-
-  // Re-allows user to download molecule or make NN predictions
-  unlockMetrics = function() {
-    $('#download').prop('disabled', false)
-    $('#predict_s').prop('disabled', false)
-    $('#predict_t').prop('disabled', false)
-  }
-
-  // Locks the plotting ability
-  lockPlot = function() {
-    $('#plot').prop('disabled', true)
-    $('#plot_pca').prop('disabled', true)
-  }
-
-  // Unlocks the plotting ability
-  unlockPlot = function() {
-    $('#plot').prop('disabled', false)
-    $('#plot_pca').prop('disabled', false)
-  }
-  // Set callbacks
-  $('#metal').change(updateOx);
-  $('#ox').change(updateSpins);
-  $('.locksMetrics').change(lockMetrics);
-
-  // Upload MOF cif file  <!-- Gianmarco Terrones addition -->
   $(function() {
-    $('#upload').on('click', function() { // button triggers upload
-      $('#fileinput').trigger('click'); // OS file selection
-    });
-  });
+
+    // Define global variables
+    metal_spin_dict = {'cr': {2: [1, 5], 3: [2, 4]},
+   'mn': {2: [2, 6], 3: [1, 5]},
+   'fe': {2: [1, 5], 3: [2, 6]},
+   'co': {2: [2, 4], 3: [1, 5]},
+   'mo': {2: [1, 5], 3: [2, 4]},
+   'tc': {2: [2, 6], 3: [1, 5]},
+   'ru': {2: [1, 5], 3: [2, 6]},
+   'rh': {2: [2, 4], 3: [1, 5]}};
 
 
-  // Used for ensuring that only .cif files are uploaded  <!-- Gianmarco Terrones addition -->
-  function getExtension(filename) {
-    var parts = filename.split('.');
-    return parts[parts.length - 1];
-  }
-
-  // Used for ensuring that only .cif files are uploaded   <!-- Gianmarco Terrones addition -->
-  function isCif(filename) {
-    var ext = getExtension(filename);
-    return ext == 'cif';
-  }
-
-  $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
-      // clearing previous predictions
-      $('#solvent_stability_prediction').text('');
-      $('#thermal_stability_prediction').text('');
-      
-      // check if uploaded file is a .cif
-      if (! isCif(this.value)) { // if the uploaded file is not a cif
-          this.value = ""; // clear the non-cif file
-          $('#upload_status').text(''); // now nothing is uploaded
-          document.getElementById('exampleholder').value = ''; // clears example cif as well
-          alert("Must be a cif file.");
-          return;      
-      }
-
-      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-      $('#upload_status').text('File uploaded: ' + myFile.name);
-      console.log('check C');
-      console.log(myFile);
-      clearViewer(stage);
-
-  });
-
-  $("#visualize").on('click', function() {
-      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
-      console.log('check G');
-      console.log(myFile);
-      console.log(myFile2);
-      if (myFile === undefined && myFile2 === undefined) {
-        alert("Must upload a cif file first.");
-        return;
-      }
-
-      alert('Visualization loading, may take around 30 seconds...')
+    // Set up 3Dmol viewer  // TODO we won't need this once MOF visualizer is set up
+    let element = $('#container-01');
+    let config = { backgroundColor: 'white' };
+    let viewer = $3Dmol.createViewer( element, config );
+    data = {};
 
 
-      document.getElementById("viewportnote").innerHTML = "Loading visualization...";
+    // Populate the spin dropdown
+    updateSpins = function() {
+      valid_spins = metal_spin_dict[$('#metal').val()][$('#ox').val()];
+      spin_dropdown = $("#spin").empty()
+      for(var i=0; i<valid_spins.length; i++) {
+          var option = $('<option></option>').attr("value", valid_spins[i].toString()).text(valid_spins[i]);
+          spin_dropdown.append(option);
+      };
+    };
 
-      handleInput(); // handles visualization
+    // Populate the oxidation state dropdown (triggers spin dropdown repopulation)
+    updateOx = function() {
+      valid_oxs = Object.keys(metal_spin_dict['cr'])
+      ox_strs = {2: 'II', 3: 'III'}
+      ox_dropdown = $("#ox").empty()
+      for(var i=0; i<valid_oxs.length; i++) {
+          var option = $('<option></option>').attr("value", valid_oxs[i].toString()).text(ox_strs[valid_oxs[i]]);
+          ox_dropdown.append(option);
+      };
+      updateSpins()
+    };
 
-
+    // Prevents user from downloading molecule and making NN predictions
+    lockMetrics = function() {
+      $('#download').prop('disabled', true)
+      $('#predict_s').prop('disabled', true)
+      $('#predict_t').prop('disabled', true)
+      $('#plot').prop('disabled', true)
+      $('#plot_pca').prop('disabled', true)
+      viewer.clear();
       $('#loading').text('');
       $('#chart').text('');
-  })
-
-  // Generate solvent removal stability prediction
-  $('#predict_s').click(function() {  // <!-- Gianmarco Terrones addition -->
-    // check if a cif is uploaded
-    let myFile = document.getElementById('fileinput').files[0];
-
-    if (myFile==undefined) {
-      alert("Must upload a cif file first.");
-      return;  
     }
 
-    // myFile.text() is a promise
-    myFile.text().then(function(result){
-      // result is the text of the loaded .cif file
-
-      // console.log(JSON.stringify(result)); // debugging
-
-      $.post("/predict_solvent_stability", JSON.stringify(result)).done(
-          function(response) {
-                // TODO Implement an actual prediction on the backend
-                $('#solvent_stability_prediction').text(response); 
-          });
-    })
-  });
-
-  // Generate thermal stability prediction
-  $('#predict_t').click(function() {  // <!-- Gianmarco Terrones addition -->
-    // check if a cif is uploaded
-    let myFile = document.getElementById('fileinput').files[0];
-
-    if (myFile==undefined) {
-      alert("Must upload a cif file first.");
-      return;  
+    // Re-allows user to download molecule or make NN predictions
+    unlockMetrics = function() {
+      $('#download').prop('disabled', false)
+      $('#predict_s').prop('disabled', false)
+      $('#predict_t').prop('disabled', false)
     }
 
-    // myFile.text() is a promise
-    myFile.text().then(function(result){
-      // result is the text of the loaded .cif file
-      $.post("/predict_thermal_stability", JSON.stringify(result)).done(
-          function(response) {
-                // TODO Implement an actual prediction on the backend
-                $('#thermal_stability_prediction').text(response); 
-          });
+    // Locks the plotting ability
+    lockPlot = function() {
+      $('#plot').prop('disabled', true)
+      $('#plot_pca').prop('disabled', true)
+    }
+
+    // Unlocks the plotting ability
+    unlockPlot = function() {
+      $('#plot').prop('disabled', false)
+      $('#plot_pca').prop('disabled', false)
+    }
+    // Set callbacks
+    $('#metal').change(updateOx);
+    $('#ox').change(updateSpins);
+    $('.locksMetrics').change(lockMetrics);
+
+    // Upload MOF cif file  <!-- Gianmarco Terrones addition -->
+    $(function() {
+      $('#upload').on('click', function() { // button triggers upload
+        $('#fileinput').trigger('click'); // OS file selection
+      });
+    });
+
+
+    // Used for ensuring that only .cif files are uploaded  <!-- Gianmarco Terrones addition -->
+    function getExtension(filename) {
+      var parts = filename.split('.');
+      return parts[parts.length - 1];
+    }
+
+    // Used for ensuring that only .cif files are uploaded   <!-- Gianmarco Terrones addition -->
+    function isCif(filename) {
+      var ext = getExtension(filename);
+      return ext == 'cif';
+    }
+
+    $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
+        // clearing previous predictions
+        $('#solvent_stability_prediction').text('');
+        $('#thermal_stability_prediction').text('');
+
+        $('#upload_status').text(''); // now nothing is uploaded
+        document.getElementById('exampleholder').value = null; // clears example cif
+
+        // check if uploaded file is a .cif
+        if (! isCif(this.value)) { // if the uploaded file is not a cif
+            this.value = null; // clear the non-cif file
+            alert("Must be a cif file.");
+            return;      
+        }
+
+        let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+        $('#upload_status').text('File uploaded: ' + myFile.name);
+        console.log('check C');
+        console.log(myFile);
+        clearViewer(stage);
+
+    });
+
+    $("#visualize").on('click', function() {
+        let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+        let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+        console.log('check G');
+        console.log(myFile);
+        console.log(myFile2);
+        if (myFile == null && myFile2 == null) {
+          alert("Must upload a cif file first.");
+          return;
+        }
+
+        alert('Visualization loading, may take around 30 seconds...')
+
+
+        document.getElementById("viewportnote").innerHTML = "Loading visualization...";
+
+        handleInput(); // handles visualization
+
+
+        $('#loading').text('');
+        $('#chart').text('');
     })
-  });
 
+    // Generate solvent removal stability prediction
+    $('#predict_s').click(function() {  // <!-- Gianmarco Terrones addition -->
+      // check if a cif is uploaded
+      let myFile = document.getElementById('fileinput').files[0];
 
-  // // Generate molecule
-  // $('#generate').click(function() {
-  //   viewer.clear();
-  //   $('#loading').text('');
-  //   $('#chart').text('');
-  //   $('#generate').prop('disabled', true);
-  //   data.ox = $('#ox').val()
-  //   data.hfx = $('#hfx').val()
-  //   data.metal = $('#metal').val()
-  //   data.ax1 = $('#ligand_ax1').val()
-  //   data.ax2 = $('#ligand_ax2').val()
-  //   data.eq = $('#ligand_eq').val()
-  //   data.spin = $('#spin').val()
-  //   $.post("/generate", JSON.stringify(data)).done(
-  //       function(response) {
-  //             data.geometry = response.geometry;
-  //             viewer.clear();
-  //             viewer.addModel(data.geometry, "xyz");
-  //             viewer.setStyle({}, {stick:{radius:0.25}});
-  //             viewer.zoomTo();
-  //             viewer.render();
-  //             unlockMetrics();
-  //             // For testing
-  //             // unlockPlot();
-  //             $("#loading").html(response.message)
-  //             $('#generate').prop('disabled', false);
-  //       });
-  // });
-
-
-  
-  // Load example MOF
-  $('#load').click(function() {
-    $('#loading').text('');
-    $('#solvent_stability_prediction').text('');
-    $('#thermal_stability_prediction').text('');
-    $('#upload_status').text('File uploaded: Example MOF cif file');
-
-    console.log('check F0')
-    console.log(document.getElementById('exampleholder').value);
-
-    fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => response.blob()) // host the example cif files with the terminal command: node node.js
-    .then(blob => {
-      var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()});
-      document.getElementById('fileinput').files[0] = myFile;
-      console.log('check F')
-      console.log(myFile);
-      console.log('check F2')
-      console.log(document.getElementById('fileinput').files[0])
-
-
-      console.log('check F3')
-      let dummyVar = document.getElementById('fileinput').files[0]; // the uploaded file
-      console.log(dummyVar === undefined)
-      if (dummyVar === undefined) {
-        alert("file is undefined.");
-        return;
+      if (myFile==undefined) {
+        alert("Must upload a cif file first.");
+        return;  
       }
 
-      console.log('check F4')
-      document.getElementById('exampleholder').value = myFile;
+      // myFile.text() is a promise
+      myFile.text().then(function(result){
+        // result is the text of the loaded .cif file
+
+        // console.log(JSON.stringify(result)); // debugging
+
+        $.post("/predict_solvent_stability", JSON.stringify(result)).done(
+            function(response) {
+                  // TODO Implement an actual prediction on the backend
+                  $('#solvent_stability_prediction').text(response); 
+            });
+      })
+    });
+
+    // Generate thermal stability prediction
+    $('#predict_t').click(function() {  // <!-- Gianmarco Terrones addition -->
+      // check if a cif is uploaded
+      let myFile = document.getElementById('fileinput').files[0];
+
+      if (myFile==undefined) {
+        alert("Must upload a cif file first.");
+        return;  
+      }
+
+      // myFile.text() is a promise
+      myFile.text().then(function(result){
+        // result is the text of the loaded .cif file
+        $.post("/predict_thermal_stability", JSON.stringify(result)).done(
+            function(response) {
+                  // TODO Implement an actual prediction on the backend
+                  $('#thermal_stability_prediction').text(response); 
+            });
+      })
+    });
+
+
+    // // Generate molecule
+    // $('#generate').click(function() {
+    //   viewer.clear();
+    //   $('#loading').text('');
+    //   $('#chart').text('');
+    //   $('#generate').prop('disabled', true);
+    //   data.ox = $('#ox').val()
+    //   data.hfx = $('#hfx').val()
+    //   data.metal = $('#metal').val()
+    //   data.ax1 = $('#ligand_ax1').val()
+    //   data.ax2 = $('#ligand_ax2').val()
+    //   data.eq = $('#ligand_eq').val()
+    //   data.spin = $('#spin').val()
+    //   $.post("/generate", JSON.stringify(data)).done(
+    //       function(response) {
+    //             data.geometry = response.geometry;
+    //             viewer.clear();
+    //             viewer.addModel(data.geometry, "xyz");
+    //             viewer.setStyle({}, {stick:{radius:0.25}});
+    //             viewer.zoomTo();
+    //             viewer.render();
+    //             unlockMetrics();
+    //             // For testing
+    //             // unlockPlot();
+    //             $("#loading").html(response.message)
+    //             $('#generate').prop('disabled', false);
+    //       });
+    // });
+
+
+      // Load example MOF
+    $('#load').click(function() {
+      $('#loading').text('');
+      $('#solvent_stability_prediction').text('');
+      $('#thermal_stability_prediction').text('');
+      $('#upload_status').text('File uploaded: Example MOF cif file');
+      document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
+
+      console.log('check F0')
       console.log(document.getElementById('exampleholder').value);
 
-    }); // function(response){
+      fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => response.blob()) // host the example cif files with the terminal command: node node.js
+      .then(blob => {
+        var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()});
+        // document.getElementById('fileinput').files[0] = myFile;
+        // console.log('check F')
+        // console.log(myFile);
+        // console.log('check F2')
+        // console.log(document.getElementById('fileinput').files[0])
+
+
+        // console.log('check F3')
+        // let dummyVar = document.getElementById('fileinput').files[0]; // the uploaded file
+        // console.log(dummyVar === undefined)
+        // if (dummyVar === undefined) {
+        //   alert("file is undefined.");
+        //   return;
+        // }
+
+        console.log('check F4')
+        document.getElementById('exampleholder').value = myFile;
+        console.log(document.getElementById('exampleholder').value);
+
+        clearViewer(stage);
+
+      }); // function(response){
 
 
 
-      // $('#fileinput').value = response;
-      // console.log(document.getElementById('fileinput').files[0]);
-    //})
+        // $('#fileinput').value = response;
+        // console.log(document.getElementById('fileinput').files[0]);
+      //})
 
-      // $.get("/get_example_mol", dataType='text').done(
-      //   function(response) {
+        // $.get("/get_example_mol", dataType='text').done(
+        //   function(response) {
 
+            
+        //     console.log('check')  //debugging
+        //     console.log(response)   //debugging
           
-      //     console.log('check')  //debugging
-      //     console.log(response)   //debugging
-        
-      //     // $('#metal').val('fe')
-      //     // $('#ox').val('2')
-      //     // updateSpins()
-      //     // $('#ligand_ax1').val('water')
-      //     // $('#ligand_ax2').val('water')
-      //     // $('#ligand_eq').val('water')
-      //     // $('#spin').val('1')
-      //     // $('#hfx').val('0.20')
-      //     unlockMetrics()
-      // });
+        //     // $('#metal').val('fe')
+        //     // $('#ox').val('2')
+        //     // updateSpins()
+        //     // $('#ligand_ax1').val('water')
+        //     // $('#ligand_ax2').val('water')
+        //     // $('#ligand_eq').val('water')
+        //     // $('#spin').val('1')
+        //     // $('#hfx').val('0.20')
+        //     unlockMetrics()
+        // });
 
 
-  });
+    });
+    
 
-  // // Reset zoom level
-  // $('#reset').click(function() {
-  //   viewer.zoomTo();
-  // })
+    // // Reset zoom level
+    // $('#reset').click(function() {
+    //   viewer.zoomTo();
+    // })
 
 
 
-  // Make a neural network prediction (the display text is defined in app.py)
-  $('#predict').click(function() {
-    data.ox = $('#ox').val()
-    data.hfx = $('#hfx').val()
-    data.metal = $('#metal').val()
-    data.ax1 = $('#ligand').val()
-    data.ax2 = $('#ligand').val()
-    data.eq = $('#ligand').val()
-    data.spin = $('#spin').val()
-    $('#loading').html('loading...');
-    $.post("/nn_predict", JSON.stringify(data)).done(function(response){
-      data.sseplot = response.result; // Set the sseplot value used for plotting
-      if (data.sseplot != 'Error') {
-        unlockPlot();
+    // Make a neural network prediction (the display text is defined in app.py)
+    $('#predict').click(function() {
+      data.ox = $('#ox').val()
+      data.hfx = $('#hfx').val()
+      data.metal = $('#metal').val()
+      data.ax1 = $('#ligand').val()
+      data.ax2 = $('#ligand').val()
+      data.eq = $('#ligand').val()
+      data.spin = $('#spin').val()
+      $('#loading').html('loading...');
+      $.post("/nn_predict", JSON.stringify(data)).done(function(response){
+        data.sseplot = response.result; // Set the sseplot value used for plotting
+        if (data.sseplot != 'Error') {
+          unlockPlot();
+        }
+        $("#loading").html(response.resulttext);
+        document.getElementById('loading').scrollIntoView();
+        });
+    });
+
+    // Define the behavior of the download button
+    $('#download').click(function() {
+      function download(filename, text) {
+          var element = document.createElement('a');
+          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+          element.setAttribute('download', filename);
+
+          element.style.display = 'none';
+          document.body.appendChild(element);
+
+          element.click();
+
+          document.body.removeChild(element);
       }
-      $("#loading").html(response.resulttext);
-      document.getElementById('loading').scrollIntoView();
-      });
+      download('mol.xyz', data.geometry);
+    });
+
+    // Start up page by virtually clicking the "Load example MOF" button
+    $('#load').click();
   });
 
-  // Define the behavior of the download button
-  $('#download').click(function() {
-    function download(filename, text) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
 
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-    download('mol.xyz', data.geometry);
+  $('#plot').click(function() {
+    // For testing.
+    // data.sseplot = -15 
+    $.post("/plot", JSON.stringify(data)).done(function(response) { 
+      $('#chart').html(response)
+    })
   });
 
-  // Start up page by virtually clicking the "Load example MOF" button
-  $('#load').click();
-});
-
-
-$('#plot').click(function() {
-  // For testing.
-  // data.sseplot = -15 
-  $.post("/plot", JSON.stringify(data)).done(function(response) { 
-    $('#chart').html(response)
-  })
-});
-
-$('#plot_pca').click(function() {
-  // For testing
-  // data.ox = -2
-  // data.hfx = 0.2
-  // data.sseplot = -15
-  $.post("/plotpca", JSON.stringify(data)).done(function(response) { 
-    $('#chart').html(response)
-  })
-});
+  $('#plot_pca').click(function() {
+    // For testing
+    // data.ox = -2
+    // data.hfx = 0.2
+    // data.sseplot = -15
+    $.post("/plotpca", JSON.stringify(data)).done(function(response) { 
+      $('#chart').html(response)
+    })
+  });
 
 </script>
 

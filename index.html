@@ -31,11 +31,11 @@ TODO list:
   margin-top: 3px;
 }
 
-.mol-container { /* Gianmarco Terrones: will not be needed later */
+/*.mol-container {  Gianmarco Terrones: will not be needed later 
   width: 100%;
   height: 400px;
   position: relative;
-}
+}*/
 
 .form-control {
   margin-bottom:0.1cm;
@@ -114,12 +114,17 @@ TODO list:
       </div>
 
   <div class='row'>
-    <!-- Create a column containing 3DMol viewer and buttons -->
+    <!-- Create a column containing 3DMol viewer and buttons  TODO edit comment-->
     <div class='col-lg-6'>
-        <div id="container-01" class="mol-container" style='border-style:solid;border-width:1px;'></div>
+<!--         <div id="container-01" class="mol-container" style='border-style:solid;border-width:1px;'></div> -->
+
+        <div id="viewportwrapper" style="width:420px;border-style:solid;border-width:1px;box-sizing:border-box;float: left; margin: 15px;" class="content inactive"> <!-- Gianmarco Terrones addition -->
+          <div id="viewportnote" style="position: relative; left: 1em; top: 1em; z-index: 2;">(MOFs are visualized here)</div>
+          <div id="cifviewport" style="width:400px; height:300px;"></div>
+        </div>
         <div style="margin-bottom:0.5cm;"></div>
         <button class='btn btn-primary' id='load' type="button">Load example MOF</button>
-        <button class='btn btn-primary' id='reset' type="button">Reset zoom level</button>
+        <button class='btn btn-primary' id='visualize' type="button">Visualize</button>
     </div>
     
     <!-- Create a column containing selection boxes and buttons -->
@@ -250,20 +255,15 @@ TODO list:
         </div>
     </div>
         <!-- Empty spot where the MOF prediction text is placed. -->
-        <div class='row' style='margin-top: 1cm;'>
+        <div class='row' style='margin-top: 0.5cm;'>
             <div class='col-12' id='upload_status'></div> <!-- Gianmarco Terrones addition -->
+            <div class='col-6' id='loading'></div>
             <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
             <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
-            <div class='col-6' id='loading'></div>
             <div class='col-6' id='chart'></div>
     </div>
 </div>
 
-
-<div id="viewportwrapper" style="width:400px;" class="content inactive"> <!-- Gianmarco Terrones addition -->
-  <div id="viewportnote" style="position: relative; left: 1em; top: 1em; z-index: 2;">(MOFs are visualized here)</div>
-  <div id="cifviewport" style="width:400px; height:300px;"></div>
-</div>
 
 
 <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px;">
@@ -443,6 +443,7 @@ TODO list:
         //document.getElementById("resultsdownload").classList.remove("inactive");
         document.getElementById("viewportnote").style.display = "none";
         document.getElementById("viewportwrapper").classList.remove("inactive");
+
 
         clearViewer(stage);
         drawEmPDB(stage, "/Output/orig_mol.pdb");
@@ -789,18 +790,31 @@ $(function() {
           alert("Must be a cif file.");
           return;      
       }
-      
+
+      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+      $('#upload_status').text('File uploaded: ' + myFile.name);
+      clearViewer(stage);
+
+  });
+
+  $("#visualize").on('click', function() {
+      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+      if (myFile === undefined) {
+        alert("Must upload a cif file first.");
+        return;
+      }
+
+      alert('Visualization loading, may take around 30 seconds...')
+
+
+      document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
       handleInput(); // handles visualization
 
-      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
 
-      viewer.clear(); // Gianmarco Terrones, will not be needed later
-      $('#upload_status').text('File uploaded: ' + myFile.name);
       $('#loading').text('');
       $('#chart').text('');
-
-  });
+  })
 
   // Generate solvent removal stability prediction
   $('#predict_s').click(function() {  // <!-- Gianmarco Terrones addition -->
@@ -848,78 +862,66 @@ $(function() {
   });
 
 
-  // Generate molecule
-  $('#generate').click(function() {
-    viewer.clear();
-    $('#loading').text('');
-    $('#chart').text('');
-    $('#generate').prop('disabled', true);
-    data.ox = $('#ox').val()
-    data.hfx = $('#hfx').val()
-    data.metal = $('#metal').val()
-    data.ax1 = $('#ligand_ax1').val()
-    data.ax2 = $('#ligand_ax2').val()
-    data.eq = $('#ligand_eq').val()
-    data.spin = $('#spin').val()
-    $.post("/generate", JSON.stringify(data)).done(
-        function(response) {
-              data.geometry = response.geometry;
-              viewer.clear();
-              viewer.addModel(data.geometry, "xyz");
-              viewer.setStyle({}, {stick:{radius:0.25}});
-              viewer.zoomTo();
-              viewer.render();
-              unlockMetrics();
-              // For testing
-              // unlockPlot();
-              $("#loading").html(response.message)
-              $('#generate').prop('disabled', false);
-        });
-  });
+  // // Generate molecule
+  // $('#generate').click(function() {
+  //   viewer.clear();
+  //   $('#loading').text('');
+  //   $('#chart').text('');
+  //   $('#generate').prop('disabled', true);
+  //   data.ox = $('#ox').val()
+  //   data.hfx = $('#hfx').val()
+  //   data.metal = $('#metal').val()
+  //   data.ax1 = $('#ligand_ax1').val()
+  //   data.ax2 = $('#ligand_ax2').val()
+  //   data.eq = $('#ligand_eq').val()
+  //   data.spin = $('#spin').val()
+  //   $.post("/generate", JSON.stringify(data)).done(
+  //       function(response) {
+  //             data.geometry = response.geometry;
+  //             viewer.clear();
+  //             viewer.addModel(data.geometry, "xyz");
+  //             viewer.setStyle({}, {stick:{radius:0.25}});
+  //             viewer.zoomTo();
+  //             viewer.render();
+  //             unlockMetrics();
+  //             // For testing
+  //             // unlockPlot();
+  //             $("#loading").html(response.message)
+  //             $('#generate').prop('disabled', false);
+  //       });
+  // });
 
 
   
   // Load example MOF
   $('#load').click(function() {
     $('#loading').text('');
-      $.get("/get_example_mol", dataType='text').done(
-        function(response) {
-          // data.geometry = response;
-          // viewer.clear();
-          // viewer.addModel(data.geometry, "xyz");
-          // viewer.setStyle({}, {stick:{radius:0.25}});
-          // viewer.zoomTo();
-          // viewer.render();
+    $('#solvent_stability_prediction').text('');
+    $('#thermal_stability_prediction').text('');
+
+      // $.get("/get_example_mol", dataType='text').done(
+      //   function(response) {
+
           
-          console.log('check')  //debugging
-          console.log(response)   //debugging
-
-          // imolecule.create(viewer) // <!-- Gianmarco Terrones addition -->
-          // imolecule.draw(convert(response, 'xyz', 'json')); // <!-- Gianmarco Terrones addition -->  convert is from imolecule
-          //imolecule.clear();
-          //console.log('drawing');
-          //imolecule.draw(response);
-
-                /*$.getJSON(response, function (mof) {
-                    imolecule.draw(mof);
-                });*/
+      //     console.log('check')  //debugging
+      //     console.log(response)   //debugging
         
-          $('#metal').val('fe')
-          $('#ox').val('2')
-          updateSpins()
-          $('#ligand_ax1').val('water')
-          $('#ligand_ax2').val('water')
-          $('#ligand_eq').val('water')
-          $('#spin').val('1')
-          $('#hfx').val('0.20')
-          unlockMetrics()
-      });
+      //     // $('#metal').val('fe')
+      //     // $('#ox').val('2')
+      //     // updateSpins()
+      //     // $('#ligand_ax1').val('water')
+      //     // $('#ligand_ax2').val('water')
+      //     // $('#ligand_eq').val('water')
+      //     // $('#spin').val('1')
+      //     // $('#hfx').val('0.20')
+      //     unlockMetrics()
+      // });
   });
 
-  // Reset zoom level
-  $('#reset').click(function() {
-    viewer.zoomTo();
-  })
+  // // Reset zoom level
+  // $('#reset').click(function() {
+  //   viewer.zoomTo();
+  // })
 
   // Make a neural network prediction (the display text is defined in app.py)
   $('#predict').click(function() {

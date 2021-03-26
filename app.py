@@ -182,7 +182,7 @@ def serve_example_mol():
     #subprocess.run('ls') # debugging
 
     # TODO
-    return 'meep'
+    return 'example placeholder'
 
 
     

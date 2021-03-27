@@ -16,6 +16,7 @@ import pickle
 import molSimplify.Classes.mol3D as ms_mol3D
 import molSimplify.Informatics.RACassemble as ms_RAC
 import molSimplify.python_nn.tf_ANN as ms_ANN
+import tempfile # will try to use this for MOF_descriptors
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -266,6 +267,14 @@ def ss_predict():
     # subprocess.run(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif', '>', 'geometry.txt']) # this works in terminal, but not here...
     zeo_output = subprocess.check_output(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif'])
     print(zeo_output)
+    py_file = open('txt_file_bin/geometry.txt', 'w')
+    py_file.write(zeo_output.decode("utf-8")) # convert from bytes to string
+    py_file.close()
+
+    print('test C')
+    os.chdir('txt_file_bin')
+    ls_output2 = subprocess.check_output('ls')
+    print(ls_output2)
 
     return 'test ss_predict'
 

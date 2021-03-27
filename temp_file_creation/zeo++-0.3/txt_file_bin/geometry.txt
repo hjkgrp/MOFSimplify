@@ -1,0 +1,23 @@
+High accuracy requested (DEF (default) settings). 
+Opening File: ../RACs/temp_cif_primitive.cif
+Radii analysis: the smallest atom r = 1.09 while the largest atoms r = 1.8.
+Starting Voronoi decomposition
+Box dimensions:
+  va=(11.135000 0 0)
+  vb=(4.785290 11.417767 0)
+  vc=(0.118036 1.423955 14.536948)
+
+Total particles = 2982
+
+Internal grid size = (7 7 9)
+
+Using voro++ with radii for particles.
+Performing Voronoi decomposition.
+Volume check:
+  Total domain volume  = 1848.181611
+  Total Voronoi volume = 1848.181611
+Voronoi decomposition finished. Rerouting Voronoi network information.
+Finished rerouting information.
+Finished Voronoi decomposition
+Command 0  -ha
+Command 1  -res

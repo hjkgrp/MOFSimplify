@@ -1,0 +1,18 @@
+
+To check before the code is released:
+-thresholds in grid and zeo_const.h - esp. node merge one
+-remove unused files
+
+
+
+
+Check with Chris:
+-voronoi volume error
+-vertex merge - how to update radii on vertexes (VOR_NODE_MERGE_THRESHOLD)
+
+
+Testing the code:
+for memory leaks. example:
+valgrind -v --leak-check=yes ./network -sa 1.2 1.2 2000 DDR.cssr
+
+

@@ -1,0 +1,28 @@
+
+Notes on Zeo++ revision (M. Haranczyk, Feb 2014)
+
+
+The revised version of Zeo++ is organized around jobs.
+
+Each job has:
+
+Tasks (summary of what Zeo++ is going to do)
+
+Material  [optionally a list of structures]
+
+Output(functions to handle I/O)
+
+
+
+
+ 
+Each Material has:
+
+-Coordinates of atoms (basically the atom net)
+-optional High Accuracy (sphere approx.) copy
+-voronoi objects
+-surface area/AV/PSD objects
+
+
+
+

@@ -27,11 +27,17 @@ from bokeh.models import ColorBar, LinearColorMapper, LogColorMapper, HoverTool
 from bokeh.models.markers import Circle
 from bokeh.palettes import Inferno256#,RdBu11#,Viridis256
 from flask import jsonify
+#from flask_session import Session
 
 cmap_bokeh = Inferno256
 # cmap_bokeh = RdBu11 # optional select other colormaps
 
 app = flask.Flask(__name__)
+# app.config['SECRET_KEY'] = "secretkeythatisverysecret,averysecretsecretkey"
+# next, session code added by Gianmarco
+# SESSION_TYPE = 'redis'
+# app.config.from_object(__name__)
+#sess = Session(app)
 
 # Display text for neural network predictions
 results_string='''<b>Results</b>
@@ -193,6 +199,17 @@ def ss_predict():
     # Grab data
     mydata = json.loads(flask.request.get_data())
 
+    print('test W')
+    ls_output = subprocess.check_output('ls')
+    print(ls_output)
+
+    print('test X')
+    current_directory = subprocess.check_output('pwd')
+    print(current_directory)
+
+
+    os.chdir("temp_file_creation")
+
     # Write the data back to a cif file
     cif_file = open('temp_cif.cif', 'w')
     cif_file.write(mydata)
@@ -203,17 +220,31 @@ def ss_predict():
     # for line in log:
     #     print(line)
 
+    os.chdir("RACs")
+    print('test Y')
+    ls_output = subprocess.check_output('ls')
+    print(ls_output)
+
+    print('test Z')
+    cat_output = subprocess.check_output(['cat', 'featurize.py'])
+    print(cat_output)
+
     # Next, running MOF featurization
     # Write a python script to run MOF_descriptors.get_MOF_descriptors
     py_file = open('featurize.py', 'w')
     py_file.write('from molSimplify.Informatics.MOF.MOF_descriptors import *\n')
-    py_file.write('get_primitive(\'temp_cif.cif\', \'temp_cif_primitive.cif\')\n')
+    py_file.write('get_primitive(\'../temp_cif.cif\', \'temp_cif_primitive.cif\')\n')
     py_file.write('full_names, full_descriptors = get_MOF_descriptors(\'temp_cif_primitive.cif\',3,path=\'/\', xyzpath=\'temp_cif.xyz\')\n')
     py_file.close()
 
+    f = open('featurize.py', 'r') # this works in terminal, but not here...   OSError: [Errno 30] Read-only file system: '/ligands'
+    print('test A \n')
+    print(f.read())
+    f.close()
+
     # debugging
     #current_directory = subprocess.run('pwd');
-    #print('test')
+    print('test B')
     #print(current_directory)
     current_directory = subprocess.check_output('pwd')
     print(current_directory)
@@ -221,7 +252,7 @@ def ss_predict():
     # subprocess.run()
 
     # debugging; setting writable permission to folder
-    subprocess.run(['chmod', '-R', '777', current_directory])  # TODO flask documentation on writing to folders   # possible app.route
+    # subprocess.run(['chmod', '-R', '777', current_directory])  # TODO flask documentation on writing to folders   # possible app.route
         # TODO possible instead make sessions
 
     # Next, run featurize.py
@@ -230,7 +261,11 @@ def ss_predict():
     print('check')
 
     # Next, run Zeo++
-    # subprocess.run(['./network', '-ha', '-res', 'temp_cif_primitive.cif'])
+    os.chdir('..')
+    os.chdir('zeo++-0.3')
+    # subprocess.run(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif', '>', 'geometry.txt']) # this works in terminal, but not here...
+    zeo_output = subprocess.check_output(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif'])
+    print(zeo_output)
 
     return 'test ss_predict'
 

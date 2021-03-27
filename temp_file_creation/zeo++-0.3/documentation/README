@@ -1,0 +1,71 @@
+Network commandline invocation syntax:
+
+./network [-cssr [outputfile_cssr]] 
+	  [-v1 [outputfile_v1]] 
+	  [-xyz [outputfile_xyz]] 
+	  [-nt2 [outputfile_nt2]]
+          [-res [outputfile_res]] 
+	  [-zvis [outputfile_zvis]] 
+	  [-axs probe_radius [outputfile_axs]] 
+	  [-sa chan_radius probe_radius num_samples [outputfile_sa]] 
+	  [-vol chan_radius probe_radius num_samples [outputfile_vol]]
+          [-block probe_radius num_samples [outputfile_sa]]
+          [-psd chan_radius probe_radius num_samples [outputfile_vol]]
+	  [-chan probe_radius [outputfile_chan]] 
+	  [-r [radfile]] 
+	  INPUTFILE
+
+Note: For all of the program features that have an optional outputfile, the output is written to the filename when it is provided. Otherwise,
+the output is  written to ($file_prefix).($feature_name). For instance, if the provided file is ABW.cuc and -cssr is specified w/o any output file,
+the resulting input will be written by default to ABW.cssr
+
+-cssr [outputfile_cssr] : Output a .cssr representation of the input file. 
+
+-v1   [outputfile_v1]   : Output a .v1   representation of the input file.  
+
+-xyz  [outputfile_xyz]  : Output a .xyz  representation of the input file.   
+
+-nt2  [outputfile_nt2]  : Output a .nt2  representation of the Voronoi network for the given unit cell.   
+
+-r    [radfile] : Use radii while performing the Vornoi decomposition. If no .rad file is provided,
+   	          default radii contained within the program are used, if possible. If a .rad 
+	          file is provided, the default radii are overriden. The .rad file consists of 
+		  two columns, containing the atomic types and radii respectively. For an example
+		  file, please refer to example.rad.
+		  If no -r option is specified, all of the atoms are treated as having a radius of 0.
+		  
+-mass massfile : Replace the built-in mass table with that provided in a .mass file. The .mass file consists
+      	       	 of two columns, containing the atomic types and masses respectively. For an example file,
+		 please refer to example.mass
+
+
+-res  [outputfile_res] : Output the maximum free sphere results to the provided file.  
+      		       	 Format is: maxIncDiam maxDiam incDiam 
+	       	       	 where  maxIncDiam is the maximum included sphere diameter, maxDiam is the maximum free sphere diameter, incDiam is the maximum included diameters for the maximum free sphere path.
+
+-zvis [outputfile_zvis] : Output a file used by ZeoVis to depict important features about the atomic network and Voronoi network.
+
+-axs probe_radius [outputfile_axs] : Outputs a file with N lines, where N = # of Voronoi nodes.  
+     		  		     Each line is true or false, representing the accessibility of the ith Voronoi node.
+
+-sa chan_radius probe_radius num_samples_per_atom  [outputfile_sa]  : Determine the amount of accessible surface area. The accessibility of nodes is determined
+    			     		 		     	      using $chan_radius, and probe-atom overlap is determiend using $probe_radius. A total of
+							     	      $num_samples_per_atom points are sampled at a distance of $probe_radius from each atom and Monte
+							     	      Carlo integration is used to determine the final result.  
+
+-vol chan_radius probe_radius num_samples [outputfile_sa]  : Determine the amount of accessible volume. The accessibility of nodes is determined
+    			     		 		     using $chan_radius, and probe-atom overlap is determined using $probe_radius. A total of
+							     $num_samples points are sampled across the unit cell and Monte Carlo integration is used
+							     to determine the final result. 
+
+-sub [outputfile_sub]        : Attempt to replace every other Si atom within the network with an Al atom consistently.
+     			       If successful, write the resulting network to a .cssr file. No output is written if the substitution fails. 
+     			      
+
+-fsub frac [outputfile_fsub] : Attempt to randomly replace $frac of Si atoms within the network with an Al atom consistently. The specified fraction must not exceed 0.5.
+      	   		       If successful, write the resulting network to a .cssr file. No output is written if the substitution fails. 
+
+-chan probe_radius  [outputfile_chan]      : Determine the channels available to a probe of size $probe_radius. 
+      		  	       	  	     Outputs a file used by ZeoVis to draw the resulting channels.
+
+INPUTFILE    : Must be in the .cuc, .cssr or .v1 file format.

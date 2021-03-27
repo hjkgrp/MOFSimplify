@@ -1,0 +1,92 @@
+main.o: main.cc network.h heap.h networkstorage.h mindist.h geometry.h \
+ net.h voronoicell.h zeo_consts.h graphstorage.h string_additions.h \
+ material.h general.h networkaccessibility.h channel.h networkio.h \
+ networkinfo.h networkanalysis.h grid.h feature.h holograms.h \
+ instructions.h ray.h psd.h area_and_volume.h sphere_approx.h poreinfo.h \
+ zeojobs.h arguments.h
+framework_builder.o: framework_builder.cc geometry.h mindist.h \
+ networkinfo.h rmsd.h networkstorage.h net.h symmetry.h networkio.h \
+ zeo_consts.h
+molecule_to_abstract.o: molecule_to_abstract.cc geometry.h mindist.h \
+ networkinfo.h rmsd.h networkstorage.h net.h symmetry.h \
+ string_additions.h zeo_consts.h
+network.o: network.cc network.h heap.h networkstorage.h mindist.h \
+ geometry.h net.h voronoicell.h zeo_consts.h graphstorage.h \
+ string_additions.h material.h general.h networkaccessibility.h channel.h \
+ networkinfo.h networkanalysis.h v_network.h
+networkinfo.o: networkinfo.cc networkinfo.h
+networkio.o: networkio.cc networkio.h networkstorage.h mindist.h \
+ geometry.h net.h string_additions.h networkinfo.h symbcalc.h \
+ zeo_consts.h network.h heap.h voronoicell.h graphstorage.h material.h \
+ general.h networkaccessibility.h channel.h
+instructions.o: instructions.cc instructions.h
+networkanalysis.o: networkanalysis.cc networkanalysis.h graphstorage.h \
+ geometry.h voronoicell.h zeo_consts.h networkstorage.h mindist.h net.h \
+ heap.h
+area_and_volume.o: area_and_volume.cc area_and_volume.h networkstorage.h \
+ mindist.h geometry.h net.h voronoicell.h zeo_consts.h material.h \
+ general.h networkaccessibility.h channel.h graphstorage.h heap.h \
+ networkinfo.h string_additions.h
+segment.o: segment.cc segment.h networkstorage.h mindist.h geometry.h \
+ net.h feature.h graphstorage.h voronoicell.h zeo_consts.h channel.h \
+ heap.h
+string_additions.o: string_additions.cc string_additions.h
+symbcalc.o: symbcalc.cc symbcalc.h string_additions.h
+ray.o: ray.cc ray.h networkstorage.h mindist.h geometry.h net.h \
+ zeo_consts.h channel.h graphstorage.h voronoicell.h heap.h \
+ area_and_volume.h material.h general.h networkaccessibility.h network.h \
+ string_additions.h
+graphstorage.o: graphstorage.cc graphstorage.h geometry.h voronoicell.h \
+ zeo_consts.h networkstorage.h mindist.h net.h
+networkstorage.o: networkstorage.cc networkstorage.h mindist.h geometry.h \
+ net.h networkinfo.h zeo_consts.h rmsd.h symmetry.h string_additions.h \
+ ray.h
+voronoicell.o: voronoicell.cc voronoicell.h zeo_consts.h geometry.h \
+ networkstorage.h mindist.h net.h graphstorage.h
+channel.o: channel.cc channel.h graphstorage.h geometry.h voronoicell.h \
+ zeo_consts.h networkstorage.h mindist.h net.h heap.h
+mindist.o: mindist.cc mindist.h geometry.h
+feature.o: feature.cc feature.h networkstorage.h mindist.h geometry.h \
+ net.h graphstorage.h voronoicell.h zeo_consts.h channel.h heap.h \
+ general.h
+v_network.o: v_network.cc v_network.h networkstorage.h mindist.h \
+ geometry.h net.h
+geometry.o: geometry.cc zeo_consts.h geometry.h
+holograms.o: holograms.cc holograms.h networkstorage.h mindist.h \
+ geometry.h net.h
+grid.o: grid.cc grid.h networkstorage.h mindist.h geometry.h net.h \
+ networkinfo.h networkaccessibility.h voronoicell.h zeo_consts.h \
+ channel.h graphstorage.h heap.h
+psd.o: psd.cc voronoicell.h zeo_consts.h geometry.h networkstorage.h \
+ mindist.h net.h channel.h graphstorage.h heap.h network.h \
+ string_additions.h material.h general.h networkaccessibility.h psd.h
+sphere_approx.o: sphere_approx.cc zeo_consts.h networkstorage.h mindist.h \
+ geometry.h net.h sphere_approx.h
+networkaccessibility.o: networkaccessibility.cc network.h heap.h \
+ networkstorage.h mindist.h geometry.h net.h voronoicell.h zeo_consts.h \
+ graphstorage.h string_additions.h material.h general.h \
+ networkaccessibility.h channel.h
+poreinfo.o: poreinfo.cc grid.h networkstorage.h mindist.h geometry.h \
+ net.h networkinfo.h poreinfo.h general.h
+cluster.o: cluster.cc mindist.h geometry.h networkstorage.h net.h \
+ graphstorage.h voronoicell.h zeo_consts.h sphere_approx.h network.h \
+ heap.h string_additions.h material.h general.h networkaccessibility.h \
+ channel.h cluster.h
+net.o: net.cc net.h geometry.h networkstorage.h mindist.h symmetry.h
+rmsd.o: rmsd.cc rmsd.h zeo_consts.h
+symmetry.o: symmetry.cc networkstorage.h mindist.h geometry.h net.h \
+ symmetry.h zeo_consts.h
+cycle.o: cycle.cc mindist.h geometry.h networkstorage.h net.h \
+ graphstorage.h voronoicell.h zeo_consts.h sphere_approx.h network.h \
+ heap.h string_additions.h material.h general.h networkaccessibility.h \
+ channel.h cycle.h
+arguments.o: arguments.cc network.h heap.h networkstorage.h mindist.h \
+ geometry.h net.h voronoicell.h zeo_consts.h graphstorage.h \
+ string_additions.h material.h general.h networkaccessibility.h channel.h \
+ networkinfo.h arguments.h
+material.o: material.cc network.h heap.h networkstorage.h mindist.h \
+ geometry.h net.h voronoicell.h zeo_consts.h graphstorage.h \
+ string_additions.h material.h general.h networkaccessibility.h channel.h \
+ networkio.h networkinfo.h networkanalysis.h grid.h feature.h holograms.h \
+ instructions.h ray.h psd.h area_and_volume.h sphere_approx.h poreinfo.h \
+ zeojobs.h arguments.h

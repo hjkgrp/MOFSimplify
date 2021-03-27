@@ -812,7 +812,7 @@ TODO list:
           return;
         }
 
-        alert('Visualization loading, may take around 30 seconds...')
+        alert('Visualization loading, may take up to 30 seconds...') // based on NaX.cif
 
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
@@ -827,11 +827,16 @@ TODO list:
     // Generate solvent removal stability prediction
     $('#predict_s').click(function() {  // <!-- Gianmarco Terrones addition -->
       // check if a cif is uploaded
-      let myFile = document.getElementById('fileinput').files[0];
+      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+
 
       if (myFile==undefined) {
-        alert("Must upload a cif file first.");
-        return;  
+        myFile = myFile2;
+        if (myFile2 == undefined) {
+          alert("Must upload a cif file first.");
+          return;  
+        }
       }
 
       // myFile.text() is a promise
@@ -851,11 +856,16 @@ TODO list:
     // Generate thermal stability prediction
     $('#predict_t').click(function() {  // <!-- Gianmarco Terrones addition -->
       // check if a cif is uploaded
-      let myFile = document.getElementById('fileinput').files[0];
+      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+
 
       if (myFile==undefined) {
-        alert("Must upload a cif file first.");
-        return;  
+        myFile = myFile2;
+        if (myFile2 == undefined) {
+          alert("Must upload a cif file first.");
+          return;  
+        }
       }
 
       // myFile.text() is a promise
@@ -905,70 +915,29 @@ TODO list:
       $('#loading').text('');
       $('#solvent_stability_prediction').text('');
       $('#thermal_stability_prediction').text('');
-      $('#upload_status').text('File uploaded: Example MOF cif file');
       document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
 
       console.log('check F0')
       console.log(document.getElementById('exampleholder').value);
 
-      fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => response.blob()) // host the example cif files with the terminal command: node node.js
-      .then(blob => {
-        var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()});
-        // document.getElementById('fileinput').files[0] = myFile;
-        // console.log('check F')
-        // console.log(myFile);
-        // console.log('check F2')
-        // console.log(document.getElementById('fileinput').files[0])
+      fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => {
+        if(!response.ok) {
+          throw Error(response.statusText);
+        } 
+          return response.blob();
+        }).then(function(blob) {
+          var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()})
+          console.log('check F4!!')
+          document.getElementById('exampleholder').value = myFile;
+          console.log(document.getElementById('exampleholder').value);
 
-
-        // console.log('check F3')
-        // let dummyVar = document.getElementById('fileinput').files[0]; // the uploaded file
-        // console.log(dummyVar === undefined)
-        // if (dummyVar === undefined) {
-        //   alert("file is undefined.");
-        //   return;
-        // }
-
-        console.log('check F4')
-        document.getElementById('exampleholder').value = myFile;
-        console.log(document.getElementById('exampleholder').value);
-
-        clearViewer(stage);
-
-      }); // function(response){
-
-
-
-        // $('#fileinput').value = response;
-        // console.log(document.getElementById('fileinput').files[0]);
-      //})
-
-        // $.get("/get_example_mol", dataType='text').done(
-        //   function(response) {
-
-            
-        //     console.log('check')  //debugging
-        //     console.log(response)   //debugging
-          
-        //     // $('#metal').val('fe')
-        //     // $('#ox').val('2')
-        //     // updateSpins()
-        //     // $('#ligand_ax1').val('water')
-        //     // $('#ligand_ax2').val('water')
-        //     // $('#ligand_eq').val('water')
-        //     // $('#spin').val('1')
-        //     // $('#hfx').val('0.20')
-        //     unlockMetrics()
-        // });
-
-
+          $('#upload_status').text('File uploaded: Example MOF cif file');
+          clearViewer(stage);
+        }).catch(error => {
+          console.error('There has been a problem with your fetch operation:', error);
+        })      
     });
     
-
-    // // Reset zoom level
-    // $('#reset').click(function() {
-    //   viewer.zoomTo();
-    // })
 
 
 

@@ -1,0 +1,146 @@
+
+Getting Started:
+	Install VMD on your computer within a given directory. Compile zeo++ and copy the executable into this directory in addition to the files
+	ZeoVis.tcl and ZeoVisCommands.tcl. Make sure that the executable remains named network.
+
+	To start ZeoVis, simply type the following in a shell window:
+	   	 ./vmd -e ZeoVis.tcl
+
+Getting Help:
+	The most comprehensive help is available within ZeoVis itself. After opening the program, simply type help to obtain
+	a list of procedure names. Typing help $command_name will then display information about a given command, including
+	the numbers and types of its arguments and what the command does.
+
+ZeoVis overview:
+       ZeoVis displays various attributes about a periodic atomic structure. These attributes primarily revolve around the atoms themselves
+       and their underlying Voronoi network. In particular, the following types are defined in ZeoVis:
+
+       	   	 atom     - Particular atom in network. Atoms are indexed from 0 to $num_atoms. Atoms are loaded upon startup
+
+		 unitcell - Unit cell of periodic structure. The unitcell is loaded upon startup
+
+		 node     - Particular Voronoi node. Nodes are indexed from 0 to $num_nodes. Nodes are loaded upon startup
+
+		 vorcell  - Outline of a particular Voronoi cell. Cells are indexed from 0 to $num_atoms, and a cell's index corresponds to that
+		 	    of the atom it surrounds. The nodes within the cell are displayed using the properties of the each node.
+			    Vorcells are loaded upon startup
+
+		 face     - Filled in outline of a Voronoi cell. Faces are loaded upon startup
+
+		 vornet   - Complete Voronoi network. The vornet is loaded upon startup
+
+		 channel  - Series of Voronoi nodes and edges that can propagate through an infinite number of Voronoi cells. Channels
+		 	    are added to the environment using the id_channel function.
+
+			    segment- Component of a channel. Segments are added using the id_segment function after calling id_channel
+		 	    feature- Component of a channel. Features are added using the id_feature function after calling id_feature
+		 
+		 cage     - Cage structure within the void space. Cages are added to the environment using the id_cage function
+		 
+
+Indexing:
+	To facilitate the display of lots of elements, commands take of variety of possible indices. The simplest is just a single number,
+	which denotes the element referred to by the type and index. Instead, however, indices can also be a list of numbers representing all
+	the elements of the specified type contained in the list. The most comprehensive option is 'all', which refers to all elements of the given type
+
+	Ex: (The show command will be discussed below) 
+		show atom 1
+		show face {1 2 3}
+		show node all 
+
+
+Displaying elements:
+	To display elements within the zeovis framework, the primary function syntax is:
+
+	      	      show $type $indices
+	
+	This command will display the relevant elements within the original unit cell. In addition, elements can be displayed using periodic translation
+	using the command
+		      
+		      show_trans $da $db $dc $type $indices
+		      
+	The translations, however, must fall within the range -4 to 4. To display elements over a wide range of translations, the command
+	    
+		      show_range {$min_da $min_db $min_dc} {$max_da $max_db $max_dc} $type $indices  
+
+        will show the relevant elements over the box with these two corner points.
+
+
+Hiding elements:
+       To hide an already displayed element in the (0,0,0) unitcell, simply use the command
+       	       	  
+		  hide $type $indices
+
+	Translated versions can also be hidden using the command
+	
+		 hide_trans $da $db $dc $type $indices
+
+	To hide all periodic images of certain elements, the following command is useful:
+
+	   	hide_all_images $type $indices
+
+Altering element properties:
+	 Occasionally, it's convenient to adjust the properties of various elements. In particular, ZeoVis allows the user to change the color
+	 of any element. To do so, simply use the following syntax:
+
+	 	 color $new_color $type $indices
+		
+	If the element is already visible, its color will be automatically updated on screen. Occasionally, you may wish to go back to an element's
+	original color. To do so, simply use the syntax:
+	
+		reset color $type $indices
+
+	In addition to colors, some elements also have sizes. In particular, these correspond to the radii of atoms and nodes. To change their sizes,
+	any of the following commands can be used:
+
+	       size $new_size $type $indices
+	       adjust_size $amount $type $indices
+	       scale $factor $type $indices
+	       reset size $type $indices
+	 
+
+Adding to the environment:
+         Channels, cages, features and segments are all probe-size dependent features. As a result, ZeoVis allows on-the-fly identification of these
+	 elements using the commands
+
+	 	  id_channel $probe_size
+	 	  id_feature
+	 	  id_segment
+
+	 	  id_cage $probe_size
+
+	 Running these commands will add all relevant instances of these types to the environment and delete any past record of the same type.
+	 These elements can then be displayed and manipulated using all of the aforementioned commands.
+
+Sampling surface area:
+	 Accessible surface area can also be visualized for probes on-the-fly. To do so, use the syntax:
+	 	    sample_surface_area $probeRad $samples_per_atom
+
+	Accessible points will be colored green whereas inaccessible points will be red. Those points that lie within a distance of
+	$probeRad + $atomRadius of a particular atom will not be displayed.
+
+Sampling rays within unit cell:
+	 The ray tracing algorithms in Zeo++ can be visulalized in ZeoVis. To do so, use the syntax:
+	     	 sample_ray_atom $chanRad $probeRad $numSamples
+		 sample_ray_sphere $chanRad $probeRad $numSamples
+		 sample_ray_andrew_sphere $chanRad $probeRad $numSamples
+	 	 sample_ray_andrew_atom $chanRad $probeRad $numSamples
+	Rays will be displayed in different colors based on their length. Color options can be changed in ray.cc. 
+
+Coloring rays of range of lengths:
+	 Rays can be color-coded according to their lengths.
+	 
+		(not yet but soon) color_code_rays $minLength $maxLength
+		 
+Coloring nodes:
+	 Voronoi nodes can be color-coded according to their accessibility. To do so, use the command
+	 
+		color_code_nodes $probeRad
+
+	Accessible nodes to the probe will be green while inaccessible nodes will be red.
+
+ 
+Undoing operations:
+	A sequence of operations can be back-stepped using the undo command. The command takes no arguments and, if possible,
+	undoes the last action for which undo applies. Not all actions, however, are undoable.
+

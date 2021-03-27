@@ -1,0 +1,11 @@
+README_rich_test
+
+In order to generate pre-segment holograms, use the flags -r -holo followed by some probe radius.
+
+The *bounds_considering_atoms files provided are the 16 upper bounds for each variable required in the binning process. They are based on a profiling of IZA plus 200 random structures using CH4, but will suffice for all probes and structures, for consistency.
+
+The *bounds_considering_atoms files must be placed in the directory where you are running the code, otherwise an error will occur.
+
+Richard
+07/27/11
+

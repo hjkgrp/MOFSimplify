@@ -16,7 +16,7 @@ import pickle
 import molSimplify.Classes.mol3D as ms_mol3D
 import molSimplify.Informatics.RACassemble as ms_RAC
 import molSimplify.python_nn.tf_ANN as ms_ANN
-import tempfile # will try to use this for MOF_descriptors
+import pathlib # will try to use this for MOF_descriptors
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -232,23 +232,34 @@ def ss_predict():
 
     # Next, running MOF featurization
     # Write a python script to run MOF_descriptors.get_MOF_descriptors
+
+
+    # Write a python file to generate MOF descriptors
     py_file = open('featurize.py', 'w')
     py_file.write('from molSimplify.Informatics.MOF.MOF_descriptors import *\n')
     py_file.write('get_primitive(\'../temp_cif.cif\', \'temp_cif_primitive.cif\')\n')
-    py_file.write('full_names, full_descriptors = get_MOF_descriptors(\'temp_cif_primitive.cif\',3,path=\'/\', xyzpath=\'temp_cif.xyz\')\n')
+    py_file.write('full_names, full_descriptors = get_MOF_descriptors(\'temp_cif_primitive.cif\',3,path=\'' + str(pathlib.Path().absolute()) + 
+        '\', xyzpath=\'temp_cif.xyz\')\n')
     py_file.close()
 
-    f = open('featurize.py', 'r') # this works in terminal, but not here...   OSError: [Errno 30] Read-only file system: '/ligands'
+
+
+    f = open('featurize.py', 'r') 
     print('test A \n')
     print(f.read())
     f.close()
 
+    print('test A2 \n')
+
+    # Next, run featurize.py
+    os.system('python featurize.py') # this works in terminal, but not here...   OSError: [Errno 30] Read-only file system: '/ligands'
+
     # debugging
-    #current_directory = subprocess.run('pwd');
-    print('test B')
-    #print(current_directory)
-    current_directory = subprocess.check_output('pwd')
-    print(current_directory)
+    # #current_directory = subprocess.run('pwd');
+    # print('test B')
+    # #print(current_directory)
+    # current_directory = subprocess.check_output('pwd')
+    # print(current_directory)
 
     # subprocess.run()
 
@@ -256,8 +267,7 @@ def ss_predict():
     # subprocess.run(['chmod', '-R', '777', current_directory])  # TODO flask documentation on writing to folders   # possible app.route
         # TODO possible instead make sessions
 
-    # Next, run featurize.py
-    os.system('python featurize.py')
+
 
     print('check')
 

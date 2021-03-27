@@ -16,7 +16,7 @@ import pickle
 import molSimplify.Classes.mol3D as ms_mol3D
 import molSimplify.Informatics.RACassemble as ms_RAC
 import molSimplify.python_nn.tf_ANN as ms_ANN
-import pathlib # will try to use this for MOF_descriptors
+import pathlib 
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -196,45 +196,23 @@ def serve_library_files(path):
 @app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
 def ss_predict():
     # Generates solvent stability prediction TODO
+    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
+    # Then, apply Aditya's model to make prediction
 
     # Grab data
     mydata = json.loads(flask.request.get_data())
 
-    print('test W')
-    ls_output = subprocess.check_output('ls')
-    print(ls_output)
-
-    print('test X')
-    current_directory = subprocess.check_output('pwd')
-    print(current_directory)
-
-
-    os.chdir("temp_file_creation")
+    os.chdir("temp_file_creation") # changing directory
 
     # Write the data back to a cif file
     cif_file = open('temp_cif.cif', 'w')
     cif_file.write(mydata)
     cif_file.close()
 
-    # # debugging; checking to see if writing was successful
-    # log = open("temp_cif.cif", "r")
-    # for line in log:
-    #     print(line)
-
     os.chdir("RACs")
-    print('test Y')
-    ls_output = subprocess.check_output('ls')
-    print(ls_output)
-
-    print('test Z')
-    cat_output = subprocess.check_output(['cat', 'featurize.py'])
-    print(cat_output)
 
     # Next, running MOF featurization
-    # Write a python script to run MOF_descriptors.get_MOF_descriptors
-
-
-    # Write a python file to generate MOF descriptors
+    # Write a python script to run MOF_descriptors.get_MOF_descriptors, to generate MOF descriptors
     py_file = open('featurize.py', 'w')
     py_file.write('from molSimplify.Informatics.MOF.MOF_descriptors import *\n')
     py_file.write('get_primitive(\'../temp_cif.cif\', \'temp_cif_primitive.cif\')\n')
@@ -243,54 +221,30 @@ def ss_predict():
     py_file.close()
 
 
-
-    f = open('featurize.py', 'r') 
-    print('test A \n')
-    print(f.read())
-    f.close()
-
-    print('test A2 \n')
-
     # Next, run featurize.py
-    os.system('python featurize.py') # this works in terminal, but not here...   OSError: [Errno 30] Read-only file system: '/ligands'
+    os.system('python featurize.py')
 
-    # debugging
-    # #current_directory = subprocess.run('pwd');
-    # print('test B')
-    # #print(current_directory)
-    # current_directory = subprocess.check_output('pwd')
-    # print(current_directory)
+    # At this point, have the RAC featurization. Need geometry information next.
 
-    # subprocess.run()
-
-    # debugging; setting writable permission to folder
-    # subprocess.run(['chmod', '-R', '777', current_directory])  # TODO flask documentation on writing to folders   # possible app.route
-        # TODO possible instead make sessions
-
-
-
-    print('check')
-
-    # Next, run Zeo++
+    # Run Zeo++
     os.chdir('..')
     os.chdir('zeo++-0.3')
-    # subprocess.run(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif', '>', 'geometry.txt']) # this works in terminal, but not here...
-    zeo_output = subprocess.check_output(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif'])
-    print(zeo_output)
+    zeo_output = subprocess.check_output(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif']) # Zeo++ command (see http://www.zeoplusplus.org/examples.html)
     py_file = open('txt_file_bin/geometry.txt', 'w')
     py_file.write(zeo_output.decode("utf-8")) # convert from bytes to string
     py_file.close()
 
-    print('test C')
-    os.chdir('txt_file_bin')
-    ls_output2 = subprocess.check_output('ls')
-    print(ls_output2)
+    # TODO apply model next
+
 
     return 'test ss_predict'
 
 @app.route('/predict_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
 def ts_predict():
     # Generates thermal stability prediction TODO
+    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
+    # Then, apply Aditya's model to make prediction
+
     return 'test ts_predict'
 
 @app.route('/generate', methods=['POST'])

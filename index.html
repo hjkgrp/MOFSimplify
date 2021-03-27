@@ -1,9 +1,10 @@
-<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. A lot of the current code still has metal complex stuff, which will need to be removed/tweaked later. Visualization now can be done directly from an uploaded cif file (I get it to work by using Safari and using Develop -> Disable Cross-Origin Restrictions). An example MOF is prepared by default, using fetch and a node hosting of local files. 
+<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. A lot of the current code still has metal complex stuff, which will need to be removed/tweaked later. Visualization now can be done directly from an uploaded cif file. An example MOF is prepared by default, using fetch and a node hosting of local files. 
+
+In order to get code to work, use Safari and select Develop -> Disable Cross-Origin Restrictions.
 
 
 TODO list:
   featurize MOFS with RACs and Zeo++ to make predictions, and display this predictions to the user
-    Sessions? In order to have write permissions for the many folders that will be created
 -->
 
 
@@ -105,7 +106,6 @@ TODO list:
   <div class='row'>
     <!-- Create a column containing MOF viewer and buttons -->
     <div class='col-lg-6'>
-<!--         <div id="container-01" class="mol-container" style='border-style:solid;border-width:1px;'></div> -->
 
         <div id="viewportwrapper" style="width:420px;border-style:solid;border-width:1px;box-sizing:border-box;float: left; margin: 15px;" class="content inactive"> <!-- Gianmarco Terrones addition -->
           <div id="viewportnote" style="position: relative; left: 1em; top: 1em; z-index: 2;">(MOFs are visualized here)</div>
@@ -267,10 +267,11 @@ TODO list:
 
 <!-- For cif file upload -->
  <input id="fileinput" type="file" name="fileinput" style="display:none"/>  <!-- Gianmarco Terrones addition -->
+<!-- This will never display anything. Just used to store a MOF cif file if the button "Upload MOF file" is used -->
 
 
 <!-- For example MOF file -->
-<p id="exampleholder"> </p>
+<p id="exampleholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
 
 </body>
 
@@ -795,18 +796,15 @@ TODO list:
 
         let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
         $('#upload_status').text('File uploaded: ' + myFile.name);
-        console.log('check C');
-        console.log(myFile);
-        clearViewer(stage);
 
+        clearViewer(stage); // no MOF is displayed in the visualizer now
     });
 
     $("#visualize").on('click', function() {
         let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
         let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
-        console.log('check G');
-        console.log(myFile);
-        console.log(myFile2);
+
+        // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
         if (myFile == null && myFile2 == null) {
           alert("Must upload a cif file first.");
           return;
@@ -814,11 +812,9 @@ TODO list:
 
         alert('Visualization loading, may take up to 30 seconds...') // based on NaX.cif
 
-
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
-        handleInput(); // handles visualization
-
+        handleInput(); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
         $('#loading').text('');
         $('#chart').text('');
@@ -831,6 +827,7 @@ TODO list:
       let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
 
 
+      // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
         myFile = myFile2;
         if (myFile2 == undefined) {
@@ -860,6 +857,7 @@ TODO list:
       let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
 
 
+      // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
         myFile = myFile2;
         if (myFile2 == undefined) {
@@ -912,6 +910,7 @@ TODO list:
 
       // Load example MOF
     $('#load').click(function() {
+      // clearing all display fields
       $('#loading').text('');
       $('#solvent_stability_prediction').text('');
       $('#thermal_stability_prediction').text('');
@@ -920,19 +919,17 @@ TODO list:
       console.log('check F0')
       console.log(document.getElementById('exampleholder').value);
 
-      fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => {
-        if(!response.ok) {
+      // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
+      fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
+        if(!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         } 
           return response.blob();
         }).then(function(blob) {
-          var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()})
-          console.log('check F4!!')
-          document.getElementById('exampleholder').value = myFile;
-          console.log(document.getElementById('exampleholder').value);
-
-          $('#upload_status').text('File uploaded: Example MOF cif file');
-          clearViewer(stage);
+          var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
+          document.getElementById('exampleholder').value = myFile; // setting the value of exampleholder
+          $('#upload_status').text('File uploaded: Example MOF cif file'); // indicating that the example MOF has been uploaded
+          clearViewer(stage); // clearing MOF visualizer
         }).catch(error => {
           console.error('There has been a problem with your fetch operation:', error);
         })      
@@ -1003,5 +1000,6 @@ TODO list:
 
 </script>
 
-<script async type="text/javascript" src="libraries/sbu.js"></script>
+<!-- sbu.js is pulled from https://github.com/snurr-group/web-mofid, for visualization purposes. Not all of the code in it is used by our website. -->
+<script async type="text/javascript" src="libraries/sbu.js"></script> 
 

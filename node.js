@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 5000
 const app = express()
 
 app.use("/mof_examples", express.static(path.join(__dirname, "mof_examples")))
-console.log('buckets g 4 3!')
 
 app.listen(PORT, function () {
   console.log(`Express server listening on port ${PORT}`)

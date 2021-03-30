@@ -845,6 +845,12 @@ TODO list:
         $.post("/predict_solvent_stability", JSON.stringify(result)).done(
             function(response) {
                   // TODO Implement an actual prediction on the backend
+
+                  if (response == 'FAILED') { // (!response.ok) || 
+                      alert('Failed to featurize')
+                    return; // Do not update solvent stability prediction if prediction failed
+                  }
+
                   $('#solvent_stability_prediction').text(response); 
             });
       })

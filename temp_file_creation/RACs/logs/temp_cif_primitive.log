@@ -1,30 +1,6 @@
-atom 0 with type of Ag found to have 2 coordinates with atom types of N
-atom 1 with type of Ag found to have 3 coordinates with atom types of N
-atom 2 with type of Ag found to have 3 coordinates with atom types of N
-atom 3 with type of Ag found to have 2 coordinates with atom types of N
-atom 4 with type of Ag found to have 3 coordinates with atom types of N
-atom 5 with type of Ag found to have 3 coordinates with atom types of N
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 3
-
-Structure has LONG ligand
-
-atom 0 with type of Ag found to have 2 coordinates with atom types of N
-atom 1 with type of Ag found to have 3 coordinates with atom types of N
-atom 2 with type of Ag found to have 3 coordinates with atom types of N
-atom 3 with type of Ag found to have 2 coordinates with atom types of N
-atom 4 with type of Ag found to have 3 coordinates with atom types of N
-atom 5 with type of Ag found to have 3 coordinates with atom types of N
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 3
-
-Structure has LONG ligand
-
-atom 0 with type of Ag found to have 2 coordinates with atom types of N
-atom 1 with type of Ag found to have 3 coordinates with atom types of N
-atom 2 with type of Ag found to have 3 coordinates with atom types of N
-atom 3 with type of Ag found to have 2 coordinates with atom types of N
-atom 4 with type of Ag found to have 3 coordinates with atom types of N
-atom 5 with type of Ag found to have 3 coordinates with atom types of N
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 3
+atom 0 with type of La found to have 8 coordinates with atom types of C,O
+atom 1 with type of La found to have 8 coordinates with atom types of C,O
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 7 , 2
 
 Structure has LONG ligand
 

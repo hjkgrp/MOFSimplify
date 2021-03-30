@@ -28,7 +28,7 @@ from bokeh.models import ColorBar, LinearColorMapper, LogColorMapper, HoverTool
 from bokeh.models.markers import Circle
 from bokeh.palettes import Inferno256#,RdBu11#,Viridis256
 from flask import jsonify
-#from flask_session import Session
+from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
 
 cmap_bokeh = Inferno256
 # cmap_bokeh = RdBu11 # optional select other colormaps
@@ -199,6 +199,9 @@ def ss_predict():
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
     # Then, apply Aditya's model to make prediction
 
+    # To begin, always go to main directory (this directory will vary depending on computer)
+    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/")
+
     # Grab data
     mydata = json.loads(flask.request.get_data())
 
@@ -209,20 +212,30 @@ def ss_predict():
     cif_file.write(mydata)
     cif_file.close()
 
-    os.chdir("RACs")
+
+    # delete the RACs folder, then remake it (to start fresh for this prediction)
+    shutil.rmtree('RACs')
+    os.mkdir('RACs')
+
+    os.chdir("RACs") # move to RACs folder
 
     # Next, running MOF featurization
-    # Write a python script to run MOF_descriptors.get_MOF_descriptors, to generate MOF descriptors
-    py_file = open('featurize.py', 'w')
-    py_file.write('from molSimplify.Informatics.MOF.MOF_descriptors import *\n')
-    py_file.write('get_primitive(\'../temp_cif.cif\', \'temp_cif_primitive.cif\')\n')
-    py_file.write('full_names, full_descriptors = get_MOF_descriptors(\'temp_cif_primitive.cif\',3,path=\'' + str(pathlib.Path().absolute()) + 
-        '\', xyzpath=\'temp_cif.xyz\')\n')
-    py_file.close()
+    try:
+        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+    except ValueError:
+        return 'FAILED'
 
+    try:
+        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz')
+    except ValueError:
+        return 'FAILED'
+    except NotImplementedError:
+        return 'FAILED'
+    except AssertionError:
+        return 'FAILED'
 
-    # Next, run featurize.py
-    os.system('python featurize.py')
+    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+        return 'FAILED'
 
     # At this point, have the RAC featurization. Need geometry information next.
 

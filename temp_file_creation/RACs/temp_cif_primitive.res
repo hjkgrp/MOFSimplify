@@ -1,1 +1,1 @@
-../RACs/temp_cif_primitive.res    5.89138 4.83520  5.87664
+../RACs/temp_cif_primitive.res    6.81796 5.05367  6.81796

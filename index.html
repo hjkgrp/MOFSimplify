@@ -854,7 +854,12 @@ TODO list:
                     return; // Do not update solvent stability prediction if prediction failed
                   }
 
-                  $('#solvent_stability_prediction').text(response); 
+                  var result = JSON.parse(response);
+                  console.log('check Q')
+                  console.log(result)
+                  console.log(result.sbu_0)
+
+                  $('#solvent_stability_prediction').text(result.prediction); 
             });
       })
     });
@@ -930,7 +935,7 @@ TODO list:
       console.log(document.getElementById('exampleholder').value);
 
       // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
-      fetch('http://localhost:5000/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
+      fetch('http://localhost:5001/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         } 

@@ -250,7 +250,51 @@ def ss_predict():
     # TODO apply model next
 
 
-    return 'test ss_predict'
+    # will return a json object
+    # one field will be the prediction
+    # the other fields are string representations of the linkers and sbus, however many there are
+
+    dictionary = {
+        'prediction': 'test ss_predict' 
+    }
+
+    os.chdir('..')
+    os.chdir('RACs')
+    
+    linker_num = 0;
+    while True:
+        if not os.path.exists('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz'):
+            break
+        else:
+            linker_file = open('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz', 'r')
+            linker_info = linker_file.read()
+            linker_file.close()
+
+            dictionary['linker_' + str(linker_num)] = linker_info
+
+            linker_num = linker_num + 1;
+
+
+    sbu_num = 0;
+    while True:
+        if not os.path.exists('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz'):
+            break
+        else:
+            sbu_file = open('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz', 'r')
+            sbu_info = sbu_file.read()
+            sbu_file.close()
+
+            dictionary['sbu_' + str(sbu_num)] = sbu_info
+
+            sbu_num = sbu_num + 1
+
+
+    dictionary['total_linkers'] = linker_num
+    dictionary['total_sbus'] = sbu_num
+
+    json_object = json.dumps(dictionary, indent = 4)
+
+    return json_object
 
 @app.route('/predict_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
 def ts_predict():

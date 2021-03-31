@@ -3,19 +3,19 @@ Opening File: ../RACs/temp_cif_primitive.cif
 Radii analysis: the smallest atom r = 1.09 while the largest atoms r = 2.
 Starting Voronoi decomposition
 Box dimensions:
-  va=(10.534000 0 0)
-  vb=(-1.776280 11.159517 0)
-  vc=(-4.065560 -3.290958 11.530036)
+  va=(9.806400 0 0)
+  vb=(2.809220 10.291996 0)
+  vc=(4.903078 0.000000 13.082502)
 
-Total particles = 2254
+Total particles = 3908
 
-Internal grid size = (7 7 7)
+Internal grid size = (7 8 10)
 
 Using voro++ with radii for particles.
 Performing Voronoi decomposition.
 Volume check:
-  Total domain volume  = 1355.406013
-  Total Voronoi volume = 1355.406013
+  Total domain volume  = 1320.383256
+  Total Voronoi volume = 1320.383256
 Voronoi decomposition finished. Rerouting Voronoi network information.
 Finished rerouting information.
 Finished Voronoi decomposition

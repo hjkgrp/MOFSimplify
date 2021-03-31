@@ -246,6 +246,7 @@ TODO list:
         <!-- Empty spot where the MOF prediction text is placed. -->
         <div class='row' style='margin-top: 0.5cm;'>
             <div class='col-12' id='upload_status'></div> <!-- Gianmarco Terrones addition -->
+            <div class='col-12' id='status'></div> <!-- Gianmarco Terrones addition -->
             <div class='col-6' id='loading'></div>
             <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
             <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
@@ -603,7 +604,7 @@ TODO list:
 
 
 
-  //var statusElement = document.getElementById('status');
+  var statusElement = document.getElementById('status');
   //var progressElement = document.getElementById('progress');
   //var spinnerElement = document.getElementById('spinner');
 
@@ -661,7 +662,7 @@ TODO list:
         //progressElement.hidden = true;
         //if (!text) spinnerElement.style.display = 'none';
       //}
-      //statusElement.innerHTML = text;
+      statusElement.innerHTML = text;
     },
     totalDependencies: 0,
     monitorRunDependencies: function(left) {
@@ -672,11 +673,12 @@ TODO list:
   Module.setStatus('Downloading...');
   window.onerror = function(event) {
     // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
-    Module.setStatus('Exception thrown, see JavaScript console');
+    Module.setStatus('Exception thrown in visualization, see JavaScript console and refresh page');
     //spinnerElement.style.display = 'none';
     Module.setStatus = function(text) {
       if (text) Module.printErr('[post-exception status] ' + text);
     };
+
   };
 
   // end of section with a lot of copied code
@@ -781,6 +783,7 @@ TODO list:
 
     $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
         // clearing previous predictions
+        //$('status').text(''); // clearing any visualization error messages from prior runs
         $('#solvent_stability_prediction').text('');
         $('#thermal_stability_prediction').text('');
 
@@ -917,6 +920,7 @@ TODO list:
       // Load example MOF
     $('#load').click(function() {
       // clearing all display fields
+      //$('status').text(''); // clearing any visualization error messages from prior runs
       $('#loading').text('');
       $('#solvent_stability_prediction').text('');
       $('#thermal_stability_prediction').text('');

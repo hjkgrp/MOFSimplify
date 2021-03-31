@@ -220,22 +220,22 @@ def ss_predict():
     os.chdir("RACs") # move to RACs folder
 
     # Next, running MOF featurization
-    try:
-        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
-    except ValueError:
-        return 'FAILED'
+    #try:
+    get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+    # except ValueError:
+    #     return 'FAILED'
 
-    try:
-        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz')
-    except ValueError:
-        return 'FAILED'
-    except NotImplementedError:
-        return 'FAILED'
-    except AssertionError:
-        return 'FAILED'
+    # try:
+    full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz')
+    # except ValueError:
+    #     return 'FAILED'
+    # except NotImplementedError:
+    #     return 'FAILED'
+    # except AssertionError:
+    #     return 'FAILED'
 
-    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-        return 'FAILED'
+    # if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+    #     return 'FAILED'
 
     # At this point, have the RAC featurization. Need geometry information next.
 

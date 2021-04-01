@@ -734,7 +734,6 @@ TODO list:
   };
   Module.setStatus('Downloading...');
   window.onerror = function(event) {
-    // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
     Module.setStatus('Exception thrown in visualization, see JavaScript console and refresh page');
     //spinnerElement.style.display = 'none';
     Module.setStatus = function(text) {
@@ -854,6 +853,7 @@ TODO list:
         $('#solvent_stability_prediction').text('');
         $('#thermal_stability_prediction').text('');
 
+
         $('#upload_status').text(''); // now nothing is uploaded
         document.getElementById('exampleholder').value = null; // clears example cif
 
@@ -868,8 +868,13 @@ TODO list:
         $('#upload_status').text('File uploaded: ' + myFile.name);
 
         clearViewer(stage); // no MOF is displayed in the visualizer now
+        component_viewer.clear(); // likewise, clear component visualizer
+        clear_component_dropdowns();
+
+        // re-display messages in the two visualizers
         document.getElementById('viewportnote').style.display = 'block';
-        document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)'
+        document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
+        document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
     });
 
     $("#visualize").on('click', function() {
@@ -1014,8 +1019,15 @@ TODO list:
           document.getElementById('exampleholder').value = myFile; // setting the value of exampleholder
           $('#upload_status').text('File uploaded: Example MOF cif file'); // indicating that the example MOF has been uploaded
           clearViewer(stage); // clearing MOF visualizer
+          component_viewer.clear(); // clearing component visualizer
+          clear_component_dropdowns();
+
+
+          // re-displaying messages inside the two visualizers
           document.getElementById('viewportnote').style.display = 'block';
-          document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)'
+          document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
+          document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
+
 
         }).catch(error => {
           console.error('There has been a problem with your fetch operation:', error);
@@ -1103,21 +1115,9 @@ TODO list:
       }
     }
 
-    // // function for converting object to dictionary
-    // function convert(obj) {
-    //   return Object.keys(obj).map(key => ({
-    //       name: key,
-    //       value: obj[key],
-    //       type: "foo"
-    //   }));
-    // }
-
 
     // Visualize the linker after MOF components have been resolved
     $('#visualize_linker').click(function() {
-
-      // console.log('check S1')
-      // console.log(document.getElementById('componentsholder').value)
 
       // Ensure there are components to visualize
       if (document.getElementById('componentsholder').value == undefined) {
@@ -1126,30 +1126,15 @@ TODO list:
       }
 
       my_linker = $('#linker').val() // Check which linker is selected in the linker dropdown 
-      // console.log('check S2')
-      // console.log(my_linker)
       linker_number = my_linker.split(" "); // an array, split at the space
       linker_number = parseInt(linker_number[1]); // gets the number
       linker_number = linker_number - 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
-
-      // console.log('check S3')
-      // console.log(linker_number)
 
       // getting xyz data
       dictionary = document.getElementById('componentsholder').value;
       my_key = 'linker_' + linker_number;
 
-      geometry = dictionary[my_key]; // TODO
-
-      // console.log('check S4')
-      // console.log(dictionary)
-
-      // console.log('check S5')
-      // console.log(my_key)
-      // console.log(geometry)
-
-      // console.log('check S6')
-      // console.log(Object.keys(dictionary))
+      geometry = dictionary[my_key];  
 
       $('#container-01-note').text('');
       component_viewer.clear();
@@ -1157,15 +1142,11 @@ TODO list:
       component_viewer.setStyle({}, {stick:{radius:0.25}});
       component_viewer.zoomTo();
       component_viewer.render();
-
     })
 
 
     // Visualize the sbu after MOF components have been resolved
     $('#visualize_sbu').click(function() {
-
-      // console.log('check S1')
-      // console.log(document.getElementById('componentsholder').value)
 
       // Ensure there are components to visualize
       if (document.getElementById('componentsholder').value == undefined) {
@@ -1174,30 +1155,15 @@ TODO list:
       }
 
       my_sbu = $('#sbu').val() // Check which sbu is selected in the linker dropdown 
-      // console.log('check S2')
-      // console.log(my_sbu)
       sbu_number = my_sbu.split(" "); // an array, split at the space
       sbu_number = parseInt(sbu_number[1]); // gets the number
       sbu_number = sbu_number - 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
-
-      // console.log('check S3')
-      // console.log(sbu_number)
 
       // getting xyz data
       dictionary = document.getElementById('componentsholder').value;
       my_key = 'sbu_' + sbu_number;
 
-      geometry = dictionary[my_key]; // TODO
-
-      // console.log('check S4')
-      // console.log(dictionary)
-
-      // console.log('check S5')
-      // console.log(my_key)
-      // console.log(geometry)
-
-      // console.log('check S6')
-      // console.log(Object.keys(dictionary))
+      geometry = dictionary[my_key];
 
       $('#container-01-note').text('');
       component_viewer.clear();

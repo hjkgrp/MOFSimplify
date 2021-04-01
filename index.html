@@ -9,12 +9,13 @@ TODO list:
 
 
 <!-- Import NGL, webGavrog, and Bootstrap libaries--> 
+<script src="libraries/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="libraries/ngl.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/runtime.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/vendors.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/main.js"></script>
 <script src="libraries/3Dmol-min.js"></script>
-<script src="libraries/jquery-3.4.1.min.js"></script>
+<script src="libraries/bootstrap.min.js"></script>
 
 <!-- Import CSS -->
 <link rel="stylesheet" href="libraries/bootstrap.min.css">
@@ -25,6 +26,20 @@ TODO list:
 <style>
 .btn {
   margin-top: 3px;
+}
+
+.viewportwrapper {
+
+}
+
+.cifviewport {
+
+}
+
+.mol-container {
+  width: 100%;
+  height: 400px;
+  position: relative;
 }
 
 .form-control {
@@ -99,7 +114,7 @@ TODO list:
             
             <!-- Lead text -->
             <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a href="about.html">About</a> tab.</p>
-          </div>
+          </di>
         </div>
       </div>
 
@@ -107,13 +122,13 @@ TODO list:
     <!-- Create a column containing MOF viewer and buttons -->
     <div class='col-lg-6'>
 
-        <div id="viewportwrapper" style="width:420px;border-style:solid;border-width:1px;box-sizing:border-box;float: left; margin: 15px;" class="content inactive"> <!-- Gianmarco Terrones addition -->
-          <div id="viewportnote" style="position: relative; left: 1em; top: 1em; z-index: 2;">(MOFs are visualized here)</div>
-          <div id="cifviewport" style="width:400px; height:300px;"></div>
+        <div id="viewportwrapper" style="border-style: solid;" class="content inactive"> <!-- Gianmarco Terrones addition -->
+          <div id="viewportnote" style="position: relative; top: 13em; text-align: center; z-index: 2;">(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)</div>
+          <div id="cifviewport" style="width:534px; height:406px;"></div>
         </div>
         <div style="margin-bottom:0.5cm;"></div>
         <button class='btn btn-primary' id='load' type="button">Load example MOF</button>
-        <button class='btn btn-primary' id='visualize' type="button">Visualize</button>
+        <button class='btn btn-primary' id='visualize' type="button">Visualize MOF</button>
     </div>
     
     <!-- Create a column containing selection boxes and buttons -->
@@ -223,9 +238,13 @@ TODO list:
             </div>
         </div>
 
-        <div style="margin-bottom:0.5cm;"></div>
+        <div style="margin-top:0.5cm;"></div>
         <!-- Button for uploading MOF cif file -->
         <button class='btn btn-primary' id='upload' type="button">Upload MOF cif file</button>
+
+        <!-- Button for getting MOF components for visualization  -->
+        <button class='btn btn-primary' id='get_components' type='button'>Get MOF components</button>
+
         
         <!-- Button for generating molecule -->
         <!-- <button class='btn btn-primary' id='generate' type="button">Generate!</button> -->
@@ -243,16 +262,56 @@ TODO list:
         <!-- <button class='btn btn-primary' id='plot_pca' type="button" disabled="true">PCA ΔE<sub>H-L</sub></sub></button> -->
         </div>
     </div>
-        <!-- Empty spot where the MOF prediction text is placed. -->
-        <div class='row' style='margin-top: 0.5cm;'>
-            <div class='col-12' id='upload_status'></div> <!-- Gianmarco Terrones addition -->
-            <div class='col-12' id='status'></div> <!-- Gianmarco Terrones addition -->
-            <div class='col-6' id='loading'></div>
-            <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
-            <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
-            <div class='col-6' id='chart'></div>
+    <!-- Empty spot where the MOF prediction text is placed. -->
+    <div class='row' style='margin-top: 0.5cm;'>
+        <b> Status messages and MOF predictions </b>
+        <div class='col-12' id='upload_status'></div> <!-- Gianmarco Terrones addition -->
+        <div class='col-12' id='status_visualization'></div> <!-- Gianmarco Terrones addition -->
+        <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
+        <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
+        <div class='col-6' id='loading'></div>
+        <div class='col-6' id='chart'></div>
     </div>
+
+
+  <div class='row'>
+    <div class='col-lg-6' style='margin-top: 0.5cm;'>
+      <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;'>
+          <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
+        </div>
+      <div style="margin-bottom:0.5cm;"></div>
+      <button class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
+      <button class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
+      <button class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
+
+    </div>
+
+    <div class='col-lg-6' style='margin-top: 0.5cm;'>
+
+      <p> Can display MOF's linkers and sbus after clicking the Get MOF Components button. </p>
+      <div>
+        Linkers
+        <select class='form-control' id='linker'>
+<!--           <option value='linker_1'>Linker 1</option>
+          <option value='linker_2'>Linker 2</option> -->
+        </select>
+      </div>
+
+      <div>
+        sbus
+        <select class='form-control' id='sbu'>
+<!--           <option value='sbu_1'>sbu 1</option>
+          <option value='sbu_2'>sbu 2</option> -->
+        </select>
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
+
+
 
 
 
@@ -273,6 +332,9 @@ TODO list:
 
 <!-- For example MOF file -->
 <p id="exampleholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
+
+<!-- For MOF components (xyz file text) -->
+<p id="componentsholder"> </p> <!-- This will never display anything. Just used to store MOF components if the button "Get MOF Components" is used -->
 
 </body>
 
@@ -604,7 +666,7 @@ TODO list:
 
 
 
-  var statusElement = document.getElementById('status');
+  var statusElement = document.getElementById('status_visualization');
   //var progressElement = document.getElementById('progress');
   //var spinnerElement = document.getElementById('spinner');
 
@@ -697,11 +759,16 @@ TODO list:
    'rh': {2: [2, 4], 3: [1, 5]}};
 
 
-    // Set up 3Dmol viewer  // TODO we won't need this once MOF visualizer is set up
+    // Set up 3Dmol viewer 
     let element = $('#container-01');
     let config = { backgroundColor: 'white' };
-    let viewer = $3Dmol.createViewer( element, config );
+    let component_viewer = $3Dmol.createViewer( element, config );
     data = {};
+
+    // Reset zoom level
+    $('#reset').click(function() {
+      component_viewer.zoomTo();
+    })
 
 
     // Populate the spin dropdown
@@ -801,6 +868,8 @@ TODO list:
         $('#upload_status').text('File uploaded: ' + myFile.name);
 
         clearViewer(stage); // no MOF is displayed in the visualizer now
+        document.getElementById('viewportnote').style.display = 'block';
+        document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)'
     });
 
     $("#visualize").on('click', function() {
@@ -945,12 +1014,199 @@ TODO list:
           document.getElementById('exampleholder').value = myFile; // setting the value of exampleholder
           $('#upload_status').text('File uploaded: Example MOF cif file'); // indicating that the example MOF has been uploaded
           clearViewer(stage); // clearing MOF visualizer
+          document.getElementById('viewportnote').style.display = 'block';
+          document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)'
+
         }).catch(error => {
           console.error('There has been a problem with your fetch operation:', error);
         })      
     });
+
+
+    // Get MOF linkers and sbus
+    // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
+    $('#get_components').click(function() {
+      // check if a cif is uploaded
+      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+
+
+      // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
+      if (myFile==undefined) {
+        myFile = myFile2;
+        if (myFile2 == undefined) {
+          alert("Must upload a cif file first.");
+          return;  
+        }
+      }
+
+      // myFile.text() is a promise
+      myFile.text().then(function(result){
+        // result is the text of the loaded .cif file
+        $.post("/get_components", JSON.stringify(result)).done(
+          function(response) {
+
+            if (response == 'FAILED') { // (!response.ok) || 
+              alert('Failed to featurize')
+              return; // Do not update solvent stability prediction if prediction failed
+            }
+
+            var result = JSON.parse(response);
+            console.log('check Q')
+            console.log(typeof result)
+            console.log(result)
+            console.log(result.sbu_0)
+
+
+            clear_component_dropdowns();
+            var linker_dropdown = document.getElementById("linker");
+            var sbu_dropdown = document.getElementById("sbu");
+
+            num_linkers = result.total_linkers;
+            num_sbus = result.total_sbus;
+
+            // populating linker dropdown
+            for (i = 1; i <= num_linkers; i++) {
+              var option = document.createElement('option');
+              option.text = 'Linker ' + i.toString();
+              linker_dropdown.add(option);
+            }
+
+            // populating sbu dropdown
+            for (i = 1; i <= num_sbus; i++) {
+              var option = document.createElement('option');
+              option.text = 'sbu ' + i.toString();
+              sbu_dropdown.add(option);
+            }
+
+            // storing the linker and sbu data
+            document.getElementById('componentsholder').value = result; //convert(result);
+
+        });
+      })
+    });
     
 
+    function clear_component_dropdowns() { // TODO clear dropdowns when upload new file, and reshow message in 3dmol viewer
+      // clearing linker dropdown
+      var linker_dropdown = document.getElementById("linker");
+      var length = linker_dropdown.options.length;
+      for (i = length-1; i >= 0; i--) {
+        linker_dropdown.options[i] = null;
+      }
+
+      // clearing sbu dropdown
+      var sbu_dropdown = document.getElementById("sbu");
+      var length = sbu_dropdown.options.length;
+      for (i = length-1; i >= 0; i--) {
+        sbu_dropdown.options[i] = null;
+      }
+    }
+
+    // // function for converting object to dictionary
+    // function convert(obj) {
+    //   return Object.keys(obj).map(key => ({
+    //       name: key,
+    //       value: obj[key],
+    //       type: "foo"
+    //   }));
+    // }
+
+
+    // Visualize the linker after MOF components have been resolved
+    $('#visualize_linker').click(function() {
+
+      // console.log('check S1')
+      // console.log(document.getElementById('componentsholder').value)
+
+      // Ensure there are components to visualize
+      if (document.getElementById('componentsholder').value == undefined) {
+        alert('Must get MOF components first.');
+        return;
+      }
+
+      my_linker = $('#linker').val() // Check which linker is selected in the linker dropdown 
+      // console.log('check S2')
+      // console.log(my_linker)
+      linker_number = my_linker.split(" "); // an array, split at the space
+      linker_number = parseInt(linker_number[1]); // gets the number
+      linker_number = linker_number - 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
+
+      // console.log('check S3')
+      // console.log(linker_number)
+
+      // getting xyz data
+      dictionary = document.getElementById('componentsholder').value;
+      my_key = 'linker_' + linker_number;
+
+      geometry = dictionary[my_key]; // TODO
+
+      // console.log('check S4')
+      // console.log(dictionary)
+
+      // console.log('check S5')
+      // console.log(my_key)
+      // console.log(geometry)
+
+      // console.log('check S6')
+      // console.log(Object.keys(dictionary))
+
+      $('#container-01-note').text('');
+      component_viewer.clear();
+      component_viewer.addModel(geometry, "xyz");
+      component_viewer.setStyle({}, {stick:{radius:0.25}});
+      component_viewer.zoomTo();
+      component_viewer.render();
+
+    })
+
+
+    // Visualize the sbu after MOF components have been resolved
+    $('#visualize_sbu').click(function() {
+
+      // console.log('check S1')
+      // console.log(document.getElementById('componentsholder').value)
+
+      // Ensure there are components to visualize
+      if (document.getElementById('componentsholder').value == undefined) {
+        alert('Must get MOF components first.');
+        return;
+      }
+
+      my_sbu = $('#sbu').val() // Check which sbu is selected in the linker dropdown 
+      // console.log('check S2')
+      // console.log(my_sbu)
+      sbu_number = my_sbu.split(" "); // an array, split at the space
+      sbu_number = parseInt(sbu_number[1]); // gets the number
+      sbu_number = sbu_number - 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
+
+      // console.log('check S3')
+      // console.log(sbu_number)
+
+      // getting xyz data
+      dictionary = document.getElementById('componentsholder').value;
+      my_key = 'sbu_' + sbu_number;
+
+      geometry = dictionary[my_key]; // TODO
+
+      // console.log('check S4')
+      // console.log(dictionary)
+
+      // console.log('check S5')
+      // console.log(my_key)
+      // console.log(geometry)
+
+      // console.log('check S6')
+      // console.log(Object.keys(dictionary))
+
+      $('#container-01-note').text('');
+      component_viewer.clear();
+      component_viewer.addModel(geometry, "xyz");
+      component_viewer.setStyle({}, {stick:{radius:0.25}});
+      component_viewer.zoomTo();
+      component_viewer.render();
+
+    })
 
 
     // Make a neural network prediction (the display text is defined in app.py)

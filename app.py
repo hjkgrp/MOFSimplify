@@ -220,22 +220,22 @@ def ss_predict():
     os.chdir("RACs") # move to RACs folder
 
     # Next, running MOF featurization
-    #try:
-    get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
-    # except ValueError:
-    #     return 'FAILED'
+    try:
+        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+    except ValueError:
+        return 'FAILED'
 
-    # try:
-    full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz')
-    # except ValueError:
-    #     return 'FAILED'
-    # except NotImplementedError:
-    #     return 'FAILED'
-    # except AssertionError:
-    #     return 'FAILED'
+    try:
+        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+    except ValueError:
+        return 'FAILED'
+    except NotImplementedError:
+        return 'FAILED'
+    except AssertionError:
+        return 'FAILED'
 
-    # if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-    #     return 'FAILED'
+    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+        return 'FAILED'
 
     # At this point, have the RAC featurization. Need geometry information next.
 
@@ -303,6 +303,91 @@ def ts_predict():
     # Then, apply Aditya's model to make prediction
 
     return 'test ts_predict'
+
+@app.route('/get_components', methods=['POST']) # Gianmarco Terrones addition
+def get_components():
+    # Uses Aditya's MOF code to get linkers and sbus
+    # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
+
+    # To begin, always go to main directory (this directory will vary depending on computer)
+    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/");
+
+    # Grab data
+    mydata = json.loads(flask.request.get_data());
+
+    os.chdir("temp_file_creation"); # changing directory
+
+    # Write the data back to a cif file
+    cif_file = open('temp_cif.cif', 'w');
+    cif_file.write(mydata);
+    cif_file.close();
+
+
+    # delete the RACs folder, then remake it (to start fresh for this prediction)
+    shutil.rmtree('RACs');
+    os.mkdir('RACs');
+
+    os.chdir("RACs"); # move to RACs folder
+
+    # Next, running MOF featurization
+    try:
+        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+    except ValueError:
+        return 'FAILED'
+
+    try:
+        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+    except ValueError:
+        return 'FAILED'
+    except NotImplementedError:
+        return 'FAILED'
+    except AssertionError:
+        return 'FAILED'
+
+    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+        return 'FAILED'
+
+    # At this point, have the RAC featurization. 
+
+    # will return a json object
+    # the fields are string representations of the linkers and sbus, however many there are
+
+    dictionary = {};
+    
+    linker_num = 0;
+    while True:
+        if not os.path.exists('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz'):
+            break
+        else:
+            linker_file = open('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz', 'r');
+            linker_info = linker_file.read();
+            linker_file.close();
+
+            dictionary['linker_' + str(linker_num)] = linker_info;
+
+            linker_num = linker_num + 1;
+
+
+    sbu_num = 0;
+    while True:
+        if not os.path.exists('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz'):
+            break
+        else:
+            sbu_file = open('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz', 'r');
+            sbu_info = sbu_file.read();
+            sbu_file.close();
+
+            dictionary['sbu_' + str(sbu_num)] = sbu_info;
+
+            sbu_num = sbu_num + 1;
+
+
+    dictionary['total_linkers'] = linker_num;
+    dictionary['total_sbus'] = sbu_num;
+
+    json_object = json.dumps(dictionary, indent = 4);
+
+    return json_object
 
 @app.route('/generate', methods=['POST'])
 def generate_mol():

@@ -1009,9 +1009,6 @@ TODO list:
       $('#thermal_stability_prediction').text('');
       document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
 
-      console.log('check F0')
-      console.log(document.getElementById('exampleholder').value);
-
       // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
       fetch('http://localhost:5001/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
@@ -1034,6 +1031,7 @@ TODO list:
 
 
         }).catch(error => {
+          $('#upload_status').text('Failed to upload example MOF');
           console.error('There has been a problem with your fetch operation:', error);
         })      
     });

@@ -273,8 +273,6 @@ var read_,
 
 if (ENVIRONMENT_IS_NODE) {
   scriptDirectory = __dirname + '/';
-  console.log('check: node environment'); // Gianmarco change
-
 
   // Expose functionality in the same simple way that the shells work
   // Note that we pollute the global namespace here, otherwise we break in node
@@ -326,8 +324,6 @@ if (ENVIRONMENT_IS_NODE) {
   Module['inspect'] = function () { return '[Emscripten Module object]'; };
 } else
 if (ENVIRONMENT_IS_SHELL) {
-  console.log('check: shell environment'); // Gianmarco change
-
 
   if (typeof read != 'undefined') {
     read_ = function shell_read(f) {
@@ -358,7 +354,6 @@ if (ENVIRONMENT_IS_SHELL) {
   }
 } else
 if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
-  console.log('check: web or worker environment'); // Gianmarco change
   if (ENVIRONMENT_IS_WORKER) { // Check worker, not web, since window could be polyfilled
     scriptDirectory = self.location.href;
   } else if (document.currentScript) { // web
@@ -383,7 +378,6 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
   };
 
   // if (ENVIRONMENT_IS_WORKER) {  Gianmarco change
-    console.log('check: worker environment'); // Gianmarco change
     readBinary = function readBinary(url) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
@@ -411,7 +405,6 @@ if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
   setWindowTitle = function(title) { document.title = title };
 } else
 {
-  console.log('check: weird environment'); // Gianmarco change
 }
 
 // Set up the out() and err() hooks, which are how we can print to stdout or
@@ -1654,15 +1647,11 @@ if (!isDataURI(wasmBinaryFile)) {
 function getBinary() {
   try {
     if (Module['wasmBinary']) {
-      console.log('check A'); // Gianmarco change
       return new Uint8Array(Module['wasmBinary']);
     }
     if (readBinary) {
-      console.log('check B'); // Gianmarco change      
       return readBinary(wasmBinaryFile);
     } else {
-      console.log('check C'); // Gianmarco change    
-      console.log(readBinary); // Gianmarco change    Problem seems to be that readBinary is not defined for the web environment
       throw "both async and sync fetching of the wasm failed";
     }
   }
@@ -1675,13 +1664,8 @@ function getBinaryPromise() {
   // if we don't have the binary yet, and have the Fetch api, use that
   // in some environments, like Electron's render process, Fetch api may be present, but have a different context than expected, let's only use it on the Web
   if (!Module['wasmBinary'] && (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) && typeof fetch === 'function') {
-    console.log('check D'); // Gianmarco change
-    console.log(wasmBinaryFile); // Gianmarco change
     return fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function(response) {
-      console.log(response)
       if (!response['ok']) {
-        console.log('check D2'); // Gianmarco change    The problem seems to be occurring here
-        console.log(response['ok']); // Gianmarco change
         throw "failed to load wasm binary file at '" + wasmBinaryFile + "'";
       }
       return response['arrayBuffer']();
@@ -1747,20 +1731,17 @@ function createWasm(env) {
         typeof WebAssembly.instantiateStreaming === 'function' &&
         !isDataURI(wasmBinaryFile) &&
         typeof fetch === 'function') {
-      console.log('check E'); // Gianmarco change
       fetch(wasmBinaryFile, { credentials: 'same-origin' }).then(function (response) {
         return WebAssembly.instantiateStreaming(response, info)
           .then(receiveInstantiatedSource, function(reason) {
             // We expect the most common failure cause to be a bad MIME type for the binary,
             // in which case falling back to ArrayBuffer instantiation should work.
-            console.log('check E2'); // Gianmarco change
             err('wasm streaming compile failed: ' + reason);
             err('falling back to ArrayBuffer instantiation');
             instantiateArrayBuffer(receiveInstantiatedSource);
           });
       });
     } else {
-      console.log('check E3'); // Gianmarco change
       return instantiateArrayBuffer(receiveInstantiatedSource);
     }
   }
@@ -6337,7 +6318,6 @@ if (Module['preInit']) {
 
   Module["noExitRuntime"] = true;
 
-console.log('testing testing'); // Gianmarco change
 run();
 
 

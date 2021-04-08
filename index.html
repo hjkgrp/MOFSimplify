@@ -738,7 +738,7 @@ TODO list:
   };
   Module.setStatus('Downloading...');
   window.onerror = function(event) {
-    Module.setStatus('Exception thrown in visualization, see JavaScript console and refresh page');
+    Module.setStatus('Exception thrown in visualization, see JavaScript console and refresh page (refreshing fixes the OOM, or out of memory, error).');
     //spinnerElement.style.display = 'none';
     Module.setStatus = function(text) {
       if (text) Module.printErr('[post-exception status] ' + text);

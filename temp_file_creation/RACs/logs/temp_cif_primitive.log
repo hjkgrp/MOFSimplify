@@ -1,7 +1,16 @@
-atom 32 with type of Nd found to have 9 coordinates with atom types of O
-atom 30 with type of Nd found to have 12 coordinates with atom types of O
-atom 31 with type of Nd found to have 9 coordinates with atom types of O
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 4 , 2
+atom 108 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 109 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 110 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 111 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 112 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 113 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 114 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 115 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 116 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 117 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 118 with type of Mn found to have 5 coordinates with atom types of Cl,O
+atom 119 with type of Mn found to have 5 coordinates with atom types of Cl,O
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 2
 
 Structure has LONG ligand
 

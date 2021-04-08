@@ -891,7 +891,7 @@ TODO list:
           return;
         }
 
-        alert('Visualization loading, may take up to 30 seconds...') // based on NaX.cif
+        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // based on NaX.cif
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
@@ -1060,9 +1060,10 @@ TODO list:
         $.post("/get_components", JSON.stringify(result)).done(
           function(response) {
 
-            if (response == 'FAILED') { // (!response.ok) || 
+            if (response == 'FAILED') { 
               alert('Failed to featurize')
-              return; // Do not update solvent stability prediction if prediction failed
+              document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+              return; 
             }
 
             var result = JSON.parse(response);
@@ -1120,6 +1121,8 @@ TODO list:
 
     // Visualize the linker after MOF components have been resolved
     $('#visualize_linker').click(function() {
+
+      console.log(document.getElementById('componentsholder').value) // testing TODO
 
       // Ensure there are components to visualize
       if (document.getElementById('componentsholder').value == undefined) {

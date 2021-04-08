@@ -1,8 +1,7 @@
-atom 0 with type of Sm found to have 6 coordinates with atom types of O,C
-atom 1 with type of Sm found to have 6 coordinates with atom types of O
-atom 2 with type of Sm found to have 6 coordinates with atom types of O,C
-atom 3 with type of Sm found to have 6 coordinates with atom types of O
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 11 , 2
+atom 32 with type of Nd found to have 9 coordinates with atom types of O
+atom 30 with type of Nd found to have 12 coordinates with atom types of O
+atom 31 with type of Nd found to have 9 coordinates with atom types of O
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 4 , 2
 
 Structure has LONG ligand
 

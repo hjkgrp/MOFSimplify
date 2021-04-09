@@ -917,6 +917,8 @@ TODO list:
         }
       }
 
+      //$('#solvent_stability_prediction').text('Generating solvent stability prediction...');
+
       // myFile.text() is a promise
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
@@ -929,15 +931,19 @@ TODO list:
 
                   if (response == 'FAILED') { // (!response.ok) || 
                       alert('Failed to featurize')
+                      //$('#solvent_stability_prediction').text('Solvent stability prediction failed.');
                     return; // Do not update solvent stability prediction if prediction failed
                   }
 
-                  var result = JSON.parse(response);
-                  console.log('check Q')
-                  console.log(result)
-                  console.log(result.sbu_0)
+                  // var result = JSON.parse(response);
+                  // console.log('check Q')
+                  // console.log(result)
+                  // console.log(result.sbu_0)
 
-                  $('#solvent_stability_prediction').text(result.prediction); 
+                  console.log('check Q')
+                  console.log(response)
+
+                  $('#solvent_stability_prediction').text('The solvent stability prediction is: ' + response.toString()); //result.prediction); 
             });
       })
     });

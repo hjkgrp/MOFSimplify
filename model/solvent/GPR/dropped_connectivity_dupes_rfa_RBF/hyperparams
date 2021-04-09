@@ -1,0 +1,10 @@
+Name : gp_classification
+Objective : 942.3910239699666
+Number of Parameters : 2
+Number of Optimization Parameters : 2
+Updates : True
+Parameters:
+  gp_classification.  |               value  |  constraints  |  priors
+  rbf.variance        |    1.67842473905158  |      +ve      |        
+  rbf.lengthscale     |  1.5426326195796864  |      +ve      |         final
+

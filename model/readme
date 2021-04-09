@@ -1,0 +1,5 @@
+This folder contains the code necessary for solvent stability prediction
+
+See ANN/predict_ANN.py on how to perform predictions using the ANN
+
+See GPR/make_ROC.py 

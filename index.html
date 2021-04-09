@@ -917,6 +917,8 @@ TODO list:
         }
       }
 
+      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') // based on NaX.cif
+
       //$('#solvent_stability_prediction').text('Generating solvent stability prediction...');
 
       // myFile.text() is a promise
@@ -943,7 +945,27 @@ TODO list:
                   console.log('check Q')
                   console.log(response)
 
-                  $('#solvent_stability_prediction').text('The solvent stability prediction is: ' + response.toString()); //result.prediction); 
+                  // preparing the human-interpretable solvent removal stability prediction
+                  if (response <= 0.2) {
+                    verdict = 'Very confident the MOF is unstable upon solvent removal.';
+                  }
+                  else if (response <= 0.4) {
+                    verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
+                  }
+                  else if (response <= 0.5) {
+                    verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
+                  }
+                  else if (response <= 0.6) {
+                    verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
+                  }
+                  else if (response <= 0.8) {
+                    verdict = 'Fairly confident the MOF is stable upon solvent removal.';
+                  }
+                  else {
+                    verdict = 'Very confident the MOF is stable upon solvent removal.';
+                  }
+
+                  $('#solvent_stability_prediction').text('The solvent stability prediction is: ' + response.toString() + '. ' + verdict ); 
             });
       })
     });

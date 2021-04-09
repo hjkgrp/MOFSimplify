@@ -238,6 +238,11 @@ def ss_predict():
     if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
         return 'FAILED'
 
+    # # TODO temp, for debugging; uncommment the stuff above later
+    # get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+    # full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+
+
     # At this point, have the RAC featurization. Need geometry information next.
 
     # Run Zeo++
@@ -340,9 +345,9 @@ def ss_predict():
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
     linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
 
-    lc_df = lc_df.iloc[0].to_frame().transpose() # taking the first row only, since all rows are the same anyway. Convert resulting Series into a Dataframe, then transpose
-    sbu_df = sbu_df.iloc[0].to_frame().transpose()
-    linker_df = linker_df.iloc[0].to_frame().transpose()
+    lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
+    sbu_df = sbu_df.mean().to_frame().transpose()
+    linker_df = linker_df.mean().to_frame().transpose()
 
     print('check U')
     display(geo_df)

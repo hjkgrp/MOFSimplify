@@ -917,15 +917,11 @@ TODO list:
         }
       }
 
-      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') // based on NaX.cif
-
-      //$('#solvent_stability_prediction').text('Generating solvent stability prediction...');
+      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
-
-        // console.log(JSON.stringify(result)); // debugging
 
         $.post("/predict_solvent_stability", JSON.stringify(result)).done(
             function(response) {
@@ -965,7 +961,7 @@ TODO list:
                     verdict = 'Very confident the MOF is stable upon solvent removal.';
                   }
 
-                  $('#solvent_stability_prediction').text('The solvent stability prediction is: ' + response.toString() + '. ' + verdict ); 
+                  $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + response.toString() + '. ' + verdict ); 
             });
       })
     });
@@ -986,13 +982,26 @@ TODO list:
         }
       }
 
+      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
+
       // myFile.text() is a promise
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
+
         $.post("/predict_thermal_stability", JSON.stringify(result)).done(
             function(response) {
                   // TODO Implement an actual prediction on the backend
-                  $('#thermal_stability_prediction').text(response); 
+
+                  if (response == 'FAILED') { // (!response.ok) || 
+                      alert('Failed to featurize')
+                      //$('#solvent_stability_prediction').text('Solvent stability prediction failed.');
+                    return; // Do not update solvent stability prediction if prediction failed
+                  }
+
+                  console.log('check R')
+                  console.log(response)
+
+                  $('#thermal_stability_prediction').text('The thermal stability prediction is: ' + response.toString()); 
             });
       })
     });

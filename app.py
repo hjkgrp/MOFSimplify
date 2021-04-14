@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 import flask
 import pandas as pd
-import keras
+import tensorflow.keras
 import numpy as np
 import time
-from keras import backend as K
+from tensorflow.keras import backend as K
 import json
 import string
 import os
@@ -41,109 +41,109 @@ app = flask.Flask(__name__)
 # app.config.from_object(__name__)
 #sess = Session(app)
 
-# Display text for neural network predictions
-results_string='''<b>Results</b>
-<br> ΔE<sub>H-L</sub> = %.1f kcal/mol predicted for the provided structure.
-<br> This corresponds to S=%s being the ground state.
-<br>
-<br> <b>Value</b>
-<br> When |ΔE<sub>H-L</sub>| < 5 kcal/mol, the complex is a potential spin-crossover complex (SCO), which can have important implications in catalytic reaction cycles.
-<br> Our machine learning (ML) models [<a href="https://doi.org/10.1039/C7SC01247K">1</a>] took %.3f seconds to predict the geometry, spin splitting energy, and more for this complex!
-<br> By comparison, density functional theory (DFT) optimizations on the two structures to get these properties would take about an hour using one Nvidia 970 GPU.
-<br> molSimplify can help accelerate discovery of new materials, such as SCOs! [<a href="https://doi.org/10.1021/acs.jpclett.8b00170">2</a>]
-<br>
-<br> <b>Details</b>
-<br> The ML models are trained on data from density functional theory (DFT) with the B3LYP functional, the LANL2DZ effective core potential for metal atoms, and the 6-31G* basis set for all other atoms.
-<br> Warning: the training data do not include 4d transition metals, so results for these are extrapolations and may not be as accurate.
-'''
+# # Display text for neural network predictions
+# results_string='''<b>Results</b>
+# <br> ΔE<sub>H-L</sub> = %.1f kcal/mol predicted for the provided structure.
+# <br> This corresponds to S=%s being the ground state.
+# <br>
+# <br> <b>Value</b>
+# <br> When |ΔE<sub>H-L</sub>| < 5 kcal/mol, the complex is a potential spin-crossover complex (SCO), which can have important implications in catalytic reaction cycles.
+# <br> Our machine learning (ML) models [<a href="https://doi.org/10.1039/C7SC01247K">1</a>] took %.3f seconds to predict the geometry, spin splitting energy, and more for this complex!
+# <br> By comparison, density functional theory (DFT) optimizations on the two structures to get these properties would take about an hour using one Nvidia 970 GPU.
+# <br> molSimplify can help accelerate discovery of new materials, such as SCOs! [<a href="https://doi.org/10.1021/acs.jpclett.8b00170">2</a>]
+# <br>
+# <br> <b>Details</b>
+# <br> The ML models are trained on data from density functional theory (DFT) with the B3LYP functional, the LANL2DZ effective core potential for metal atoms, and the 6-31G* basis set for all other atoms.
+# <br> Warning: the training data do not include 4d transition metals, so results for these are extrapolations and may not be as accurate.
+# '''
 
-licores = getlicores()
+# licores = getlicores()
 
-# Pre-load neural networks to save time later
-valid_predictors = ['ls_ii', 'split']
-predictor_vars = {}
-# Load time is 0.5 seconds per predictor (only happens once, when server is started)
-for predictor_name in valid_predictors:
-    curr_dict = {}
-    curr_dict['train_vars'] = ms_ANN.load_ANN_variables(predictor_name)
-    curr_dict['norm_data'] = ms_ANN.load_normalization_data(predictor_name)
-    curr_dict['my_ANN'] = ms_ANN.load_keras_ann(predictor_name)
-    curr_dict['my_ANN']._make_predict_function()
-    curr_dict['train_x'] = ms_ANN.load_training_data(predictor_name)
-    predictor_vars[predictor_name] = curr_dict
+# # Pre-load neural networks to save time later
+# valid_predictors = ['ls_ii', 'split']
+# predictor_vars = {}
+# # Load time is 0.5 seconds per predictor (only happens once, when server is started)
+# for predictor_name in valid_predictors:
+#     curr_dict = {}
+#     curr_dict['train_vars'] = ms_ANN.load_ANN_variables(predictor_name)
+#     curr_dict['norm_data'] = ms_ANN.load_normalization_data(predictor_name)
+#     curr_dict['my_ANN'] = ms_ANN.load_keras_ann(predictor_name)
+#     curr_dict['my_ANN']._make_predict_function()
+#     curr_dict['train_x'] = ms_ANN.load_training_data(predictor_name)
+#     predictor_vars[predictor_name] = curr_dict
 
-# Pre-load PCA for plotting
-pca_plot_df = pd.read_csv('data/pca_for_bokeh.csv')
-with open('data/rac_names.txt','r') as file1:
-    lines = file1.readlines()
-pca_variables = [x.strip('\n') for x in lines]
-# pca_model = pickle.load(open('data/PCA_model.pkl','rb')) # removed
-with open('data/PCA_model.pkl','rb') as f: # next 4 lines were added by Gianmarco Terrones, for Python 3
-    u = pickle._Unpickler(f)
-    u.encoding = 'latin1'
-    pca_model = u.load()
+# # Pre-load PCA for plotting
+# pca_plot_df = pd.read_csv('data/pca_for_bokeh.csv')
+# with open('data/rac_names.txt','r') as file1:
+#     lines = file1.readlines()
+# pca_variables = [x.strip('\n') for x in lines]
+# # pca_model = pickle.load(open('data/PCA_model.pkl','rb')) # removed
+# with open('data/PCA_model.pkl','rb') as f: # next 4 lines were added by Gianmarco Terrones, for Python 3
+#     u = pickle._Unpickler(f)
+#     u.encoding = 'latin1'
+#     pca_model = u.load()
 
-# KDE data for plotting
-datadf = pd.read_csv('data/kde_data.csv')
+# # KDE data for plotting
+# datadf = pd.read_csv('data/kde_data.csv')
 
-def perform_ANN_prediction(RAC_dataframe, predictor_name, RAC_column='RACs'):
-    # Function that performs ANN predictions (written quite inefficiently)
-    assert type(RAC_dataframe) == pd.DataFrame
-    start_time = time.time()
+# def perform_ANN_prediction(RAC_dataframe, predictor_name, RAC_column='RACs'):
+#     # Function that performs ANN predictions (written quite inefficiently)
+#     assert type(RAC_dataframe) == pd.DataFrame
+#     start_time = time.time()
 
-    curr_dict = predictor_vars[predictor_name]
-    train_vars = curr_dict['train_vars']
-    train_mean_x, train_mean_y, train_var_x, train_var_y = curr_dict['norm_data']
-    my_ANN = curr_dict['my_ANN']
-    train_x = curr_dict['train_x']
-    #train_vars = load_ANN_variables(predictor_name)
-    #train_mean_x, train_mean_y, train_var_x, train_var_y = load_normalization_data(predictor_name)
-    #my_ANN = load_keras_ann(predictor_name)
+#     curr_dict = predictor_vars[predictor_name]
+#     train_vars = curr_dict['train_vars']
+#     train_mean_x, train_mean_y, train_var_x, train_var_y = curr_dict['norm_data']
+#     my_ANN = curr_dict['my_ANN']
+#     train_x = curr_dict['train_x']
+#     #train_vars = load_ANN_variables(predictor_name)
+#     #train_mean_x, train_mean_y, train_var_x, train_var_y = load_normalization_data(predictor_name)
+#     #my_ANN = load_keras_ann(predictor_name)
 
-    # Check if any RAC elements are missing from the provided dataframe
-    missing_labels = [i for i in train_vars if i not in RAC_dataframe.columns]
+#     # Check if any RAC elements are missing from the provided dataframe
+#     missing_labels = [i for i in train_vars if i not in RAC_dataframe.columns]
 
-    if len(missing_labels) > 0:
-        # Try checking if there is anything in the column `RAC_column`. If so, deserialize it and re-run.
-        if RAC_column in RAC_dataframe.columns:
-            deserialized_RACs = pd.DataFrame.from_records(RAC_dataframe[RAC_column].values, index=RAC_dataframe.index)
-            deserialized_RACs = deserialized_RACs.astype(float)
-            RAC_dataframe = RAC_dataframe.join(deserialized_RACs)
-            return perform_ANN_prediction(RAC_dataframe, predictor_name, RAC_column='RACs')
-        else:
-            raise ValueError('Please supply missing variables in your RAC dataframe: %s' % missing_labels)
-    if 'alpha' in train_vars:
-        if any(RAC_dataframe.alpha > 1):
-            raise ValueError('Alpha is too large - should be between 0 and 1.')
-    RAC_subset_for_ANN = RAC_dataframe.loc[:,train_vars].astype(float)
-    normalized_input = ms_ANN.data_normalize(RAC_subset_for_ANN, train_mean_x, train_var_x)
-    ANN_prediction = my_ANN.predict(normalized_input)
-    rescaled_output = ms_ANN.data_rescale(ANN_prediction, train_mean_y, train_var_y)
-    # Get latent vectors for training data and queried data
-    #train_x = load_training_data(predictor_name)
-    #train_x = pd.DataFrame(train_x, columns=train_vars).astype(float)
-    #get_outputs = K.function([my_ANN.layers[0].input, K.learning_phase()],
-    #                         [my_ANN.layers[len(my_ANN.layers) - 2].output])
-    #normalized_train = ms_ANN.data_normalize(train_x, train_mean_x, train_var_x)
-    #training_latent = get_outputs([normalized_train, 0])[0]
-    #query_latent = get_outputs([normalized_input, 0])[0]
+#     if len(missing_labels) > 0:
+#         # Try checking if there is anything in the column `RAC_column`. If so, deserialize it and re-run.
+#         if RAC_column in RAC_dataframe.columns:
+#             deserialized_RACs = pd.DataFrame.from_records(RAC_dataframe[RAC_column].values, index=RAC_dataframe.index)
+#             deserialized_RACs = deserialized_RACs.astype(float)
+#             RAC_dataframe = RAC_dataframe.join(deserialized_RACs)
+#             return perform_ANN_prediction(RAC_dataframe, predictor_name, RAC_column='RACs')
+#         else:
+#             raise ValueError('Please supply missing variables in your RAC dataframe: %s' % missing_labels)
+#     if 'alpha' in train_vars:
+#         if any(RAC_dataframe.alpha > 1):
+#             raise ValueError('Alpha is too large - should be between 0 and 1.')
+#     RAC_subset_for_ANN = RAC_dataframe.loc[:,train_vars].astype(float)
+#     normalized_input = ms_ANN.data_normalize(RAC_subset_for_ANN, train_mean_x, train_var_x)
+#     ANN_prediction = my_ANN.predict(normalized_input)
+#     rescaled_output = ms_ANN.data_rescale(ANN_prediction, train_mean_y, train_var_y)
+#     # Get latent vectors for training data and queried data
+#     #train_x = load_training_data(predictor_name)
+#     #train_x = pd.DataFrame(train_x, columns=train_vars).astype(float)
+#     #get_outputs = K.function([my_ANN.layers[0].input, K.learning_phase()],
+#     #                         [my_ANN.layers[len(my_ANN.layers) - 2].output])
+#     #normalized_train = ms_ANN.data_normalize(train_x, train_mean_x, train_var_x)
+#     #training_latent = get_outputs([normalized_train, 0])[0]
+#     #query_latent = get_outputs([normalized_input, 0])[0]
 
 
-    # Append all results to dataframe
-    results_allocation = [None for i in range(len(RAC_dataframe))]
-    for i in range(len(RAC_dataframe)):
-        results_dict = {}
-        #min_latent_distance = min(np.linalg.norm(training_latent - query_latent[i][:], axis=1))
-        #results_dict['%s_latent_vector' % predictor_name] = query_latent[i]
-        #results_dict['%s_min_latent_distance' % predictor_name] = min_latent_distance
-        output_value = rescaled_output[i]
-        if len(output_value) == 1: # squash array of length 1 to the value it contains
-            output_value = output_value[0]
-        results_dict['%s_prediction' % predictor_name] = output_value
-        results_allocation[i] = results_dict
-    results_df = pd.DataFrame(results_allocation, index=RAC_dataframe.index)
-    RAC_dataframe_with_results = RAC_dataframe.join(results_df)
-    return RAC_dataframe_with_results
+#     # Append all results to dataframe
+#     results_allocation = [None for i in range(len(RAC_dataframe))]
+#     for i in range(len(RAC_dataframe)):
+#         results_dict = {}
+#         #min_latent_distance = min(np.linalg.norm(training_latent - query_latent[i][:], axis=1))
+#         #results_dict['%s_latent_vector' % predictor_name] = query_latent[i]
+#         #results_dict['%s_min_latent_distance' % predictor_name] = min_latent_distance
+#         output_value = rescaled_output[i]
+#         if len(output_value) == 1: # squash array of length 1 to the value it contains
+#             output_value = output_value[0]
+#         results_dict['%s_prediction' % predictor_name] = output_value
+#         results_allocation[i] = results_dict
+#     results_df = pd.DataFrame(results_allocation, index=RAC_dataframe.index)
+#     RAC_dataframe_with_results = RAC_dataframe.join(results_df)
+#     return RAC_dataframe_with_results
 
 @app.route('/demo')
 def serve_demo():
@@ -182,23 +182,14 @@ def serve_cite():
 def serve_library_files(path):
     # Serves libraries
     return flask.send_from_directory('libraries', path)
-
-# @app.route('/get_example_mol')
-# def serve_example_mol():
-#     #print('testing testing') # debugging
-#     #subprocess.run('pwd') # debugging
-#     #subprocess.run('ls') # debugging
-
-#     # TODO
-#     return 'example placeholder'
-
-
     
 @app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
 def ss_predict():
-    # Generates solvent stability prediction TODO
+    # Generates solvent stability prediction
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
     # Then, apply Aditya's model to make prediction
+
+    print('TIME CHECK 1')
 
     # To begin, always go to main directory (this directory will vary depending on computer)
     os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/")
@@ -220,6 +211,8 @@ def ss_predict():
 
     os.chdir("RACs") # move to RACs folder
 
+    print('TIME CHECK 2')
+
     # Next, running MOF featurization
     try:
         get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
@@ -238,21 +231,13 @@ def ss_predict():
     if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
         return 'FAILED'
 
-    # # TODO temp, for debugging; uncommment the stuff above later
-    # get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
-    # full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
-
+    print('TIME CHECK 3')
 
     # At this point, have the RAC featurization. Need geometry information next.
 
     # Run Zeo++
     os.chdir('..')
     os.chdir('zeo++-0.3')
-    # zeo_output = subprocess.check_output(['./network', '-ha', '-res', '../RACs/temp_cif_primitive.cif']) # Zeo++ command (see http://www.zeoplusplus.org/examples.html)
-    # py_file = open('txt_file_bin/geometry.txt', 'w')
-    # py_file.write(zeo_output.decode("utf-8")) # convert from bytes to string
-    # py_file.close()
-
 
     cmd1 = './network -ha -res txt_file_bin/temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
     cmd2 = './network -sa 1.86 1.86 10000 txt_file_bin/temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
@@ -266,6 +251,8 @@ def ss_predict():
     output2 = process2.communicate()[0]
     output3 = process3.communicate()[0]
     output4 = process4.communicate()[0]
+
+    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
 
     ''' The geometric descriptors are largest included sphere (Di), 
     largest free sphere (Df), largest included sphere along free path (Dif),
@@ -334,12 +321,13 @@ def ss_predict():
     geo_df.to_csv('geometric_parameters.csv',index=False)
 
 
-    # Applying the model next
+    print('TIME CHECK 4')
 
+    # Applying the model next
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
 
-    from IPython.display import display # debugging
+    # from IPython.display import display # debugging
 
     lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") # change addresses on different computer
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
@@ -349,18 +337,18 @@ def ss_predict():
     sbu_df = sbu_df.mean().to_frame().transpose()
     linker_df = linker_df.mean().to_frame().transpose()
 
-    print('check U')
-    display(geo_df)
-    print(geo_df.columns)
+    # print('check U')
+    # display(geo_df)
+    # print(geo_df.columns)
 
-    print('check V')
-    display(lc_df) # debugging
-    print(lc_df.columns)
+    # print('check V')
+    # display(lc_df) # debugging
+    # print(lc_df.columns)
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
 
-    print('check W')
-    display(merged_df) # debugging
+    # print('check W')
+    # display(merged_df) # debugging
 
     # merged_df = merged_df.merge(sbu_df, how='outer') 
     # merged_df = merged_df.merge(linker_df, how='outer') 
@@ -368,22 +356,19 @@ def ss_predict():
     # print('check X')
     # display(merged_df) # debugging
 
-
-
-    # reordering the columns of merged_df to be the same as those in /model/solvent/ANN/dropped_connectivity_dupes/test.csv
-    # actually, I think for_GT.py does this in normalize_data (_df_newMOF[fnames].values, https://www.kite.com/python/answers/how-to-reorder-columns-in-a-pandas-dataframe-in-python)
-
     merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation
 
     os.chdir('..')
     os.chdir('..')
     os.chdir('model/solvent/ANN')
 
-    os.system('python for_GT.py > prediction.txt')
+    print('TIME CHECK 5')
+
+    os.system('python solvent_ANN.py > solvent_prediction.txt')
     # import for_GT
     # prediction = for_GT.main()
 
-    f = open("prediction.txt", "r")
+    f = open("solvent_prediction.txt", "r")
     line = f.read()
     line = line.split('[')
     line = line[2]
@@ -391,62 +376,183 @@ def ss_predict():
     prediction = line[0] # isolating just the prediction
     f.close()
 
+    print('TIME CHECK 6')
 
     return prediction
 
-
-    # will return a json object
-    # one field will be the prediction
-    # the other fields are string representations of the linkers and sbus, however many there are
-
-    # dictionary = {
-    #     'prediction': prediction # 'test ss_predict' 
-    # }
-
-    # os.chdir('/Users/gianmarcoterrones/Research/mofSimplify/temp_file_creation/RACs') # go to the RACs folder
-    
-    # linker_num = 0;
-    # while True:
-    #     if not os.path.exists('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz'):
-    #         break
-    #     else:
-    #         linker_file = open('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz', 'r')
-    #         linker_info = linker_file.read()
-    #         linker_file.close()
-
-    #         dictionary['linker_' + str(linker_num)] = linker_info
-
-    #         linker_num = linker_num + 1;
-
-
-    # sbu_num = 0;
-    # while True:
-    #     if not os.path.exists('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz'):
-    #         break
-    #     else:
-    #         sbu_file = open('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz', 'r')
-    #         sbu_info = sbu_file.read()
-    #         sbu_file.close()
-
-    #         dictionary['sbu_' + str(sbu_num)] = sbu_info
-
-    #         sbu_num = sbu_num + 1
-
-
-    # dictionary['total_linkers'] = linker_num
-    # dictionary['total_sbus'] = sbu_num
-
-    # json_object = json.dumps(dictionary, indent = 4)
-
-    # return json_object  # TODO in future, maybe just return the prediction, leave out component information
-
 @app.route('/predict_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
 def ts_predict():
-    # Generates thermal stability prediction TODO
+    # Generates thermal stability prediction 
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
     # Then, apply Aditya's model to make prediction
 
-    return 'test ts_predict'
+    print('TIME CHECK 1')
+
+    # To begin, always go to main directory (this directory will vary depending on computer)
+    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/")
+
+    # Grab data
+    mydata = json.loads(flask.request.get_data())
+
+    os.chdir("temp_file_creation") # changing directory
+
+    # Write the data back to a cif file
+    cif_file = open('temp_cif.cif', 'w')
+    cif_file.write(mydata)
+    cif_file.close()
+
+    # delete the RACs folder, then remake it (to start fresh for this prediction)
+    shutil.rmtree('RACs')
+    os.mkdir('RACs')
+
+    os.chdir("RACs") # move to RACs folder
+
+    print('TIME CHECK 2')
+
+    # Next, running MOF featurization
+    try:
+        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+    except ValueError:
+        return 'FAILED'
+
+    try:
+        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+    except ValueError:
+        return 'FAILED'
+    except NotImplementedError:
+        return 'FAILED'
+    except AssertionError:
+        return 'FAILED'
+
+    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+        return 'FAILED'
+
+    print('TIME CHECK 3')
+
+    # At this point, have the RAC featurization. Need geometry information next.
+
+    # Run Zeo++
+    os.chdir('..')
+    os.chdir('zeo++-0.3')
+
+    cmd1 = './network -ha -res txt_file_bin/temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd2 = './network -sa 1.86 1.86 10000 txt_file_bin/temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd3 = './network -ha -vol 1.86 1.86 10000 txt_file_bin/temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd4 = './network -volpo 1.86 1.86 10000 txt_file_bin/temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+    output1 = process1.communicate()[0]
+    output2 = process2.communicate()[0]
+    output3 = process3.communicate()[0]
+    output4 = process4.communicate()[0]
+
+    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
+
+    ''' The geometric descriptors are largest included sphere (Di), 
+    largest free sphere (Df), largest included sphere along free path (Dif),
+    crystal density (rho), volumetric surface area (VSA), gravimetric surface (GSA), 
+    volumetric pore volume (VPOV) and gravimetric pore volume (GPOV). 
+    Also, we include cell volume as a descriptor.
+
+    All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
+    '''
+
+    dict_list = []
+    # base_dir = sys.argv[1] #base_dir must be an absolute path
+    # if base_dir[-1] != '/':
+    #     base_dir+='/'
+    # for cif_file in os.listdir(base_dir+'/primitive/'):
+    #     print('---- now on ----, '+cif_file)
+    #     if '.cif' not in cif_file:
+    #         continue
+    #     basename = cif_file.strip('.cif')
+    cif_file = 'temp.cif' # techincally, calculations were with the primitive, but I'll just call it temp
+    basename = cif_file.strip('.cif')
+    largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
+    unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
+    VPOV, GPOV = np.nan, np.nan
+    POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+    if (os.path.exists('txt_file_bin/temp_cif_pd.txt') & os.path.exists('txt_file_bin/temp_cif_sa.txt') &
+        os.path.exists('txt_file_bin/temp_cif_av.txt') & os.path.exists('txt_file_bin/temp_cif_pov.txt')
+        ):
+        with open('txt_file_bin/temp_cif_pd.txt') as f:
+            pore_diameter_data = f.readlines()
+            for row in pore_diameter_data:
+                largest_included_sphere = float(row.split()[1]) # largest included sphere
+                largest_free_sphere = float(row.split()[2]) # largest free sphere
+                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+        with open('txt_file_bin/temp_cif_sa.txt') as f:
+            surface_area_data = f.readlines()
+            for i, row in enumerate(surface_area_data):
+                if i == 0:
+                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
+                    crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
+                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
+                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+        with open('txt_file_bin/temp_cif_pov.txt') as f:
+            pore_volume_data = f.readlines()
+            for i, row in enumerate(pore_volume_data):
+                if i == 0:
+                    density = float(row.split('Density:')[1].split()[0])
+                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
+                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
+                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
+                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
+                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
+                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                    VPOV = POAV_volume_fraction+PONAV_volume_fraction
+                    GPOV = VPOV/density
+    else:
+        print(basename, 'not all 4 files exist!', 'sa: ',os.path.exists(base_dir+'geometric/'+str(basename)+'_sa.txt'), 
+              'pd: ',os.path.exists(base_dir+'geometric/'+str(basename)+'_pd.txt'), 'av: ', os.path.exists(base_dir+'geometric/'+str(basename)+'_av.txt'),
+              'pov: ', os.path.exists(base_dir+'geometric/'+str(basename)+'_pov.txt'))
+        return 'FAILED'
+    geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
+                'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
+                'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
+    dict_list.append(geo_dict)
+    geo_df = pd.DataFrame(dict_list)
+    geo_df.to_csv('geometric_parameters.csv',index=False)
+
+
+    print('TIME CHECK 4')
+
+    # Applying the model next
+
+    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+
+    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") # change addresses on different computer
+    sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
+    linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
+
+    lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
+    sbu_df = sbu_df.mean().to_frame().transpose()
+    linker_df = linker_df.mean().to_frame().transpose()
+
+    merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
+    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation
+
+    os.chdir('..')
+    os.chdir('..')
+    os.chdir('model/thermal/ANN')
+
+    print('TIME CHECK 5')
+
+    os.system('python thermal_ANN.py > thermal_prediction.txt')
+
+    f = open("thermal_prediction.txt", "r")
+    line = f.read()
+    line = line.split('[')
+    line = line[2]
+    line = line.split(']')
+    prediction = line[0] # isolating just the prediction
+    f.close()
+
+    print('TIME CHECK 6')
+
+    return prediction
 
 @app.route('/get_components', methods=['POST']) # Gianmarco Terrones addition
 def get_components():

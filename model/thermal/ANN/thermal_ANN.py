@@ -182,7 +182,7 @@ model = keras.models.load_model('final_model_T_few_epochs.h5',custom_objects=dep
 # test_pred = y_scaler.inverse_transform(model.predict(X_test))
 # new_pred = y_scaler.inverse_transform(model.predict(X_new))
 new_MOF_pred = y_scaler.inverse_transform(model.predict(X_newMOF))
-new_MOF_pred = np.round(new_MOF_pred,2) # round to 2 decimals
+new_MOF_pred = np.round(new_MOF_pred,1) # round to 1 decimal
 
 # isolating just the prediction, since the model spits out the prediction like [[PREDICTION]], as in, in hard brackets
 new_MOF_pred = str(new_MOF_pred)

@@ -183,6 +183,8 @@ def serve_library_files(path):
     # Serves libraries
     return flask.send_from_directory('libraries', path)
     
+# Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of Terachem (here, 1.14)
+# the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
 @app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
 def ss_predict():
     # Generates solvent stability prediction
@@ -373,7 +375,7 @@ def ss_predict():
     line = line.split('[')
     line = line[2]
     line = line.split(']')
-    prediction = line[0] # isolating just the prediction
+    prediction = line[0] # isolating just the prediction, since the model spits out the prediction like [[PREDICTION]], as in, in hard brackets
     f.close()
 
     print('TIME CHECK 6')
@@ -543,11 +545,7 @@ def ts_predict():
     os.system('python thermal_ANN.py > thermal_prediction.txt')
 
     f = open("thermal_prediction.txt", "r")
-    line = f.read()
-    line = line.split('[')
-    line = line[2]
-    line = line.split(']')
-    prediction = line[0] # isolating just the prediction
+    prediction = f.read()
     f.close()
 
     print('TIME CHECK 6')

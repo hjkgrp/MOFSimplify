@@ -24,7 +24,7 @@ red = "rgba(255, 0, 0, 1)"
 green = "rgba(0, 196, 64, 1)"
 gray = "rgba(140, 140, 140, 1)"
 
-def normalize_data(df_train, df_test, fnames, lname, unit_trans=1, debug=False): # assumes gets a Pandas dataframe with MOfs as rows and features as columns
+def normalize_data(df_train, df_test, fnames, lname, unit_trans=1, debug=False): # assumes gets Pandas dataframes with MOfs as rows and features as columns
     _df_train = df_train.copy().dropna(subset=fnames+lname)
     _df_test = df_test.copy().dropna(subset=fnames+lname)
     X_train, X_test = _df_train[fnames].values, _df_test[fnames].values

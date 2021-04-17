@@ -252,7 +252,9 @@ def ss_predict():
     output1 = process1.communicate()[0]
     output2 = process2.communicate()[0]
     output3 = process3.communicate()[0]
-    output4 = process4.communicate()[0]
+    output4 = process4.communicate()[0] # TODO there should be some commands to parallelize the call, to quarter the time it is currently taking on Zeo++
+        # could do in subprocess? TODO
+        # potentially called joblib
 
     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
 
@@ -632,6 +634,89 @@ def get_components():
 
     dictionary['total_linkers'] = linker_num;
     dictionary['total_sbus'] = sbu_num;
+
+
+    os.chdir("linkers"); # move to linkers folder
+
+    # Identifying which linkers and sbus have different connectivities
+
+    # Code below uses molecular graph determinants 
+    # two ligands that are the same (via connectivity) will have the same molecular graph determinant. 
+    # Molecular graph determinant fails to distinguish between isomers, but so would RCM (Reverse Cuthill McKee)
+
+    # This simple script is meant to be run within the linkers directory, and it will give a bunch of numbers. 
+    # If those numbers are the same, the linker is the same, if not, the linkers are different, etc
+
+
+    from molSimplify.Classes.mol3D import mol3D
+    import glob
+    MOF_of_interest = 'temp_cif_primitive'
+    XYZs = sorted(glob.glob('*'+MOF_of_interest+'*xyz'))
+    det_list = []
+
+    print('test test')
+    print(XYZs)
+    for xyz in XYZs:
+        net = xyz.replace('xyz', 'net') # substring replacement; getting the appropriate .net file
+        linker_mol = mol3D()
+        linker_mol.readfromxyz(xyz)
+        with open(net,'r') as f:
+            data = f.readlines()
+        for i, line in enumerate(data):
+            if i==0:
+                # Skip first line
+                continue
+            elif i == 1:
+                graph = np.array([[int(val) for val in line.strip('\n').split(',')]])
+            else:
+                graph = np.append(graph, [np.array([int(val) for val in line.strip('\n').split(',')])],axis=0)
+        linker_mol.graph = graph
+        safedet = linker_mol.get_mol_graph_det(oct=False)
+        det_list.append(safedet)
+    #### linkers with the same molecular graph determinant are the same
+    #### molecular graph determinant does not catch isomers
+    linker_det_list = det_list
+
+    unique_linker_det = set(linker_det_list) # getting the unique determinants
+    unique_linker_indices = []
+    for item in unique_linker_det:
+        unique_linker_indices.append(linker_det_list.index(item)) # indices of the unique linkers in the list of linkers
+
+
+
+    os.chdir("../sbus"); # move to sbus folder
+
+    XYZs = sorted(glob.glob('*'+MOF_of_interest+'*xyz'))
+    det_list = []
+    for xyz in XYZs:
+        net = xyz.replace('xyz', 'net') # substring replacement; getting the appropriate .net file
+        linker_mol = mol3D()
+        linker_mol.readfromxyz(xyz)
+        with open(net,'r') as f:
+            data = f.readlines()
+        for i, line in enumerate(data):
+            if i==0:
+                # Skip first line
+                continue
+            elif i == 1:
+                graph = np.array([[int(val) for val in line.strip('\n').split(',')]])
+            else:
+                graph = np.append(graph, [np.array([int(val) for val in line.strip('\n').split(',')])],axis=0)
+        linker_mol.graph = graph
+        safedet = linker_mol.get_mol_graph_det(oct=False)
+        det_list.append(safedet)
+
+    sbu_det_list = det_list
+
+    unique_sbu_det = set(sbu_det_list) # getting the unique determinants
+    unique_sbu_indices = []
+    for item in unique_sbu_det:
+        unique_sbu_indices.append(sbu_det_list.index(item)) # indices of the unique sbus in the list of linkers
+
+
+    # adding the unique indices to the dictionary
+    dictionary['unique_linker_indices'] = unique_linker_indices;
+    dictionary['unique_sbu_indices'] = unique_sbu_indices;
 
     json_object = json.dumps(dictionary, indent = 4);
 

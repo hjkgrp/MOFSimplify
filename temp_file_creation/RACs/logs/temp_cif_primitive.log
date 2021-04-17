@@ -1,12 +1,10 @@
-atom 0 with type of La found to have 7 coordinates with atom types of N,O
-atom 1 with type of La found to have 8 coordinates with atom types of N,O
-atom 2 with type of La found to have 7 coordinates with atom types of N,O
-atom 3 with type of La found to have 8 coordinates with atom types of N,O
-atom 4 with type of La found to have 7 coordinates with atom types of N,O
-atom 5 with type of La found to have 8 coordinates with atom types of N,O
-atom 6 with type of La found to have 7 coordinates with atom types of N,O
-atom 7 with type of La found to have 8 coordinates with atom types of N,O
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 3 , 2
+atom 0 with type of Ag found to have 2 coordinates with atom types of N
+atom 1 with type of Ag found to have 3 coordinates with atom types of N
+atom 2 with type of Ag found to have 3 coordinates with atom types of N
+atom 3 with type of Ag found to have 2 coordinates with atom types of N
+atom 4 with type of Ag found to have 3 coordinates with atom types of N
+atom 5 with type of Ag found to have 3 coordinates with atom types of N
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 3
 
-Structure has SHORT ligand
+Structure has LONG ligand
 

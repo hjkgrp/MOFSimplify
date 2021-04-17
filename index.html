@@ -922,6 +922,7 @@ TODO list:
         $('#upload_status').text(''); // now nothing is uploaded
         document.getElementById('exampleholder').value = null; // clears example cif
         document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+        document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
 
         // check if uploaded file is a .cif
         if (! isCif(this.value)) { // if the uploaded file is not a cif
@@ -1108,6 +1109,7 @@ TODO list:
       $('#thermal_stability_prediction').text('');
       document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
       document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
 
       // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
       fetch('http://localhost:5001/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
@@ -1219,19 +1221,65 @@ TODO list:
     }
 
     $('#toggle_unique_components').click(function() {
-      
+
       // Ensure there are components to visualize
       if (document.getElementById('componentsholder').value == undefined) {
         alert('Must get MOF components first.');
         return;
       }
 
+      clear_component_dropdowns();
+
+      // find the dropdowns
+      var linker_dropdown = document.getElementById("linker");
+      var sbu_dropdown = document.getElementById("sbu");
+
       if (document.getElementById('toggle_unique_components').textContent == 'Only components with unique connectivities') {
         document.getElementById('toggle_unique_components').textContent = 'All components'; // cycle the button text on click
+
+        // getting the unique indices
+        unique_linker_indices = document.getElementById('componentsholder').value.unique_linker_indices;
+        unique_sbu_indices = document.getElementById('componentsholder').value.unique_sbu_indices;
+
+        // populating linker dropdown
+        for (i in unique_linker_indices) {
+          j = parseInt(i) + 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
+          var option = document.createElement('option');
+          option.text = 'Linker ' + j.toString(); 
+          linker_dropdown.add(option);
+        }
+
+        // populating sbu dropdown
+        for (i in unique_sbu_indices) {
+          j = parseInt(i) + 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
+          var option = document.createElement('option');
+          option.text = 'sbu ' + j.toString(); 
+          sbu_dropdown.add(option);
+        }
+
 
       }
       else if (document.getElementById('toggle_unique_components').textContent == 'All components') {
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // cycle the button text on click
+
+        // getting the total number of linkers and sbus
+        num_linkers = document.getElementById('componentsholder').value.total_linkers;
+        num_sbus = document.getElementById('componentsholder').value.total_sbus;
+
+        // populating linker dropdown
+        for (i = 1; i <= num_linkers; i++) {
+          var option = document.createElement('option');
+          option.text = 'Linker ' + i.toString();
+          linker_dropdown.add(option);
+        }
+
+        // populating sbu dropdown
+        for (i = 1; i <= num_sbus; i++) {
+          var option = document.createElement('option');
+          option.text = 'sbu ' + i.toString();
+          sbu_dropdown.add(option);
+        }
+
       }
 
     })

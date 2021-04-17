@@ -813,14 +813,14 @@ TODO list:
   $(function() {
 
     // Define global variables
-    metal_spin_dict = {'cr': {2: [1, 5], 3: [2, 4]},
-   'mn': {2: [2, 6], 3: [1, 5]},
-   'fe': {2: [1, 5], 3: [2, 6]},
-   'co': {2: [2, 4], 3: [1, 5]},
-   'mo': {2: [1, 5], 3: [2, 4]},
-   'tc': {2: [2, 6], 3: [1, 5]},
-   'ru': {2: [1, 5], 3: [2, 6]},
-   'rh': {2: [2, 4], 3: [1, 5]}};
+   //  metal_spin_dict = {'cr': {2: [1, 5], 3: [2, 4]},
+   // 'mn': {2: [2, 6], 3: [1, 5]},
+   // 'fe': {2: [1, 5], 3: [2, 6]},
+   // 'co': {2: [2, 4], 3: [1, 5]},
+   // 'mo': {2: [1, 5], 3: [2, 4]},
+   // 'tc': {2: [2, 6], 3: [1, 5]},
+   // 'ru': {2: [1, 5], 3: [2, 6]},
+   // 'rh': {2: [2, 4], 3: [1, 5]}};
 
 
     // Set up 3Dmol viewer 
@@ -836,61 +836,61 @@ TODO list:
 
 
     // Populate the spin dropdown
-    updateSpins = function() {
-      valid_spins = metal_spin_dict[$('#metal').val()][$('#ox').val()];
-      spin_dropdown = $("#spin").empty()
-      for(var i=0; i<valid_spins.length; i++) {
-          var option = $('<option></option>').attr("value", valid_spins[i].toString()).text(valid_spins[i]);
-          spin_dropdown.append(option);
-      };
-    };
+    // updateSpins = function() {
+    //   valid_spins = metal_spin_dict[$('#metal').val()][$('#ox').val()];
+    //   spin_dropdown = $("#spin").empty()
+    //   for(var i=0; i<valid_spins.length; i++) {
+    //       var option = $('<option></option>').attr("value", valid_spins[i].toString()).text(valid_spins[i]);
+    //       spin_dropdown.append(option);
+    //   };
+    // };
 
     // Populate the oxidation state dropdown (triggers spin dropdown repopulation)
-    updateOx = function() {
-      valid_oxs = Object.keys(metal_spin_dict['cr'])
-      ox_strs = {2: 'II', 3: 'III'}
-      ox_dropdown = $("#ox").empty()
-      for(var i=0; i<valid_oxs.length; i++) {
-          var option = $('<option></option>').attr("value", valid_oxs[i].toString()).text(ox_strs[valid_oxs[i]]);
-          ox_dropdown.append(option);
-      };
-      updateSpins()
-    };
+    // updateOx = function() {
+    //   valid_oxs = Object.keys(metal_spin_dict['cr'])
+    //   ox_strs = {2: 'II', 3: 'III'}
+    //   ox_dropdown = $("#ox").empty()
+    //   for(var i=0; i<valid_oxs.length; i++) {
+    //       var option = $('<option></option>').attr("value", valid_oxs[i].toString()).text(ox_strs[valid_oxs[i]]);
+    //       ox_dropdown.append(option);
+    //   };
+    //   updateSpins()
+    // };
 
     // Prevents user from downloading molecule and making NN predictions
-    lockMetrics = function() {
-      $('#download').prop('disabled', true)
-      $('#predict_s').prop('disabled', true)
-      $('#predict_t').prop('disabled', true)
-      $('#plot').prop('disabled', true)
-      $('#plot_pca').prop('disabled', true)
-      viewer.clear();
-      $('#loading').text('');
-      $('#chart').text('');
-    }
+    // lockMetrics = function() {
+    //   $('#download').prop('disabled', true)
+    //   $('#predict_s').prop('disabled', true)
+    //   $('#predict_t').prop('disabled', true)
+    //   $('#plot').prop('disabled', true)
+    //   $('#plot_pca').prop('disabled', true)
+    //   viewer.clear();
+    //   $('#loading').text('');
+    //   $('#chart').text('');
+    // }
 
     // Re-allows user to download molecule or make NN predictions
-    unlockMetrics = function() {
-      $('#download').prop('disabled', false)
-      $('#predict_s').prop('disabled', false)
-      $('#predict_t').prop('disabled', false)
-    }
+    // unlockMetrics = function() {
+    //   $('#download').prop('disabled', false)
+    //   $('#predict_s').prop('disabled', false)
+    //   $('#predict_t').prop('disabled', false)
+    // }
 
     // Locks the plotting ability
-    lockPlot = function() {
-      $('#plot').prop('disabled', true)
-      $('#plot_pca').prop('disabled', true)
-    }
+    // lockPlot = function() {
+    //   $('#plot').prop('disabled', true)
+    //   $('#plot_pca').prop('disabled', true)
+    // }
 
     // Unlocks the plotting ability
-    unlockPlot = function() {
-      $('#plot').prop('disabled', false)
-      $('#plot_pca').prop('disabled', false)
-    }
+    // unlockPlot = function() {
+    //   $('#plot').prop('disabled', false)
+    //   $('#plot_pca').prop('disabled', false)
+    // }
     // Set callbacks
-    $('#metal').change(updateOx);
-    $('#ox').change(updateSpins);
-    $('.locksMetrics').change(lockMetrics);
+    // $('#metal').change(updateOx);
+    // $('#ox').change(updateSpins);
+    // $('.locksMetrics').change(lockMetrics);
 
     // Upload MOF cif file  <!-- Gianmarco Terrones addition -->
     $(function() {
@@ -1347,24 +1347,24 @@ TODO list:
 
 
     // Make a neural network prediction (the display text is defined in app.py)
-    $('#predict').click(function() {
-      data.ox = $('#ox').val()
-      data.hfx = $('#hfx').val()
-      data.metal = $('#metal').val()
-      data.ax1 = $('#ligand').val()
-      data.ax2 = $('#ligand').val()
-      data.eq = $('#ligand').val()
-      data.spin = $('#spin').val()
-      $('#loading').html('loading...');
-      $.post("/nn_predict", JSON.stringify(data)).done(function(response){
-        data.sseplot = response.result; // Set the sseplot value used for plotting
-        if (data.sseplot != 'Error') {
-          unlockPlot();
-        }
-        $("#loading").html(response.resulttext);
-        document.getElementById('loading').scrollIntoView();
-        });
-    });
+    // $('#predict').click(function() {
+    //   data.ox = $('#ox').val()
+    //   data.hfx = $('#hfx').val()
+    //   data.metal = $('#metal').val()
+    //   data.ax1 = $('#ligand').val()
+    //   data.ax2 = $('#ligand').val()
+    //   data.eq = $('#ligand').val()
+    //   data.spin = $('#spin').val()
+    //   $('#loading').html('loading...');
+    //   $.post("/nn_predict", JSON.stringify(data)).done(function(response){
+    //     data.sseplot = response.result; // Set the sseplot value used for plotting
+    //     if (data.sseplot != 'Error') {
+    //       unlockPlot();
+    //     }
+    //     $("#loading").html(response.resulttext);
+    //     document.getElementById('loading').scrollIntoView();
+    //     });
+    // });
 
     // Define the behavior of the download button
     $('#download').click(function() {
@@ -1388,23 +1388,23 @@ TODO list:
   });
 
 
-  $('#plot').click(function() {
-    // For testing.
-    // data.sseplot = -15 
-    $.post("/plot", JSON.stringify(data)).done(function(response) { 
-      $('#chart').html(response)
-    })
-  });
+  // $('#plot').click(function() {
+  //   // For testing.
+  //   // data.sseplot = -15 
+  //   $.post("/plot", JSON.stringify(data)).done(function(response) { 
+  //     $('#chart').html(response)
+  //   })
+  // });
 
-  $('#plot_pca').click(function() {
-    // For testing
-    // data.ox = -2
-    // data.hfx = 0.2
-    // data.sseplot = -15
-    $.post("/plotpca", JSON.stringify(data)).done(function(response) { 
-      $('#chart').html(response)
-    })
-  });
+  // $('#plot_pca').click(function() {
+  //   // For testing
+  //   // data.ox = -2
+  //   // data.hfx = 0.2
+  //   // data.sseplot = -15
+  //   $.post("/plotpca", JSON.stringify(data)).done(function(response) { 
+  //     $('#chart').html(response)
+  //   })
+  // });
 
 </script>
 

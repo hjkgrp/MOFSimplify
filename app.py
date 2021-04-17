@@ -211,6 +211,10 @@ def ss_predict():
     shutil.rmtree('RACs')
     os.mkdir('RACs')
 
+    # doing the same with the Zeo++ folder
+    shutil.rmtree('zeo++')
+    os.mkdir('zeo++')
+
     os.chdir("RACs") # move to RACs folder
 
     print('TIME CHECK 2')
@@ -239,12 +243,16 @@ def ss_predict():
 
     # Run Zeo++
     os.chdir('..')
-    os.chdir('zeo++-0.3')
+    os.chdir('zeo++')
 
-    cmd1 = './network -ha -res txt_file_bin/temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd2 = './network -sa 1.86 1.86 10000 txt_file_bin/temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd3 = './network -ha -vol 1.86 1.86 10000 txt_file_bin/temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd4 = './network -volpo 1.86 1.86 10000 txt_file_bin/temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    import time # debugging
+    timeStarted = time.time() # save start time (debugging)
+
+    cmd1 = '../../zeo++-0.3/network -ha -res temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd2 = '../../zeo++-0.3/network -sa 1.86 1.86 10000 temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd3 = '../../zeo++-0.3/network -ha -vol 1.86 1.86 10000 temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd4 = '../../zeo++-0.3/network -volpo 1.86 1.86 10000 temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    # four parallelized Zeo++ commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
     process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -252,9 +260,10 @@ def ss_predict():
     output1 = process1.communicate()[0]
     output2 = process2.communicate()[0]
     output3 = process3.communicate()[0]
-    output4 = process4.communicate()[0] # TODO there should be some commands to parallelize the call, to quarter the time it is currently taking on Zeo++
-        # could do in subprocess? TODO
-        # potentially called joblib
+    output4 = process4.communicate()[0]
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
 
     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
 
@@ -282,16 +291,16 @@ def ss_predict():
     unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
     VPOV, GPOV = np.nan, np.nan
     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-    if (os.path.exists('txt_file_bin/temp_cif_pd.txt') & os.path.exists('txt_file_bin/temp_cif_sa.txt') &
-        os.path.exists('txt_file_bin/temp_cif_av.txt') & os.path.exists('txt_file_bin/temp_cif_pov.txt')
+    if (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
+        os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
         ):
-        with open('txt_file_bin/temp_cif_pd.txt') as f:
+        with open('temp_cif_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
                 largest_included_sphere = float(row.split()[1]) # largest included sphere
                 largest_free_sphere = float(row.split()[2]) # largest free sphere
                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open('txt_file_bin/temp_cif_sa.txt') as f:
+        with open('temp_cif_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
@@ -299,7 +308,7 @@ def ss_predict():
                     crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open('txt_file_bin/temp_cif_pov.txt') as f:
+        with open('temp_cif_pov.txt') as f:
             pore_volume_data = f.readlines()
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
@@ -313,9 +322,9 @@ def ss_predict():
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
-        print(basename, 'not all 4 files exist!', 'sa: ',os.path.exists(base_dir+'geometric/'+str(basename)+'_sa.txt'), 
-              'pd: ',os.path.exists(base_dir+'geometric/'+str(basename)+'_pd.txt'), 'av: ', os.path.exists(base_dir+'geometric/'+str(basename)+'_av.txt'),
-              'pov: ', os.path.exists(base_dir+'geometric/'+str(basename)+'_pov.txt'))
+        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists('temp_cif_sa.txt'), 
+              '; pd: ',os.path.exists('temp_cif_pd.txt'), '; av: ', os.path.exists('temp_cif_av.txt'),
+              '; pov: ', os.path.exists('temp_cif_pov.txt'))
         return 'FAILED'
     geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
                 'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
@@ -437,12 +446,16 @@ def ts_predict():
 
     # Run Zeo++
     os.chdir('..')
-    os.chdir('zeo++-0.3')
+    os.chdir('zeo++')
 
-    cmd1 = './network -ha -res txt_file_bin/temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd2 = './network -sa 1.86 1.86 10000 txt_file_bin/temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd3 = './network -ha -vol 1.86 1.86 10000 txt_file_bin/temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd4 = './network -volpo 1.86 1.86 10000 txt_file_bin/temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    import time # debugging
+    timeStarted = time.time() # save start time (debugging)
+
+    cmd1 = '../../zeo++-0.3/network -ha -res temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd2 = '../../zeo++-0.3/network -sa 1.86 1.86 10000 temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd3 = '../../zeo++-0.3/network -ha -vol 1.86 1.86 10000 temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
+    cmd4 = '../../zeo++-0.3/network -volpo 1.86 1.86 10000 temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    # four parallelized Zeo++ commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
     process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -451,6 +464,9 @@ def ts_predict():
     output2 = process2.communicate()[0]
     output3 = process3.communicate()[0]
     output4 = process4.communicate()[0]
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
 
     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
 
@@ -478,16 +494,16 @@ def ts_predict():
     unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
     VPOV, GPOV = np.nan, np.nan
     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-    if (os.path.exists('txt_file_bin/temp_cif_pd.txt') & os.path.exists('txt_file_bin/temp_cif_sa.txt') &
-        os.path.exists('txt_file_bin/temp_cif_av.txt') & os.path.exists('txt_file_bin/temp_cif_pov.txt')
+    if (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
+        os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
         ):
-        with open('txt_file_bin/temp_cif_pd.txt') as f:
+        with open('temp_cif_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
                 largest_included_sphere = float(row.split()[1]) # largest included sphere
                 largest_free_sphere = float(row.split()[2]) # largest free sphere
                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open('txt_file_bin/temp_cif_sa.txt') as f:
+        with open('temp_cif_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
@@ -495,7 +511,7 @@ def ts_predict():
                     crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open('txt_file_bin/temp_cif_pov.txt') as f:
+        with open('temp_cif_pov.txt') as f:
             pore_volume_data = f.readlines()
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
@@ -509,9 +525,9 @@ def ts_predict():
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
-        print(basename, 'not all 4 files exist!', 'sa: ',os.path.exists(base_dir+'geometric/'+str(basename)+'_sa.txt'), 
-              'pd: ',os.path.exists(base_dir+'geometric/'+str(basename)+'_pd.txt'), 'av: ', os.path.exists(base_dir+'geometric/'+str(basename)+'_av.txt'),
-              'pov: ', os.path.exists(base_dir+'geometric/'+str(basename)+'_pov.txt'))
+        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists('temp_cif_sa.txt'), 
+              '; pd: ',os.path.exists('temp_cif_pd.txt'), '; av: ', os.path.exists('temp_cif_av.txt'),
+              '; pov: ', os.path.exists('temp_cif_pov.txt'))
         return 'FAILED'
     geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
                 'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
@@ -654,8 +670,6 @@ def get_components():
     XYZs = sorted(glob.glob('*'+MOF_of_interest+'*xyz'))
     det_list = []
 
-    print('test test')
-    print(XYZs)
     for xyz in XYZs:
         net = xyz.replace('xyz', 'net') # substring replacement; getting the appropriate .net file
         linker_mol = mol3D()
@@ -722,247 +736,247 @@ def get_components():
 
     return json_object
 
-@app.route('/generate', methods=['POST'])
-def generate_mol():
-    # Grab data
-    mydata = json.loads(flask.request.get_data())
+# @app.route('/generate', methods=['POST'])
+# def generate_mol():
+#     # Grab data
+#     mydata = json.loads(flask.request.get_data())
 
-    good_request = True
+#     good_request = True
 
-    # Rename ligands appropriately
-    ligand_rename_dict = {'pyridine': 'pyr', 
-        'methyl isocyanide': 'misc',
-        'phenyl isocyanide': 'pisc',
-        'acetylacetonate': 'acac',
-        'bipyridine': 'bipy'}
+#     # Rename ligands appropriately
+#     ligand_rename_dict = {'pyridine': 'pyr', 
+#         'methyl isocyanide': 'misc',
+#         'phenyl isocyanide': 'pisc',
+#         'acetylacetonate': 'acac',
+#         'bipyridine': 'bipy'}
 
-    for lig_type in ['ax1', 'ax2', 'eq']:
-        if mydata[lig_type] in ligand_rename_dict:
-            mydata[lig_type] = ligand_rename_dict[mydata[lig_type]]
+#     for lig_type in ['ax1', 'ax2', 'eq']:
+#         if mydata[lig_type] in ligand_rename_dict:
+#             mydata[lig_type] = ligand_rename_dict[mydata[lig_type]]
 
-    ligoccs = []
-    ligs = []
+#     ligoccs = []
+#     ligs = []
 
-    if mydata['eq'] in licores: # Check for higher denticity
-        if isinstance(licores[mydata['eq']][2],list):
-            n = int(4/len(licores[mydata['eq']][2]))
-            for item in range(n):
-                ligoccs.append(1)
-                ligs.append(mydata['eq'])
-        else: # Monodentate
-            for item in range(4):
-                ligoccs.append(1)
-                ligs.append(mydata['eq'])
-    else: # Force monodentate for now
-        for item in range(4):
-            ligoccs.append(1)
-            ligs.append(mydata['eq'])
+#     if mydata['eq'] in licores: # Check for higher denticity
+#         if isinstance(licores[mydata['eq']][2],list):
+#             n = int(4/len(licores[mydata['eq']][2]))
+#             for item in range(n):
+#                 ligoccs.append(1)
+#                 ligs.append(mydata['eq'])
+#         else: # Monodentate
+#             for item in range(4):
+#                 ligoccs.append(1)
+#                 ligs.append(mydata['eq'])
+#     else: # Force monodentate for now
+#         for item in range(4):
+#             ligoccs.append(1)
+#             ligs.append(mydata['eq'])
 
-    ligs.append(mydata['ax1'])
-    ligs.append(mydata['ax2'])
-    ligoccs.append(1)
-    ligoccs.append(1)
+#     ligs.append(mydata['ax1'])
+#     ligs.append(mydata['ax2'])
+#     ligoccs.append(1)
+#     ligoccs.append(1)
 
-    ligoccs = ','.join([str(x) for x in ligoccs])
-    if any([True for x in ligs if len(x) == 0]): # Catch cases where empty ligand passed.
-        good_request = False
+#     ligoccs = ','.join([str(x) for x in ligoccs])
+#     if any([True for x in ligs if len(x) == 0]): # Catch cases where empty ligand passed.
+#         good_request = False
 
-    ligs = ','.join([str(x) for x in ligs])
-    print(ligs,ligoccs)
-    # Generates an xyz file from parameters provided in POST request
-    rundir = os.path.join(os.getcwd(), 'geos/')
-    jobname = 'run_generate_query'
-    mytext = string.Template('''-rundir $rundir
--ffoption no
--skipANN True
--distort 0
--name $jobname
--coord 6
--core $metal
--ligocc $ligoccs
--geometry oct
--spin $spin
--ligloc True
--oxstate $ox
--lig $ligs
--ff uff''')
-    mytext = mytext.substitute(rundir=rundir, metal=mydata['metal'], spin=mydata['spin'], ox=mydata['ox'], ligoccs=ligoccs, ligs=ligs, jobname=jobname)
-    inputstring_to_dict = lambda s: {i[0]:' '.join(i[1:]) for i in [i.split(' ') for i in s.split('\n')]}
-    mytext_dict = inputstring_to_dict(mytext)
-    try:
-        strfiles, emsg, this_diag = startgen_pythonic(mytext_dict)
-        print("printing xyz")
-        # print(this_diag.mol.writexyz('', writestring=True))
-        if good_request: 
-            outstring = this_diag.mol.writexyz('', writestring=True)
-        else:
-            outstring = mydata['geometry']
-    except UnboundLocalError:
-        print('CAUGHT UNBOUND LOCAL ERROR')
-        good_request = False
-        outstring = mydata['geometry']
+#     ligs = ','.join([str(x) for x in ligs])
+#     print(ligs,ligoccs)
+#     # Generates an xyz file from parameters provided in POST request
+#     rundir = os.path.join(os.getcwd(), 'geos/')
+#     jobname = 'run_generate_query'
+#     mytext = string.Template('''-rundir $rundir
+# -ffoption no
+# -skipANN True
+# -distort 0
+# -name $jobname
+# -coord 6
+# -core $metal
+# -ligocc $ligoccs
+# -geometry oct
+# -spin $spin
+# -ligloc True
+# -oxstate $ox
+# -lig $ligs
+# -ff uff''')
+#     mytext = mytext.substitute(rundir=rundir, metal=mydata['metal'], spin=mydata['spin'], ox=mydata['ox'], ligoccs=ligoccs, ligs=ligs, jobname=jobname)
+#     inputstring_to_dict = lambda s: {i[0]:' '.join(i[1:]) for i in [i.split(' ') for i in s.split('\n')]}
+#     mytext_dict = inputstring_to_dict(mytext)
+#     try:
+#         strfiles, emsg, this_diag = startgen_pythonic(mytext_dict)
+#         print("printing xyz")
+#         # print(this_diag.mol.writexyz('', writestring=True))
+#         if good_request: 
+#             outstring = this_diag.mol.writexyz('', writestring=True)
+#         else:
+#             outstring = mydata['geometry']
+#     except UnboundLocalError:
+#         print('CAUGHT UNBOUND LOCAL ERROR')
+#         good_request = False
+#         outstring = mydata['geometry']
 
-    http_response = {}
-    http_response['geometry'] = outstring
-    if good_request:
-        http_response['message'] = "Geometry Successfully Generated!"
-    else:
-        http_response['message'] = "Please either specify a valid monodentate SMILES string or select a pre-populated ligand."
+#     http_response = {}
+#     http_response['geometry'] = outstring
+#     if good_request:
+#         http_response['message'] = "Geometry Successfully Generated!"
+#     else:
+#         http_response['message'] = "Please either specify a valid monodentate SMILES string or select a pre-populated ligand."
 
-    return jsonify(http_response)
+#     return jsonify(http_response)
     
 
 
 
-@app.route('/nn_predict', methods=['POST'])
-def serve_nn_prediction():
-    # Run an NN prediction for the xyz file, ox state, and HFX contained in the POST request
-    try:
-        mydata = json.loads(flask.request.get_data())
-        xyzstr = mydata['geometry']
-        mymol = ms_mol3D.mol3D()
-        mymol.readfromstring(xyzstr)
-        rac_names, rac_vals = ms_RAC.get_descriptor_vector(mymol)
-        mydict = {rac_name:rac_val for rac_name, rac_val in zip(rac_names, rac_vals)}
-        mydict['alpha'] = float(mydata['hfx'])
-        mydict['ox'] = int(mydata['ox'])
-        mytable = pd.DataFrame([pd.Series(mydict)])
-	    # Local ANN prediction
-        start_time = time.time()
-        mytable = perform_ANN_prediction(mytable, 'split')
-        SSE_prediction = mytable.split_prediction.iloc[0]
+# @app.route('/nn_predict', methods=['POST'])
+# def serve_nn_prediction():
+#     # Run an NN prediction for the xyz file, ox state, and HFX contained in the POST request
+#     try:
+#         mydata = json.loads(flask.request.get_data())
+#         xyzstr = mydata['geometry']
+#         mymol = ms_mol3D.mol3D()
+#         mymol.readfromstring(xyzstr)
+#         rac_names, rac_vals = ms_RAC.get_descriptor_vector(mymol)
+#         mydict = {rac_name:rac_val for rac_name, rac_val in zip(rac_names, rac_vals)}
+#         mydict['alpha'] = float(mydata['hfx'])
+#         mydict['ox'] = int(mydata['ox'])
+#         mytable = pd.DataFrame([pd.Series(mydict)])
+# 	    # Local ANN prediction
+#         start_time = time.time()
+#         mytable = perform_ANN_prediction(mytable, 'split')
+#         SSE_prediction = mytable.split_prediction.iloc[0]
 
-	    # Sketchy math to find ground state spin
-        quantum_spins = {1: '0', 2: '1/2', 3: '1', 4: '3/2', 5: '2', 6: '5/2'}
-        mult = int(mydata['spin'])
-        ground_mult = 6 - mult if SSE_prediction < 0 else mult
-        quantum_spin_str = quantum_spins[ground_mult]
-        time_taken = time.time() - start_time
-        myresult = results_string % (SSE_prediction, quantum_spin_str, time_taken)
-        http_response = {}
-        http_response['resulttext'] = myresult
-        http_response['result'] = str(SSE_prediction) 
-        return jsonify(http_response)
-    except:
-        http_response = {}
-        http_response['resulttext'] = 'Error'
-        http_response['result'] = str(-24.5) 
-        return jsonify(http_response)
+# 	    # Sketchy math to find ground state spin
+#         quantum_spins = {1: '0', 2: '1/2', 3: '1', 4: '3/2', 5: '2', 6: '5/2'}
+#         mult = int(mydata['spin'])
+#         ground_mult = 6 - mult if SSE_prediction < 0 else mult
+#         quantum_spin_str = quantum_spins[ground_mult]
+#         time_taken = time.time() - start_time
+#         myresult = results_string % (SSE_prediction, quantum_spin_str, time_taken)
+#         http_response = {}
+#         http_response['resulttext'] = myresult
+#         http_response['result'] = str(SSE_prediction) 
+#         return jsonify(http_response)
+#     except:
+#         http_response = {}
+#         http_response['resulttext'] = 'Error'
+#         http_response['result'] = str(-24.5) 
+#         return jsonify(http_response)
 
-# Version 1 - KDE
-def make_plot(x1):
-    source = ColumnDataSource(datadf)
-    print(datadf.columns.values)
-    x_min = min(x1, min(datadf.sse.values))
-    x_max = max(x1, max(datadf.sse.values))
-    x_range = x_max - x_min
-    x_min, x_max = (x_min - 0.05*x_range, x_max + 0.05*x_range)
-    p = figure(title = "Your Complex Spin Splitting Energy Compared to Training Data", 
-               sizing_mode="scale_both", plot_width=400, plot_height=200, x_axis_type=None, x_range=(x_min, x_max))
-    p.yaxis.axis_label = 'KDE of Training Data'
-    p.line('sse', 'kde', source=source, line_width=2)
-    vertical = Span(location=x1,dimension='height',
-                    line_color='green',line_dash='dashed',line_width=3)
-    p.yaxis.major_tick_line_color = None  # turn off y-axis major ticks
-    p.yaxis.minor_tick_line_color = None  # turn off y-axis minor ticks
-    p.yaxis.major_label_text_font_size = '0pt'  # turn off y-axis tick labels
-    p.xgrid.grid_line_color = None
-    p.ygrid.grid_line_color = None
-    p.add_layout(vertical)
-    ticker = SingleIntervalTicker(interval=10, num_minor_ticks=2)
-    xaxis = LinearAxis(ticker=ticker)
-    p.add_layout(xaxis, 'below')
-    p.xaxis.axis_label = 'Spin Splitting Energy (kcal/mol)'
-    return p
+# # Version 1 - KDE
+# def make_plot(x1):
+#     source = ColumnDataSource(datadf)
+#     print(datadf.columns.values)
+#     x_min = min(x1, min(datadf.sse.values))
+#     x_max = max(x1, max(datadf.sse.values))
+#     x_range = x_max - x_min
+#     x_min, x_max = (x_min - 0.05*x_range, x_max + 0.05*x_range)
+#     p = figure(title = "Your Complex Spin Splitting Energy Compared to Training Data", 
+#                sizing_mode="scale_both", plot_width=400, plot_height=200, x_axis_type=None, x_range=(x_min, x_max))
+#     p.yaxis.axis_label = 'KDE of Training Data'
+#     p.line('sse', 'kde', source=source, line_width=2)
+#     vertical = Span(location=x1,dimension='height',
+#                     line_color='green',line_dash='dashed',line_width=3)
+#     p.yaxis.major_tick_line_color = None  # turn off y-axis major ticks
+#     p.yaxis.minor_tick_line_color = None  # turn off y-axis minor ticks
+#     p.yaxis.major_label_text_font_size = '0pt'  # turn off y-axis tick labels
+#     p.xgrid.grid_line_color = None
+#     p.ygrid.grid_line_color = None
+#     p.add_layout(vertical)
+#     ticker = SingleIntervalTicker(interval=10, num_minor_ticks=2)
+#     xaxis = LinearAxis(ticker=ticker)
+#     p.add_layout(xaxis, 'below')
+#     p.xaxis.axis_label = 'Spin Splitting Energy (kcal/mol)'
+#     return p
 
-# Version 2 - PCA
-def make_plotpca(sse,geometry,ox,alpha):
-    print(pca_plot_df.columns.values)
-    ##### Apply Data
-    my_mol = ms_mol3D.mol3D()
-    my_mol.readfromstring(geometry)
-    RACs = my_mol.get_features()
-    RACs['ox'] = ox
-    RACs['alpha'] = alpha
-    new_vect = np.array([RACs[x] for x in pca_variables])
-    plot_vals = pca_model.transform(np.array(new_vect).reshape(1,-1))
-    x1 = plot_vals[0][0] # New X
-    y1 = plot_vals[0][1] # New Y
-    ########
-    x_min = min(x1, min(pca_plot_df.PC1.values))
-    x_max = max(x1, max(pca_plot_df.PC1.values))
-    y_min = min(y1, min(pca_plot_df.PC2.values))
-    y_max = max(y1, max(pca_plot_df.PC2.values))
-    x_range = x_max - x_min
-    y_range = y_max - y_min
-    x_min, x_max = (x_min - 0.05*x_range, x_max + 0.05*x_range)
-    y_min, y_max = (y_min - 0.05*y_range, y_max + 0.05*y_range)
-    #### Colormap
-    colormax = max(np.abs(sse),np.abs(pca_plot_df['Spin Splitting Energy (kcal/mol)'].values).max())
-    colormax = 50
-    mapper = LinearColorMapper(palette=cmap_bokeh, low=-colormax, high=colormax)
-    colors = {'field':np.array(list(pca_plot_df['Spin Splitting Energy (kcal/mol)'].values) + [sse]),
-                'transform':mapper}
-    cticker = SingleIntervalTicker(interval=10, num_minor_ticks=0)
-    color_bar = ColorBar(color_mapper=mapper, ticker=cticker, label_standoff=5, 
-                         border_line_color=None, location=(0,0))#, title='SSE (kcal/mol)')
-    ##### Plotting
-    source = ColumnDataSource({
-        'PC1':pca_plot_df.PC1.values,
-        'PC2':pca_plot_df.PC2.values,
-        'chemname':pca_plot_df['Chemical Name'].values,
-        'color': pca_plot_df['Spin Splitting Energy (kcal/mol)'].values})
-    TOOLS="crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,reset,tap,"
-    p = figure(title = "Your Complex (green) Compared to Training Data in Feature Space", 
-               sizing_mode="scale_both", plot_width=400, plot_height=400,
-                x_range=(x_min, x_max),y_range=(y_min, y_max),tools=TOOLS)
-    # p.line('sse', 'kde', source=source, line_width=2)
-    source2 = ColumnDataSource({
-        'PC1':[x1],
-        'PC2':[y1],
-        'chemname':['Your Complex'],
-        'color': [sse]})
-    p.circle('PC1','PC2',source=source,fill_color={'field':'color','transform':mapper},line_color={'field':'color','transform':mapper},
-             size=10)
-    p.circle('PC1','PC2',source=source2,fill_color={'field':'color','transform':mapper},line_color='mediumseagreen',
-             size=20,line_width=3)
-    # Datalabels with hover animation.
-    p.add_tools(HoverTool(
-        tooltips = [('Chemical Name', '@chemname{%s}'),
-                     ('Spin Splitting Energy (kcal/mol)', '@color{%0.2d}'),
-                     ],
-        formatters={ 'chemname':'printf',
-            'color': 'printf'
-        }
-    ))
-    p.yaxis.major_tick_line_color = None  # turn off y-axis major ticks
-    p.yaxis.minor_tick_line_color = None  # turn off y-axis minor ticks
-    p.xaxis.major_tick_line_color = None  # turn off x-axis major ticks
-    p.xaxis.minor_tick_line_color = None  # turn off x-axis minor ticks
-    p.yaxis.major_label_text_font_size = '0pt'  # turn off y-axis tick labels
-    p.xaxis.major_label_text_font_size = '0pt' # turn off x-axis tick labels
-    p.xgrid.grid_line_color = None # Remove grid
-    p.ygrid.grid_line_color = None # Remove grid
-    p.outline_line_width = 2
-    p.outline_line_alpha = 1
-    p.outline_line_color = "black"
-    p.xaxis.axis_label = 'PC1'
-    p.yaxis.axis_label = 'PC2'
-    p.add_layout(color_bar,'right')
-    return p
+# # Version 2 - PCA
+# def make_plotpca(sse,geometry,ox,alpha):
+#     print(pca_plot_df.columns.values)
+#     ##### Apply Data
+#     my_mol = ms_mol3D.mol3D()
+#     my_mol.readfromstring(geometry)
+#     RACs = my_mol.get_features()
+#     RACs['ox'] = ox
+#     RACs['alpha'] = alpha
+#     new_vect = np.array([RACs[x] for x in pca_variables])
+#     plot_vals = pca_model.transform(np.array(new_vect).reshape(1,-1))
+#     x1 = plot_vals[0][0] # New X
+#     y1 = plot_vals[0][1] # New Y
+#     ########
+#     x_min = min(x1, min(pca_plot_df.PC1.values))
+#     x_max = max(x1, max(pca_plot_df.PC1.values))
+#     y_min = min(y1, min(pca_plot_df.PC2.values))
+#     y_max = max(y1, max(pca_plot_df.PC2.values))
+#     x_range = x_max - x_min
+#     y_range = y_max - y_min
+#     x_min, x_max = (x_min - 0.05*x_range, x_max + 0.05*x_range)
+#     y_min, y_max = (y_min - 0.05*y_range, y_max + 0.05*y_range)
+#     #### Colormap
+#     colormax = max(np.abs(sse),np.abs(pca_plot_df['Spin Splitting Energy (kcal/mol)'].values).max())
+#     colormax = 50
+#     mapper = LinearColorMapper(palette=cmap_bokeh, low=-colormax, high=colormax)
+#     colors = {'field':np.array(list(pca_plot_df['Spin Splitting Energy (kcal/mol)'].values) + [sse]),
+#                 'transform':mapper}
+#     cticker = SingleIntervalTicker(interval=10, num_minor_ticks=0)
+#     color_bar = ColorBar(color_mapper=mapper, ticker=cticker, label_standoff=5, 
+#                          border_line_color=None, location=(0,0))#, title='SSE (kcal/mol)')
+#     ##### Plotting
+#     source = ColumnDataSource({
+#         'PC1':pca_plot_df.PC1.values,
+#         'PC2':pca_plot_df.PC2.values,
+#         'chemname':pca_plot_df['Chemical Name'].values,
+#         'color': pca_plot_df['Spin Splitting Energy (kcal/mol)'].values})
+#     TOOLS="crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,reset,tap,"
+#     p = figure(title = "Your Complex (green) Compared to Training Data in Feature Space", 
+#                sizing_mode="scale_both", plot_width=400, plot_height=400,
+#                 x_range=(x_min, x_max),y_range=(y_min, y_max),tools=TOOLS)
+#     # p.line('sse', 'kde', source=source, line_width=2)
+#     source2 = ColumnDataSource({
+#         'PC1':[x1],
+#         'PC2':[y1],
+#         'chemname':['Your Complex'],
+#         'color': [sse]})
+#     p.circle('PC1','PC2',source=source,fill_color={'field':'color','transform':mapper},line_color={'field':'color','transform':mapper},
+#              size=10)
+#     p.circle('PC1','PC2',source=source2,fill_color={'field':'color','transform':mapper},line_color='mediumseagreen',
+#              size=20,line_width=3)
+#     # Datalabels with hover animation.
+#     p.add_tools(HoverTool(
+#         tooltips = [('Chemical Name', '@chemname{%s}'),
+#                      ('Spin Splitting Energy (kcal/mol)', '@color{%0.2d}'),
+#                      ],
+#         formatters={ 'chemname':'printf',
+#             'color': 'printf'
+#         }
+#     ))
+#     p.yaxis.major_tick_line_color = None  # turn off y-axis major ticks
+#     p.yaxis.minor_tick_line_color = None  # turn off y-axis minor ticks
+#     p.xaxis.major_tick_line_color = None  # turn off x-axis major ticks
+#     p.xaxis.minor_tick_line_color = None  # turn off x-axis minor ticks
+#     p.yaxis.major_label_text_font_size = '0pt'  # turn off y-axis tick labels
+#     p.xaxis.major_label_text_font_size = '0pt' # turn off x-axis tick labels
+#     p.xgrid.grid_line_color = None # Remove grid
+#     p.ygrid.grid_line_color = None # Remove grid
+#     p.outline_line_width = 2
+#     p.outline_line_alpha = 1
+#     p.outline_line_color = "black"
+#     p.xaxis.axis_label = 'PC1'
+#     p.yaxis.axis_label = 'PC2'
+#     p.add_layout(color_bar,'right')
+#     return p
 
-@app.route('/plot', methods=['POST'])
-def plot():
-    mydata = json.loads(flask.request.get_data())
-    plt = make_plot(float(mydata['sseplot'])) # V1 KDE
-    return file_html(plt,CDN,'my plot')
+# @app.route('/plot', methods=['POST'])
+# def plot():
+#     mydata = json.loads(flask.request.get_data())
+#     plt = make_plot(float(mydata['sseplot'])) # V1 KDE
+#     return file_html(plt,CDN,'my plot')
 
-@app.route('/plotpca', methods=['POST'])
-def plotpca():
-    mydata = json.loads(flask.request.get_data())
-    plt = make_plotpca(float(mydata['sseplot']),mydata['geometry'],
-                    mydata['ox'],mydata['hfx'])
-    return file_html(plt,CDN,'my plot pca')
+# @app.route('/plotpca', methods=['POST'])
+# def plotpca():
+#     mydata = json.loads(flask.request.get_data())
+#     plt = make_plotpca(float(mydata['sseplot']),mydata['geometry'],
+#                     mydata['ox'],mydata['hfx'])
+#     return file_html(plt,CDN,'my plot pca')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

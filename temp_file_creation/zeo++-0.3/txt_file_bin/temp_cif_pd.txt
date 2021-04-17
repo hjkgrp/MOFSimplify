@@ -1,1 +1,0 @@
-txt_file_bin/temp_cif_pd.txt    5.89138 4.83520  5.87664

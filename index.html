@@ -1,4 +1,4 @@
-<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. A lot of the current code still has metal complex stuff, which will need to be removed/tweaked later. Visualization now can be done directly from an uploaded cif file. An example MOF is prepared by default, using fetch and a node hosting of local files. 
+<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. Visualization can be done directly from an uploaded cif file. An example MOF is prepared by default, using fetch and a node hosting of local files. 
 
 In order to get code to work, use Safari and select Develop -> Disable Cross-Origin Restrictions.
 
@@ -6,9 +6,6 @@ In two terminals, navigate to folder containing app.py
 First, in one terminal, run node node.js (this is to make the example MOF available)
 Then, to open the website, run python app.py in the second terminal
 
-
-TODO list:
-  featurize MOFS with RACs and Zeo++ to make predictions, and display this predictions to the user
 -->
 
 
@@ -140,7 +137,7 @@ TODO list:
 
         <div style="margin-bottom:0.5cm;"></div>
 
-        In progress: A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks.
+        A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb).
 
 
         <!-- Selection box for Axial Ligand 1 (gets replaced immediately by JavaScript code) -->
@@ -297,7 +294,8 @@ TODO list:
             </select>
             </div>
         </div> -->
-        <button class='btn btn-primary' id='download_generated' type="button">Download building block-generated MOF</button>
+        <button class='btn btn-primary' id='generate' type="button">Make bb-generated MOF</button>
+        <button class='btn btn-primary' id='download_generated' type="button">Download bb-generated MOF</button>
 
 
 
@@ -394,12 +392,15 @@ TODO list:
  <input id="fileinput" type="file" name="fileinput" style="display:none"/>  <!-- Gianmarco Terrones addition -->
 <!-- This will never display anything. Just used to store a MOF cif file if the button "Upload MOF file" is used -->
 
-
 <!-- For example MOF file -->
 <p id="exampleholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
 
+<!-- For building block-generated MOF file -->
+<p id="bbgMOFholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
+
+
 <!-- For MOF components (xyz file text) -->
-<p id="componentsholder"> </p> <!-- This will never display anything. Just used to store MOF components if the button "Get MOF Components" is used -->
+<p id="componentsholder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used TODO -->
 
 </body>
 
@@ -928,7 +929,7 @@ TODO list:
         if (! isCif(this.value)) { // if the uploaded file is not a cif
             this.value = null; // clear the non-cif file
             alert("Must be a cif file.");
-            return;      
+            return; // if not a cif, doesn't continue     
         }
 
         let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
@@ -988,7 +989,6 @@ TODO list:
 
         $.post("/predict_solvent_stability", JSON.stringify(result)).done(
             function(response) {
-                  // TODO Implement an actual prediction on the backend
 
                   if (response == 'FAILED') { // (!response.ok) || 
                       alert('Failed to featurize')
@@ -1053,7 +1053,6 @@ TODO list:
 
         $.post("/predict_thermal_stability", JSON.stringify(result)).done(
             function(response) {
-                  // TODO Implement an actual prediction on the backend
 
                   if (response == 'FAILED') { // (!response.ok) || 
                       alert('Failed to featurize')
@@ -1204,7 +1203,7 @@ TODO list:
     });
     
 
-    function clear_component_dropdowns() { // TODO clear dropdowns when upload new file, and reshow message in 3dmol viewer
+    function clear_component_dropdowns() { // clear dropdowns when upload new file, and reshow message in 3dmol viewer
       // clearing linker dropdown
       var linker_dropdown = document.getElementById("linker");
       var length = linker_dropdown.options.length;
@@ -1287,8 +1286,6 @@ TODO list:
 
     // Visualize the linker after MOF components have been resolved
     $('#visualize_linker').click(function() {
-
-      console.log(document.getElementById('componentsholder').value) // testing TODO
 
       // Ensure there are components to visualize
       if (document.getElementById('componentsholder').value == undefined) {

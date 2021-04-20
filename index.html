@@ -420,12 +420,16 @@ Then, to open the website, run python app.py in the second terminal
   }
 
   handleInput = function() {
-    if (document.getElementById("fileinput").files[0] == null) {
+    if (document.getElementById("fileinput").files[0] !== null) {
+      var ciffile = document.getElementById("fileinput").files[0];
+    }
+    else if (document.getElementById("exampleholder").value !== null) {
       var ciffile = document.getElementById("exampleholder").value;
     }
     else {
-      var ciffile = document.getElementById("fileinput").files[0];
+      var ciffile = document.getElementById('bbgMOFholder').value;
     }
+        
 
     
     //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";

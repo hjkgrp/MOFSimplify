@@ -868,6 +868,7 @@ Then, to open the website, run python app.py in the third terminal
 
             fetch('http://localhost:5002/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the example MOF from local host
               if(!response.ok) { // catching 404 and other issues
+                document.getElementById('bbgMOFholder').value = undefined; // clearing the value, so no component visualization is possible
                 throw Error(response.statusText);
               } 
                 return response.blob();
@@ -903,6 +904,17 @@ Then, to open the website, run python app.py in the third terminal
 
         });
     });  
+
+    $('#download_generated').click(function() {
+      if (document.getElementById('bbgMOFholder').value == undefined) {
+        alert('Must generate MOF with building blocks first, using Make bb-generated MOF button'); 
+        return;
+      }
+
+      myFile = document.getElementById('bbgMOFholder').value;
+
+      // TODO
+    })
 
 
       // Load example MOF

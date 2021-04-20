@@ -115,7 +115,7 @@ Then, to open the website, run python app.py in the second terminal
             
             <!-- Lead text -->
             <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a href="about.html">About</a> tab.</p>
-          </di>
+          </div>
         </div>
       </div>
 
@@ -142,186 +142,62 @@ Then, to open the website, run python app.py in the second terminal
 
         <!-- Selection box for Axial Ligand 1 (gets replaced immediately by JavaScript code) -->
         <div  style="padding-top: 30px">
-        Linker, the connecting building block (selection or SMILES string)
-<!--         <input id="ligand_ax1" class='form-control locksMetrics' list="ligands_ax" onmousedown="value = '';" />
- -->        
-        <input id="linker_option" class='form-control locksMetrics' onmousedown="value = '';" />
-          <option value>Option 1 TODO</option>
-          <option value>Option 2 TODO</option>
-</div>
+          Linker, the connecting building block
+          <input id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
+            <option value>Option 1 TODO</option>
+            <option value>Option 2 TODO</option>
+        </div>
+
+        <!-- Default linkers -->
+        <datalist id = 'linkers_list'>
+            <option value="1B_4H_Ch">
+            <option value="3B_4H_Ch">
+        </datalist>
 
 
         <!-- Selection box for metal -->
         <div>
-        sbu, the metal-centered nodular building block (selection or SMILES string)
-        <input id="sbu_option" class='form-control locksMetrics' onmousedown="value = '';" />
-          <option value>Option 1 TODO</option>
-          <option value>Option 2 TODO</option>
-
-<!--         <select class='form-control locksMetrics' id="metal">
-          <option value='cr'>Option 1 TODO</option>
-          <option value='mn'>Option 2 TODO</option>
-          <option value='fe'>Iron</option>
-          <option value='co'>Cobalt</option>
-          <option value='mo'>Molybdenum</option>
-          <option value='tc'>Technetium</option>
-          <option value='ru'>Ruthenium</option>
-          <option value='rh'>Rhodium</option>
-        </select> -->
+          sbu, the metal-centered nodular building block 
+          <input id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
+            <option value>Option 1 TODO</option>
+            <option value>Option 2 TODO</option>
         </div>
 
-        <!-- Selection box for Axial Ligand 2 (gets replaced immediately by JavaScript code) -->
-<!--         <div>
-        Axial Ligand 2 (selection or SMILES string)
-        <input id="ligand_ax2" class='form-control locksMetrics' list="ligands_ax" onmousedown="value = '';" />
-        </div>
- -->
-        <!-- Selection box for Equatorial Ligand (gets replaced immediately by JavaScript code) -->
-        <div>
-        MOF Net (selection)
-<!--         <input id="ligand_eq" class='form-control locksMetrics' list="ligands_eq" onmousedown="value = '';" />
- -->        
-        <select class='form-control locksMetrics' id="metal">
-          <option value='net_1'>Option 1</option>
-          <option value='net_2'>Option 2</option>
-          <option value='net_3'>Option 3</option>
-          <option value='net_4'>Option 4</option>
-          <option value='net_5'>Option 5</option>
-          <option value='net_6'>Option 6</option>
-          <option value='net_7'>Option 7</option>
-          <option value='net_8'>Option 8</option>
-          <option value='net_9'>Option 9</option>
-          <option value='net_10'>Option 10</option>
-          <option value='net_11'>Option 11</option>
-          <option value='net_12'>Option 12</option>                    
-          <option value='net_13'>Option 13</option>
-          <option value='net_14'>Option 14</option>
-          <option value='net_15'>Option 15</option>
-          <option value='net_16'>Option 16</option>
-          <option value='net_17'>Option 17</option>
-          <option value='net_18'>Option 18</option>
-          <option value='net_19'>Option 19</option>
-          <option value='net_20'>Option 20</option>
-          <option value='net_21'>Option 21</option>
-          <option value='net_22'>Option 22</option>
-          <option value='net_23'>Option 23</option>
-          <option value='net_24'>Option 24</option>
-          <option value='net_25'>Option 25</option>
-          <option value='net_26'>Option 26</option>
-          <option value='net_27'>Option 27</option>
-          <option value='net_28'>Option 28</option>
-          <option value='net_29'>Option 29</option>
-          <option value='net_30'>Option 30</option>
-          <option value='net_31'>Option 31</option>
-          <option value='net_32'>Option 32</option>
-          <option value='net_33'>Option 33</option>
-          <option value='net_34'>Option 34</option>
-          <option value='net_35'>Option 35</option>
-          <option value='net_36'>Option 36</option>          
-          <option value='net_37'>Option 37</option>
-          <option value='net_38'>Option 38</option>
-          <option value='net_39'>Option 39</option>
-          <option value='net_40'>Option 40</option>
-          <option value='net_41'>Option 41</option>
-        </select>
-</div>
-
-        <!-- Default Axial Ligands-->
-<!--         <datalist id="ligands_ax">
-          <option value="water">
-          <option value="ammonia">
-          <option value="cyanide">
-          <option value="pyridine">
-          <option value="carbonyl">
-          <option value="methyl isocyanide">
-          <option value="isothiocyanate">
-          <option value="thiocyanate">
-          <option value="fluoride">
-          <option value="chloride">
-          <option value="cyanide">
-          <option value="phosphine">
-          <option value="acetonitrile">
-          <option value='phenyl isocyanide'>
-        </datalist> -->
-
-        <!-- Default Equatorial Ligands-->
-<!--         <datalist id="ligands_eq">
-          <option value="water">
-          <option value="ammonia">
-          <option value="cyanide">
-          <option value="pyridine">
-          <option value="carbonyl">
-          <option value="methyl isocyanide">
-          <option value="isothiocyanate">
-          <option value="thiocyanate">
-          <option value="fluoride">
-          <option value="chloride">
-          <option value="cyanide">
-          <option value="phosphine">
-          <option value="acetonitrile">
-          <option value='phenyl isocyanide'>
-          <option value='porphyrin'>
-          <option value='acetylacetonate'>
-          <option value='bipyridine'>
-        </datalist> -->
-
-        <!-- Selection box for oxidation state -->
-<!--         <div>
-        Oxidation State
-        <select class='form-control locksMetrics' id="ox">
-          <option value="2">II</option>
-          <option value="3">III</option>
-        </select>
-        </div> -->
-
-<!--         <button style='margin-top: 10px' class='btn btn-info' data-toggle='collapse' data-target='#advanced' aria-expanded='false' aria-controls='advanced' id='show_advanced' type="button">Show/hide advanced parameters</button> -->
+        <!-- Default sbus -->
+        <datalist id = 'sbus_list'>
+            <option value="4c_Cd_1_Ch">
+            <option value="6c_Zn_1_Ch">
+            <option value="6c_Al_1">
+            <option value="4c_Cu_1_Ch">
+        </datalist>
         
-<!--         <div style='margin-top: 10px' id='advanced' class='collapse'>
- -->            <!-- Selection box for HFX -->
-<!--             Hartree-Fock Exchange Fraction
-            <select class='form-control locksMetrics' id="hfx">
-              <option value='0.10'>10%</option>
-              <option value='0.20'>20%</option>
-              <option value='0.30'>30%</option>
-            </select> -->
-            <!-- Selection box for spin -->
-<!--             <div>
-            Spin Multiplicity
-            <select class='form-control locksMetrics' id="spin">
-              <option value="1">1</option>
-              <option value="3">3</option>
-              <option value="5">5</option>
-            </select>
-            </div>
-        </div> -->
+        <div>
+          MOF Net (selection)
+          <select class='form-control locksMetrics' id="nets_option">
+            <option value='cdl'>cdl</option>
+            <option value='cds'>cds</option>
+            <option value='crr'>crr</option>
+          </select>
+        </div>
+
         <button class='btn btn-primary' id='generate' type="button">Make bb-generated MOF</button>
         <button class='btn btn-primary' id='download_generated' type="button">Download bb-generated MOF</button>
 
 
 
-        <div style="margin-top:1cm;"></div>
+      <div style="margin-top:1cm;"></div>
         <!-- Button for uploading MOF cif file -->
         <button class='btn btn-primary' id='upload' type="button">Upload MOF cif file</button>
 
         <!-- Button for getting MOF components for visualization  -->
         <button class='btn btn-primary' id='get_components' type='button'>Get MOF components</button>
 
-        
-        <!-- Button for generating molecule -->
-        <!-- <button class='btn btn-primary' id='generate' type="button">Generate!</button> -->
-        <!-- Button for downloading generated molecule -->
-        <!-- <button class='btn btn-primary' id='download' type="button">Download XYZ File</button> -->
-
         <!-- Button for predicting solvent removal stability of MOF -->
         <button class='btn btn-primary' id='predict_s' type="button">Predict stability upon solvent removal</button> <!-- Gianmarco Terrones addition -->
         <!-- Button for predicting thermal stability of MOF -->
         <button class='btn btn-primary' id='predict_t' type="button">Predict thermal stability</button> <!-- Gianmarco Terrones addition -->
 
-        <!-- Button for plotting spin-splitting of generated molecule -->
-        <!-- <button class='btn btn-primary' id='plot' type="button" disabled="true">Plot ΔE<sub>H-L</sub></button> -->
-        <!-- Button for plotting PCA of generated molecule-->
-        <!-- <button class='btn btn-primary' id='plot_pca' type="button" disabled="true">PCA ΔE<sub>H-L</sub></sub></button> -->
-        </div>
+      </div>
     </div>
     <!-- Empty spot where the MOF prediction text is placed. -->
     <div class='row' style='margin-top: 0.5cm;'>
@@ -353,17 +229,12 @@ Then, to open the website, run python app.py in the second terminal
       <div>
         Linkers
         <select class='form-control' id='linker'>
-<!--           <option value='linker_1'>Linker 1</option>
-          <option value='linker_2'>Linker 2</option> -->
         </select>
       </div>
 
       <div>
         sbus
-        <select class='form-control' id='sbu'>
-<!--           <option value='sbu_1'>sbu 1</option>
-          <option value='sbu_2'>sbu 2</option> -->
-        </select>
+        <select class='form-control' id='sbu'> </select>
       </div>
 
       <button class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
@@ -596,13 +467,7 @@ Then, to open the website, run python app.py in the second terminal
     }
   }
 
-  // clearDropdown = function(select_id) {
-  //   // Clear out the listed options from a <select> tag
-  //   var select_tag = document.getElementById(select_id);
-  //   while (select_tag.firstChild) {
-  //     select_tag.removeChild(select_tag.firstChild);
-  //   }
-  // }
+
 
   updateFileLists = function() {
     //clearDropdown("cifdownload");
@@ -628,55 +493,9 @@ Then, to open the website, run python app.py in the second terminal
       // Separate linkers into branches + branch points for the AllNode algorithm
       view_value_list[0] = "nodes_and_branches";
     }
-    // filelist.forEach(function(file) {
-    //   var option = document.createElement("option");
-    //   option.text = file;
-    //   option.value = file;
-    //   document.getElementById("cifdownload").appendChild(option);
-    // });
 
-    //clearDropdown("view_type");
-    // for (var i=0; i<view_value_list.length; i++) {
-    //   var option = document.createElement("option");
-    //   option.text = view_name_list[i];
-    //   option.value = view_value_list[i];
-    //   document.getElementById("view_type").appendChild(option);
-    // }
-    // document.getElementById("view_type").selectedIndex = selected_view_index;
   }
 
-  // getInputValue = function(html_id) {
-  //   var input_tag = document.getElementById(html_id);
-  //   return input_tag.options[input_tag.selectedIndex].value;
-  // }
-
-  // updateAlgorithmSelection = function() {
-  //   updateFileLists();
-  //   updateAlgorithmView();
-  // }
-
-  // updateAlgorithmView = function() {
-  //   var view_name = "original"; //getInputValue("view_type");
-  //   var folder_name = ""; //getInputValue("folderdownload");
-  //   clearViewer(stage);
-  //   if (view_name == "original") {
-  //     drawEmPDB(stage, "/Output/orig_mol.pdb", "element");
-  //   } else if (view_name == "nodes_and_linkers" || view_name == "nodes_and_branches") {
-  //     drawEmPDB(stage, "/Output/" + folder_name + "/nodes.pdb", UniformColor(0xFF9155));
-  //     drawEmPDB(stage, "/Output/" + folder_name + "/node_bridges.pdb", UniformColor(0xFF9155));
-  //     if (view_name == "nodes_and_linkers") {
-  //       drawEmPDB(stage, "/Output/" + folder_name + "/linkers.pdb", UniformColor(0x2298FE));
-  //     } else {
-  //       drawEmPDB(stage, "/Output/" + folder_name + "/branches.pdb", UniformColor(0x2298FE));
-  //       drawEmPDB(stage, "/Output/" + folder_name + "/branch_points.pdb", UniformColor(0x2298FE));
-  //     }
-  //   } else if (view_name == "simplified_net") {
-  //     //drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", UniformColor(0x888888));
-  //     drawEmPDB(stage, "/Output/" + folder_name + "/simplified_topology_with_two_conn.pdb", "element");
-  //   } else {
-  //     throw "Unknown view name: " + view_name;
-  //   }
-  // }
 
   clearViewer = function(ngl_stage) {
     ngl_stage.removeAllComponents();
@@ -707,29 +526,6 @@ Then, to open the website, run python app.py in the second terminal
       }
     });
   }
-
-  // handleDownload = function() {
-  //   var folder_input = document.getElementById("folderdownload");
-  //   var download_input = document.getElementById("cifdownload");
-  //   var folder_name = folder_input.options[folder_input.selectedIndex].value;
-  //   var filename = download_input.options[download_input.selectedIndex].value;
-  //   var filepath = "Output/" + folder_name + "/" + filename;  // Set in deconstructor.h:DEFAULT_OUTPUT_PATH
-
-  //   var contents = FS.readFile(filepath, {'encoding': 'utf8'});
-  //   var download_contents = "data:text/plain;base64," + btoa(contents);
-
-  //   // Open download dialog using a temporary hidden link
-  //   var fakelink = document.createElement("a");
-  //   fakelink.setAttribute("href", download_contents);
-  //   fakelink.setAttribute("download", filename);
-  //   fakelink.style.display = "none";
-  //   document.body.appendChild(fakelink);
-  //   fakelink.click();
-  //   document.body.removeChild(fakelink);
-  // }
-
-
-
 
 
   var statusElement = document.getElementById('status_visualization');
@@ -813,16 +609,6 @@ Then, to open the website, run python app.py in the second terminal
 
   $(function() {
 
-    // Define global variables
-   //  metal_spin_dict = {'cr': {2: [1, 5], 3: [2, 4]},
-   // 'mn': {2: [2, 6], 3: [1, 5]},
-   // 'fe': {2: [1, 5], 3: [2, 6]},
-   // 'co': {2: [2, 4], 3: [1, 5]},
-   // 'mo': {2: [1, 5], 3: [2, 4]},
-   // 'tc': {2: [2, 6], 3: [1, 5]},
-   // 'ru': {2: [1, 5], 3: [2, 6]},
-   // 'rh': {2: [2, 4], 3: [1, 5]}};
-
 
     // Set up 3Dmol viewer 
     let element = $('#container-01');
@@ -835,63 +621,6 @@ Then, to open the website, run python app.py in the second terminal
       component_viewer.zoomTo();
     })
 
-
-    // Populate the spin dropdown
-    // updateSpins = function() {
-    //   valid_spins = metal_spin_dict[$('#metal').val()][$('#ox').val()];
-    //   spin_dropdown = $("#spin").empty()
-    //   for(var i=0; i<valid_spins.length; i++) {
-    //       var option = $('<option></option>').attr("value", valid_spins[i].toString()).text(valid_spins[i]);
-    //       spin_dropdown.append(option);
-    //   };
-    // };
-
-    // Populate the oxidation state dropdown (triggers spin dropdown repopulation)
-    // updateOx = function() {
-    //   valid_oxs = Object.keys(metal_spin_dict['cr'])
-    //   ox_strs = {2: 'II', 3: 'III'}
-    //   ox_dropdown = $("#ox").empty()
-    //   for(var i=0; i<valid_oxs.length; i++) {
-    //       var option = $('<option></option>').attr("value", valid_oxs[i].toString()).text(ox_strs[valid_oxs[i]]);
-    //       ox_dropdown.append(option);
-    //   };
-    //   updateSpins()
-    // };
-
-    // Prevents user from downloading molecule and making NN predictions
-    // lockMetrics = function() {
-    //   $('#download').prop('disabled', true)
-    //   $('#predict_s').prop('disabled', true)
-    //   $('#predict_t').prop('disabled', true)
-    //   $('#plot').prop('disabled', true)
-    //   $('#plot_pca').prop('disabled', true)
-    //   viewer.clear();
-    //   $('#loading').text('');
-    //   $('#chart').text('');
-    // }
-
-    // Re-allows user to download molecule or make NN predictions
-    // unlockMetrics = function() {
-    //   $('#download').prop('disabled', false)
-    //   $('#predict_s').prop('disabled', false)
-    //   $('#predict_t').prop('disabled', false)
-    // }
-
-    // Locks the plotting ability
-    // lockPlot = function() {
-    //   $('#plot').prop('disabled', true)
-    //   $('#plot_pca').prop('disabled', true)
-    // }
-
-    // Unlocks the plotting ability
-    // unlockPlot = function() {
-    //   $('#plot').prop('disabled', false)
-    //   $('#plot_pca').prop('disabled', false)
-    // }
-    // Set callbacks
-    // $('#metal').change(updateOx);
-    // $('#ox').change(updateSpins);
-    // $('.locksMetrics').change(lockMetrics);
 
     // Upload MOF cif file  <!-- Gianmarco Terrones addition -->
     $(function() {
@@ -948,9 +677,10 @@ Then, to open the website, run python app.py in the second terminal
     $("#visualize").on('click', function() {
         let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
         let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+        let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
 
-        // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
-        if (myFile == null && myFile2 == null) {
+        // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
+        if (myFile == null && myFile2 == null && myFile3 == null) {
           alert("Must upload a cif file first.");
           return;
         }
@@ -970,14 +700,18 @@ Then, to open the website, run python app.py in the second terminal
       // check if a cif is uploaded
       let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
       let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+      let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
 
 
-      // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
+      // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
         myFile = myFile2;
         if (myFile2 == undefined) {
-          alert("Must upload a cif file first.");
-          return;  
+          myFile = myFile3;
+          if (myFile3 == undefined) {
+            alert("Must upload/generate a cif file first.");
+            return;  
+          }
         }
       }
 
@@ -1034,14 +768,18 @@ Then, to open the website, run python app.py in the second terminal
       // check if a cif is uploaded
       let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
       let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+      let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
 
 
-      // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
+      // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
         myFile = myFile2;
         if (myFile2 == undefined) {
-          alert("Must upload a cif file first.");
-          return;  
+          myFile = myFile3;
+          if (myFile3 == undefined) {
+            alert("Must upload/generate a cif file first.");
+            return;  
+          }
         }
       }
 
@@ -1069,34 +807,80 @@ Then, to open the website, run python app.py in the second terminal
     });
 
 
-    // // Generate molecule
-    // $('#generate').click(function() {
-    //   viewer.clear();
-    //   $('#loading').text('');
-    //   $('#chart').text('');
-    //   $('#generate').prop('disabled', true);
-    //   data.ox = $('#ox').val()
-    //   data.hfx = $('#hfx').val()
-    //   data.metal = $('#metal').val()
-    //   data.ax1 = $('#ligand_ax1').val()
-    //   data.ax2 = $('#ligand_ax2').val()
-    //   data.eq = $('#ligand_eq').val()
-    //   data.spin = $('#spin').val()
-    //   $.post("/generate", JSON.stringify(data)).done(
-    //       function(response) {
-    //             data.geometry = response.geometry;
-    //             viewer.clear();
-    //             viewer.addModel(data.geometry, "xyz");
-    //             viewer.setStyle({}, {stick:{radius:0.25}});
-    //             viewer.zoomTo();
-    //             viewer.render();
-    //             unlockMetrics();
-    //             // For testing
-    //             // unlockPlot();
-    //             $("#loading").html(response.message)
-    //             $('#generate').prop('disabled', false);
-    //       });
-    // });
+    // Generate MOF from building blocks
+    $('#generate').click(function() {
+      my_linker = $('#linker_option').val() // Check which linker is selected in the linker building block construction dropdown 
+      my_sbu = $('#sbu_option').val() // Check which sbu is selected in the sbu building block construction dropdown 
+      my_net = $('#nets_option').val() // Check which net is selected in the net building block dropdown 
+
+      console.log('Check G')
+      console.log(my_linker)
+      console.log(my_sbu)
+      console.log(my_net)
+
+      if (my_linker === '') {
+        alert("Must choose a linker building block first.");
+        return;  
+      }
+      else if (my_sbu === '') {
+        alert("Must choose an sbu building block first.");
+        return;  
+      }
+
+      $('#upload_status').text(''); // now nothing is uploaded
+      document.getElementById('exampleholder').value = null; // clears example cif
+      document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
+
+
+      bb_information = {}; // a dictionary
+      bb_information.linker = my_linker;
+      bb_information.sbu = my_sbu;
+      bb_information.net = my_net;
+
+      $.post("/get_bb_generated_MOF", JSON.stringify(bb_information)).done(
+          function(response) {
+
+            if (response == 'FAILED') { 
+              alert('Failed to generate MOF')
+              document.getElementById('bbgMOFholder').value = undefined; // clearing the value, so no component visualization is possible
+              return; 
+            }
+
+            var result = JSON.parse(response);
+
+            var name = result.mof_name;
+            var bbMOF = result.mof_info;
+
+            console.log('Check H')
+            //console.log(name)
+            //console.log(bbMOF)
+
+            var blob = new Blob([bbMOF], { // TODO check if this works
+              type: 'text/plain'
+            });
+            var myFile = new File([blob], name, {type: "", lastModified: Date.now()}); // making a cif file
+            document.getElementById('bbgMOFholder').value = myFile; //bbMOF
+
+
+            $('#solvent_stability_prediction').text(''); // clearing predictions
+            $('#thermal_stability_prediction').text('');
+            document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
+            document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+            clearViewer(stage); // clearing MOF visualizer
+            component_viewer.clear(); // clearing component visualizer
+            clear_component_dropdowns();
+
+
+            // re-displaying messages inside the two visualizers
+            document.getElementById('viewportnote').style.display = 'block';
+            document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
+            document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
+
+            $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+
+        });
+    });  
 
 
       // Load example MOF
@@ -1144,14 +928,18 @@ Then, to open the website, run python app.py in the second terminal
       // check if a cif is uploaded
       let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
       let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
+      let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
 
 
-      // If neither the example MOF has been loaded, nor has the user uploaded a MOF, then an alert is raised and the function exits.
+      // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
         myFile = myFile2;
         if (myFile2 == undefined) {
-          alert("Must upload a cif file first.");
-          return;  
+          myFile = myFile3;
+          if (myFile3 == undefined) {
+            alert("Must upload/generate a cif file first.");
+            return;  
+          }
         }
       }
 

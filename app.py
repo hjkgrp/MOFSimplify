@@ -77,8 +77,6 @@ def serve_library_files(path):
 @app.route('/bbcif/<path:path>')
 def serve_bbcif(path):
     # Serves the building block generated MOF
-    print('Check P')
-    print(path)
     return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
@@ -99,9 +97,6 @@ def bb_generate():
 
     # Grab data
     mydata = json.loads(flask.request.get_data())
-    print(mydata)
-    print('check check')
-    print(mydata['linker'])
 
     linker = mydata['linker']
     sbu = mydata['sbu']
@@ -138,9 +133,6 @@ def bb_generate():
     
     constructed_MOF = listdir_nohidden('output_cifs')
     constructed_MOF = constructed_MOF[0] # getting the first, and only, element out of the list
-
-    print('Check F')
-    print(constructed_MOF)
 
     dictionary = {};
 

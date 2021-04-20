@@ -102,7 +102,7 @@ def bb_generate():
 
     os.chdir("temp_file_creation/tobacco_3.0")
 
-    # clear the edges, nodes, and templates folders to start fresh
+    # clear the edges, nodes, templates, and output cifs folders to start fresh
         # when running python tobacco.py, it looks in these folders
 
     shutil.rmtree('edges')
@@ -111,6 +111,8 @@ def bb_generate():
     os.mkdir('nodes')
     shutil.rmtree('templates')
     os.mkdir('templates')
+    shutil.rmtree('output_cifs')
+    os.mkdir('output_cifs')
 
     # copy over the linker, sbu, and net specified by the user in the edges, nodes, and templates folders
 

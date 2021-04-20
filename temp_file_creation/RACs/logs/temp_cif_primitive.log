@@ -1,36 +1,10 @@
-atom 0 with type of Cu found to have 4 coordinates with atom types of O
-atom 1 with type of Cu found to have 4 coordinates with atom types of O
-atom 2 with type of Cu found to have 4 coordinates with atom types of O
-atom 3 with type of Cu found to have 4 coordinates with atom types of O
-atom 4 with type of Cu found to have 4 coordinates with atom types of O
-atom 5 with type of Cu found to have 4 coordinates with atom types of O
-atom 6 with type of Cu found to have 4 coordinates with atom types of O
-atom 7 with type of Cu found to have 4 coordinates with atom types of O
-atom 8 with type of Cu found to have 4 coordinates with atom types of O
-atom 9 with type of Cu found to have 4 coordinates with atom types of O
-atom 10 with type of Cu found to have 4 coordinates with atom types of O
-atom 11 with type of Cu found to have 4 coordinates with atom types of O
-atom 12 with type of Cu found to have 4 coordinates with atom types of O
-atom 13 with type of Cu found to have 4 coordinates with atom types of O
-atom 14 with type of Cu found to have 4 coordinates with atom types of O
-atom 15 with type of Cu found to have 4 coordinates with atom types of O
-atom 16 with type of Cu found to have 4 coordinates with atom types of O
-atom 17 with type of Cu found to have 4 coordinates with atom types of O
-atom 18 with type of Cu found to have 4 coordinates with atom types of O
-atom 19 with type of Cu found to have 4 coordinates with atom types of O
-atom 20 with type of Cu found to have 4 coordinates with atom types of O
-atom 21 with type of Cu found to have 4 coordinates with atom types of O
-atom 22 with type of Cu found to have 4 coordinates with atom types of O
-atom 23 with type of Cu found to have 4 coordinates with atom types of O
-atom 24 with type of Cu found to have 4 coordinates with atom types of O
-atom 25 with type of Cu found to have 4 coordinates with atom types of O
-atom 26 with type of Cu found to have 4 coordinates with atom types of O
-atom 27 with type of Cu found to have 4 coordinates with atom types of O
-atom 28 with type of Cu found to have 4 coordinates with atom types of O
-atom 29 with type of Cu found to have 4 coordinates with atom types of O
-atom 30 with type of Cu found to have 4 coordinates with atom types of O
-atom 31 with type of Cu found to have 4 coordinates with atom types of O
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 7 , 2
+atom 0 with type of Al found to have 5 coordinates with atom types of O
+atom 1 with type of Al found to have 5 coordinates with atom types of O
+atom 2 with type of Al found to have 5 coordinates with atom types of O
+atom 3 with type of Al found to have 5 coordinates with atom types of O
+atom 4 with type of Al found to have 5 coordinates with atom types of O
+atom 5 with type of Al found to have 5 coordinates with atom types of O
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 15 , 2
 
 Structure has LONG ligand
 

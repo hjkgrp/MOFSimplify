@@ -853,13 +853,23 @@ Then, to open the website, run python app.py in the second terminal
             var bbMOF = result.mof_info;
 
             console.log('Check H')
-            //console.log(name)
-            //console.log(bbMOF)
+            console.log(name)
+            console.log(bbMOF)
 
             var blob = new Blob([bbMOF], { // TODO check if this works
               type: 'text/plain'
             });
+            console.log(blob)
+            console.log(blob.text())
+            
+            // debugging
+            blob.text().then(function(result){
+              console.log(result)
+            });
+
+
             var myFile = new File([blob], name, {type: "", lastModified: Date.now()}); // making a cif file
+            console.log(myFile)
             document.getElementById('bbgMOFholder').value = myFile; //bbMOF
 
 

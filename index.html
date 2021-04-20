@@ -911,11 +911,19 @@ Then, to open the website, run python app.py in the third terminal
         return;
       }
 
-      myFile = document.getElementById('bbgMOFholder').value;
+      var myFile = document.getElementById('bbgMOFholder').value;
+      var name = document.getElementById('upload_status').innerHTML;
+      console.log(name)
+      name = name.split(' ');
+      console.log(name)
+      console.log(name.slice(-1)[0])
+      name = name.slice(-1)[0]; // getting the last element of the array
 
-      // TODO
+
+      //console.log(name)
+      window.location = '/bbcif/'.concat(name);
+      //window.location = '; // assuming primitive is same as normal file
     })
-
 
       // Load example MOF
     $('#load').click(function() {

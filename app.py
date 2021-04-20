@@ -142,13 +142,13 @@ def bb_generate():
     # getting the primitive cell using molSimplify
     get_primitive('output_cifs/' + constructed_MOF, 'output_cifs/primitive_' + constructed_MOF);
 
-    mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
-    mof_info = mof_file.read();
-    mof_file.close();
+    # mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
+    # mof_info = mof_file.read();
+    # mof_file.close();
 
-    dictionary['mof_info'] = mof_info;
+    # dictionary['mof_info'] = mof_info;
 
-    json_object = json.dumps(dictionary, indent = 4);
+    json_object = json.dumps(dictionary, indent = 4); # TODO dict not necessary now
 
     return json_object
 

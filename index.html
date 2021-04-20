@@ -2,9 +2,10 @@
 
 In order to get code to work, use Safari and select Develop -> Disable Cross-Origin Restrictions.
 
-In two terminals, navigate to folder containing app.py
+In three terminals, navigate to folder containing app.py
 First, in one terminal, run node node.js (this is to make the example MOF available)
-Then, to open the website, run python app.py in the second terminal
+First, in second terminal, run node node2.js (this is to make the building block generated MOF available)
+Then, to open the website, run python app.py in the third terminal
 
 -->
 
@@ -420,13 +421,19 @@ Then, to open the website, run python app.py in the second terminal
   }
 
   handleInput = function() {
-    if (document.getElementById("fileinput").files[0] !== null) {
+    console.log('Check D')
+    if (document.getElementById("fileinput").files[0] !== undefined) {
+      console.log('Check E')
+      console.log(document.getElementById("fileinput").files[0])
+      console.log(document.getElementById("fileinput").files[0] !== undefined)
       var ciffile = document.getElementById("fileinput").files[0];
     }
     else if (document.getElementById("exampleholder").value !== null) {
+      console.log('Check F')
       var ciffile = document.getElementById("exampleholder").value;
     }
     else {
+      console.log('Check G')
       var ciffile = document.getElementById('bbgMOFholder').value;
     }
         
@@ -855,44 +862,44 @@ Then, to open the website, run python app.py in the second terminal
             var result = JSON.parse(response);
 
             var name = result.mof_name;
-            var bbMOF = result.mof_info;
 
             console.log('Check H')
             console.log(name)
-            console.log(bbMOF)
 
-            var blob = new Blob([bbMOF], { // TODO check if this works
-              type: 'text/plain'
-            });
-            console.log(blob)
-            console.log(blob.text())
-            
-            // debugging
-            blob.text().then(function(result){
-              console.log(result)
-            });
+            fetch('http://localhost:5002/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the example MOF from local host
+              if(!response.ok) { // catching 404 and other issues
+                throw Error(response.statusText);
+              } 
+                return response.blob();
+              }).then(function(blob) {
+                var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
+                document.getElementById('bbgMOFholder').value = myFile; //bbMOF
 
 
-            var myFile = new File([blob], name, {type: "", lastModified: Date.now()}); // making a cif file
-            console.log(myFile)
-            document.getElementById('bbgMOFholder').value = myFile; //bbMOF
+                $('#solvent_stability_prediction').text(''); // clearing predictions
+                $('#thermal_stability_prediction').text('');
+                document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
+                document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+                clearViewer(stage); // clearing MOF visualizer
+                component_viewer.clear(); // clearing component visualizer
+                clear_component_dropdowns();
 
 
-            $('#solvent_stability_prediction').text(''); // clearing predictions
-            $('#thermal_stability_prediction').text('');
-            document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
-            document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
-            clearViewer(stage); // clearing MOF visualizer
-            component_viewer.clear(); // clearing component visualizer
-            clear_component_dropdowns();
+                // re-displaying messages inside the two visualizers
+                document.getElementById('viewportnote').style.display = 'block';
+                document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
+                document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
+
+                $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
 
 
-            // re-displaying messages inside the two visualizers
-            document.getElementById('viewportnote').style.display = 'block';
-            document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
-            document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
 
-            $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+              }).catch(error => {
+                $('#upload_status').text('Failed to upload example MOF');
+                console.error('There has been a problem with your fetch operation:', error);
+              })     
+
+
 
         });
     });  
@@ -945,11 +952,14 @@ Then, to open the website, run python app.py in the second terminal
       let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
       let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
 
+      console.log('check A0')
 
       // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
+        console.log('check A')
         myFile = myFile2;
         if (myFile2 == undefined) {
+          console.log('check B')
           myFile = myFile3;
           if (myFile3 == undefined) {
             alert("Must upload/generate a cif file first.");

@@ -696,6 +696,10 @@ def get_components():
     for item in unique_sbu_det:
         unique_sbu_indices.append(sbu_det_list.index(item)) # indices of the unique sbus in the list of linkers
 
+    print('det lists')
+    print(linker_det_list)
+    print(sbu_det_list)
+
 
     # adding the unique indices to the dictionary
     dictionary['unique_linker_indices'] = unique_linker_indices;

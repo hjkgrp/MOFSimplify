@@ -163,7 +163,7 @@ df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
 # df_val = pd.read_csv(path+"/val.csv")
 # df_test = pd.read_csv(path+"/test.csv")
 # df_new = pd.read_csv(path+"/full_CoRE_MOF_feature_set_with_geo.csv")
-df_newMOF = pd.read_csv('/Users/gianmarcoterrones/Research/mofSimplify/temp_file_creation/merged_descriptors.csv') # would need to change this address for a new computer
+df_newMOF = pd.read_csv('../../../temp_file_creation/merged_descriptors.csv') # Assume temp_file_creation/ in parent directory
 features = [val for val in df_train.columns.values if val in RACs+geo]
 
 X_train, X_newMOF, y_train, x_scaler, y_scaler = normalize_data(df_train, df_newMOF, features, ["T"], unit_trans=1, debug=False)

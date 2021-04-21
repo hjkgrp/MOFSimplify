@@ -866,7 +866,7 @@ Then, to open the website, run python app.py in the third terminal
             console.log('Check H')
             console.log(name)
 
-            fetch('http://localhost:5002/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the example MOF from local host
+            fetch('http://localhost:8000/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the example MOF from local host
               if(!response.ok) { // catching 404 and other issues
                 document.getElementById('bbgMOFholder').value = undefined; // clearing the value, so no component visualization is possible
                 throw Error(response.statusText);
@@ -932,7 +932,7 @@ Then, to open the website, run python app.py in the third terminal
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
 
       // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
-      fetch('http://localhost:5001/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
+      fetch('http://localhost:8000/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         } 

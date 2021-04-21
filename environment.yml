@@ -1,4 +1,4 @@
-name: molSimplify
+name: mofsimplify
 channels:
   - omnia
   - openbabel
@@ -253,4 +253,3 @@ dependencies:
     - prompt-toolkit==3.0.18
     - ptyprocess==0.7.0
     - pygments==2.8.1
-prefix: /Users/gianmarcoterrones/opt/anaconda3/envs/molSimplify

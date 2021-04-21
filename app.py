@@ -36,6 +36,8 @@ cmap_bokeh = Inferno256
 
 app = flask.Flask(__name__)
 
+MOFSIMPLIFY_PATH = os.path.abspath('.')
+
 @app.route('/demo')
 def serve_demo():
     # Go to localhost:8000/demo to see this.
@@ -58,6 +60,16 @@ def serve_homepage():
 def serve_about():
     # Serves homepage
     return flask.send_from_directory('.', 'about.html')
+
+@app.route('/mof_examples/<path:path>')
+def serve_example(path):
+    # Serves example
+    return flask.send_from_directory('mof_examples', path)
+
+@app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>')
+def serve_bb(path):
+    # Serves bb-generated MOF
+    return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path)
 
 @app.route('/ris_files/<path:path>')
 def serve_ris(path):
@@ -93,7 +105,7 @@ def bb_generate():
     # returns the constructed MOF to the front end
 
     # To begin, always go to main directory (this directory will vary depending on computer)
-    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/")
+    os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
     mydata = json.loads(flask.request.get_data())
@@ -141,11 +153,11 @@ def bb_generate():
     # getting the primitive cell using molSimplify
     get_primitive('output_cifs/' + constructed_MOF, 'output_cifs/primitive_' + constructed_MOF);
 
-    # mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
-    # mof_info = mof_file.read();
-    # mof_file.close();
+    mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
+    mof_info = mof_file.read();
+    mof_file.close();
 
-    # dictionary['mof_info'] = mof_info;
+    dictionary['mof_info'] = mof_info;
 
     json_object = json.dumps(dictionary, indent = 4); # TODO dict not necessary now
 
@@ -163,7 +175,7 @@ def ss_predict():
     print('TIME CHECK 1')
 
     # To begin, always go to main directory (this directory will vary depending on computer)
-    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/")
+    os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
     mydata = json.loads(flask.request.get_data())
@@ -371,7 +383,7 @@ def ts_predict():
     print('TIME CHECK 1')
 
     # To begin, always go to main directory (this directory will vary depending on computer)
-    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/")
+    os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
     mydata = json.loads(flask.request.get_data())
@@ -545,7 +557,7 @@ def get_components():
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
 
     # To begin, always go to main directory (this directory will vary depending on computer)
-    os.chdir("/Users/gianmarcoterrones/Research/mofSimplify/");
+    os.chdir(MOFSIMPLIFY_PATH);
 
     # Grab data
     mydata = json.loads(flask.request.get_data());

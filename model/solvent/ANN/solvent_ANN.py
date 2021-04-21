@@ -163,7 +163,7 @@ def main():
     df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
     #df_val = pd.read_csv(path+"/val.csv")
     #df_test = pd.read_csv(path+"/test.csv")
-    df_newMOF = pd.read_csv('/Users/gianmarcoterrones/Research/mofSimplify/temp_file_creation/merged_descriptors.csv') # would need to change this address for a new computer
+    df_newMOF = pd.read_csv('../../../temp_file_creation/merged_descriptors.csv') # assumes that temp_file_creation/ is in parent folder
     features = [val for val in df_train.columns.values if val in RACs+geo]
 
     df_train = standard_labels(df_train, key="flag")

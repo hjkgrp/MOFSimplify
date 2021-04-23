@@ -86,10 +86,10 @@ def serve_library_files(path):
     # Serves libraries
     return flask.send_from_directory('libraries', path)
 
-@app.route('/bbcif/<path:path>')
-def serve_bbcif(path):
-    # Serves the building block generated MOF
-    return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
+# @app.route('/bbcif/<path:path>')
+# def serve_bbcif(path):
+#     # Serves the building block generated MOF
+#     return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     myList = os.listdir(path);

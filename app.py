@@ -104,7 +104,7 @@ def bb_generate():
     # uses ToBaCCo code, version 3.0
     # returns the constructed MOF to the front end
 
-    # To begin, always go to main directory (this directory will vary depending on computer)
+    # To begin, always go to main directory
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
@@ -174,7 +174,7 @@ def ss_predict():
 
     print('TIME CHECK 1')
 
-    # To begin, always go to main directory (this directory will vary depending on computer)
+    # To begin, always go to main directory
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
@@ -323,7 +323,7 @@ def ss_predict():
 
     # from IPython.display import display # debugging
 
-    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") # change addresses on different computer
+    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
     linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
 
@@ -382,7 +382,7 @@ def ts_predict():
 
     print('TIME CHECK 1')
 
-    # To begin, always go to main directory (this directory will vary depending on computer)
+    # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
@@ -524,7 +524,7 @@ def ts_predict():
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
 
-    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") # change addresses on different computer
+    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
     linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
 
@@ -551,12 +551,91 @@ def ts_predict():
 
     return prediction
 
+@app.route('/plot_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
+def plot_thermal_stability():
+    # returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on
+    # additionally, displays the position of the current MOF's thermal breakdown temperature
+
+    # To begin, always go to main directory 
+    os.chdir(MOFSIMPLIFY_PATH)
+
+    # debugging
+    print('Check A')
+    print(os.getcwd())
+
+    # Grab data
+    mydata = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
+    mydata = mydata[:-3] # getting rid of the celsius symbol, left with just the number
+    print(mydata)
+
+    # Getting the temperature data
+    temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
+
+    print('Check A2')
+
+    import matplotlib
+    matplotlib.use('Agg') # noninteractive backend
+    import matplotlib.pyplot as plt
+    plt.close("all")
+
+    # in training data, smallest T breakdown is 35, and largest T breakdown is 654
+    myBins = np.arange(30,661,10) # bins each 10 Celsius wide
+    myHist = temps_df['T'].hist(bins=myBins) # histogram of breakdown temperatures, with bins delineated by borders in myBins
+    fig = myHist.get_figure() # the figure
+    fig.savefig('testingtesting1.pdf')
+
+    print('Check B')
+
+    # current potential bugs TODO
+        # if mydata does not lie in one of the bins in myBins (extreme value), will be placed in one of the extreme bins but won't be correct
+        # if bin in which mydata belongs does not have any MOFs in the training data, there will be no bar to color
+            # could fix this issue with a stacked bar
+
+    # want to label the bin that contains the current MOF. I use a stack overflow solution
+    bar_value_to_label = float(mydata)
+    min_distance = float("inf")  # initialize min_distance with infinity
+    index_of_bar_to_label = 0
+    print('Check B2')
+    for i, rectangle in enumerate(myHist.patches):  # iterate over every bar
+        print('Check B3')
+        print(i)
+        print(rectangle)
+        print(rectangle.get_x())
+        print(rectangle.get_width())
+        tmp = abs(  # tmp = distance from middle of the bar to bar_value_to_label
+            (rectangle.get_x() +
+                (rectangle.get_width() * (1 / 2))) - bar_value_to_label)
+        print('Check B4')
+        print(i)
+        print(tmp)
+        if tmp < min_distance:  # we are searching for the bar with x cordinate
+                                # closest to bar_value_to_label
+            min_distance = tmp
+            index_of_bar_to_label = i
+    print('Check C')
+    myHist.patches[index_of_bar_to_label].set_color('b') # label by coloring the bin's bar a different shade of blue
+
+    print('Check C2')
+
+    # labelling axes
+    myHist.set_xlabel('Breakdown temperature (°C)')
+    myHist.set_ylabel('Number of MOFs in training data')
+    myHist.set_title('Current MOF\'s breakdown temperature relative to others')
+
+    fig = myHist.get_figure() # the figure
+    fig.savefig('testingtesting2.pdf')
+
+    import mpld3
+
+    return mpld3.fig_to_html(fig)
+
+
 @app.route('/get_components', methods=['POST']) # Gianmarco Terrones addition
 def get_components():
     # Uses Aditya's MOF code to get linkers and sbus
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
 
-    # To begin, always go to main directory (this directory will vary depending on computer)
+    # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH);
 
     # Grab data

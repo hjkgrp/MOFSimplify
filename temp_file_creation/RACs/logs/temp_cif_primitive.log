@@ -1,14 +1,10 @@
-atom 40 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 41 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 42 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 43 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 44 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 45 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 46 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 47 with type of U found to have 8 coordinates with atom types of O,P,U
-atom 48 with type of U found to have 4 coordinates with atom types of O
-atom 49 with type of U found to have 4 coordinates with atom types of O
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 2 , 1
+atom 0 with type of Ag found to have 2 coordinates with atom types of N
+atom 1 with type of Ag found to have 3 coordinates with atom types of N
+atom 2 with type of Ag found to have 3 coordinates with atom types of N
+atom 3 with type of Ag found to have 2 coordinates with atom types of N
+atom 4 with type of Ag found to have 3 coordinates with atom types of N
+atom 5 with type of Ag found to have 3 coordinates with atom types of N
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 3
 
-Structure has SHORT ligand
+Structure has LONG ligand
 

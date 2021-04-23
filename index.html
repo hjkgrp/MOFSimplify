@@ -196,6 +196,8 @@ Then, to open the website, run python app.py in the terminal
         <button class='btn btn-primary' id='predict_s' type="button">Predict stability upon solvent removal</button> <!-- Gianmarco Terrones addition -->
         <!-- Button for predicting thermal stability of MOF -->
         <button class='btn btn-primary' id='predict_t' type="button">Predict thermal stability</button> <!-- Gianmarco Terrones addition -->
+        <!-- Button for plotting the distribution of thermal stabilities of MOFs, and where the loaded MOF lies -->
+        <!-- <button class='btn btn-primary' id='plot_t' type="button">Plot thermal stability distribution</button> --> <!-- Gianmarco Terrones addition -->
 
       </div>
     </div>
@@ -206,8 +208,8 @@ Then, to open the website, run python app.py in the terminal
         <div class='col-12' id='status_visualization'></div> <!-- Gianmarco Terrones addition -->
         <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
         <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
-        <div class='col-6' id='loading'></div>
-        <div class='col-6' id='chart'></div>
+        <div class='col-12' id='loading'></div>
+        <div class='col-12' id='chart'></div>
     </div>
 
 
@@ -660,6 +662,7 @@ Then, to open the website, run python app.py in the terminal
 
 
         $('#upload_status').text(''); // now nothing is uploaded
+        $('#chart').text('');
         document.getElementById('exampleholder').value = null; // clears example cif
         document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
@@ -799,20 +802,26 @@ Then, to open the website, run python app.py in the terminal
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
 
-        $.post("/predict_thermal_stability", JSON.stringify(result)).done(
-            function(response) {
 
-                  if (response == 'FAILED') { // (!response.ok) || 
-                      alert('Failed to featurize')
-                      //$('#solvent_stability_prediction').text('Solvent stability prediction failed.');
-                    return; // Do not update solvent stability prediction if prediction failed
-                  }
+      $.post("/predict_thermal_stability", JSON.stringify(result)).done(
+          function(response) {
 
-                  console.log('check R')
-                  console.log(response)
+                if (response == 'FAILED') { // (!response.ok) || 
+                    alert('Failed to featurize')
+                    //$('#solvent_stability_prediction').text('Solvent stability prediction failed.');
+                  return; // Do not update solvent stability prediction if prediction failed
+                }
 
-                  $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + response.toString()); 
-            });
+                console.log('check R')
+                console.log(response)
+
+                prediction = response.toString();
+                $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
+
+                $.post("/plot_thermal_stability", JSON.stringify(prediction)).done(function(response) { // making the thermal breakdown temperatures plot
+                  $('#chart').html(response)
+                })                
+          });
       })
     });
 
@@ -838,6 +847,7 @@ Then, to open the website, run python app.py in the terminal
       }
 
       $('#upload_status').text(''); // now nothing is uploaded
+      $('#chart').text('');
       document.getElementById('exampleholder').value = null; // clears example cif
       document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
@@ -925,6 +935,7 @@ Then, to open the website, run python app.py in the terminal
       $('#loading').text('');
       $('#solvent_stability_prediction').text('');
       $('#thermal_stability_prediction').text('');
+      $('#chart').text('');
       document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
       document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text

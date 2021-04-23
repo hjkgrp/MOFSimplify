@@ -566,6 +566,7 @@ def plot_thermal_stability():
     # Grab data
     mydata = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
     mydata = mydata[:-3] # getting rid of the celsius symbol, left with just the number
+    mydata = float(mydata)
     print(mydata)
 
     # Getting the temperature data
@@ -577,53 +578,32 @@ def plot_thermal_stability():
     matplotlib.use('Agg') # noninteractive backend
     import matplotlib.pyplot as plt
     plt.close("all")
+    import scipy.stats as stats
 
     # in training data, smallest T breakdown is 35, and largest T breakdown is 654
-    myBins = np.arange(30,661,10) # bins each 10 Celsius wide
-    myHist = temps_df['T'].hist(bins=myBins) # histogram of breakdown temperatures, with bins delineated by borders in myBins
-    fig = myHist.get_figure() # the figure
-    fig.savefig('testingtesting1.pdf')
+
+    # use stats.gaussian_kde to estimate the probability density function from the histogram
+    density = stats.gaussian_kde(temps_df['T'])
+    x = np.arange(30,661,1) # in training data, smallest T breakdown is 35, and largest T breakdown is 654
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    plt.plot(x, density(x))
+    print('Check A3')
+    print(mydata)
+    print(density(mydata))
+    plt.plot(mydata, density(mydata), "or") # the current MOF's predicted thermal breakdown temperature
 
     print('Check B')
-
-    # current potential bugs TODO
-        # if mydata does not lie in one of the bins in myBins (extreme value), will be placed in one of the extreme bins but won't be correct
-        # if bin in which mydata belongs does not have any MOFs in the training data, there will be no bar to color
-            # could fix this issue with a stacked bar
-
-    # want to label the bin that contains the current MOF. I use a stack overflow solution
-    bar_value_to_label = float(mydata)
-    min_distance = float("inf")  # initialize min_distance with infinity
-    index_of_bar_to_label = 0
-    print('Check B2')
-    for i, rectangle in enumerate(myHist.patches):  # iterate over every bar
-        print('Check B3')
-        print(i)
-        print(rectangle)
-        print(rectangle.get_x())
-        print(rectangle.get_width())
-        tmp = abs(  # tmp = distance from middle of the bar to bar_value_to_label
-            (rectangle.get_x() +
-                (rectangle.get_width() * (1 / 2))) - bar_value_to_label)
-        print('Check B4')
-        print(i)
-        print(tmp)
-        if tmp < min_distance:  # we are searching for the bar with x cordinate
-                                # closest to bar_value_to_label
-            min_distance = tmp
-            index_of_bar_to_label = i
-    print('Check C')
-    myHist.patches[index_of_bar_to_label].set_color('b') # label by coloring the bin's bar a different shade of blue
 
     print('Check C2')
 
     # labelling axes
-    myHist.set_xlabel('Breakdown temperature (°C)')
-    myHist.set_ylabel('Number of MOFs in training data')
-    myHist.set_title('Current MOF\'s breakdown temperature relative to others')
-
-    fig = myHist.get_figure() # the figure
-    fig.savefig('testingtesting2.pdf')
+    # myHist.set_xlabel('Breakdown temperature (°C)')
+    # myHist.set_ylabel('Number of MOFs in training data')
+    # myHist.set_title('Current MOF\'s breakdown temperature relative to others')
+    ax.set_xlabel('Breakdown temperature (°C)')
+    ax.set_ylabel('Frequency in the training data')
+    ax.set_title('Current MOF\'s breakdown temperature relative to others')
 
     import mpld3
 

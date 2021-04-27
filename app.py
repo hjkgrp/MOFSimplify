@@ -86,10 +86,10 @@ def serve_library_files(path):
     # Serves libraries
     return flask.send_from_directory('libraries', path)
 
-# @app.route('/bbcif/<path:path>')
-# def serve_bbcif(path):
-#     # Serves the building block generated MOF
-#     return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
+@app.route('/bbcif/<path:path>')
+def serve_bbcif(path):
+    # Serves the building block generated MOF
+    return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     myList = os.listdir(path);
@@ -102,7 +102,7 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
 def bb_generate():
     # generates a MOF using the building blocks and net specified by the user
     # uses ToBaCCo code, version 3.0
-    # returns the constructed MOF to the front end
+    # returns the constructed MOF's name to the front end
 
     # To begin, always go to main directory
     os.chdir(MOFSIMPLIFY_PATH)
@@ -153,11 +153,11 @@ def bb_generate():
     # getting the primitive cell using molSimplify
     get_primitive('output_cifs/' + constructed_MOF, 'output_cifs/primitive_' + constructed_MOF);
 
-    mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
-    mof_info = mof_file.read();
-    mof_file.close();
+    # mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
+    # mof_info = mof_file.read();
+    # mof_file.close();
 
-    dictionary['mof_info'] = mof_info;
+    # dictionary['mof_info'] = mof_info;
 
     json_object = json.dumps(dictionary, indent = 4); # TODO dict not necessary now
 

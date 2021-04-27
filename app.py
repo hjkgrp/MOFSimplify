@@ -591,6 +591,9 @@ def plot_thermal_stability():
     print('Check A3')
     print(mydata)
     print(density(mydata))
+    print('sanity check')
+    print(density(0))
+    print(density(700))
     plt.plot(mydata, density(mydata), "or") # the current MOF's predicted thermal breakdown temperature
 
     print('Check B')

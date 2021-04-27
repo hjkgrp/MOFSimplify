@@ -874,13 +874,15 @@ Then, to open the website, run python app.py in the terminal
             console.log('Check H')
             console.log(name)
 
-            fetch('http://localhost:8000/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the example MOF from local host
+            // the function corresponding to @app.route('/get_bb_generated_MOF', methods=['POST']) on the backend will make a cif file of the building block generated MOF if successful, using ToBaCCo 3.0 code. Files are made in output_cifs folder
+
+            fetch('http://localhost:8000/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the MOF from local host
               if(!response.ok) { // catching 404 and other issues
                 document.getElementById('bbgMOFholder').value = undefined; // clearing the value, so no component visualization is possible
                 throw Error(response.statusText);
               } 
                 return response.blob();
-              }).then(function(blob) {
+              }).then(function(blob) { 
                 var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
                 document.getElementById('bbgMOFholder').value = myFile; //bbMOF
 

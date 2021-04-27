@@ -613,6 +613,43 @@ def plot_thermal_stability():
     return mpld3.fig_to_html(fig)
 
 
+@app.route('/thermal_stability_percentile', methods=['POST']) # Gianmarco Terrones addition
+def thermal_stability_percentile():
+    # returns what percentile the thermal breakdown temperature of the selected MOF lies in
+    # with respect to the MOFs used to train the ANN for thermal stability predictions
+
+    print('check check 1')
+
+    # To begin, always go to main directory 
+    os.chdir(MOFSIMPLIFY_PATH)
+
+    # Grab data
+    mydata = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
+    mydata = mydata[:-3] # getting rid of the celsius symbol, left with just the number
+    mydata = float(mydata)
+    print(mydata)
+
+    # Getting the temperature data
+    temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
+
+    print('check check 2')
+
+    # will find what percentile our prediction belongs to, by checking the 100 percentiles and seeing which is closest to our prediction
+    difference = np.Infinity
+
+    breakdown_Ts = temps_df['T']
+    for i in np.arange(0,100.1,1): # 0,1, ..., 99, 100
+        current_percentile = np.percentile(breakdown_Ts, i) # ith percentile
+        current_difference = np.absolute(mydata - current_percentile) # absolute difference
+        if current_difference < difference:
+            difference = current_difference
+            our_percentile = i
+
+    our_percentile = int(our_percentile) # no decimal points
+
+    return str(our_percentile)
+
+
 @app.route('/get_components', methods=['POST']) # Gianmarco Terrones addition
 def get_components():
     # Uses Aditya's MOF code to get linkers and sbus

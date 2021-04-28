@@ -948,7 +948,7 @@ Then, to open the website, run python app.py in the terminal
         } 
           return response.blob();
         }).then(function(blob) {
-          renew('example');
+          renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
           document.getElementById('exampleholder').value = myFile; // setting the value of exampleholder
           $('#upload_status').text('File uploaded: Example MOF cif file (cleaned LIWVIY from CoRE2019)'); // indicating that the example MOF has been uploaded

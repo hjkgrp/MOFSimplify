@@ -657,20 +657,46 @@ Then, to open the website, run python app.py in the terminal
       return ext == 'cif';
     }
 
-    $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
+    // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks
+    function renew(action) { // something else was already called reset, so we're calling this renew
+        // action will be either 'example', 'input', or 'bb'
+        if (action != 'example') {
+          document.getElementById('exampleholder').value = null; // clears example cif
+        }
+        else if (action != 'input') {
+          document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
+        }
+        else if (action != 'bb') {
+          document.getElementById('bbgMOFholder').value = null; // clearing bb-generated MOFs holder
+        }
+
+
+
         // clearing previous predictions
-        //$('status').text(''); // clearing any visualization error messages from prior runs
         $('#solvent_stability_prediction').text('');
         $('#thermal_stability_prediction').text('');
         $('#thermal_stability_percentile').text('');
 
-
+        $('#loading').text('');
         $('#upload_status').text(''); // now nothing is uploaded
         $('#chart').text('');
-        document.getElementById('exampleholder').value = null; // clears example cif
         document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
+
+        clearViewer(stage); // no MOF is displayed in the visualizer now
+        component_viewer.clear(); // likewise, clear component visualizer
+        clear_component_dropdowns();
+
+        // re-display messages in the two visualizers
+        document.getElementById('viewportnote').style.display = 'block';
+        document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
+        document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
+
+    }
+
+    $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
+        renew('input');
 
         // check if uploaded file is a .cif
         if (! isCif(this.value)) { // if the uploaded file is not a cif
@@ -682,14 +708,6 @@ Then, to open the website, run python app.py in the terminal
         let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
         $('#upload_status').text('File uploaded: ' + myFile.name);
 
-        clearViewer(stage); // no MOF is displayed in the visualizer now
-        component_viewer.clear(); // likewise, clear component visualizer
-        clear_component_dropdowns();
-
-        // re-display messages in the two visualizers
-        document.getElementById('viewportnote').style.display = 'block';
-        document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
-        document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
     });
 
     $("#visualize").on('click', function() {
@@ -838,6 +856,8 @@ Then, to open the website, run python app.py in the terminal
 
     // Generate MOF from building blocks
     $('#generate').click(function() {
+      renew('bb');
+
       my_linker = $('#linker_option').val() // Check which linker is selected in the linker building block construction dropdown 
       my_sbu = $('#sbu_option').val() // Check which sbu is selected in the sbu building block construction dropdown 
       my_net = $('#nets_option').val() // Check which net is selected in the net building block dropdown 
@@ -856,13 +876,6 @@ Then, to open the website, run python app.py in the terminal
         return;  
       }
 
-      $('#upload_status').text(''); // now nothing is uploaded
-      $('#chart').text('');
-      document.getElementById('exampleholder').value = null; // clears example cif
-      document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
-      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
-
-
       bb_information = {}; // a dictionary
       bb_information.linker = my_linker;
       bb_information.sbu = my_sbu;
@@ -873,7 +886,7 @@ Then, to open the website, run python app.py in the terminal
 
             if (response == 'FAILED') { 
               alert('Failed to generate MOF')
-              document.getElementById('bbgMOFholder').value = undefined; // clearing the value, so no component visualization is possible
+              document.getElementById('bbgMOFholder').value = undefined; // clearing the value
               return; 
             }
 
@@ -888,30 +901,13 @@ Then, to open the website, run python app.py in the terminal
 
             fetch('http://localhost:8000/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the MOF from local host
               if(!response.ok) { // catching 404 and other issues
-                document.getElementById('bbgMOFholder').value = undefined; // clearing the value, so no component visualization is possible
+                document.getElementById('bbgMOFholder').value = undefined; // clearing the value
                 throw Error(response.statusText);
               } 
                 return response.blob();
               }).then(function(blob) { 
                 var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
                 document.getElementById('bbgMOFholder').value = myFile; //bbMOF
-
-
-                $('#solvent_stability_prediction').text(''); // clearing predictions
-                $('#thermal_stability_prediction').text('');
-                $('#thermal_stability_percentile').text('');
-                document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
-                document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
-                clearViewer(stage); // clearing MOF visualizer
-                component_viewer.clear(); // clearing component visualizer
-                clear_component_dropdowns();
-                $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
-
-
-                // re-displaying messages inside the two visualizers
-                document.getElementById('viewportnote').style.display = 'block';
-                document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
-                document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
 
                 $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
 
@@ -944,17 +940,6 @@ Then, to open the website, run python app.py in the terminal
 
       // Load example MOF
     $('#load').click(function() {
-      // clearing all display fields
-      //$('status').text(''); // clearing any visualization error messages from prior runs
-      $('#loading').text('');
-      $('#solvent_stability_prediction').text('');
-      $('#thermal_stability_prediction').text('');
-      $('#thermal_stability_percentile').text('');
-      $('#chart').text('');
-      document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
-      document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
-      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
-      $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
 
       // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
       fetch('http://localhost:8000/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
@@ -963,18 +948,10 @@ Then, to open the website, run python app.py in the terminal
         } 
           return response.blob();
         }).then(function(blob) {
+          renew('example');
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
           document.getElementById('exampleholder').value = myFile; // setting the value of exampleholder
           $('#upload_status').text('File uploaded: Example MOF cif file (cleaned LIWVIY from CoRE2019)'); // indicating that the example MOF has been uploaded
-          clearViewer(stage); // clearing MOF visualizer
-          component_viewer.clear(); // clearing component visualizer
-          clear_component_dropdowns();
-
-
-          // re-displaying messages inside the two visualizers
-          document.getElementById('viewportnote').style.display = 'block';
-          document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
-          document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
 
 
         }).catch(error => {
@@ -1165,7 +1142,7 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.render();
 
       // showing the SMILES string
-      $('#component_SMILES').text('The current linker\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
+      $('#component_SMILES').text('The currently visualized linker\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
     })
 
 
@@ -1197,7 +1174,7 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.render();
 
       // showing the SMILES string
-      $('#component_SMILES').text('The current sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
+      $('#component_SMILES').text('The currently visualized sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
 
     })
 

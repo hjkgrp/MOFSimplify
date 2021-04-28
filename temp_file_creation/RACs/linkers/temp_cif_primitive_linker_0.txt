@@ -1,1 +1,1 @@
-N12CN3CN(C1)CN(C2)C3	temp_cif_primitive_linker_0.xyz
+c1c(nccn1)Sc1cnccn1	temp_cif_primitive_linker_0.xyz

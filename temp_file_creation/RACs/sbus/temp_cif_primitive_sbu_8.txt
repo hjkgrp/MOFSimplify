@@ -1,1 +1,0 @@
-[Zn]([N]([C])([C])[C])(O[C])(O[C])O[C]	temp_cif_primitive_sbu_8.xyz

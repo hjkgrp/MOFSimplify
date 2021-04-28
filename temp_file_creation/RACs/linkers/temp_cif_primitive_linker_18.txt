@@ -1,1 +1,0 @@
-C(=O)(c1cc2c(cc(C(=O)[O])cc2)cc1)[O]	temp_cif_primitive_linker_18.xyz

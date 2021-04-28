@@ -1,1 +1,1 @@
-O([Zn]([N]([C])([C])[C])(O[C])(O[C])O[C])[C]	temp_cif_primitive_sbu_1.xyz
+[Ag](n1[c][c]n([Ag]N([C])[C])[c][c]1)(N1[C]=[C]N=[C][CH]1)n1[c][c]n([Ag]N([C])[C])[c][c]1	temp_cif_primitive_sbu_1.xyz

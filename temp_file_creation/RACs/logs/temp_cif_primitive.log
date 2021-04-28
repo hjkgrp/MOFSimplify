@@ -1,16 +1,20 @@
-atom 108 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 109 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 110 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 111 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 112 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 113 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 114 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 115 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 116 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 117 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 118 with type of Mn found to have 5 coordinates with atom types of O,Cl
-atom 119 with type of Mn found to have 5 coordinates with atom types of O,Cl
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 6 , 2
+atom 0 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 1 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 2 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 3 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 4 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 5 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 6 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 7 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 8 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 9 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 10 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 11 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 12 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 13 with type of Zn found to have 5 coordinates with atom types of N,O
+atom 14 with type of Zn found to have 4 coordinates with atom types of N,O
+atom 15 with type of Zn found to have 4 coordinates with atom types of N,O
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 2 , 2
 
-Structure has LONG ligand
+Structure has SHORT ligand
 

@@ -242,6 +242,8 @@ Then, to open the website, run python app.py in the terminal
 
       <button class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
 
+      <div class='col-12' id='component_SMILES'></div> <!-- Gianmarco Terrones addition -->
+
     </div>
 
   </div>
@@ -660,7 +662,7 @@ Then, to open the website, run python app.py in the terminal
         //$('status').text(''); // clearing any visualization error messages from prior runs
         $('#solvent_stability_prediction').text('');
         $('#thermal_stability_prediction').text('');
-        $('#thermal_stability_percentile').text('')
+        $('#thermal_stability_percentile').text('');
 
 
         $('#upload_status').text(''); // now nothing is uploaded
@@ -668,6 +670,7 @@ Then, to open the website, run python app.py in the terminal
         document.getElementById('exampleholder').value = null; // clears example cif
         document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
+        $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
 
         // check if uploaded file is a .cif
         if (! isCif(this.value)) { // if the uploaded file is not a cif
@@ -902,6 +905,7 @@ Then, to open the website, run python app.py in the terminal
                 clearViewer(stage); // clearing MOF visualizer
                 component_viewer.clear(); // clearing component visualizer
                 clear_component_dropdowns();
+                $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
 
 
                 // re-displaying messages inside the two visualizers
@@ -950,6 +954,7 @@ Then, to open the website, run python app.py in the terminal
       document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
       document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
+      $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
 
       // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
       fetch('http://localhost:8000/mof_examples/LIWVIY_clean.cif').then(response => { // grabbing the example MOF from local host
@@ -1019,7 +1024,7 @@ Then, to open the website, run python app.py in the terminal
             console.log('check Q')
             console.log(typeof result)
             console.log(result)
-            console.log(result.sbu_0)
+            console.log(result.sbu_0_SMILES)
 
 
             clear_component_dropdowns();
@@ -1158,6 +1163,9 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.setStyle({}, {stick:{radius:0.25}});
       component_viewer.zoomTo();
       component_viewer.render();
+
+      // showing the SMILES string
+      $('#component_SMILES').text('The current linker\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
     })
 
 
@@ -1187,6 +1195,9 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.setStyle({}, {stick:{radius:0.25}});
       component_viewer.zoomTo();
       component_viewer.render();
+
+      // showing the SMILES string
+      $('#component_SMILES').text('The current sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
 
     })
 

@@ -654,6 +654,7 @@ def thermal_stability_percentile():
 def get_components():
     # Uses Aditya's MOF code to get linkers and sbus
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
+    # Also in the dictionary: SMILES string for each of the linkers and sbus TODO
 
     # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH);
@@ -813,8 +814,45 @@ def get_components():
 
 
     # adding the unique indices to the dictionary
-    dictionary['unique_linker_indices'] = unique_linker_indices;
-    dictionary['unique_sbu_indices'] = unique_sbu_indices;
+    dictionary['unique_linker_indices'] = unique_linker_indices
+    dictionary['unique_sbu_indices'] = unique_sbu_indices
+
+
+
+
+
+    # In this next section TODO, getting the SMILES strings for all of the linkers and sbus using pybel
+    # write the smiles strings to file, then read the file
+    import pybel
+
+    os.chdir("../linkers"); # move to linkers folder
+
+    for i in range(dictionary['total_linkers']): # 0, 1, 2, ..., numberoflinkersminus1
+        smilesFile = pybel.Outputfile('smi', 'temp_cif_primitive_linker_' + str(i) + '.txt') # smi refers to SMILES
+        smilesFile.write(next(pybel.readfile('xyz', 'temp_cif_primitive_linker_' + str(i) + '.xyz'))) # writes SMILES string to the text file
+
+        # next, get the SMILES string from the text file
+        f = open('temp_cif_primitive_linker_' + str(i) + '.txt', 'r')
+        line = f.readline()
+        line = line.split('\t') # split at tabs
+        smiles_ID = line[0]
+        dictionary['linker_' + str(i) + '_SMILES'] = smiles_ID
+        f.close()
+
+    os.chdir("../sbus"); # move to sbus folder
+
+    for i in range(dictionary['total_sbus']):
+        smilesFile = pybel.Outputfile('smi', 'temp_cif_primitive_sbu_' + str(i) + '.txt') # smi refers to SMILES
+        smilesFile.write(next(pybel.readfile('xyz', 'temp_cif_primitive_sbu_' + str(i) + '.xyz'))) # writes SMILES string to the text file
+
+        # next, get the SMILES string from the text file
+        f = open('temp_cif_primitive_sbu_' + str(i) + '.txt', 'r')
+        line = f.readline()
+        line = line.split('\t') # split at tabs
+        smiles_ID = line[0]
+        dictionary['sbu_' + str(i) + '_SMILES'] = smiles_ID
+        f.close()
+
 
     json_object = json.dumps(dictionary, indent = 4);
 

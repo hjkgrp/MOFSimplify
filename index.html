@@ -16,6 +16,7 @@ Then, to open the website, run python app.py in the terminal
 <script type="text/javascript" src="libraries/webGavrog/main.js"></script>
 <script src="libraries/3Dmol-min.js"></script>
 <script src="libraries/bootstrap.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.1.min.js"></script>
 
 <!-- Import CSS -->
 <link rel="stylesheet" href="libraries/bootstrap.min.css">
@@ -206,6 +207,8 @@ Then, to open the website, run python app.py in the terminal
         <div class='col-12' id='thermal_stability_percentile'></div> <!-- Gianmarco Terrones addition -->
         <div class='col-12' id='loading'></div>
         <div class='col-12' id='chart'></div>
+        <div class='col-12' id='tga_plot'></div>
+
     </div>
 
 
@@ -675,6 +678,7 @@ Then, to open the website, run python app.py in the terminal
         $('#loading').text('');
         $('#upload_status').text(''); // now nothing is uploaded
         $('#chart').text('');
+        $('#tga_plot').text('');
         document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
@@ -843,6 +847,10 @@ Then, to open the website, run python app.py in the terminal
                 $.post("/plot_thermal_stability", JSON.stringify(prediction)).done(function(response) { // making the thermal breakdown temperatures plot
                   $('#chart').html(response);
                 }) 
+
+                $.post("/TGA_plot").done(function(response) { // TODO edit later, once have latent space plot implemented
+                  $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
+                })
 
           });
       })
@@ -1028,7 +1036,7 @@ Then, to open the website, run python app.py in the terminal
     });
     
 
-    function clear_component_dropdowns() { // clear dropdowns when upload new file, and reshow message in 3dmol viewer
+    function clear_component_dropdowns() { // clear dropdowns when upload new file
       // clearing linker dropdown
       var linker_dropdown = document.getElementById("linker");
       var length = linker_dropdown.options.length;

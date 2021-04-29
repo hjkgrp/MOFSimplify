@@ -1,1 +1,0 @@
-[Co](O[C])(O[C])(O[C])(N([C])[C])(N([C])[C])O[C]	temp_cif_primitive_sbu_0.xyz

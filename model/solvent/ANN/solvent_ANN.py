@@ -195,7 +195,7 @@ def main():
 
     ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
     new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
-    print(new_MOF_pred)
+    print(new_MOF_pred) # do not get rid of this print statement
 
     #train_pred = np.round(model.predict(X_train))
     #val_pred = np.round(model.predict(X_val))

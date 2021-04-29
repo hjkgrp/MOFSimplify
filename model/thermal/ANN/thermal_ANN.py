@@ -195,7 +195,7 @@ new_MOF_pred = new_MOF_pred[0]
 degree_sign= u'\N{DEGREE SIGN}'
 new_MOF_pred = new_MOF_pred + degree_sign + 'C' # degrees Celsius
 
-print(new_MOF_pred)
+print(new_MOF_pred) # do not get rid of this print statement
 
 
 # from sklearn.metrics import r2_score

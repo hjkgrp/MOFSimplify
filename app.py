@@ -560,19 +560,19 @@ def plot_thermal_stability():
     os.chdir(MOFSIMPLIFY_PATH)
 
     # debugging
-    print('Check A')
-    print(os.getcwd())
+    # print('Check A')
+    # print(os.getcwd())
 
     # Grab data
     mydata = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
     mydata = mydata[:-3] # getting rid of the celsius symbol, left with just the number
     mydata = float(mydata)
-    print(mydata)
+    # print(mydata)
 
     # Getting the temperature data
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
 
-    print('Check A2')
+    # print('Check A2')
 
     import matplotlib
     matplotlib.use('Agg') # noninteractive backend
@@ -588,17 +588,17 @@ def plot_thermal_stability():
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
     plt.plot(x, density(x))
-    print('Check A3')
-    print(mydata)
-    print(density(mydata))
-    print('sanity check')
-    print(density(0))
-    print(density(700))
+    # print('Check A3')
+    # print(mydata)
+    # print(density(mydata))
+    # print('sanity check')
+    # print(density(0))
+    # print(density(700))
     plt.plot(mydata, density(mydata), "or") # the current MOF's predicted thermal breakdown temperature
 
-    print('Check B')
+    # print('Check B')
 
-    print('Check C2')
+    # print('Check C2')
 
     # labelling axes
     # myHist.set_xlabel('Breakdown temperature (°C)')
@@ -618,7 +618,7 @@ def thermal_stability_percentile():
     # returns what percentile the thermal breakdown temperature of the selected MOF lies in
     # with respect to the MOFs used to train the ANN for thermal stability predictions
 
-    print('check check 1')
+    # print('check check 1')
 
     # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH)
@@ -632,7 +632,7 @@ def thermal_stability_percentile():
     # Getting the temperature data
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
 
-    print('check check 2')
+    # print('check check 2')
 
     # will find what percentile our prediction belongs to, by checking the 100 percentiles and seeing which is closest to our prediction
     difference = np.Infinity
@@ -649,6 +649,78 @@ def thermal_stability_percentile():
 
     return str(our_percentile)
 
+# I use https://stackoverflow.com/questions/3252194/numpy-and-line-intersections to get code for the intersection of the two TGA lines
+# for use in /TGA_plot call. perp and seg_intersect are from that stackoverflow page
+
+#
+# line segment intersection using vectors
+# see Computer Graphics by F.S. Hill
+#
+def perp( a ) :
+    b = np.empty_like(a)
+    b[0] = -a[1]
+    b[1] = a[0]
+    return b
+
+# line segment a given by endpoints a1, a2
+# line segment b given by endpoints b1, b2
+# return 
+def seg_intersect(a1,a2, b1,b2) :
+    da = a2-a1
+    db = b2-b1
+    dp = a1-b1
+    dap = perp(da)
+    denom = np.dot( dap, db)
+    num = np.dot( dap, dp )
+    return (num / denom.astype(float))*db + b1
+
+@app.route('/TGA_plot', methods=['POST'])
+def TGA_plot():
+
+    print('TGA plot check 1')
+
+    # To begin, always go to main directory 
+    os.chdir(MOFSIMPLIFY_PATH)
+
+    # Grab data (for now, just grabbing ABAVIJ; later, will need to select based on nearest neighbor to current MOF in latent space)
+    slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/ABAVIJ.csv")
+
+    # from IPython.display import display # debugging
+    # display(slopes_df)
+
+    x_values = []
+    y_values = []
+    for i in range(4): # 0, 1, 2, 3
+        x_values.append(slopes_df.iloc[[i]]['T (degrees C)'][i])
+        y_values.append(slopes_df.iloc[[i]]['mass (arbitrary units)'][i])
+
+    # making the four points
+    p1 = np.array( [x_values[0], y_values[0]] )
+    p2 = np.array( [x_values[1], y_values[1]] )
+
+    p3 = np.array( [x_values[2], y_values[2]] )
+    p4 = np.array( [x_values[3], y_values[3]] )
+
+    intersection_point = seg_intersect(p1, p2, p3, p4)
+
+    # instantiating the figure object 
+    graph = figure(title = "Simplified TGA Plot")  # a multi line graph
+         
+    # the points to be plotted 
+    xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
+    ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
+        
+    # plotting the graph 
+    graph.multi_line(xs, ys) 
+    graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
+    graph.xaxis.axis_label = 'Temperature (°C)'
+    graph.yaxis.axis_label = 'Percentage mass remaining or Mass'    
+
+    return file_html(graph,CDN,'my plot')
+
+    # mydata = json.loads(flask.request.get_data())
+    # plt = make_plot(float(mydata['sseplot'])) # V1 KDE
+    # return file_html(plt,CDN,'my plot')
 
 @app.route('/get_components', methods=['POST']) # Gianmarco Terrones addition
 def get_components():

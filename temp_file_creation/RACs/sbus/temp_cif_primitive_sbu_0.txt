@@ -1,1 +1,1 @@
-[Ag](n1[c][c]n([Ag](N([C])[C])N([C])[C])[c][c]1)n1[c][c]n([Ag](N([C])[C])N([C])[C])[c][c]1	temp_cif_primitive_sbu_0.xyz
+[Al]123O[C]O[Al]45(O[C]O[Al](O[C]O1)(O[C]O3)(O[C]O5)O4)O[C]O2	temp_cif_primitive_sbu_0.xyz

@@ -1,1 +1,1 @@
-S(c1nccnc1)c1nccnc1	temp_cif_primitive_linker_2.xyz
+c1c(ccc(C(=O)[O])c1)c1ccc(cc1)c1ccc(cc1)C(=O)[O]	temp_cif_primitive_linker_2.xyz

@@ -704,7 +704,7 @@ def TGA_plot():
     intersection_point = seg_intersect(p1, p2, p3, p4)
 
     # instantiating the figure object 
-    graph = figure(title = "Simplified TGA Plot")  
+    graph = figure(title = "Simplified TGA Plot (breakdown temperature indicated by circle)")  
          
     # the points to be plotted 
     xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 

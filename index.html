@@ -944,7 +944,6 @@ Then, to open the website, run python app.py in the terminal
       // Load example MOF
     $('#load').click(function() {
 
-      // for fetch to work, need to open a separate terminal, go to the folder containing index.html, and run node node.js
       fetch('http://localhost:8000/mof_examples/jz4002345_si_002_primitive.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);

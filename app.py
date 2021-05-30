@@ -750,7 +750,7 @@ def TGA_plot():
 def get_components():
     # Uses Aditya's MOF code to get linkers and sbus
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
-    # Also in the dictionary: SMILES string for each of the linkers and sbus TODO
+    # Also in the dictionary: SMILES string for each of the linkers and sbus
 
     # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH);
@@ -917,7 +917,7 @@ def get_components():
 
 
 
-    # In this next section TODO, getting the SMILES strings for all of the linkers and sbus using pybel
+    # In this next section, getting the SMILES strings for all of the linkers and sbus using pybel
     # write the smiles strings to file, then read the file
     import pybel
 

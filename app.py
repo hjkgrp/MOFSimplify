@@ -630,7 +630,7 @@ def plot_thermal_stability():
     # myHist.set_title('Current MOF\'s breakdown temperature relative to others')
     ax.set_xlabel('Breakdown temperature (°C)')
     ax.set_ylabel('Frequency in the training data')
-    ax.set_title('Current MOF\'s breakdown temperature relative to others')
+    ax.set_title('Current MOF\'s predicted breakdown temperature relative to others')
 
     import mpld3
 

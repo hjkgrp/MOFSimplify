@@ -199,12 +199,19 @@ def ss_predict():
     os.chdir("RACs") # move to RACs folder
 
     print('TIME CHECK 2')
+    import time # debugging
+    timeStarted = time.time() # save start time (debugging)
 
     # Next, running MOF featurization
     try:
         get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
     except ValueError:
         return 'FAILED'
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
+
+    timeStarted = time.time() # save start time (debugging)
 
     try:
         full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
@@ -218,6 +225,9 @@ def ss_predict():
     if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
         return 'FAILED'
 
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
+
     print('TIME CHECK 3')
 
     # At this point, have the RAC featurization. Need geometry information next.
@@ -226,7 +236,6 @@ def ss_predict():
     os.chdir('..')
     os.chdir('zeo++')
 
-    import time # debugging
     timeStarted = time.time() # save start time (debugging)
 
     cmd1 = '../../zeo++-0.3/network -ha -res temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
@@ -256,6 +265,8 @@ def ss_predict():
 
     All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
     '''
+
+    timeStarted = time.time() # save start time (debugging)
 
     dict_list = []
     # base_dir = sys.argv[1] #base_dir must be an absolute path
@@ -315,6 +326,9 @@ def ss_predict():
     geo_df.to_csv('geometric_parameters.csv',index=False)
 
 
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
+
     print('TIME CHECK 4')
 
     # Applying the model next
@@ -358,9 +372,14 @@ def ss_predict():
 
     print('TIME CHECK 5')
 
+    timeStarted = time.time() # save start time (debugging)
+
     os.system('python solvent_ANN.py > solvent_prediction.txt')
     # import for_GT
     # prediction = for_GT.main()
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
 
     f = open("solvent_prediction.txt", "r")
     line = f.read()
@@ -541,7 +560,12 @@ def ts_predict():
 
     print('TIME CHECK 5')
 
+    timeStarted = time.time() # save start time (debugging)
+
     os.system('python thermal_ANN.py > thermal_prediction.txt')
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
 
     f = open("thermal_prediction.txt", "r")
     prediction = f.read()

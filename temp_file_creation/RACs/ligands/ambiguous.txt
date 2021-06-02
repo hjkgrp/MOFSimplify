@@ -1,6 +1,0 @@
-temp_cif_primitive, Anchors list: {0, 1, 4, 5}, SBU connectlist: {0} set to be linker
-temp_cif_primitive, Anchors list: {0, 1, 4, 5}, SBU connectlist: {0} set to be linker
-temp_cif_primitive, Anchors list: {2, 3, 4, 5}, SBU connectlist: {0} set to be linker
-temp_cif_primitive, Anchors list: {2, 3, 4, 5}, SBU connectlist: {0} set to be linker
-temp_cif_primitive, Anchors list: {0, 1, 2, 3}, SBU connectlist: {0} set to be linker
-temp_cif_primitive, Anchors list: {0, 1, 2, 3}, SBU connectlist: {0} set to be linker

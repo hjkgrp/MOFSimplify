@@ -1,3 +1,3 @@
-@ temp_cif_av.txt Unitcell_volume: 2329.31   Density: 1.55108   AV_A^3: 0 AV_Volume_fraction: 0 AV_cm^3/g: 0 NAV_A^3: 9.31724 NAV_Volume_fraction: 0.004 NAV_cm^3/g: 0.00257885
-Number_of_channels: 0 Channel_volume_A^3: 
-Number_of_pockets: 4 Pocket_volume_A^3: 1.39759  2.09638  3.0281  2.79517  
+@ temp_cif_av.txt Unitcell_volume: 1189   Density: 1.80933   AV_A^3: 29.2494 AV_Volume_fraction: 0.0246 AV_cm^3/g: 0.0135962 NAV_A^3: 0 NAV_Volume_fraction: 0 NAV_cm^3/g: 0
+Number_of_channels: 2 Channel_volume_A^3: 16.1704  13.079  
+Number_of_pockets: 0 Pocket_volume_A^3: 

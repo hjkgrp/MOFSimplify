@@ -1,3 +1,3 @@
-@ temp_cif_sa.txt Unitcell_volume: 2329.31   Density: 1.55108   ASA_A^2: 0 ASA_m^2/cm^3: 0 ASA_m^2/g: 0 NASA_A^2: 48.5225 NASA_m^2/cm^3: 208.313 NASA_m^2/g: 134.302
+@ temp_cif_sa.txt Unitcell_volume: 1189   Density: 1.80933   ASA_A^2: 0 ASA_m^2/cm^3: 0 ASA_m^2/g: 0 NASA_A^2: 112.517 NASA_m^2/cm^3: 946.312 NASA_m^2/g: 523.019
 Number_of_channels: 0 Channel_surface_area_A^2: 
-Number_of_pockets: 4 Pocket_surface_area_A^2: 12.5568  11.7493  11.8639  12.3526  
+Number_of_pockets: 2 Pocket_surface_area_A^2: 56.7309  55.7857  

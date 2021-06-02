@@ -382,16 +382,38 @@ def ss_predict():
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
     f = open("solvent_prediction.txt", "r")
-    line = f.read()
+    line = f.readline()
     line = line.split('[')
     line = line[2]
     line = line.split(']')
     prediction = line[0] # isolating just the prediction, since the model spits out the prediction like [[PREDICTION]], as in, in hard brackets
+    f.readline() # skip a line
+    neighbor_names = f.readline()
+    neighbor_distances = f.readline()
     f.close()
+
+    # Next, some hacky stuff to convert strings back into lists
+    neighbor_names = neighbor_names.split('\', \'')
+    neighbor_names[0] = neighbor_names[0][2:]
+    neighbor_names[-1] = neighbor_names[-1][:-3]
+
+    neighbor_distances = neighbor_distances.split(', ')
+    neighbor_distances[0] = neighbor_distances[0][2:]
+    neighbor_distances[-1] = neighbor_distances[-1][:-2]    
+
+    print('check check')
+    print(neighbor_names) # debugging
+    print(neighbor_distances) # debugging
+    print(type(neighbor_names)) # debugging
+    print(type(neighbor_distances)) # debugging    
+
+    results = {'prediction': prediction,
+        'neighbor_names': neighbor_names,
+        'neighbor_distances': neighbor_distances}
 
     print('TIME CHECK 6')
 
-    return prediction
+    return results
 
 @app.route('/predict_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
 def ts_predict():
@@ -568,12 +590,34 @@ def ts_predict():
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
     f = open("thermal_prediction.txt", "r")
-    prediction = f.read()
+    prediction = f.readline()
+    f.readline() # skip a line
+    neighbor_names = f.readline()
+    neighbor_distances = f.readline()
     f.close()
+
+    # Next, some hacky stuff to convert strings back into lists
+    neighbor_names = neighbor_names.split('\', \'')
+    neighbor_names[0] = neighbor_names[0][2:]
+    neighbor_names[-1] = neighbor_names[-1][:-3]
+
+    neighbor_distances = neighbor_distances.split(', ')
+    neighbor_distances[0] = neighbor_distances[0][2:]
+    neighbor_distances[-1] = neighbor_distances[-1][:-2]    
+
+    print('check check')
+    print(neighbor_names) # debugging
+    print(neighbor_distances) # debugging
+    print(type(neighbor_names)) # debugging
+    print(type(neighbor_distances)) # debugging    
+
+    results = {'prediction': prediction,
+        'neighbor_names': neighbor_names,
+        'neighbor_distances': neighbor_distances}
 
     print('TIME CHECK 6')
 
-    return prediction
+    return results
 
 @app.route('/plot_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
 def plot_thermal_stability():

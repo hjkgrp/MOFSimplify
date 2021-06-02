@@ -18,6 +18,7 @@ import sys
 import os
 import json
 import pickle
+from sklearn.metrics import pairwise_distances
 
 blue = "rgba(0, 0, 255, 1)"
 red = "rgba(255, 0, 0, 1)"
@@ -195,7 +196,7 @@ new_MOF_pred = new_MOF_pred[0]
 degree_sign= u'\N{DEGREE SIGN}'
 new_MOF_pred = new_MOF_pred + degree_sign + 'C' # degrees Celsius
 
-print(new_MOF_pred) # do not get rid of this print statement
+print(new_MOF_pred) # do not get rid of this print statement, since in app.py the output of this file is catted into another file
 
 
 # from sklearn.metrics import r2_score
@@ -213,3 +214,41 @@ print(new_MOF_pred) # do not get rid of this print statement
 # df_val.to_csv('val_with_predicted.csv',index=False)
 # df_test.to_csv('test_with_predicted.csv',index=False)
 # df_new.to_csv('CoRE_with_predicted_TGA.csv',index=False)
+
+# Define the function for the latent space. This will depend on the model. We want the layer before the last, in this case this was the 8th one.
+get_latent = K.function([model.layers[0].input],
+                        [model.layers[8].output]) # TODO ask Aditya what this should be; is it the last layer of any kind? It looks like it is the one before dense-last
+
+# Get the latent vectors for the training data first, then the latent vectors for the test data.
+training_latent = get_latent([X_train, 0])[0]
+design_latent = get_latent([X_newMOF, 0])[0]
+
+print(training_latent.shape,design_latent.shape)
+
+# Compute the pairwise distances between the test latent vectors and the train latent vectors to get latent distances
+# TODO seems like you will want to put in the newMOF where X_test is currently
+d1 = pairwise_distances(design_latent,training_latent,n_jobs=30)
+df1 = pd.DataFrame(data=d1, columns=df_train['CoRE_name'].tolist())
+df1.to_csv('solvent_test_latent_dists.csv')
+
+## New code below
+# Want to find the closest points (let's say the closest 5 points); so, smallest values in df1
+neighbors = 5 # number of closest points
+
+# will make arrays of length neighbors, where each entry is the next closest neighbor (will do this for both names and distances)
+neighbors_names = []
+neighbors_distances = []
+
+df_reformat = df1.min(axis='index')
+
+for i in range(neighbors):
+    name = df_reformat.idxmin() # name of next closest complex in the traiing data
+    distance = df_reformat.min() # distance of the next closest complex in the training data to the new MOF
+    df_reformat = df_reformat.drop(name) # dropping the next closest complex, in order to find the next-next closest complex
+
+    neighbors_names.append(name)
+    neighbors_distances.append(distance)
+
+print(neighbors_names)
+print(neighbors_distances)
+

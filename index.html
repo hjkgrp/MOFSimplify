@@ -209,6 +209,26 @@ Then, to open the website, run python app.py in the terminal
         <div class='col-12' id='chart'></div>
         <div class='col-12' id='tga_plot'></div>
 
+        <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN. </p>
+
+        <div class = 'col-6'>
+        Solvent removal stability ANN nearest neighbors in latent space
+        <select class='form-control' id='solvent_neighbors'>
+        </select>
+
+        <button class='btn btn-primary' id='s_neighbor' type="button">Show solvent neighbor info</button> 
+        <p id='s_neighbor_info'>Info here TODO.</p>
+        </div>
+
+        <div class = 'col-6'>
+        Thermal stability ANN nearest neighbors in latent space
+        <select class='form-control' id='thermal_neighbors'>
+        </select>
+
+        <button class='btn btn-primary' id='t_neighbor' type="button">Show thermal neighbor info</button> 
+        <p id='t_neighbor_info'>Info here TODO.</p>
+        </div>
+
     </div>
 
 
@@ -270,11 +290,16 @@ Then, to open the website, run python app.py in the terminal
 <p id="exampleholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
 
 <!-- For building block-generated MOF file -->
-<p id="bbgMOFholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
-
+<p id="bbgMOFholder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used -->
 
 <!-- For MOF components (xyz file text) -->
-<p id="componentsholder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used -->
+<p id="componentsholder"> </p> <!-- This will never display anything. Just used to store components if the button "Get MOF components" is used -->
+
+<!-- For solvent removal stability ANN nearest neighbors -->
+<p id="solvent_neighbors_holder"> </p> <!-- This will never display anything. Just used to ANN nearest neighbors if the button "Predict stability upon solvent removal" is used -->
+
+<!-- For thermal stability ANN nearest neighbors -->
+<p id="thermal_neighbors_holder"> </p> <!-- This will never display anything. Just used to ANN nearest neighbors if the button "Predict thermal stability" is used -->
 
 </body>
 
@@ -679,13 +704,19 @@ Then, to open the website, run python app.py in the terminal
         $('#upload_status').text(''); // now nothing is uploaded
         $('#chart').text('');
         $('#tga_plot').text('');
+        $('#s_neighbor_info').text('');
+        $('#t_neighbor_info').text('');
         document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
+        document.getElementById('solvent_neighbors_holder').value = undefined
+        document.getElementById('thermal_neighbors_holder').value = undefined
+
 
         clearViewer(stage); // no MOF is displayed in the visualizer now
         component_viewer.clear(); // likewise, clear component visualizer
-        clear_component_dropdowns();
+        clear_component_dropdowns(); 
+        clear_neighbor_dropdowns(); // clear the nearest neighbor dropdowns
 
         // re-display messages in the two visualizers
         document.getElementById('viewportnote').style.display = 'block';
@@ -773,27 +804,54 @@ Then, to open the website, run python app.py in the terminal
                   console.log('check Q')
                   console.log(response)
 
+                  var prediction = response['prediction']
+
                   // preparing the human-interpretable solvent removal stability prediction
-                  if (response <= 0.2) {
+                  if (prediction <= 0.2) {
                     verdict = 'Very confident the MOF is unstable upon solvent removal.';
                   }
-                  else if (response <= 0.4) {
+                  else if (prediction <= 0.4) {
                     verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
                   }
-                  else if (response <= 0.5) {
+                  else if (prediction <= 0.5) {
                     verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
                   }
-                  else if (response <= 0.6) {
+                  else if (prediction <= 0.6) {
                     verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
                   }
-                  else if (response <= 0.8) {
+                  else if (prediction <= 0.8) {
                     verdict = 'Fairly confident the MOF is stable upon solvent removal.';
                   }
                   else {
                     verdict = 'Very confident the MOF is stable upon solvent removal.';
                   }
 
-                  $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + response.toString() + '. ' + verdict ); 
+                  $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + prediction.toString() + '. ' + verdict ); 
+
+
+                  // now that the prediction has been displayed, can move on to the neighbors display
+                  var neighbor_names = response['neighbor_names']
+                  var neighbor_distances = response['neighbor_distances'] 
+                  // will convert these arrays into a dictionary called neighbors
+                  var neighbors = {}
+                  for (i = 0; i < neighbor_names.length; i++) {
+                    neighbors[neighbor_names[i]] = neighbor_distances[i]
+                  }
+
+                  // storing the information on the neighbors
+                  document.getElementById('solvent_neighbors_holder').value = neighbors;
+
+                  // populating the solvent neighbors dropdown
+                  var solvent_dropdown = document.getElementById("solvent_neighbors");
+
+                  // populating solvent dropdown
+                  for (i = 0; i < neighbor_names.length; i++) {
+                    var option = document.createElement('option');
+                    option.text = neighbor_names[i];
+                    solvent_dropdown.add(option);
+                  }
+
+
             });
       })
     });
@@ -837,7 +895,7 @@ Then, to open the website, run python app.py in the terminal
                 console.log('check R')
                 console.log(response)
 
-                prediction = response.toString();
+                prediction = response['prediction'];
                 $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
 
                 $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
@@ -847,6 +905,29 @@ Then, to open the website, run python app.py in the terminal
                 $.post("/plot_thermal_stability", JSON.stringify(prediction)).done(function(response) { // making the thermal breakdown temperatures plot
                   $('#chart').html(response);
                 }) 
+
+
+                // now that the prediction has been displayed, can move on to the neighbors display
+                var neighbor_names = response['neighbor_names']
+                var neighbor_distances = response['neighbor_distances'] 
+                // will convert these arrays into a dictionary called neighbors
+                var neighbors = {}
+                for (i = 0; i < neighbor_names.length; i++) {
+                  neighbors[neighbor_names[i]] = neighbor_distances[i]
+                }
+
+                // storing the information on the neighbors
+                document.getElementById('thermal_neighbors_holder').value = neighbors;
+
+                // populating the solvent neighbors dropdown
+                var thermal_dropdown = document.getElementById("thermal_neighbors");
+
+                // populating solvent dropdown
+                for (i = 0; i < neighbor_names.length; i++) {
+                  var option = document.createElement('option');
+                  option.text = neighbor_names[i];
+                  thermal_dropdown.add(option);
+                }
 
                 $.post("/TGA_plot").done(function(response) { // TODO edit later, once have latent space plot implemented
                   $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
@@ -1176,10 +1257,76 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.render();
 
       // showing the SMILES string
-      $('#component_SMILES').text('The currently visualized sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
+      $('#component_SMILES').text('The currently visualized sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES']);
 
     })
 
+    function clear_neighbor_dropdowns() { // clear dropdowns when upload new file
+      // clearing solvent stability ANN nearest neighbors dropdown
+      var solvent_dropdown = document.getElementById("solvent_neighbors");
+      var length = solvent_dropdown.options.length;
+      for (i = length-1; i >= 0; i--) {
+        solvent_dropdown.options[i] = null;
+      }
+
+      // clearing thermal stability ANN nearest neighbors dropdown
+      var thermal_dropdown = document.getElementById("thermal_neighbors");
+      var length = thermal_dropdown.options.length;
+      for (i = length-1; i >= 0; i--) {
+        thermal_dropdown.options[i] = null;
+      }
+    }
+
+    // Get information on a nearest neighbor in solvent removal stability ANN latent space
+    $('#s_neighbor').click(function() {
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      // console.log('Neighbor check s 1')
+      // console.log(my_neighbor)
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+        alert('Must make solvent removal stability prediction first.');
+        return;
+      }
+
+      // get the latent space distance from the information returned from the prediction
+      dictionary = document.getElementById('solvent_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+        + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+        + '<br />Experimentally observed to be stable upon solvent removal? TODO<br />'; // <br /> for a new line in display
+    })
+
+
+    // Get information on a nearest neighbor in thermal stability ANN latent space
+    $('#t_neighbor').click(function() {
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      // console.log('Neighbor check s 1')
+      // console.log(my_neighbor)
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+        alert('Must make thermal stability prediction first.');
+        return;
+      }
+
+      // get the latent space distance from the information returned from the prediction
+      dictionary = document.getElementById('thermal_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+        + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+        + '<br />Experimentally observed thermal breakdown temperature: TODO<br />'; // <br /> for a new line in display
+    })
 
     // Make a neural network prediction (the display text is defined in app.py)
     // $('#predict').click(function() {
@@ -1201,22 +1348,22 @@ Then, to open the website, run python app.py in the terminal
     //     });
     // });
 
-    // Define the behavior of the download button
-    $('#download').click(function() {
-      function download(filename, text) {
-          var element = document.createElement('a');
-          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-          element.setAttribute('download', filename);
+    // // Define the behavior of the download button
+    // $('#download').click(function() {
+    //   function download(filename, text) {
+    //       var element = document.createElement('a');
+    //       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    //       element.setAttribute('download', filename);
 
-          element.style.display = 'none';
-          document.body.appendChild(element);
+    //       element.style.display = 'none';
+    //       document.body.appendChild(element);
 
-          element.click();
+    //       element.click();
 
-          document.body.removeChild(element);
-      }
-      download('mol.xyz', data.geometry);
-    });
+    //       document.body.removeChild(element);
+    //   }
+    //   download('mol.xyz', data.geometry);
+    // });
 
     // Start up page by virtually clicking the "Load example MOF" button
     $('#load').click();

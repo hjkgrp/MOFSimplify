@@ -425,19 +425,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 
   handleInput = function() {
-    console.log('Check D')
     if (document.getElementById("file_input").files[0] !== undefined) {
-      console.log('Check E')
-      console.log(document.getElementById("file_input").files[0])
-      console.log(document.getElementById("file_input").files[0] !== undefined)
       var ciffile = document.getElementById("file_input").files[0];
     }
     else if (document.getElementById("example_holder").value !== null) {
-      console.log('Check F')
       var ciffile = document.getElementById("example_holder").value;
     }
     else {
-      console.log('Check G')
       var ciffile = document.getElementById('bbg_MOF_holder').value;
     }
         
@@ -990,14 +984,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
       let myFile3 = document.getElementById('bbg_MOF_holder').value; // the generated MOF, if Make bb-generated MOF has been used
 
-      console.log('check A0')
-
       // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
-        console.log('check A')
         myFile = myFile2;
         if (myFile2 == undefined) {
-          console.log('check B')
           myFile = myFile3;
           if (myFile3 == undefined) {
             alert("Must upload/generate a cif file first.");
@@ -1244,8 +1234,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // Get information on a nearest neighbor in thermal stability ANN latent space when the Show thermal neighbor info button is clicked.
     $('#t_neighbor').click(function() {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
-      console.log('Neighbor check t 1')
-      console.log(my_neighbor)
 
       // Ensure there are neighbors to display information on.
       if (document.getElementById('thermal_neighbors_holder').value == undefined) {
@@ -1275,7 +1263,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       })      
     })
 
-    // Start up page by virtually clicking the "Load example MOF" button
+    // Start up page by virtually clicking the Load example MOF button
     $('#load').click();
 
     // Below: populate the linkers, sbus, and net dropdowns in the building block section.

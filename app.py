@@ -32,7 +32,6 @@ from flask import jsonify
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
 
 cmap_bokeh = Inferno256
-# cmap_bokeh = RdBu11 # optional select other colormaps
 
 app = flask.Flask(__name__)
 

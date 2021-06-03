@@ -1,3 +1,5 @@
+# This file was the template for solvent_ANN.py. solvent_ANN.py is used by mofSimplify.
+
 import os, sys
 import pandas as pd
 import numpy as np

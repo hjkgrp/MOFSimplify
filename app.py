@@ -752,12 +752,13 @@ def TGA_plot():
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+    my_data = my_data[:6] # only want the first six letters
 
-    # Grab data (for now, just grabbing ABAVIJ; later, will need to select based on nearest neighbor to current MOF in latent space)
+    # Grab data 
     slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
 
-    # from IPython.display import display # debugging
-    # display(slopes_df)
+    from IPython.display import display # debugging
+    display(slopes_df)
 
     x_values = []
     y_values = []
@@ -775,7 +776,7 @@ def TGA_plot():
     intersection_point = seg_intersect(p1, p2, p3, p4)
 
     # instantiating the figure object 
-    graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor (breakdown temperature indicated by circle)")  
+    graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
          
     # the points to be plotted 
     xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 

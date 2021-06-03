@@ -1315,8 +1315,8 @@ Then, to open the website, run python app.py in the terminal
     // Get information on a nearest neighbor in thermal stability ANN latent space
     $('#t_neighbor').click(function() {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
-      // console.log('Neighbor check s 1')
-      // console.log(my_neighbor)
+      console.log('Neighbor check t 1')
+      console.log(my_neighbor)
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('thermal_neighbors_holder').value == undefined) {
@@ -1330,19 +1330,19 @@ Then, to open the website, run python app.py in the terminal
 
       if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
        latent_distance = '0' + latent_distance; 
-      }
+      }  
 
       $.post("/thermal_neighbor_T", JSON.stringify(my_neighbor)).done(
         function(response) {
             document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
               + '<br />Experimentally observed thermal breakdown temperature: ' + response
-              + '&#8451 <br />'; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
-      })
+              + '&#8451 <br />Circle in TGA plot marks the breakdown temperature.<br />'; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+        })       
 
-      $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { // TODO edit later, once have latent space plot implemented
+      $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { 
         $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
-      })
+      })      
 
     })
 

@@ -152,28 +152,22 @@ def bb_generate():
     # getting the primitive cell using molSimplify
     get_primitive('output_cifs/' + constructed_MOF, 'output_cifs/primitive_' + constructed_MOF);
 
-    # mof_file = open('output_cifs/primitive_' + constructed_MOF, 'r'); # reading the primitive file for information about the MOF
-    # mof_info = mof_file.read();
-    # mof_file.close();
-
-    # dictionary['mof_info'] = mof_info;
-
-    json_object = json.dumps(dictionary, indent = 4); # TODO dict not necessary now
+    json_object = json.dumps(dictionary, indent = 4);
 
     return json_object
 
     
-# Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of Terachem (here, 1.14)
+# Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14)
 # the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
 @app.route('/predict_solvent_stability', methods=['POST']) 
 def ss_predict():
-    # Generates solvent stability prediction
-    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
-    # Then, apply Aditya's model to make prediction
+    # Generates solvent stability prediction.
+    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
+    # Then, apply Aditya's model to make prediction.
 
     print('TIME CHECK 1')
 
-    # To begin, always go to main directory
+    # To begin, always go to main directory.
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
@@ -181,17 +175,17 @@ def ss_predict():
 
     os.chdir("temp_file_creation") # changing directory
 
-    # Write the data back to a cif file
+    # Write the data back to a cif file.
     cif_file = open('temp_cif.cif', 'w')
     cif_file.write(my_data)
     cif_file.close()
 
 
-    # delete the RACs folder, then remake it (to start fresh for this prediction)
+    # Delete the RACs folder, then remake it (to start fresh for this prediction).
     shutil.rmtree('RACs')
     os.mkdir('RACs')
 
-    # doing the same with the Zeo++ folder
+    # Doing the same with the Zeo++ folder.
     shutil.rmtree('zeo++')
     os.mkdir('zeo++')
 
@@ -254,7 +248,7 @@ def ss_predict():
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
+    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
     ''' The geometric descriptors are largest included sphere (Di), 
     largest free sphere (Df), largest included sphere along free path (Dif),
@@ -268,14 +262,6 @@ def ss_predict():
     timeStarted = time.time() # save start time (debugging)
 
     dict_list = []
-    # base_dir = sys.argv[1] #base_dir must be an absolute path
-    # if base_dir[-1] != '/':
-    #     base_dir+='/'
-    # for cif_file in os.listdir(base_dir+'/primitive/'):
-    #     print('---- now on ----, '+cif_file)
-    #     if '.cif' not in cif_file:
-    #         continue
-    #     basename = cif_file.strip('.cif')
     cif_file = 'temp.cif' # techincally, calculations were with the primitive, but I'll just call it temp
     basename = cif_file.strip('.cif')
     largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
@@ -333,9 +319,6 @@ def ss_predict():
     # Applying the model next
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-
-    # from IPython.display import display # debugging
-
     lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
     linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
@@ -344,24 +327,7 @@ def ss_predict():
     sbu_df = sbu_df.mean().to_frame().transpose()
     linker_df = linker_df.mean().to_frame().transpose()
 
-    # print('check U')
-    # display(geo_df)
-    # print(geo_df.columns)
-
-    # print('check V')
-    # display(lc_df) # debugging
-    # print(lc_df.columns)
-
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
-
-    # print('check W')
-    # display(merged_df) # debugging
-
-    # merged_df = merged_df.merge(sbu_df, how='outer') 
-    # merged_df = merged_df.merge(linker_df, how='outer') 
-
-    # print('check X')
-    # display(merged_df) # debugging
 
     merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation
 
@@ -416,13 +382,13 @@ def ss_predict():
 
 @app.route('/predict_thermal_stability', methods=['POST']) 
 def ts_predict():
-    # Generates thermal stability prediction 
-    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
-    # Then, apply Aditya's model to make prediction
+    # Generates thermal stability prediction.
+    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
+    # Then, apply Aditya's model to make prediction.
 
     print('TIME CHECK 1')
 
-    # To begin, always go to main directory 
+    # To begin, always go to main directory.
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
@@ -435,7 +401,7 @@ def ts_predict():
     cif_file.write(my_data)
     cif_file.close()
 
-    # delete the RACs folder, then remake it (to start fresh for this prediction)
+    # Delete the RACs folder, then remake it (to start fresh for this prediction).
     shutil.rmtree('RACs')
     os.mkdir('RACs')
 
@@ -443,7 +409,7 @@ def ts_predict():
 
     print('TIME CHECK 2')
 
-    # Next, running MOF featurization
+    # Next, running MOF featurization.
     try:
         get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
     except ValueError:
@@ -489,7 +455,7 @@ def ts_predict():
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files
+    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
     ''' The geometric descriptors are largest included sphere (Di), 
     largest free sphere (Df), largest included sphere along free path (Dif),
@@ -560,9 +526,9 @@ def ts_predict():
 
     print('TIME CHECK 4')
 
-    # Applying the model next
+    # Applying the model next.
 
-    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv).
 
     lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
@@ -595,7 +561,7 @@ def ts_predict():
     neighbor_distances = f.readline()
     f.close()
 
-    # Next, some hacky stuff to convert strings back into lists
+    # Next, some hacky stuff to convert strings back into lists.
     neighbor_names = neighbor_names.split('\', \'')
     neighbor_names[0] = neighbor_names[0][2:]
     neighbor_names[-1] = neighbor_names[-1][:-3]
@@ -620,26 +586,19 @@ def ts_predict():
 
 @app.route('/plot_thermal_stability', methods=['POST']) 
 def plot_thermal_stability():
-    # returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on
-    # additionally, displays the position of the current MOF's thermal breakdown temperature
+    # Returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on.
+    # Additionally, displays the position of the current MOF's thermal breakdown temperature.
 
     # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH)
-
-    # debugging
-    # print('Check A')
-    # print(os.getcwd())
 
     # Grab data
     my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
     my_data = float(my_data)
-    # print(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
-
-    # print('Check A2')
 
     import matplotlib
     matplotlib.use('Agg') # noninteractive backend
@@ -647,7 +606,7 @@ def plot_thermal_stability():
     plt.close("all")
     import scipy.stats as stats
 
-    # in training data, smallest T breakdown is 35, and largest T breakdown is 654
+    # In training data, smallest T breakdown is 35, and largest T breakdown is 654.
 
     # use stats.gaussian_kde to estimate the probability density function from the histogram
     density = stats.gaussian_kde(temps_df['T'])
@@ -655,22 +614,8 @@ def plot_thermal_stability():
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
     plt.plot(x, density(x))
-    # print('Check A3')
-    # print(my_data)
-    # print(density(my_data))
-    # print('sanity check')
-    # print(density(0))
-    # print(density(700))
     plt.plot(my_data, density(my_data), "or") # the current MOF's predicted thermal breakdown temperature
 
-    # print('Check B')
-
-    # print('Check C2')
-
-    # labelling axes
-    # myHist.set_xlabel('Breakdown temperature (°C)')
-    # myHist.set_ylabel('Number of MOFs in training data')
-    # myHist.set_title('Current MOF\'s breakdown temperature relative to others')
     ax.set_xlabel('Breakdown temperature (°C)')
     ax.set_ylabel('Frequency in the training data')
     ax.set_title('Current MOF\'s predicted breakdown temperature relative to others')
@@ -679,29 +624,24 @@ def plot_thermal_stability():
 
     return mpld3.fig_to_html(fig)
 
-
 @app.route('/thermal_stability_percentile', methods=['POST']) 
 def thermal_stability_percentile():
-    # returns what percentile the thermal breakdown temperature of the selected MOF lies in
-    # with respect to the MOFs used to train the ANN for thermal stability predictions
+    # Returns what percentile the thermal breakdown temperature of the selected MOF lies in
+    # with respect to the MOFs used to train the ANN for thermal stability predictions.
 
-    # print('check check 1')
-
-    # To begin, always go to main directory 
+    # To begin, always go to main directory. 
     os.chdir(MOFSIMPLIFY_PATH)
 
-    # Grab data
+    # Grab data.
     my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
     my_data = float(my_data)
     print(my_data)
 
-    # Getting the temperature data
+    # Getting the temperature data.
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
 
-    # print('check check 2')
-
-    # will find what percentile our prediction belongs to, by checking the 100 percentiles and seeing which is closest to our prediction
+    # Will find what percentile our prediction belongs to, by checking the 100 percentiles and seeing which is closest to our prediction.
     difference = np.Infinity
 
     breakdown_Ts = temps_df['T']
@@ -741,10 +681,9 @@ def seg_intersect(a1,a2, b1,b2) :
     num = np.dot( dap, dp )
     return (num / denom.astype(float))*db + b1
 
+# Makes the TGA plot for the current thermal ANN nearest neighbor.
 @app.route('/TGA_plot', methods=['POST'])
 def TGA_plot():
-
-    print('TGA plot check 1')
 
     # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH)
@@ -756,16 +695,13 @@ def TGA_plot():
     # Grab data 
     slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
 
-    from IPython.display import display # debugging
-    display(slopes_df)
-
     x_values = []
     y_values = []
     for i in range(4): # 0, 1, 2, 3
         x_values.append(slopes_df.iloc[[i]]['T (degrees C)'][i])
         y_values.append(slopes_df.iloc[[i]]['mass (arbitrary units)'][i])
 
-    # making the four points
+    # Making the four points.
     p1 = np.array( [x_values[0], y_values[0]] )
     p2 = np.array( [x_values[1], y_values[1]] )
 
@@ -774,14 +710,14 @@ def TGA_plot():
 
     intersection_point = seg_intersect(p1, p2, p3, p4)
 
-    # instantiating the figure object 
+    # Instantiating the figure object. 
     graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
          
-    # the points to be plotted 
+    # The points to be plotted.
     xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
     ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
         
-    # plotting the graph 
+    # Plotting the graph.
     graph.multi_line(xs, ys) 
     graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
     graph.xaxis.axis_label = 'Temperature (°C)'
@@ -789,17 +725,13 @@ def TGA_plot():
 
     return file_html(graph,CDN,'my plot')
 
-    # my_data = json.loads(flask.request.get_data())
-    # plt = make_plot(float(my_data['sseplot'])) # V1 KDE
-    # return file_html(plt,CDN,'my plot')
-
 @app.route('/get_components', methods=['POST']) 
 def get_components():
     # Uses Aditya's MOF code to get linkers and sbus
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
     # Also in the dictionary: SMILES string for each of the linkers and sbus
 
-    # To begin, always go to main directory 
+    # To begin, always go to main directory.
     os.chdir(MOFSIMPLIFY_PATH);
 
     # Grab data
@@ -807,19 +739,18 @@ def get_components():
 
     os.chdir("temp_file_creation"); # changing directory
 
-    # Write the data back to a cif file
+    # Write the data back to a cif file.
     cif_file = open('temp_cif.cif', 'w');
     cif_file.write(my_data);
     cif_file.close();
 
-
-    # delete the RACs folder, then remake it (to start fresh for this prediction)
+    # Delete the RACs folder, then remake it (to start fresh for this prediction).
     shutil.rmtree('RACs');
     os.mkdir('RACs');
 
     os.chdir("RACs"); # move to RACs folder
 
-    # Next, running MOF featurization
+    # Next, running MOF featurization.
     try:
         get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
     except ValueError:
@@ -840,7 +771,7 @@ def get_components():
     # At this point, have the RAC featurization. 
 
     # will return a json object
-    # the fields are string representations of the linkers and sbus, however many there are
+    # The fields are string representations of the linkers and sbus, however many there are.
 
     dictionary = {};
     
@@ -878,15 +809,14 @@ def get_components():
 
     os.chdir("linkers"); # move to linkers folder
 
-    # Identifying which linkers and sbus have different connectivities
+    # Identifying which linkers and sbus have different connectivities.
 
-    # Code below uses molecular graph determinants 
+    # Code below uses molecular graph determinants.
     # two ligands that are the same (via connectivity) will have the same molecular graph determinant. 
-    # Molecular graph determinant fails to distinguish between isomers, but so would RCM (Reverse Cuthill McKee)
+    # Molecular graph determinant fails to distinguish between isomers, but so would RCM (Reverse Cuthill McKee).
 
     # This simple script is meant to be run within the linkers directory, and it will give a bunch of numbers. 
-    # If those numbers are the same, the linker is the same, if not, the linkers are different, etc
-
+    # If those numbers are the same, the linker is the same, if not, the linkers are different, etc.
 
     from molSimplify.Classes.mol3D import mol3D
     import glob
@@ -911,16 +841,15 @@ def get_components():
         linker_mol.graph = graph
         safedet = linker_mol.get_mol_graph_det(oct=False)
         det_list.append(safedet)
-    #### linkers with the same molecular graph determinant are the same
-    #### molecular graph determinant does not catch isomers
+
+    #### Linkers with the same molecular graph determinant are the same.
+    #### Molecular graph determinant does not catch isomers.
     linker_det_list = det_list
 
     unique_linker_det = set(linker_det_list) # getting the unique determinants
     unique_linker_indices = []
     for item in unique_linker_det:
         unique_linker_indices.append(linker_det_list.index(item)) # indices of the unique linkers in the list of linkers
-
-
 
     os.chdir("../sbus"); # move to sbus folder
 
@@ -951,21 +880,13 @@ def get_components():
     for item in unique_sbu_det:
         unique_sbu_indices.append(sbu_det_list.index(item)) # indices of the unique sbus in the list of linkers
 
-    print('det lists')
-    print(linker_det_list)
-    print(sbu_det_list)
-
-
     # adding the unique indices to the dictionary
     dictionary['unique_linker_indices'] = unique_linker_indices
     dictionary['unique_sbu_indices'] = unique_sbu_indices
 
 
-
-
-
-    # In this next section, getting the SMILES strings for all of the linkers and sbus using pybel
-    # write the smiles strings to file, then read the file
+    # In this next section, getting the SMILES strings for all of the linkers and sbus using pybel.
+    # Write the smiles strings to file, then read the file.
     import pybel
 
     os.chdir("../linkers"); # move to linkers folder
@@ -974,7 +895,7 @@ def get_components():
         smilesFile = pybel.Outputfile('smi', 'temp_cif_primitive_linker_' + str(i) + '.txt') # smi refers to SMILES
         smilesFile.write(next(pybel.readfile('xyz', 'temp_cif_primitive_linker_' + str(i) + '.xyz'))) # writes SMILES string to the text file
 
-        # next, get the SMILES string from the text file
+        # Next, get the SMILES string from the text file.
         f = open('temp_cif_primitive_linker_' + str(i) + '.txt', 'r')
         line = f.readline()
         line = line.split('\t') # split at tabs
@@ -988,7 +909,7 @@ def get_components():
         smilesFile = pybel.Outputfile('smi', 'temp_cif_primitive_sbu_' + str(i) + '.txt') # smi refers to SMILES
         smilesFile.write(next(pybel.readfile('xyz', 'temp_cif_primitive_sbu_' + str(i) + '.xyz'))) # writes SMILES string to the text file
 
-        # next, get the SMILES string from the text file
+        # Next, get the SMILES string from the text file.
         f = open('temp_cif_primitive_sbu_' + str(i) + '.txt', 'r')
         line = f.readline()
         line = line.split('\t') # split at tabs
@@ -1003,38 +924,28 @@ def get_components():
 
 @app.route('/solvent_neighbor_flag', methods=['POST']) 
 def is_stable():
-    # Returns the flag (whether or not stable upon solvent removal) of the neighbor sent over from the front end
+    # Returns the flag (whether or not stable upon solvent removal) of the neighbor sent over from the front end.
 
-    # Grab data
+    # Grab data.
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
 
     print(my_data)
     
-    # To begin, always go to main directory 
+    # To begin, always go to main directory. 
     os.chdir(MOFSIMPLIFY_PATH);
 
     os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
     solvent_flags_df = pd.read_csv('train.csv')
 
-    from IPython.display import display # debugging
-    # print('Check A')
-    # display(solvent_flags_df)
-
     this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
 
-    print('Check B')
-    display(this_neighbor)
-
     this_neighbor_flag = this_neighbor['flag'] # getting the flag value
-
-    print('Check C')
-    display(this_neighbor_flag.iloc[0])
 
     return str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
 
 @app.route('/thermal_neighbor_T', methods=['POST']) 
 def breakdown_T():
-    # Returns the thermal breakdown temperature of the neighbor sent over from the front end
+    # Returns the thermal breakdown temperature of the neighbor sent over from the front end.
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
@@ -1047,19 +958,9 @@ def breakdown_T():
     os.chdir('model/thermal/ANN')
     breakdown_T_df = pd.read_csv('train.csv')
 
-    from IPython.display import display # debugging
-    # print('Check A')
-    # display(solvent_flags_df)
-
     this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
 
-    print('Check B')
-    display(this_neighbor)
-
     this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
-
-    print('Check C')
-    display(this_neighbor_T.iloc[0])
 
     return str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and return it as a string. Want just one decimal place
 

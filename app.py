@@ -98,7 +98,7 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
             myList.remove(i)
     return myList
 
-@app.route('/get_bb_generated_MOF', methods=['POST']) # Gianmarco Terrones addition
+@app.route('/get_bb_generated_MOF', methods=['POST']) 
 def bb_generate():
     # generates a MOF using the building blocks and net specified by the user
     # uses ToBaCCo code, version 3.0
@@ -108,11 +108,11 @@ def bb_generate():
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
-    mydata = json.loads(flask.request.get_data())
+    my_data = json.loads(flask.request.get_data())
 
-    linker = mydata['linker']
-    sbu = mydata['sbu']
-    net = mydata['net']
+    linker = my_data['linker']
+    sbu = my_data['sbu']
+    net = my_data['net']
 
     os.chdir("temp_file_creation/tobacco_3.0")
 
@@ -166,7 +166,7 @@ def bb_generate():
     
 # Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of Terachem (here, 1.14)
 # the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
-@app.route('/predict_solvent_stability', methods=['POST']) # Gianmarco Terrones addition
+@app.route('/predict_solvent_stability', methods=['POST']) 
 def ss_predict():
     # Generates solvent stability prediction
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
@@ -178,13 +178,13 @@ def ss_predict():
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
-    mydata = json.loads(flask.request.get_data())
+    my_data = json.loads(flask.request.get_data())
 
     os.chdir("temp_file_creation") # changing directory
 
     # Write the data back to a cif file
     cif_file = open('temp_cif.cif', 'w')
-    cif_file.write(mydata)
+    cif_file.write(my_data)
     cif_file.close()
 
 
@@ -415,7 +415,7 @@ def ss_predict():
 
     return results
 
-@app.route('/predict_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
+@app.route('/predict_thermal_stability', methods=['POST']) 
 def ts_predict():
     # Generates thermal stability prediction 
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF
@@ -427,13 +427,13 @@ def ts_predict():
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
-    mydata = json.loads(flask.request.get_data())
+    my_data = json.loads(flask.request.get_data())
 
     os.chdir("temp_file_creation") # changing directory
 
     # Write the data back to a cif file
     cif_file = open('temp_cif.cif', 'w')
-    cif_file.write(mydata)
+    cif_file.write(my_data)
     cif_file.close()
 
     # delete the RACs folder, then remake it (to start fresh for this prediction)
@@ -619,7 +619,7 @@ def ts_predict():
 
     return results
 
-@app.route('/plot_thermal_stability', methods=['POST']) # Gianmarco Terrones addition
+@app.route('/plot_thermal_stability', methods=['POST']) 
 def plot_thermal_stability():
     # returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on
     # additionally, displays the position of the current MOF's thermal breakdown temperature
@@ -632,10 +632,10 @@ def plot_thermal_stability():
     # print(os.getcwd())
 
     # Grab data
-    mydata = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
-    mydata = mydata[:-3] # getting rid of the celsius symbol, left with just the number
-    mydata = float(mydata)
-    # print(mydata)
+    my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
+    my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
+    my_data = float(my_data)
+    # print(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -657,12 +657,12 @@ def plot_thermal_stability():
     ax = fig.add_subplot(1,1,1)
     plt.plot(x, density(x))
     # print('Check A3')
-    # print(mydata)
-    # print(density(mydata))
+    # print(my_data)
+    # print(density(my_data))
     # print('sanity check')
     # print(density(0))
     # print(density(700))
-    plt.plot(mydata, density(mydata), "or") # the current MOF's predicted thermal breakdown temperature
+    plt.plot(my_data, density(my_data), "or") # the current MOF's predicted thermal breakdown temperature
 
     # print('Check B')
 
@@ -681,7 +681,7 @@ def plot_thermal_stability():
     return mpld3.fig_to_html(fig)
 
 
-@app.route('/thermal_stability_percentile', methods=['POST']) # Gianmarco Terrones addition
+@app.route('/thermal_stability_percentile', methods=['POST']) 
 def thermal_stability_percentile():
     # returns what percentile the thermal breakdown temperature of the selected MOF lies in
     # with respect to the MOFs used to train the ANN for thermal stability predictions
@@ -692,10 +692,10 @@ def thermal_stability_percentile():
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
-    mydata = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
-    mydata = mydata[:-3] # getting rid of the celsius symbol, left with just the number
-    mydata = float(mydata)
-    print(mydata)
+    my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
+    my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
+    my_data = float(my_data)
+    print(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -708,7 +708,7 @@ def thermal_stability_percentile():
     breakdown_Ts = temps_df['T']
     for i in np.arange(0,100.1,1): # 0,1, ..., 99, 100
         current_percentile = np.percentile(breakdown_Ts, i) # ith percentile
-        current_difference = np.absolute(mydata - current_percentile) # absolute difference
+        current_difference = np.absolute(my_data - current_percentile) # absolute difference
         if current_difference < difference:
             difference = current_difference
             our_percentile = i
@@ -750,8 +750,11 @@ def TGA_plot():
     # To begin, always go to main directory 
     os.chdir(MOFSIMPLIFY_PATH)
 
+    # Grab data
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+
     # Grab data (for now, just grabbing ABAVIJ; later, will need to select based on nearest neighbor to current MOF in latent space)
-    slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/ABAVIJ.csv")
+    slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
 
     # from IPython.display import display # debugging
     # display(slopes_df)
@@ -772,7 +775,7 @@ def TGA_plot():
     intersection_point = seg_intersect(p1, p2, p3, p4)
 
     # instantiating the figure object 
-    graph = figure(title = "Simplified TGA Plot (breakdown temperature indicated by circle)")  
+    graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor (breakdown temperature indicated by circle)")  
          
     # the points to be plotted 
     xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
@@ -786,11 +789,11 @@ def TGA_plot():
 
     return file_html(graph,CDN,'my plot')
 
-    # mydata = json.loads(flask.request.get_data())
-    # plt = make_plot(float(mydata['sseplot'])) # V1 KDE
+    # my_data = json.loads(flask.request.get_data())
+    # plt = make_plot(float(my_data['sseplot'])) # V1 KDE
     # return file_html(plt,CDN,'my plot')
 
-@app.route('/get_components', methods=['POST']) # Gianmarco Terrones addition
+@app.route('/get_components', methods=['POST']) 
 def get_components():
     # Uses Aditya's MOF code to get linkers and sbus
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
@@ -800,13 +803,13 @@ def get_components():
     os.chdir(MOFSIMPLIFY_PATH);
 
     # Grab data
-    mydata = json.loads(flask.request.get_data());
+    my_data = json.loads(flask.request.get_data());
 
     os.chdir("temp_file_creation"); # changing directory
 
     # Write the data back to a cif file
     cif_file = open('temp_cif.cif', 'w');
-    cif_file.write(mydata);
+    cif_file.write(my_data);
     cif_file.close();
 
 
@@ -998,6 +1001,67 @@ def get_components():
 
     return json_object
 
+@app.route('/solvent_neighbor_flag', methods=['POST']) 
+def is_stable():
+    # Returns the flag (whether or not stable upon solvent removal) of the neighbor sent over from the front end
+
+    # Grab data
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+
+    print(my_data)
+    
+    # To begin, always go to main directory 
+    os.chdir(MOFSIMPLIFY_PATH);
+
+    os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
+    solvent_flags_df = pd.read_csv('train.csv')
+
+    from IPython.display import display # debugging
+    # print('Check A')
+    # display(solvent_flags_df)
+
+    this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
+
+    print('Check B')
+    display(this_neighbor)
+
+    this_neighbor_flag = this_neighbor['flag'] # getting the flag value
+
+    print('Check C')
+    display(this_neighbor_flag.iloc[0])
+
+    return str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
+
+@app.route('/thermal_neighbor_T', methods=['POST']) 
+def breakdown_T():
+    # Returns the thermal breakdown temperature of the neighbor sent over from the front end
+
+    # Grab data
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+
+    print(my_data)
+    
+    # To begin, always go to main directory 
+    os.chdir(MOFSIMPLIFY_PATH);
+
+    os.chdir('model/thermal/ANN')
+    breakdown_T_df = pd.read_csv('train.csv')
+
+    from IPython.display import display # debugging
+    # print('Check A')
+    # display(solvent_flags_df)
+
+    this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
+
+    print('Check B')
+    display(this_neighbor)
+
+    this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
+
+    print('Check C')
+    display(this_neighbor_T.iloc[0])
+
+    return str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and return it as a string. Want just one decimal place
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

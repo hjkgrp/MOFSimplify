@@ -207,7 +207,6 @@ Then, to open the website, run python app.py in the terminal
         <div class='col-12' id='thermal_stability_percentile'></div> <!-- Gianmarco Terrones addition -->
         <div class='col-12' id='loading'></div>
         <div class='col-12' id='chart'></div>
-        <div class='col-12' id='tga_plot'></div>
 
         <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN. </p>
 
@@ -217,7 +216,7 @@ Then, to open the website, run python app.py in the terminal
         </select>
 
         <button class='btn btn-primary' id='s_neighbor' type="button">Show solvent neighbor info</button> 
-        <p id='s_neighbor_info'>Info here TODO.</p>
+        <p id='s_neighbor_info'></p>
         </div>
 
         <div class = 'col-6'>
@@ -226,7 +225,8 @@ Then, to open the website, run python app.py in the terminal
         </select>
 
         <button class='btn btn-primary' id='t_neighbor' type="button">Show thermal neighbor info</button> 
-        <p id='t_neighbor_info'>Info here TODO.</p>
+        <p id='t_neighbor_info'></p>
+        <div class='col-6' id='tga_plot'></div>
         </div>
 
     </div>
@@ -929,10 +929,6 @@ Then, to open the website, run python app.py in the terminal
                   thermal_dropdown.add(option);
                 }
 
-                $.post("/TGA_plot").done(function(response) { // TODO edit later, once have latent space plot implemented
-                  $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
-                })
-
           });
       })
     });
@@ -1297,9 +1293,22 @@ Then, to open the website, run python app.py in the terminal
        latent_distance = '0' + latent_distance; 
       }
 
-      document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
-        + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-        + '<br />Experimentally observed to be stable upon solvent removal? TODO<br />'; // <br /> for a new line in display
+      // grab the solvent stability flag from the appropriate Excel sheet with a POST request
+
+      $.post("/solvent_neighbor_flag", JSON.stringify(my_neighbor)).done(
+        function(response) {
+
+          if (response == 1) {
+            document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+              + '<br />Experimentally observed to be stable upon solvent removal? Yes <br />'; // <br /> for a new line in display
+          }
+          else {
+            document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+              + '<br />Experimentally observed to be stable upon solvent removal? No <br />'; // <br /> for a new line in display
+          }
+      })
     })
 
 
@@ -1323,9 +1332,18 @@ Then, to open the website, run python app.py in the terminal
        latent_distance = '0' + latent_distance; 
       }
 
-      document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
-        + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-        + '<br />Experimentally observed thermal breakdown temperature: TODO<br />'; // <br /> for a new line in display
+      $.post("/thermal_neighbor_T", JSON.stringify(my_neighbor)).done(
+        function(response) {
+            document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+              + '<br />Experimentally observed thermal breakdown temperature: ' + response
+              + '&#8451 <br />'; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+      })
+
+      $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { // TODO edit later, once have latent space plot implemented
+        $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
+      })
+
     })
 
     // Make a neural network prediction (the display text is defined in app.py)

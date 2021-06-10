@@ -326,8 +326,6 @@ def ss_predict():
 
     print('TIME CHECK 4')
 
-    # Applying the model next
-
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
     lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
     sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
@@ -345,7 +343,54 @@ def ss_predict():
     os.chdir('..')
     os.chdir('model/solvent/ANN')
 
+
+    # Here, I do a check to see if the current MOF is in the training data.
+    # If it is, then I return the known truth for the MOF, rather than make a prediction.
+
+    # Will iterate through the rows of the train pandas dataframe
+    train_df = pd.read_csv('dropped_connectivity_dupes/train.csv')
+
+    in_train = False
+
+    # print('In train check')
+
+    for index, row in train_df.iterrows(): # iterate through rows
+
+        row_match = True # gets set to false if any values don't match 
+
+        for col in merged_df.columns: # iterate through columns
+            if col == 'name' or col == 'cif_file':
+                continue # skip these
+            # print('Column: ')
+            # print(col)
+            # print(row[col])
+            # print(merged_df.iloc[0][col])
+            if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some same values being idenfitied as different b/c of some floating 10^-15 values 
+                row_match = False
+
+                # debugging
+                # print('TAGBUZ check')
+                # if row['CoRE_name'] == 'TAGBUZ_clean':
+                #     print(col)
+                #     print(row[col])
+                #     print(merged_df.iloc[0][col])
+
+                break
+        
+        if row_match: # all columns for row match!
+            in_train = True
+            match_truth = row['flag'] # the flag for the MOF that matches the current MOF
+            print(row['CoRE_name'])
+            break
+
+    if in_train:
+        myDict = {'in_train': True, 'truth': match_truth}
+        return myDict
+
     print('TIME CHECK 5')
+
+
+    # Applying the model next
 
     timeStarted = time.time() # save start time (debugging)
 
@@ -384,7 +429,8 @@ def ss_predict():
 
     results = {'prediction': prediction,
         'neighbor_names': neighbor_names,
-        'neighbor_distances': neighbor_distances}
+        'neighbor_distances': neighbor_distances,
+        'in_train': False} # a prediction was made. Requested MOF was not in the training data.
 
     print('TIME CHECK 6')
 
@@ -555,6 +601,60 @@ def ts_predict():
     os.chdir('..')
     os.chdir('model/thermal/ANN')
 
+
+
+    # Here, I do a check to see if the current MOF is in the training data.
+    # If it is, then I return the known truth for the MOF, rather than make a prediction.
+
+    # Will iterate through the rows of the train pandas dataframe
+    train_df = pd.read_csv('train.csv')
+
+    in_train = False
+
+    # print('In train check')
+
+    for index, row in train_df.iterrows(): # iterate through rows
+
+        row_match = True # gets set to false if any values don't match 
+
+        for col in merged_df.columns: # iterate through columns
+            if col == 'name' or col == 'cif_file':
+                continue # skip these
+            # print('Column: ')
+            # print(col)
+            # print(row[col])
+            # print(merged_df.iloc[0][col])
+            if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some identical values being identified as different b/c of some small differences 
+                row_match = False
+
+                # debugging
+                # print('TAGBUZ check')
+                # if row['CoRE_name'] == 'TAGBUZ_clean':
+                #     print(col)
+                #     print(row[col])
+                #     print(merged_df.iloc[0][col])
+
+                break
+        
+        if row_match: # all columns for row match!
+            in_train = True
+            match_truth = row['T'] # the flag for the MOF that matches the current MOF
+
+            match_truth = np.round(match_truth,1) # round to 1 decimal
+
+            # adding units
+            degree_sign= u'\N{DEGREE SIGN}'
+            match_truth = str(match_truth) + degree_sign + 'C' # degrees Celsius
+
+#            print(row['CoRE_name'])
+            break
+
+    if in_train:
+        myDict = {'in_train': True, 'truth': match_truth}
+        return myDict
+
+
+
     print('TIME CHECK 5')
 
     timeStarted = time.time() # save start time (debugging)
@@ -588,7 +688,8 @@ def ts_predict():
 
     results = {'prediction': prediction,
         'neighbor_names': neighbor_names,
-        'neighbor_distances': neighbor_distances}
+        'neighbor_distances': neighbor_distances,
+        'in_train': False} # a prediction was made. Requested MOF was not in the training data.
 
     print('TIME CHECK 6')
 
@@ -603,9 +704,12 @@ def plot_thermal_stability():
     os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
-    my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
+    info = json.loads(flask.request.get_data()) 
+    my_data = info['temperature'] # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
     my_data = float(my_data)
+    print('checkerino')
+    print(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -628,7 +732,10 @@ def plot_thermal_stability():
 
     ax.set_xlabel('Breakdown temperature (°C)')
     ax.set_ylabel('Frequency in the training data')
-    ax.set_title('Current MOF\'s predicted breakdown temperature relative to others')
+    if info['prediction']: # MOF wasn't in training data, and its ANN predicted breakdown temperature is used
+        ax.set_title('Current MOF\'s predicted breakdown temperature relative to others')
+    else: # MOF was in the training data, and its reported breakdown temperature is used
+        ax.set_title('Current MOF\'s breakdown temperature relative to others')
 
     import mpld3
 
@@ -934,7 +1041,7 @@ def get_components():
 
 @app.route('/solvent_neighbor_flag', methods=['POST']) 
 def is_stable():
-    # Returns the flag (whether or not stable upon solvent removal) of the neighbor sent over from the front end.
+    # Returns the flag (whether or not stable upon solvent removal) and DOI of the neighbor sent over from the front end.
 
     # Grab data.
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
@@ -951,11 +1058,23 @@ def is_stable():
 
     this_neighbor_flag = this_neighbor['flag'] # getting the flag value
 
-    return str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
+    this_neighbor_flag =  str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
+
+    os.chdir(MOFSIMPLIFY_PATH);
+    # next, getting DOI
+    os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
+    solvent_flags_df = pd.read_csv('train.csv')
+    this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
+    this_neighbor_doi = this_neighbor['doi'] # getting the doi
+    this_neighbor_doi = this_neighbor_doi.iloc[0]
+
+    myDict = {'flag': this_neighbor_flag, 'doi': this_neighbor_doi}
+
+    return myDict
 
 @app.route('/thermal_neighbor_T', methods=['POST']) 
 def breakdown_T():
-    # Returns the thermal breakdown temperature of the neighbor sent over from the front end.
+    # Returns the thermal breakdown temperature and DOI of the neighbor sent over from the front end.
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
@@ -967,12 +1086,21 @@ def breakdown_T():
 
     os.chdir('model/thermal/ANN')
     breakdown_T_df = pd.read_csv('train.csv')
-
     this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
-
     this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
+    this_neighbor_T =  str(round(this_neighbor_T.iloc[0], 1)) # extract the breakdown temperature value and return it as a string. Want just one decimal place
 
-    return str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and return it as a string. Want just one decimal place
+
+    os.chdir(MOFSIMPLIFY_PATH);
+    os.chdir('TGA')
+    TGA_df = pd.read_excel('TGA_info_log.xlsx')
+    this_neighbor = TGA_df[TGA_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
+    this_neighbor_doi = this_neighbor['doi'] # getting the doi
+    this_neighbor_doi = this_neighbor_doi.iloc[0]
+
+    myDict = {'T': this_neighbor_T, 'doi': this_neighbor_doi}
+
+    return myDict
 
 @app.route('/neighbor_writer', methods=['POST']) 
 def neighbor_writer():

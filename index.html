@@ -765,52 +765,68 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                     return; // Do not update solvent stability prediction if prediction failed.
                   }
 
-                  var prediction = response['prediction']
+                  if (! response['in_train']) { // a prediction was made
+                    var prediction = response['prediction']
 
-                  // preparing the human-interpretable solvent removal stability prediction
-                  if (prediction <= 0.2) {
-                    verdict = 'Very confident the MOF is unstable upon solvent removal.';
+                    // preparing the human-interpretable solvent removal stability prediction
+                    if (prediction <= 0.2) {
+                      verdict = 'Very confident the MOF is unstable upon solvent removal.';
+                    }
+                    else if (prediction <= 0.4) {
+                      verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
+                    }
+                    else if (prediction <= 0.5) {
+                      verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
+                    }
+                    else if (prediction <= 0.6) {
+                      verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
+                    }
+                    else if (prediction <= 0.8) {
+                      verdict = 'Fairly confident the MOF is stable upon solvent removal.';
+                    }
+                    else {
+                      verdict = 'Very confident the MOF is stable upon solvent removal.';
+                    }
+
+                    $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + prediction.toString() + '. ' + verdict ); 
+
+                    // Now that the prediction has been displayed, can move on to the neighbors display.
+                    var neighbor_names = response['neighbor_names']
+                    var neighbor_distances = response['neighbor_distances'] 
+
+                    // Convert these arrays into a dictionary called neighbors.
+                    var neighbors = {}
+                    for (i = 0; i < neighbor_names.length; i++) {
+                      neighbors[neighbor_names[i]] = neighbor_distances[i]
+                    }
+
+                    // Storing the information on the neighbors.
+                    document.getElementById('solvent_neighbors_holder').value = neighbors;
+
+                    // Populating the solvent neighbors dropdown.
+                    var solvent_dropdown = document.getElementById("solvent_neighbors");
+
+                    // Populating solvent dropdown.
+                    for (i = 0; i < neighbor_names.length; i++) {
+                      var option = document.createElement('option');
+                      option.text = neighbor_names[i];
+                      solvent_dropdown.add(option);
+                    }
                   }
-                  else if (prediction <= 0.4) {
-                    verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
-                  }
-                  else if (prediction <= 0.5) {
-                    verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
-                  }
-                  else if (prediction <= 0.6) {
-                    verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
-                  }
-                  else if (prediction <= 0.8) {
-                    verdict = 'Fairly confident the MOF is stable upon solvent removal.';
-                  }
-                  else {
-                    verdict = 'Very confident the MOF is stable upon solvent removal.';
+                  else { // requested MOF was in the training data
+                    
+                    // Storing information indicating that a prediction was made, but no neighbors are avaialable
+                    document.getElementById('solvent_neighbors_holder').value = 1
+                   
+                    if (response['truth'] == 1) {
+                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be stable upon solvent removal.'); 
+                    }
+                    else {
+                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be unstable upon solvent removal.');  
+                    }
+
                   }
 
-                  $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + prediction.toString() + '. ' + verdict ); 
-
-                  // Now that the prediction has been displayed, can move on to the neighbors display.
-                  var neighbor_names = response['neighbor_names']
-                  var neighbor_distances = response['neighbor_distances'] 
-
-                  // Convert these arrays into a dictionary called neighbors.
-                  var neighbors = {}
-                  for (i = 0; i < neighbor_names.length; i++) {
-                    neighbors[neighbor_names[i]] = neighbor_distances[i]
-                  }
-
-                  // Storing the information on the neighbors.
-                  document.getElementById('solvent_neighbors_holder').value = neighbors;
-
-                  // Populating the solvent neighbors dropdown.
-                  var solvent_dropdown = document.getElementById("solvent_neighbors");
-
-                  // Populating solvent dropdown.
-                  for (i = 0; i < neighbor_names.length; i++) {
-                    var option = document.createElement('option');
-                    option.text = neighbor_names[i];
-                    solvent_dropdown.add(option);
-                  }
             });
       })
     });
@@ -848,38 +864,53 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   return; // Do not update solvent stability prediction if prediction failed.
                 }
 
-                prediction = response['prediction'];
-                $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
+                if (! response['in_train']) { // a prediction was made
+                  prediction = response['prediction'];
+                  $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
 
-                $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
-                  $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-                })   
+                  $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
+                    $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+                  })   
 
-                $.post("/plot_thermal_stability", JSON.stringify(prediction)).done(function(response) { // making the thermal breakdown temperatures plot
-                  $('#chart').html(response);
-                }) 
+                  myDict = {'prediction': true, 'temperature': prediction}
+                  $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
+                    $('#chart').html(response);
+                  }) 
 
-                // Now that the prediction has been displayed, can move on to the neighbors display.
-                var neighbor_names = response['neighbor_names']
-                var neighbor_distances = response['neighbor_distances'] 
+                  // Now that the prediction has been displayed, can move on to the neighbors display.
+                  var neighbor_names = response['neighbor_names']
+                  var neighbor_distances = response['neighbor_distances'] 
 
-                // Converting these arrays into a dictionary called neighbors.
-                var neighbors = {}
-                for (i = 0; i < neighbor_names.length; i++) {
-                  neighbors[neighbor_names[i]] = neighbor_distances[i]
+                  // Converting these arrays into a dictionary called neighbors.
+                  var neighbors = {}
+                  for (i = 0; i < neighbor_names.length; i++) {
+                    neighbors[neighbor_names[i]] = neighbor_distances[i]
+                  }
+
+                  // Storing the information on the neighbors.
+                  document.getElementById('thermal_neighbors_holder').value = neighbors;
+
+                  // Populating the solvent neighbors dropdown.
+                  var thermal_dropdown = document.getElementById("thermal_neighbors");
+
+                  // Populating solvent dropdown.
+                  for (i = 0; i < neighbor_names.length; i++) {
+                    var option = document.createElement('option');
+                    option.text = neighbor_names[i];
+                    thermal_dropdown.add(option);
+                  }
                 }
 
-                // Storing the information on the neighbors.
-                document.getElementById('thermal_neighbors_holder').value = neighbors;
+                else { // requested MOF was in the training data
+                    // Storing information indicating that a prediction was made, but no neighbors are avaialable
+                    document.getElementById('thermal_neighbors_holder').value = 1
+                   
+                    $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
 
-                // Populating the solvent neighbors dropdown.
-                var thermal_dropdown = document.getElementById("thermal_neighbors");
-
-                // Populating solvent dropdown.
-                for (i = 0; i < neighbor_names.length; i++) {
-                  var option = document.createElement('option');
-                  option.text = neighbor_names[i];
-                  thermal_dropdown.add(option);
+                    myDict = {'prediction': false, 'temperature': response['truth']}
+                    $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
+                      $('#chart').html(response);
+                    }) 
                 }
           });
       })
@@ -1209,6 +1240,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         return;
       }
 
+      if (document.getElementById('solvent_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
       // Get the latent space distance from the information returned from the prediction.
       dictionary = document.getElementById('solvent_neighbors_holder').value;
       latent_distance = dictionary[my_neighbor];
@@ -1217,18 +1253,21 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
        latent_distance = '0' + latent_distance; 
       }
 
-      // Grab the solvent stability flag from the appropriate Excel sheet with a POST request.
+      // Grab the solvent stability flag and DOI from the appropriate Excel sheet with a POST request.
       $.post("/solvent_neighbor_flag", JSON.stringify(my_neighbor)).done(
         function(response) {
-          if (response == 1) {
+          flag = response['flag'] 
+          if (flag == 1) {
             document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-              + '<br />Experimentally observed to be stable upon solvent removal? Yes <br />'; // <br /> for a new line in display
+              + '<br />Experimentally observed to be stable upon solvent removal? Yes <br />Nearest neighbor DOI: ' 
+              + response['doi']; // <br /> for a new line in display
           }
           else {
             document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-              + '<br />Experimentally observed to be stable upon solvent removal? No <br />'; // <br /> for a new line in display
+              + '<br />Experimentally observed to be stable upon solvent removal? No <br />Nearest neighbor DOI: '
+              + response['doi']; // <br /> for a new line in display
           }
       })
     })
@@ -1238,6 +1277,18 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // Also download a .out file that contains information on the nearest neighbor.
     $('#download_s_neighbor').click(function() {
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+        alert('Must make solvent removal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('solvent_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
 
       // Making the txt file with information about the neighbor
       // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
@@ -1288,6 +1339,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         return;
       }
 
+      if (document.getElementById('thermal_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
       // Get the latent space distance from the information returned from the prediction.
       dictionary = document.getElementById('thermal_neighbors_holder').value;
       latent_distance = dictionary[my_neighbor];
@@ -1301,9 +1357,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         function(response) {
             document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-              + '<br />Experimentally observed thermal breakdown temperature: ' + response
-              + '&#8451 <br />Circle in TGA plot marks the breakdown temperature.<br />'; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
-        })       
+              + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
+              + '&#8451 <br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
+              + response['doi']; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+        })
 
       $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { 
         $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
@@ -1316,6 +1373,17 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // Also download the TGA plot TODO
     $('#download_t_neighbor').click(function() {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+        alert('Must make thermal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('thermal_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
 
       // Making the txt file with information about the neighbor
       // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor

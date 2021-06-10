@@ -1,10 +1,8 @@
-atom 0 with type of Zr found to have 8 coordinates with atom types of O
-atom 1 with type of Zr found to have 8 coordinates with atom types of O
-atom 2 with type of Zr found to have 8 coordinates with atom types of O
-atom 3 with type of Zr found to have 8 coordinates with atom types of O
-atom 4 with type of Zr found to have 8 coordinates with atom types of O
-atom 5 with type of Zr found to have 8 coordinates with atom types of O
-temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 7 , 2
+atom 0 with type of Cd found to have 4 coordinates with atom types of N,O
+atom 1 with type of Cd found to have 4 coordinates with atom types of N,O
+atom 2 with type of Cd found to have 4 coordinates with atom types of N,O
+atom 3 with type of Cd found to have 4 coordinates with atom types of N,O
+temp_cif_primitive, (min_max_linker_length,max_min_linker_length): 10 , 5
 
 Structure has LONG ligand
 

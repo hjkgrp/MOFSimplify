@@ -40,3 +40,5 @@ print(thermal_model.layers[10])
 print('Test test D')
 # print(solvent_model.layers[16]) # 16 is out of range
 # print(thermal_model.layers[11]) # 11 is out of range
+print(len(solvent_model.layers))
+print(len(thermal_model.layers))

@@ -90,6 +90,16 @@ def serve_bbcif(path):
     # Serves the building block generated MOF
     return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
 
+@app.route('/neighbor/<path:path>')
+def serve_neighbor(path):
+    # Serves the neighbor CoRE MOF
+    return flask.send_from_directory('CoRE2019', path);
+
+@app.route('/neighbor_txt/<path:path>')
+def serve_neighbor_txt(path):
+    # Serves the neighbor CoRE MOF information in txt file format
+    return flask.send_from_directory('temp_file_creation/latent_neighbor', path);
+
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     myList = os.listdir(path);
     for i in myList:
@@ -963,6 +973,60 @@ def breakdown_T():
     this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
 
     return str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and return it as a string. Want just one decimal place
+
+@app.route('/neighbor_writer', methods=['POST']) 
+def neighbor_writer():
+    # Writes information to a txt file about the selected latent space nearest neighbor.
+
+    # Grab data
+    my_data = json.loads(flask.request.get_data()); # This is a dictionary with information about the neighbor and the MOF that was analyzed by an ANN
+
+    # To begin, always go to main directory. 
+    os.chdir(MOFSIMPLIFY_PATH);
+
+    print('neighbor writer check')
+    print(my_data)
+
+    prediction_type = my_data['prediction_type']
+    current_MOF = my_data['current_MOF']
+    selected_neighbor = my_data['selected_neighbor']
+    latent_space_distance = my_data['latent_space_distance']
+
+    if prediction_type == 'solvent':
+        os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
+        solvent_flags_df = pd.read_csv('train.csv')
+        this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
+        this_neighbor_flag = this_neighbor['flag'] # getting the flag value
+        neighbor_truth = str(this_neighbor_flag.iloc[0]) # extract the flag value and convert it into a string
+        if neighbor_truth == '1':
+            neighbor_truth = 'Stable upon solvent removal'
+        else:
+            neighbor_truth = 'Unstable upon solvent removal'
+
+    else: # thermal stability
+        os.chdir('model/thermal/ANN')
+        breakdown_T_df = pd.read_csv('train.csv')
+        this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
+        this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
+        neighbor_truth = str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and convert it into a string. Want just one decimal place
+
+
+    # Now, writing all of this information to a string
+    os.chdir(MOFSIMPLIFY_PATH);
+
+    # Delete and remake the latent_neighbor folder each time, so only one file is ever in it
+    shutil.rmtree('temp_file_creation/latent_neighbor')
+    os.mkdir('temp_file_creation/latent_neighbor')
+
+    with open('temp_file_creation/latent_neighbor/' + prediction_type + '__' + current_MOF + '__' + selected_neighbor + '.out','w') as f:
+        f.write('Prediction type: ' + prediction_type + '\n')
+        f.write('Current MOF: ' + current_MOF + '\n')
+        f.write('Selected CoRE nearest neighbor in latent space: ' + selected_neighbor + '\n')
+        f.write('Latent space distance: ' + latent_space_distance + '\n')
+        f.write('Property for nearest neighbor: ' + neighbor_truth + '\n')
+
+    print('neighbor writer check 2')
+    return 'Success!'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

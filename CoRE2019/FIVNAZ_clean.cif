@@ -1,0 +1,39 @@
+data_crystal
+
+_cell_length_a 8.16500
+_cell_length_b 8.21500
+_cell_length_c 8.21500
+_cell_angle_alpha 94.18310
+_cell_angle_beta  117.65300
+_cell_angle_gamma 62.34720
+
+_symmetry_space_group_name_	'P 1'
+_symmetry_space_group_name_H-M	'P 1'
+
+loop_
+_symmetry_equiv_pos_as_xyz
+  x,y,z
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_charge
+Ho	Ho	0.75000 0.06649 0.06649 2.08500
+Ho	Ho	0.25000 0.93351 0.93351 1.45500
+C 	C 	0.94358 0.94903 0.50695 0.03100
+C 	C 	0.55642 0.50695 0.94903 0.16500
+C 	C 	0.05642 0.05097 0.49305 0.49400
+C 	C 	0.44358 0.49305 0.05097 0.33400
+O 	O 	0.80270 0.94558 0.35630 -0.41700
+O 	O 	0.99693 0.12141 0.33273 -0.50200
+O 	O 	0.69730 0.35630 0.94558 -0.44600
+O 	O 	0.50307 0.33273 0.12141 -0.40100
+O 	O 	0.19730 0.05442 0.64370 -0.38400
+O 	O 	0.00307 0.87859 0.66727 -0.34600
+O 	O 	0.30270 0.64370 0.05442 -0.35300
+O 	O 	0.49693 0.66727 0.87859 -0.41000
+F 	F 	-0.00000 0.00000 -0.00000 -0.63400
+F 	F 	0.50000 0.00000 -0.00000 -0.67100

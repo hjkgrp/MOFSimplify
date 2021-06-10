@@ -202,6 +202,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         </select>
 
         <button class='btn btn-primary' id='s_neighbor' type='button'>Show solvent neighbor info</button> 
+        <button class='btn btn-primary' id='download_s_neighbor' type='button'>Download solvent neighbor info</button> 
         <p id='s_neighbor_info'></p>
         </div>
 
@@ -211,6 +212,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         </select>
 
         <button class='btn btn-primary' id='t_neighbor' type='button'>Show thermal neighbor info</button> 
+        <button class='btn btn-primary' id='download_t_neighbor' type='button'>Download thermal neighbor info</button> 
         <p id='t_neighbor_info'></p>
         <div class='col-6' id='tga_plot'></div>
         </div>
@@ -1231,6 +1233,51 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       })
     })
 
+
+    // Download the cif file of the nearest neighbor in solvent removal stability ANN latent space when the Download solvent neighbor info button is clicked. 
+    // Also download a .out file that contains information on the nearest neighbor.
+    $('#download_s_neighbor').click(function() {
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Making the txt file with information about the neighbor
+      // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
+      var dict = {}
+      dict['prediction_type'] = 'solvent'
+
+      var myFile = document.getElementById('bbg_MOF_holder').value;
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // TODO check this works // if the example MOF is loaded
+        name = 'exampleMOF'
+      } 
+
+      dict['current_MOF'] = name
+      dict['selected_neighbor'] = my_neighbor
+
+      // Get the latent space distance from the information returned from the prediction.
+      dictionary = document.getElementById('solvent_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      dict['latent_space_distance'] = latent_distance
+
+      $.post("/neighbor_writer", JSON.stringify(dict)).done(
+        function(response) {
+          // I don't really care about the response, I just want download the .out file after it is written
+          window.location = '/neighbor_txt/'.concat('solvent__', name, '__', my_neighbor, '.out')
+          // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
+      })
+
+      setTimeout(function(){
+        window.location = '/neighbor/'.concat(my_neighbor, '.cif'); // download cif file from the CoRE2019 folder
+      }, 1000); // the delay is to make it possible to download multiple files in the same function
+
+    })
+
     // Get information on a nearest neighbor in thermal stability ANN latent space when the Show thermal neighbor info button is clicked.
     $('#t_neighbor').click(function() {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
@@ -1261,6 +1308,52 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { 
         $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
       })      
+    })
+
+
+    // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the Download thermal neighbor info button is clicked. 
+    // Also download a .out file that contains information on the nearest neighbor.
+    // Also download the TGA plot TODO
+    $('#download_t_neighbor').click(function() {
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Making the txt file with information about the neighbor
+      // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
+      var dict = {}
+      dict['prediction_type'] = 'thermal'
+
+      var myFile = document.getElementById('bbg_MOF_holder').value;
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // TODO check this works // if the example MOF is loaded
+        name = 'exampleMOF'
+      } 
+
+      dict['current_MOF'] = name
+      dict['selected_neighbor'] = my_neighbor
+
+      // Get the latent space distance from the information returned from the prediction.
+      dictionary = document.getElementById('thermal_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      dict['latent_space_distance'] = latent_distance
+
+      $.post("/neighbor_writer", JSON.stringify(dict)).done(
+        function(response) {
+          // I don't really care about the response, I just want download the .out file after it is written
+          window.location = '/neighbor_txt/'.concat('thermal__', name, '__', my_neighbor, '.out')
+          // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
+      })
+
+      setTimeout(function(){
+        window.location = '/neighbor/'.concat(my_neighbor, '.cif'); // download cif file from the CoRE2019 folder
+      }, 1000); // the delay is to make it possible to download multiple files in the same function
+
     })
 
     // Start up page by virtually clicking the Load example MOF button

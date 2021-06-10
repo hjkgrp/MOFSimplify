@@ -95,7 +95,7 @@ def serve_neighbor(path):
     # Serves the neighbor CoRE MOF
     return flask.send_from_directory('CoRE2019', path);
 
-@app.route('/neighbor_txt/<path:path>')
+@app.route('/neighbor_info/<path:path>')
 def serve_neighbor_txt(path):
     # Serves the neighbor CoRE MOF information in txt file format
     return flask.send_from_directory('temp_file_creation/latent_neighbor', path);
@@ -992,6 +992,7 @@ def neighbor_writer():
     selected_neighbor = my_data['selected_neighbor']
     latent_space_distance = my_data['latent_space_distance']
 
+    # next, getting neighbor_truth
     if prediction_type == 'solvent':
         os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
         solvent_flags_df = pd.read_csv('train.csv')
@@ -1011,6 +1012,21 @@ def neighbor_writer():
         neighbor_truth = str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and convert it into a string. Want just one decimal place
 
 
+    os.chdir(MOFSIMPLIFY_PATH);
+    # next, getting DOI
+    if prediction_type == 'solvent':
+        os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
+        solvent_flags_df = pd.read_csv('train.csv')
+        this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
+        this_neighbor_doi = this_neighbor['doi'] # getting the doi
+        this_neighbor_doi = this_neighbor_doi.iloc[0]
+    else: # thermal
+        os.chdir('TGA')
+        TGA_df = pd.read_excel('TGA_info_log.xlsx')
+        this_neighbor = TGA_df[TGA_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
+        this_neighbor_doi = this_neighbor['doi'] # getting the doi
+        this_neighbor_doi = this_neighbor_doi.iloc[0]
+
     # Now, writing all of this information to a string
     os.chdir(MOFSIMPLIFY_PATH);
 
@@ -1024,8 +1040,62 @@ def neighbor_writer():
         f.write('Selected CoRE nearest neighbor in latent space: ' + selected_neighbor + '\n')
         f.write('Latent space distance: ' + latent_space_distance + '\n')
         f.write('Property for nearest neighbor: ' + neighbor_truth + '\n')
+        f.write('Neighbor DOI: ' + this_neighbor_doi + '\n')
 
     print('neighbor writer check 2')
+
+    return 'Success!'
+
+
+@app.route('/TGA_maker', methods=['POST']) 
+def TGA_maker():
+    # Making the TGA plot and saving it, for it to be downloaded
+    from bokeh.io import export_png
+
+    # To begin, always go to main directory. 
+    os.chdir(MOFSIMPLIFY_PATH);
+
+    # Grab data
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+    my_data = my_data[:6] # only want the first six letters
+
+    print('neighbor writer check 3')
+
+    # Grab data 
+    slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
+
+    x_values = []
+    y_values = []
+    for i in range(4): # 0, 1, 2, 3
+        x_values.append(slopes_df.iloc[[i]]['T (degrees C)'][i])
+        y_values.append(slopes_df.iloc[[i]]['mass (arbitrary units)'][i])
+
+    # Making the four points.
+    p1 = np.array( [x_values[0], y_values[0]] )
+    p2 = np.array( [x_values[1], y_values[1]] )
+
+    p3 = np.array( [x_values[2], y_values[2]] )
+    p4 = np.array( [x_values[3], y_values[3]] )
+
+    intersection_point = seg_intersect(p1, p2, p3, p4)
+
+    # Instantiating the figure object. 
+    graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
+         
+    # The points to be plotted.
+    xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
+    ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
+        
+    # Plotting the graph.
+    graph.multi_line(xs, ys) 
+    graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
+    graph.xaxis.axis_label = 'Temperature (°C)'
+    graph.yaxis.axis_label = 'Percentage mass remaining or Mass' 
+
+    print('neighbor writer check 4')
+
+    export_png(graph, filename='temp_file_creation/latent_neighbor/' + my_data + "_simplified_TGA.png")
+    
     return 'Success!'
 
 if __name__ == '__main__':

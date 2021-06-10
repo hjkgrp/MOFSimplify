@@ -1268,7 +1268,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
           // I don't really care about the response, I just want download the .out file after it is written
-          window.location = '/neighbor_txt/'.concat('solvent__', name, '__', my_neighbor, '.out')
+          window.location = '/neighbor_info/'.concat('solvent__', name, '__', my_neighbor, '.out')
           // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
       })
 
@@ -1346,9 +1346,18 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
           // I don't really care about the response, I just want download the .out file after it is written
-          window.location = '/neighbor_txt/'.concat('thermal__', name, '__', my_neighbor, '.out')
+          window.location = '/neighbor_info/'.concat('thermal__', name, '__', my_neighbor, '.out')
           // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
       })
+
+      // setTimeout(function(){
+      //   console.log('Check Check Check')
+      //   $.post("/TGA_maker", JSON.stringify(my_neighbor)).done(
+      //     function(response){
+      //       console.log('Check Check Check 2')
+      //       window.location = '/neighbor_info/'.concat(my_neighbor.substring(0,6), '_simplified_TGA.png') // download the simplified TGA plot
+      //     })
+      // }, 500)
 
       setTimeout(function(){
         window.location = '/neighbor/'.concat(my_neighbor, '.cif'); // download cif file from the CoRE2019 folder

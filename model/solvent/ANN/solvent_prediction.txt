@@ -1,4 +1,4 @@
-[[0.92]]
+[[0.87]]
 (1394, 200) (1, 200)
-['ABAYIO_clean', 'LAZXOB_clean', 'VEHJUP_clean', 'KEFBII_clean', 'VEHJOJ_clean']
-[0.0013521147, 3.797176, 4.002922, 4.207727, 4.2995853]
+['RUBTAK01_SL', 'EWILON_clean', 'RICHIV_clean', 'IXEJIG_clean', 'NAWHOL_clean']
+[1.750766, 5.965368, 6.701346, 6.765671, 6.938796]

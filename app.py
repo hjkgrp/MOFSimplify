@@ -628,11 +628,11 @@ def ts_predict():
                 row_match = False
 
                 # debugging
-                # print('TAGBUZ check')
-                # if row['CoRE_name'] == 'TAGBUZ_clean':
-                #     print(col)
-                #     print(row[col])
-                #     print(merged_df.iloc[0][col])
+                print('BETDAH check')
+                if row['CoRE_name'] == 'BETDAH_clean':
+                    print(col)
+                    print(row[col])
+                    print(merged_df.iloc[0][col])
 
                 break
         

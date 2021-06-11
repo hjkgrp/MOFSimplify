@@ -933,6 +933,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         alert("Must choose an sbu building block first.");
         return;  
       }
+      else if (my_net === '') {
+        alert("Must choose a net first.");
+        return;  
+      }
 
       bb_information = {}; // a dictionary
       bb_information.linker = my_linker;

@@ -771,24 +771,33 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                     // preparing the human-interpretable solvent removal stability prediction
                     if (prediction <= 0.2) {
                       verdict = 'Very confident the MOF is unstable upon solvent removal.';
+                      my_color = '#ffad97'
                     }
                     else if (prediction <= 0.4) {
                       verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
+                      my_color = '#ffcd97'
                     }
                     else if (prediction <= 0.5) {
                       verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
+                      my_color = '#fffa97'
                     }
                     else if (prediction <= 0.6) {
                       verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
+                      my_color = '#fffa97'
                     }
                     else if (prediction <= 0.8) {
                       verdict = 'Fairly confident the MOF is stable upon solvent removal.';
+                      my_color = '#e7ff97'
                     }
                     else {
                       verdict = 'Very confident the MOF is stable upon solvent removal.';
+                      my_color = '#90ee90'
                     }
 
                     $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + prediction.toString() + '. ' + verdict ); 
+
+                    stability_field = document.getElementById('solvent_stability_prediction');
+                    setColor(stability_field, my_color) // color background based on the prediction
 
                     // Now that the prediction has been displayed, can move on to the neighbors display.
                     var neighbor_names = response['neighbor_names']
@@ -817,12 +826,16 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                     
                     // Storing information indicating that a prediction was made, but no neighbors are avaialable
                     document.getElementById('solvent_neighbors_holder').value = 1
+
+                    stability_field = document.getElementById('solvent_stability_prediction');
                    
                     if (response['truth'] == 1) {
-                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be stable upon solvent removal.'); 
+                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be stable upon solvent removal.');
+                      setColor(stability_field, '#90ee90') // color background
                     }
                     else {
-                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be unstable upon solvent removal.');  
+                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be unstable upon solvent removal.'); 
+                      setColor(stability_field, '#ffad97') // color background 
                     }
 
                   }
@@ -830,6 +843,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             });
       })
     });
+
+
+    function setColor(element, color)
+    {
+      element.style.backgroundColor = color;
+    }
 
     // Generate thermal stability prediction when the Predict thermal stability button is clicked.
     $('#predict_t').click(function() {
@@ -870,6 +889,23 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
                   $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
                     $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+
+                    percentile_field = document.getElementById('thermal_stability_percentile');
+                    if (response >= 80) {
+                      setColor(percentile_field, '#90ee90')
+                    }
+                    else if (response >= 60) {
+                      setColor(percentile_field, '#e7ff97')
+                    }
+                    else if (response >= 40) {
+                      setColor(percentile_field, '#fffa97')
+                    }
+                    else if (response >= 20) {
+                      setColor(percentile_field, '#ffcd97')
+                    }
+                    else {
+                      setColor(percentile_field, '#ffad97')
+                    }
                   })   
 
                   myDict = {'prediction': true, 'temperature': prediction}
@@ -906,6 +942,32 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                     document.getElementById('thermal_neighbors_holder').value = 1
                    
                     $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
+
+                    $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function(response) {
+                      $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+
+                      console.log('check check')
+                      console.log(response)
+                      console.log(response >= 60)
+
+                      percentile_field = document.getElementById('thermal_stability_percentile');
+                      if (response >= 80) {
+                        setColor(percentile_field, '#90ee90')
+                      }
+                      else if (response >= 60) {
+                        setColor(percentile_field, '#e7ff97')
+                        console.log('hit')
+                      }
+                      else if (response >= 40) {
+                        setColor(percentile_field, '#fffa97')
+                      }
+                      else if (response >= 20) {
+                        setColor(percentile_field, '#ffcd97')
+                      }
+                      else {
+                        setColor(percentile_field, '#ffad97')
+                      }
+                  })   
 
                     myDict = {'prediction': false, 'temperature': response['truth']}
                     $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot

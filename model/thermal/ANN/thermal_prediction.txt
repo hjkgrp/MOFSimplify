@@ -1,4 +1,4 @@
-384.2°C
+349.8°C
 (2005, 200) (1, 200)
-['BOHJOZ_auto', 'BIRSEC_clean', 'MOLRIP_clean', 'ERUNIQ_clean', 'DAFHOJ_clean']
-[5.530566, 5.751596, 5.796012, 5.8521376, 5.8716025]
+['EZIPEK_clean', 'BOHJOZ_auto', 'XIVMEW01_clean', 'KOKKOL_clean', 'XIVMEW_clean']
+[7.4274216, 7.4511666, 7.551837, 7.554496, 7.757633]

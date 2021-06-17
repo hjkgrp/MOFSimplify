@@ -129,7 +129,7 @@ body {
     <!-- Create a column containing selection boxes and buttons -->
     <div class='col-lg-6'>
 
-        <div style="margin-bottom:0.5cm;"></div>
+        <!-- <div style="margin-bottom:0.5cm;"></div> -->
 
         A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb). Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF visualization and construction code. 
 
@@ -191,12 +191,11 @@ body {
         <b> Status messages and MOF predictions </b>
         <div class='col-12' id='upload_status'></div> 
         <div class='col-12' id='status_visualization'></div> 
-        <div class='col-12' id='currently_visualized'></div> 
         <div class='col-12' id='solvent_stability_prediction'></div> 
         <div class='col-12' id='thermal_stability_prediction'></div> 
         <div class='col-12' id='thermal_stability_percentile'></div> 
-        <div class='col-12' id='loading'></div>
         <div class='col-12' id='chart'></div>
+        <div class='col-12' id='currently_visualized'></div> 
 
         <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN.</p>
 
@@ -208,7 +207,7 @@ body {
         <button class='btn btn-primary' id='s_neighbor' type='button'>Show solvent neighbor info</button> 
         <button class='btn btn-primary' id='download_s_neighbor' type='button'>Download solvent neighbor info</button> 
         <button class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize solvent neighbor</button> 
-        <button class='btn btn-primary' id='visualize_s_neighbor' type='button'>Get solvent neighbor components</button> 
+        <button class='btn btn-primary' id='comp_s_neighbor' type='button'>Get solvent neighbor components</button> 
         <p id='s_neighbor_info'></p>
         </div>
 
@@ -220,7 +219,7 @@ body {
         <button class='btn btn-primary' id='t_neighbor' type='button'>Show thermal neighbor info</button> 
         <button class='btn btn-primary' id='download_t_neighbor' type='button'>Download thermal neighbor info</button> 
         <button class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize thermal neighbor</button> 
-        <button class='btn btn-primary' id='visualize_t_neighbor' type='button'>Get thermal neighbor components</button> 
+        <button class='btn btn-primary' id='comp_t_neighbor' type='button'>Get thermal neighbor components</button> 
         <p id='t_neighbor_info'></p>
         <div class='col-6' id='tga_plot'></div>
         </div>
@@ -240,7 +239,10 @@ body {
     </div>
 
     <div class='col-lg-6' style='margin-top: 0.5cm;'>
-      <p> Can display MOF's linkers and sbus after clicking the Get MOF Components button. Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
+      <p> Can display MOF's linkers and sbus after clicking the Get MOF Components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
+
+      <div id='comp_MOF'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+
       <div>
         Linkers
         <select class='form-control' id='linker'>
@@ -299,6 +301,7 @@ body {
   // Lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization.
 
   // ***** Beginning of section with a lot of copied code from the Snurr group's GitHub. *****
+  // With some modifications for our purposes, specifically in the handleInput function. Also, the OOM message
 
   var stage;
 
@@ -439,13 +442,53 @@ body {
     // s_neighbor and t_neighbor are booleans, indicate if we are visualizing a neighbor
     // if not, default to visualize the MOF that is queued up
 
-    if (s_neighbor) {
+    if (s_neighbor) { // In this case, want to visualize the solvent stability ANN neighbor
+      console.log('Check A')
+
+      // grab the current solvent neighbor MOF cif file
+
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      console.log(my_neighbor)
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var ciffile = new File([blob], "solvent_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+        handleVisualization(ciffile)
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
 
     }
-    else if (t_neighbor) {
+    else if (t_neighbor) { // In this case, want to visualize the thermal stability ANN neighbor
+
+      // grab the current solvent neighbor MOF cif file
+
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var ciffile = new File([blob], "thermal_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+        handleVisualization(ciffile)
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
 
     }
-    else {
+    else { // Visualize the queued up MOF (either the default MOF, the uploaded MOF, or the building block MOF)
+      // Code elsewhere in this file makes it so only one of the three will be available, if any of them are available
+
       if (document.getElementById("file_input").files[0] !== undefined) {
         var ciffile = document.getElementById("file_input").files[0];
       }
@@ -456,9 +499,11 @@ body {
         var ciffile = document.getElementById('bbg_MOF_holder').value;
       }
     }
-        
 
-    
+    handleVisualization(ciffile)
+  }
+
+  handleVisualization = function(ciffile) {
     //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
     var cifreader = new FileReader();
     cifreader.onload = function(event) {
@@ -694,13 +739,13 @@ body {
         $('#thermal_stability_percentile').text('');
 
         // Clearing everything in the Status messages and MOF predictions section of the website, and the holders. Also clearing SMILES strings of components.
-        $('#loading').text('');
         $('#currently_visualized').text('');
         $('#upload_status').text(''); // now nothing is uploaded
         $('#chart').text('');
         $('#tga_plot').text('');
         $('#s_neighbor_info').text('');
         $('#t_neighbor_info').text('');
+        $('#comp_MOF').text('')
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
         document.getElementById('solvent_neighbors_holder').value = undefined
@@ -752,18 +797,71 @@ body {
 
         handleInput(false, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
-        $('#loading').text('');
-        $('#chart').text('');
-
         var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
         name = name.split(' ');
         name = name.slice(-1)[0]; // getting the last element of the array
-        if (name.substring(name.length - 3) != 'cif') { // check the last three characters // TODO check this works // if the example MOF is loaded
+        if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
           name = 'exampleMOF'
         } 
 
         message = 'Currently visualized MOF: '
         message = message.concat(name)
+
+        $('#currently_visualized').text(message);
+    })
+
+    // This function triggers when someone clicks the Visualize solvent neighbor button. 
+    $("#visualize_s_neighbor").on('click', function() {
+
+        // Ensure there are neighbors to display information on
+        if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+          alert('Must make solvent removal stability prediction first.');
+          return;
+        }
+
+        if (document.getElementById('solvent_neighbors_holder').value == 1) {
+          alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+          return;
+        }
+
+        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
+
+        document.getElementById("viewportnote").innerHTML = "Loading visualization...";
+
+        handleInput(true, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+
+        my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+        message = 'Currently visualized MOF: '
+        message = message.concat(my_neighbor)
+
+        $('#currently_visualized').text(message);
+    })
+
+    // This function triggers when someone clicks the Visualize thermal neighbor button. 
+    $("#visualize_t_neighbor").on('click', function() {
+
+        // Ensure there are neighbors to display information on
+        if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+          alert('Must make thermal stability prediction first.');
+          return;
+        }
+
+        if (document.getElementById('thermal_neighbors_holder').value == 1) {
+          alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+          return;
+        }
+
+        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
+
+        document.getElementById("viewportnote").innerHTML = "Loading visualization...";
+
+        handleInput(false, true); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+
+        my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+        message = 'Currently visualized MOF: '
+        message = message.concat(my_neighbor)
 
         $('#currently_visualized').text(message);
     })
@@ -851,7 +949,13 @@ body {
                     // Populating the solvent neighbors dropdown.
                     var solvent_dropdown = document.getElementById("solvent_neighbors");
 
-                    // Populating solvent dropdown.
+                    // clear dropdown
+                    var length = solvent_dropdown.options.length;
+                    for (i = length-1; i >= 0; i--) {
+                      solvent_dropdown.options[i] = null;
+                    }
+
+                    // Populating the solvent neighbors dropdown.
                     for (i = 0; i < neighbor_names.length; i++) {
                       var option = document.createElement('option');
                       option.text = neighbor_names[i];
@@ -962,10 +1066,16 @@ body {
                   // Storing the information on the neighbors.
                   document.getElementById('thermal_neighbors_holder').value = neighbors;
 
-                  // Populating the solvent neighbors dropdown.
+                  // Populating the thermal neighbors dropdown.
                   var thermal_dropdown = document.getElementById("thermal_neighbors");
 
-                  // Populating solvent dropdown.
+                  // clear dropdown
+                  var length = thermal_dropdown.options.length;
+                  for (i = length-1; i >= 0; i--) {
+                    thermal_dropdown.options[i] = null;
+                  }
+
+                  // Populating the thermal neighbors dropdown.
                   for (i = 0; i < neighbor_names.length; i++) {
                     var option = document.createElement('option');
                     option.text = neighbor_names[i];
@@ -1068,7 +1178,7 @@ body {
 
                 $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
               }).catch(error => {
-                $('#upload_status').text('Failed to upload example MOF');
+                $('#upload_status').text('Failed to load');
                 console.error('There has been a problem with your fetch operation:', error);
               })     
         });
@@ -1168,10 +1278,186 @@ body {
 
             // Storing the linker and sbu data.
             document.getElementById('components_holder').value = result; 
+
+
+            var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+            name = name.split(' ');
+            name = name.slice(-1)[0]; // getting the last element of the array
+            if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+              name = 'exampleMOF'
+            } 
+
+            $('#comp_MOF').text('MOF for which components are listed below: ' + name)
+
+            document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+            $('#component_SMILES').text('') // clear the SMILES text
+            component_viewer.clear(); // clear component visualizer
+
         });
       })
     });
+
+
+    // Get MOF linkers and sbus when the Get solvent neighbor components button is clicked.
+    // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
+    $('#comp_s_neighbor').click(function() {
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+        alert('Must make solvent removal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('solvent_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var myFile = new File([blob], "solvent_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+
+        // next, do the component breakdown
+
+        // myFile.text() is a promise
+        myFile.text().then(function(result){
+          // result is the text of the loaded .cif file
+          $.post("/get_components", JSON.stringify(result)).done(
+            function(response) {
+
+              if (response == 'FAILED') { 
+                alert('Failed to featurize.')
+                document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+                return; 
+              }
+
+              var result = JSON.parse(response);
+
+              clear_component_dropdowns();
+              var linker_dropdown = document.getElementById('linker');
+              var sbu_dropdown = document.getElementById('sbu');
+
+              num_linkers = result.total_linkers;
+              num_sbus = result.total_sbus;
+
+              // Populating the linker dropdown.
+              for (i = 1; i <= num_linkers; i++) {
+                var option = document.createElement('option');
+                option.text = 'Linker ' + i.toString();
+                linker_dropdown.add(option);
+              }
+
+              // Populating the sbu dropdown.
+              for (i = 1; i <= num_sbus; i++) {
+                var option = document.createElement('option');
+                option.text = 'sbu ' + i.toString();
+                sbu_dropdown.add(option);
+              }
+
+              // Storing the linker and sbu data.
+              document.getElementById('components_holder').value = result; 
+
+              $('#comp_MOF').text('MOF for which components are listed below: ' + my_neighbor)
+
+              document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+              $('#component_SMILES').text('') // clear the SMILES text
+              component_viewer.clear(); // clear component visualizer
+
+          });
+        })
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
+
+    });
     
+    // Get MOF linkers and sbus when the Get thermal neighbor components button is clicked.
+    // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
+    $('#comp_t_neighbor').click(function() {
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+        alert('Must make thermal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('thermal_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var myFile = new File([blob], "thermal_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+
+        // next, do the component breakdown
+
+        // myFile.text() is a promise
+        myFile.text().then(function(result){
+          // result is the text of the loaded .cif file
+          $.post("/get_components", JSON.stringify(result)).done(
+            function(response) {
+
+              if (response == 'FAILED') { 
+                alert('Failed to featurize.')
+                document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+                return; 
+              }
+
+              var result = JSON.parse(response);
+
+              clear_component_dropdowns();
+              var linker_dropdown = document.getElementById('linker');
+              var sbu_dropdown = document.getElementById('sbu');
+
+              num_linkers = result.total_linkers;
+              num_sbus = result.total_sbus;
+
+              // Populating the linker dropdown.
+              for (i = 1; i <= num_linkers; i++) {
+                var option = document.createElement('option');
+                option.text = 'Linker ' + i.toString();
+                linker_dropdown.add(option);
+              }
+
+              // Populating the sbu dropdown.
+              for (i = 1; i <= num_sbus; i++) {
+                var option = document.createElement('option');
+                option.text = 'sbu ' + i.toString();
+                sbu_dropdown.add(option);
+              }
+
+              // Storing the linker and sbu data.
+              document.getElementById('components_holder').value = result; 
+
+              $('#comp_MOF').text('MOF for which components are listed below: ' + my_neighbor)
+
+              document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+              $('#component_SMILES').text('') // clear the SMILES text
+              component_viewer.clear(); // clear component visualizer
+
+          });
+        })
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
+
+    });
+
 
     function clear_component_dropdowns() { // clear dropdowns when upload new file
       // Clearing the linker dropdown.
@@ -1378,7 +1664,6 @@ body {
     // Download the cif file of the nearest neighbor in solvent removal stability ANN latent space when the Download solvent neighbor info button is clicked. 
     // Also download a .out file that contains information on the nearest neighbor.
     $('#download_s_neighbor').click(function() {
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('solvent_neighbors_holder').value == undefined) {
@@ -1391,17 +1676,18 @@ body {
         return;
       }
 
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
 
       // Making the txt file with information about the neighbor
       // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
       var dict = {}
       dict['prediction_type'] = 'solvent'
 
-      var myFile = document.getElementById('bbg_MOF_holder').value;
       var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // TODO check this works // if the example MOF is loaded
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
         name = 'exampleMOF'
       } 
 
@@ -1472,9 +1758,7 @@ body {
 
     // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the Download thermal neighbor info button is clicked. 
     // Also download a .out file that contains information on the nearest neighbor.
-    // Also download the TGA plot TODO
     $('#download_t_neighbor').click(function() {
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('thermal_neighbors_holder').value == undefined) {
@@ -1487,16 +1771,17 @@ body {
         return;
       }
 
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
       // Making the txt file with information about the neighbor
       // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
       var dict = {}
       dict['prediction_type'] = 'thermal'
 
-      var myFile = document.getElementById('bbg_MOF_holder').value;
       var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // TODO check this works // if the example MOF is loaded
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
         name = 'exampleMOF'
       } 
 
@@ -1527,7 +1812,7 @@ body {
       //       console.log('Check Check Check 2')
       //       window.location = '/neighbor_info/'.concat(my_neighbor.substring(0,6), '_simplified_TGA.png') // download the simplified TGA plot
       //     })
-      // }, 500)
+      // }, 500) // TODO if you ever use this code, consider that the 6 thing will not work for longer file names
 
       setTimeout(function(){
         window.location = '/neighbor/'.concat(my_neighbor, '.cif'); // download cif file from the CoRE2019 folder

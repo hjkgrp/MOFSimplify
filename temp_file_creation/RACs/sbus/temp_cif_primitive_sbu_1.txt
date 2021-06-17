@@ -1,0 +1,1 @@
+[Zn]123(O[C]O[Zn](O[C]O1)(O[C]O2)(O[C]O3)N([C])[C])N([C])[C]	temp_cif_primitive_sbu_1.xyz

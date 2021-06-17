@@ -64,12 +64,13 @@ def serve_about():
     # Serves homepage
     return flask.send_from_directory('.', 'about.html')
 
-@app.route('/mof_examples/<path:path>')
+
+@app.route('/mof_examples/<path:path>') # needed for fetch
 def serve_example(path):
     # Serves example
     return flask.send_from_directory('mof_examples', path)
 
-@app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>')
+@app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>') # needed for fetch
 def serve_bb(path):
     # Serves bb-generated MOF
     return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path)
@@ -94,7 +95,7 @@ def serve_bbcif(path):
     # Serves the building block generated MOF
     return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
 
-@app.route('/neighbor/<path:path>')
+@app.route('/neighbor/<path:path>') # needed for fetch
 def serve_neighbor(path):
     # Serves the neighbor CoRE MOF
     return flask.send_from_directory('CoRE2019', path);

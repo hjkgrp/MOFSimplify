@@ -1,0 +1,1 @@
+Brc1cc(C(=O)[O])ccc1C#Cc1c(Br)cc(cc1)C(=O)[O]	temp_cif_primitive_linker_10.xyz

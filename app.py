@@ -31,9 +31,13 @@ from bokeh.palettes import Inferno256#,RdBu11#,Viridis256
 from flask import jsonify
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
 
+from flask_cors import CORS
+
 cmap_bokeh = Inferno256
 
 app = flask.Flask(__name__)
+
+cors = CORS(app)
 
 MOFSIMPLIFY_PATH = os.path.abspath('.')
 
@@ -218,6 +222,7 @@ def ss_predict():
 
     try:
         full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+            # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
     except NotImplementedError:
@@ -473,6 +478,7 @@ def ts_predict():
 
     try:
         full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+            # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
     except NotImplementedError:
@@ -875,6 +881,7 @@ def get_components():
 
     try:
         full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+            # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
     except NotImplementedError:

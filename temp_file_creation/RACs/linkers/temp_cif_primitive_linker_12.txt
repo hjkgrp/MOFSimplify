@@ -1,1 +1,0 @@
-n1ccc([C]2C=C[N]C=C2)cc1	temp_cif_primitive_linker_12.xyz

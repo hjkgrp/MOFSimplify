@@ -1820,6 +1820,8 @@ body {
 
     })
 
+
+
     // Start up page by virtually clicking the Load example MOF button
     $('#load').click();
 
@@ -1864,6 +1866,16 @@ body {
     }
 
     document.getElementById('nets_list').innerHTML = options; // populating the nets dropdown
+
+
+    // TODO 
+    // 
+
+    $.get("/new_user").done(
+      function(response) {
+        // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
+        console.log(response)
+    })
 
   });
 

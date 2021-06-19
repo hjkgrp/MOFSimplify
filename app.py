@@ -28,14 +28,16 @@ from bokeh.models import Span
 from bokeh.models import ColorBar, LinearColorMapper, LogColorMapper, HoverTool
 from bokeh.models.markers import Circle
 from bokeh.palettes import Inferno256#,RdBu11#,Viridis256
-from flask import jsonify
+from flask import jsonify, session
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
-
 from flask_cors import CORS
+import stat
+
 
 cmap_bokeh = Inferno256
 
 app = flask.Flask(__name__)
+app.secret_key = 'hjk_secret_key_mofsimplify_2021' # secret key
 
 cors = CORS(app)
 
@@ -73,7 +75,7 @@ def serve_example(path):
 @app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>') # needed for fetch
 def serve_bb(path):
     # Serves bb-generated MOF
-    return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path)
+    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/tobacco_3.0/output_cifs', path)
 
 @app.route('/ris_files/<path:path>')
 def serve_ris(path):
@@ -93,7 +95,7 @@ def serve_library_files(path):
 @app.route('/bbcif/<path:path>')
 def serve_bbcif(path):
     # Serves the building block generated MOF
-    return flask.send_from_directory('temp_file_creation/tobacco_3.0/output_cifs', path);
+    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/tobacco_3.0/output_cifs', path);
 
 @app.route('/neighbor/<path:path>') # needed for fetch
 def serve_neighbor(path):
@@ -103,7 +105,7 @@ def serve_neighbor(path):
 @app.route('/neighbor_info/<path:path>')
 def serve_neighbor_txt(path):
     # Serves the neighbor CoRE MOF information in txt file format
-    return flask.send_from_directory('temp_file_creation/latent_neighbor', path);
+    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/latent_neighbor', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     myList = os.listdir(path);
@@ -111,6 +113,41 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
         if i.startswith('.'):
             myList.remove(i)
     return myList
+
+def file_age_in_seconds(pathname): 
+    print('age_check')
+    print(time.time() - os.stat(pathname)[stat.ST_MTIME])
+    return time.time() - os.stat(pathname)[stat.ST_MTIME]
+
+@app.route('/new_user', methods=['GET'])
+def set_ID():
+    # sets the session user ID. This is used to generate unique folders, so that multiple users can ue the website at a time 
+    # specifically, copies of the temp_file_creation folder
+    session['ID'] = time.time() # a unique ID for this session
+    print('MY ID CHECK 1')
+    print(session['ID'])
+
+    # To begin, always go to main directory
+    os.chdir(MOFSIMPLIFY_PATH)
+
+    # make a version of the temp_file_creation folder for this user
+    new_folder = 'temp_file_creation_' + str(session['ID'])
+    shutil.copytree('temp_file_creation', new_folder)
+    os.remove(new_folder + '/temp_cif.cif') # remove this, for sole purpose of updating time stamp on the new folder (copytree doesn't)
+
+    print('walk check')
+    # delete all temp_file_creation clone folders that haven't been used for a while, to prevent folder accumulation
+    for root, dirs, files in os.walk(MOFSIMPLIFY_PATH):
+        for dir in dirs:
+            # print(dir)
+            target_str = 'temp_file_creation'
+            if len(dir) > len(target_str) and target_str in dir and file_age_in_seconds(dir) > 7200: # 7200s is two hours
+                # target_str in dir since all copies start with temp_file_creation
+                # len(dir) > len(target_str) to prevent deleting the original temp_file_creation folder
+                shutil.rmtree(dir)
+
+
+    return str(session['ID']) # return a string
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 
 def bb_generate():
@@ -128,7 +165,7 @@ def bb_generate():
     sbu = my_data['sbu']
     net = my_data['net']
 
-    os.chdir("temp_file_creation/tobacco_3.0")
+    os.chdir("temp_file_creation_" + str(session['ID']) + "/tobacco_3.0")
 
     # clear the edges, nodes, templates, and output cifs folders to start fresh
         # when running python tobacco.py, it looks in these folders
@@ -180,6 +217,9 @@ def ss_predict():
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
     # Then, apply Aditya's model to make prediction.
 
+    print('MY ID CHECK 2')
+    print(session['ID'])
+
     print('TIME CHECK 1')
 
     # To begin, always go to main directory.
@@ -188,7 +228,7 @@ def ss_predict():
     # Grab data
     my_data = json.loads(flask.request.get_data())
 
-    os.chdir("temp_file_creation") # changing directory
+    os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
 
     # Write the data back to a cif file.
     cif_file = open('temp_cif.cif', 'w')
@@ -333,9 +373,9 @@ def ss_predict():
     print('TIME CHECK 4')
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
-    sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
-    linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
+    lc_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/lc_descriptors.csv") 
+    sbu_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/sbu_descriptors.csv")
+    linker_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/linker_descriptors.csv")
 
     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
     sbu_df = sbu_df.mean().to_frame().transpose()
@@ -343,7 +383,7 @@ def ss_predict():
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
 
-    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation
+    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
 
     os.chdir('..')
     os.chdir('..')
@@ -456,7 +496,7 @@ def ts_predict():
     # Grab data
     my_data = json.loads(flask.request.get_data())
 
-    os.chdir("temp_file_creation") # changing directory
+    os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
 
     # Write the data back to a cif file
     cif_file = open('temp_cif.cif', 'w')
@@ -593,16 +633,16 @@ def ts_predict():
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv).
 
-    lc_df = pd.read_csv("../../temp_file_creation/RACs/lc_descriptors.csv") 
-    sbu_df = pd.read_csv("../../temp_file_creation/RACs/sbu_descriptors.csv")
-    linker_df = pd.read_csv("../../temp_file_creation/RACs/linker_descriptors.csv")
+    lc_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/lc_descriptors.csv") 
+    sbu_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/sbu_descriptors.csv")
+    linker_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/linker_descriptors.csv")
 
     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
     sbu_df = sbu_df.mean().to_frame().transpose()
     linker_df = linker_df.mean().to_frame().transpose()
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
-    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation
+    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
 
     os.chdir('..')
     os.chdir('..')
@@ -861,7 +901,7 @@ def get_components():
     # Grab data
     my_data = json.loads(flask.request.get_data());
 
-    os.chdir("temp_file_creation"); # changing directory
+    os.chdir("temp_file_creation_" + str(session['ID'])); # changing directory
 
     # Write the data back to a cif file.
     cif_file = open('temp_cif.cif', 'w');
@@ -1167,10 +1207,10 @@ def neighbor_writer():
     os.chdir(MOFSIMPLIFY_PATH);
 
     # Delete and remake the latent_neighbor folder each time, so only one file is ever in it
-    shutil.rmtree('temp_file_creation/latent_neighbor')
-    os.mkdir('temp_file_creation/latent_neighbor')
+    shutil.rmtree('temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
+    os.mkdir('temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
 
-    with open('temp_file_creation/latent_neighbor/' + prediction_type + '__' + current_MOF + '__' + selected_neighbor + '.out','w') as f:
+    with open('temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '__' + current_MOF + '__' + selected_neighbor + '.out','w') as f:
         f.write('Prediction type: ' + prediction_type + '\n')
         f.write('Current MOF: ' + current_MOF + '\n')
         f.write('Selected CoRE nearest neighbor in latent space: ' + selected_neighbor + '\n')
@@ -1230,7 +1270,7 @@ def TGA_maker():
 
     print('neighbor writer check 4')
 
-    export_png(graph, filename='temp_file_creation/latent_neighbor/' + my_data + "_simplified_TGA.png")
+    export_png(graph, filename='temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + my_data + "_simplified_TGA.png")
     
     return 'Success!'
 

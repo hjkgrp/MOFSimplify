@@ -1,6 +1,18 @@
 # Purpose of this file: check the number of layers in our models
 # Not used in mofSimplify, just used in development
-
+from numpy.random import seed
+seed(1)
+import pandas as pd
+import numpy as np
+import pickle
+import sys, os
+from keras import backend as K
+import tensorflow as tf
+from scipy.spatial import distance_matrix
+from sklearn.metrics import pairwise_distances
+import json
+import sklearn
+tf.compat.v1.disable_eager_execution()
 
 def precision(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))

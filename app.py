@@ -472,7 +472,7 @@ def ss_predict():
 
     timeStarted = time.time() # save start time (debugging)
 
-    os.system('python ' + ANN_folder + 'solvent_ANN.py ' + str(session['ID']) + ' > ' + temp_file_folder + 'solvent_prediction.txt') 
+    os.system('python ' + ANN_folder + 'solvent_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' > ' + temp_file_folder + 'solvent_prediction.txt') 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
@@ -752,7 +752,7 @@ def ts_predict():
 
     timeStarted = time.time() # save start time (debugging)
 
-    os.system('python ' + ANN_folder + 'thermal_ANN.py ' + str(session['ID']) + ' > ' + temp_file_folder + 'thermal_prediction.txt')
+    os.system('python ' + ANN_folder + 'thermal_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' > ' + temp_file_folder + 'thermal_prediction.txt')
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')

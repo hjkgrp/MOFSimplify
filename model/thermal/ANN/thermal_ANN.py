@@ -157,7 +157,7 @@ other = ['cif_file','name','filename']
 
 user_id = sys.argv[1]
 
-path = os.getcwd()+'/' # This is the main mofSimplify folder
+path = sys.argv[2] # This is the main mofSimplify folder
 ANN_path = path + 'model/thermal/ANN/'
 temp_file_path = path + 'temp_file_creation_' + user_id + '/'
 df_train_all = pd.read_csv(ANN_path+"train.csv").append(pd.read_csv(ANN_path+"val.csv"))

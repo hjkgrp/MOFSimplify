@@ -158,7 +158,7 @@ def main():
 
     user_id = sys.argv[1]
 
-    path = os.getcwd()+'/' # This is the main mofSimplify folder
+    path = sys.argv[2] # This is the main mofSimplify folder
     ANN_path = path + 'model/solvent/ANN/'
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
     df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')

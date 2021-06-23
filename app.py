@@ -211,7 +211,9 @@ def bb_generate():
 
 
     # run the command to construct the MOF
-    os.chdir(tobacco_folder) # note: os.chdir here could cause issues if multiple users are using the website, since mofSimplify server might chdir when someone else is in the middle of an operation
+    os.chdir(tobacco_folder) 
+    # note: os.chdir here could cause issues if multiple users are using the website and try to make a building block generated MOF at the same time, since mofSimplify server might chdir when someone else is in the middle of an operation
+    # luckily, it is a quick operation, so this is unlikely
     subprocess.run(['python', 'tobacco.py']) 
     os.chdir(MOFSIMPLIFY_PATH)
 

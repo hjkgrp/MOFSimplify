@@ -805,7 +805,7 @@ body {
         } 
 
         message = 'Currently visualized MOF: '
-        message = message.concat(name)
+        message = message + name
 
         $('#currently_visualized').text(message);
     })
@@ -833,7 +833,7 @@ body {
         my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
         message = 'Currently visualized MOF: '
-        message = message.concat(my_neighbor)
+        message = message + my_neighbor
 
         $('#currently_visualized').text(message);
     })
@@ -861,7 +861,7 @@ body {
         my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
         message = 'Currently visualized MOF: '
-        message = message.concat(my_neighbor)
+        message = message + my_neighbor
 
         $('#currently_visualized').text(message);
     })
@@ -1166,21 +1166,31 @@ body {
 
             // The function corresponding to @app.route('/get_bb_generated_MOF', methods=['POST']) on the backend will make a cif file of the building block generated MOF if successful, using ToBaCCo 3.0 code. Files are made in the temp_file_creation/tobacco_3.0/output_cifs folder.
 
-            fetch('http://localhost:8000/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the MOF from local host
-              if(!response.ok) { // catching 404 and other issues
-                document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
-                throw Error(response.statusText);
-              } 
-                return response.blob();
-              }).then(function(blob) { 
-                var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
-                document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
+            // grab user ID, then feed that into the fetch operation
+            // fetch was having issues with the ID key of session on the backend, so this is a workaround
+            $.get("/get_ID").done(
+              function(response) {
+                my_ID = response 
+                console.log('ID check')
+                console.log(response)
 
-                $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
-              }).catch(error => {
-                $('#upload_status').text('Failed to load');
-                console.error('There has been a problem with your fetch operation:', error);
-              })     
+                fetch('http://localhost:8000/bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
+                  if(!response.ok) { // catching 404 and other issues
+                    document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
+                    throw Error(response.statusText);
+                  } 
+                    return response.blob();
+                  }).then(function(blob) { 
+                    var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
+                    document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
+
+                    $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+                  }).catch(error => {
+                    $('#upload_status').text('Failed to load');
+                    console.error('There has been a problem with your fetch operation:', error);
+                  })    
+                })
+ 
         });
     });  
 
@@ -1196,8 +1206,28 @@ body {
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
 
-      window.location = '/bbcif/'.concat(name); // get file from the temp_file_creation/tobacco_3.0/output_cifs folder
-      // assuming primitive is same as normal file
+      $.get("/get_ID").done(
+        function(response) {
+          my_ID = response 
+          window.location = '/bbcif/' + name + '~' + my_ID // get file from the temp_file_creation_USERID/tobacco_3.0/output_cifs folder
+          // assuming primitive is same as normal file
+
+          fetch('http://localhost:8000/bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
+            if(!response.ok) { // catching 404 and other issues
+              document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
+              throw Error(response.statusText);
+            } 
+              return response.blob();
+            }).then(function(blob) { 
+              var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
+              document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
+
+              $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+            }).catch(error => {
+              $('#upload_status').text('Failed to load');
+              console.error('There has been a problem with your fetch operation:', error);
+            })    
+        })
     })
 
     // Load example MOF when the Load example MOF button is clicked.
@@ -1224,6 +1254,8 @@ body {
     // Get MOF linkers and sbus when the Get MOF components button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function() {
+      console.log('print check A')
+
       // check if a cif is uploaded
       let myFile = document.getElementById('file_input').files[0]; // the uploaded file
       let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
@@ -1241,11 +1273,18 @@ body {
         }
       }
 
+      console.log('print check B')
+
       // myFile.text() is a promise
       myFile.text().then(function(result){
+
+        console.log('print check B2')
+
         // result is the text of the loaded .cif file
         $.post("/get_components", JSON.stringify(result)).done(
           function(response) {
+
+            console.log('print check C')
 
             if (response == 'FAILED') { 
               alert('Failed to featurize.')
@@ -1276,6 +1315,8 @@ body {
               sbu_dropdown.add(option);
             }
 
+            console.log('print check D')
+
             // Storing the linker and sbu data.
             document.getElementById('components_holder').value = result; 
 
@@ -1286,6 +1327,8 @@ body {
             if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
               name = 'exampleMOF'
             } 
+
+            console.log('print check E')
 
             $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 
@@ -1707,12 +1750,12 @@ body {
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
           // I don't really care about the response, I just want download the .out file after it is written
-          window.location = '/neighbor_info/'.concat('solvent__', name, '__', my_neighbor, '.out')
+          window.location = '/neighbor_info/solvent__' + name + '__' + my_neighbor + '.out'
           // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
       })
 
       setTimeout(function(){
-        window.location = '/neighbor/'.concat(my_neighbor, '.cif'); // download cif file from the CoRE2019 folder
+        window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
       }, 1000); // the delay is to make it possible to download multiple files in the same function
 
     })
@@ -1801,7 +1844,7 @@ body {
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
           // I don't really care about the response, I just want download the .out file after it is written
-          window.location = '/neighbor_info/'.concat('thermal__', name, '__', my_neighbor, '.out')
+          window.location = '/neighbor_info/thermal__' + name + '__' + my_neighbor + '.out'
           // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
       })
 
@@ -1815,7 +1858,7 @@ body {
       // }, 500) // TODO if you ever use this code, consider that the 6 thing will not work for longer file names
 
       setTimeout(function(){
-        window.location = '/neighbor/'.concat(my_neighbor, '.cif'); // download cif file from the CoRE2019 folder
+        window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
       }, 1000); // the delay is to make it possible to download multiple files in the same function
 
     })
@@ -1875,6 +1918,14 @@ body {
       function(response) {
         // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
         console.log(response)
+    })
+
+
+    // Let the new user know how many people are currently using mofSimplify
+    $.get("/curr_users").done(
+      function(response) {
+        // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
+        alert('The current number of users on mofSimplify: ' + response)
     })
 
   });

@@ -41,7 +41,40 @@ app.secret_key = 'hjk_secret_key_mofsimplify_2021' # secret key
 
 cors = CORS(app)
 
-MOFSIMPLIFY_PATH = os.path.abspath('.')
+MOFSIMPLIFY_PATH = os.path.abspath('.') # the main directory
+MOFSIMPLIFY_PATH += '/'
+
+@app.route('/new_user', methods=['GET'])
+def set_ID():
+    # sets the session user ID. This is used to generate unique folders, so that multiple users can ue the website at a time 
+    # specifically, copies of the temp_file_creation folder
+    session['ID'] = time.time() # a unique ID for this session
+    print('MY ID CHECK 1')
+    print(session['ID'])
+
+    # make a version of the temp_file_creation folder for this user
+    new_folder = MOFSIMPLIFY_PATH + '/temp_file_creation_' + str(session['ID'])
+    shutil.copytree('temp_file_creation', new_folder)
+    os.remove(new_folder + '/temp_cif.cif') # remove this, for sole purpose of updating time stamp on the new folder (copytree doesn't)
+
+    print('walk check')
+    # delete all temp_file_creation clone folders that haven't been used for a while, to prevent folder accumulation
+    for root, dirs, files in os.walk(MOFSIMPLIFY_PATH):
+        for dir in dirs:
+            # print(dir)
+            target_str = 'temp_file_creation'
+            if len(dir) > len(target_str) and target_str in dir and file_age_in_seconds(dir) > 7200: # 7200s is two hours
+                # target_str in dir since all copies start with temp_file_creation
+                # len(dir) > len(target_str) to prevent deleting the original temp_file_creation folder
+                shutil.rmtree(dir)
+
+
+    return str(session['ID']) # return a string
+
+@app.route('/get_ID', methods=['GET'])
+def get_ID():
+    # gets the session user ID. This is used for getting building block generated MOFs
+    return str(session['ID']) # return a string
 
 @app.route('/demo')
 def serve_demo():
@@ -72,10 +105,10 @@ def serve_example(path):
     # Serves example
     return flask.send_from_directory('mof_examples', path)
 
-@app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>') # needed for fetch
-def serve_bb(path):
-    # Serves bb-generated MOF
-    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/tobacco_3.0/output_cifs', path)
+# @app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>') # needed for fetch
+# def serve_bb(path):
+#     # Serves bb-generated MOF
+#     return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/tobacco_3.0/output_cifs', path)
 
 @app.route('/ris_files/<path:path>')
 def serve_ris(path):
@@ -95,7 +128,14 @@ def serve_library_files(path):
 @app.route('/bbcif/<path:path>')
 def serve_bbcif(path):
     # Serves the building block generated MOF
-    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/tobacco_3.0/output_cifs', path);
+
+    path_parts = path.split('~')
+    cif_name = path_parts[0]
+    user_ID = path_parts[1]
+    # print('ID check')
+    # print(session)
+    # print(session['ID'])
+    return flask.send_from_directory('temp_file_creation_' + user_ID + '/tobacco_3.0/output_cifs', cif_name);
 
 @app.route('/neighbor/<path:path>') # needed for fetch
 def serve_neighbor(path):
@@ -116,38 +156,25 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
 
 def file_age_in_seconds(pathname): 
     print('age_check')
-    print(time.time() - os.stat(pathname)[stat.ST_MTIME])
+    print(time.time() - os.stat(pathname)[stat.ST_MTIME]) # time since last modification
     return time.time() - os.stat(pathname)[stat.ST_MTIME]
 
-@app.route('/new_user', methods=['GET'])
-def set_ID():
-    # sets the session user ID. This is used to generate unique folders, so that multiple users can ue the website at a time 
-    # specifically, copies of the temp_file_creation folder
-    session['ID'] = time.time() # a unique ID for this session
-    print('MY ID CHECK 1')
-    print(session['ID'])
+@app.route('/curr_users', methods=['GET'])
+def curr_num_users():
+    # Returns the current number of users on mofSimplify. 
+    # Indicative of the expected success rate of prediction operations, since two users can't run a prediction (or Get Components) at the same time
 
-    # To begin, always go to main directory
-    os.chdir(MOFSIMPLIFY_PATH)
+    sum = 0
 
-    # make a version of the temp_file_creation folder for this user
-    new_folder = 'temp_file_creation_' + str(session['ID'])
-    shutil.copytree('temp_file_creation', new_folder)
-    os.remove(new_folder + '/temp_cif.cif') # remove this, for sole purpose of updating time stamp on the new folder (copytree doesn't)
-
-    print('walk check')
-    # delete all temp_file_creation clone folders that haven't been used for a while, to prevent folder accumulation
     for root, dirs, files in os.walk(MOFSIMPLIFY_PATH):
         for dir in dirs:
-            # print(dir)
             target_str = 'temp_file_creation'
-            if len(dir) > len(target_str) and target_str in dir and file_age_in_seconds(dir) > 7200: # 7200s is two hours
+            if len(dir) > len(target_str) and target_str in dir: 
                 # target_str in dir since all copies start with temp_file_creation
-                # len(dir) > len(target_str) to prevent deleting the original temp_file_creation folder
-                shutil.rmtree(dir)
+                # len(dir) > len(target_str) to prevent counting the original temp_file_creation folder
+                sum += 1
 
-
-    return str(session['ID']) # return a string
+    return str(sum+1)
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 
 def bb_generate():
@@ -155,8 +182,7 @@ def bb_generate():
     # uses ToBaCCo code, version 3.0
     # returns the constructed MOF's name to the front end
 
-    # To begin, always go to main directory
-    os.chdir(MOFSIMPLIFY_PATH)
+    tobacco_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + "/tobacco_3.0/"
 
     # Grab data
     my_data = json.loads(flask.request.get_data())
@@ -165,36 +191,36 @@ def bb_generate():
     sbu = my_data['sbu']
     net = my_data['net']
 
-    os.chdir("temp_file_creation_" + str(session['ID']) + "/tobacco_3.0")
-
     # clear the edges, nodes, templates, and output cifs folders to start fresh
         # when running python tobacco.py, it looks in these folders
 
-    shutil.rmtree('edges')
-    os.mkdir('edges')
-    shutil.rmtree('nodes')
-    os.mkdir('nodes')
-    shutil.rmtree('templates')
-    os.mkdir('templates')
-    shutil.rmtree('output_cifs')
-    os.mkdir('output_cifs')
+    shutil.rmtree(tobacco_folder + 'edges')
+    os.mkdir(tobacco_folder + 'edges')
+    shutil.rmtree(tobacco_folder + 'nodes')
+    os.mkdir(tobacco_folder + 'nodes')
+    shutil.rmtree(tobacco_folder + 'templates')
+    os.mkdir(tobacco_folder + 'templates')
+    shutil.rmtree(tobacco_folder + 'output_cifs')
+    os.mkdir(tobacco_folder + 'output_cifs')
 
     # copy over the linker, sbu, and net specified by the user in the edges, nodes, and templates folders
 
-    shutil.copy('edges_database/' + linker + '.cif', 'edges/' + linker + '.cif')
-    shutil.copy('nodes_database/' + sbu + '.cif', 'nodes/' + sbu + '.cif')
-    shutil.copy('template_database/' + net + '.cif', 'templates/' + net + '.cif')
+    shutil.copy(tobacco_folder + 'edges_database/' + linker + '.cif', tobacco_folder + 'edges/' + linker + '.cif')
+    shutil.copy(tobacco_folder + 'nodes_database/' + sbu + '.cif', tobacco_folder + 'nodes/' + sbu + '.cif')
+    shutil.copy(tobacco_folder + 'template_database/' + net + '.cif', tobacco_folder + 'templates/' + net + '.cif')
 
 
     # run the command to construct the MOF
-    subprocess.run(['python', 'tobacco.py'])
+    os.chdir(tobacco_folder) # note: os.chdir here could cause issues if multiple users are using the website, since mofSimplify server might chdir when someone else is in the middle of an operation
+    subprocess.run(['python', 'tobacco.py']) 
+    os.chdir(MOFSIMPLIFY_PATH)
 
     # if successful, there will be an output cif in the folder output_cifs
-    if listdir_nohidden('output_cifs') == []: # no files in folder
+    if listdir_nohidden(tobacco_folder + 'output_cifs') == []: # no files in folder
         print('Construction failed.')
         return 'FAILED'
     
-    constructed_MOF = listdir_nohidden('output_cifs')
+    constructed_MOF = listdir_nohidden(tobacco_folder + 'output_cifs')
     constructed_MOF = constructed_MOF[0] # getting the first, and only, element out of the list
 
     dictionary = {};
@@ -202,7 +228,7 @@ def bb_generate():
     dictionary['mof_name'] = constructed_MOF
 
     # getting the primitive cell using molSimplify
-    get_primitive('output_cifs/' + constructed_MOF, 'output_cifs/primitive_' + constructed_MOF);
+    get_primitive(tobacco_folder + 'output_cifs/' + constructed_MOF, tobacco_folder + 'output_cifs/primitive_' + constructed_MOF);
 
     json_object = json.dumps(dictionary, indent = 4);
 
@@ -222,29 +248,26 @@ def ss_predict():
 
     print('TIME CHECK 1')
 
-    # To begin, always go to main directory.
-    os.chdir(MOFSIMPLIFY_PATH)
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
     # Grab data
     my_data = json.loads(flask.request.get_data())
 
-    os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
-
     # Write the data back to a cif file.
-    cif_file = open('temp_cif.cif', 'w')
+    cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
     cif_file.write(my_data)
     cif_file.close()
 
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
-    shutil.rmtree('RACs')
-    os.mkdir('RACs')
+    shutil.rmtree(temp_file_folder + 'RACs')
+    os.mkdir(temp_file_folder + 'RACs')
 
     # Doing the same with the Zeo++ folder.
-    shutil.rmtree('zeo++')
-    os.mkdir('zeo++')
+    shutil.rmtree(temp_file_folder + 'zeo++')
+    os.mkdir(temp_file_folder + 'zeo++')
 
-    os.chdir("RACs") # move to RACs folder
+    # os.chdir("RACs") # move to RACs folder
 
     print('TIME CHECK 2')
     import time # debugging
@@ -252,7 +275,7 @@ def ss_predict():
 
     # Next, running MOF featurization
     try:
-        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+        get_primitive(temp_file_folder + 'temp_cif.cif', temp_file_folder + 'RACs/temp_cif_primitive.cif');
     except ValueError:
         return 'FAILED'
 
@@ -261,8 +284,10 @@ def ss_predict():
 
     timeStarted = time.time() # save start time (debugging)
 
+    RACs_folder = temp_file_folder +  'RACs/'
+
     try:
-        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+        full_names, full_descriptors = get_MOF_descriptors(RACs_folder + 'temp_cif_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + 'temp_cif.xyz');
             # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
@@ -282,15 +307,14 @@ def ss_predict():
     # At this point, have the RAC featurization. Need geometry information next.
 
     # Run Zeo++
-    os.chdir('..')
-    os.chdir('zeo++')
+    zeo_folder = temp_file_folder + 'zeo++/'
 
     timeStarted = time.time() # save start time (debugging)
 
-    cmd1 = '../../zeo++-0.3/network -ha -res temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd2 = '../../zeo++-0.3/network -sa 1.86 1.86 10000 temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd3 = '../../zeo++-0.3/network -ha -vol 1.86 1.86 10000 temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd4 = '../../zeo++-0.3/network -volpo 1.86 1.86 10000 temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + 'temp_cif_pd.txt ' + RACs_folder + 'temp_cif_primitive.cif'
+    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_sa.txt ' + RACs_folder + 'temp_cif_primitive.cif'
+    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -vol 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_av.txt ' + RACs_folder + 'temp_cif_primitive.cif'
+    cmd4 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_pov.txt '+ RACs_folder + 'temp_cif_primitive.cif'
     # four parallelized Zeo++ commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -315,6 +339,9 @@ def ss_predict():
     All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
     '''
 
+    print('MY ID CHECK 3')
+    print(session['ID'])
+
     timeStarted = time.time() # save start time (debugging)
 
     dict_list = []
@@ -324,16 +351,22 @@ def ss_predict():
     unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
     VPOV, GPOV = np.nan, np.nan
     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-    if (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
-        os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
+
+    # if not (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
+    #     os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
+    #     ):
+    #     time.sleep(1) # give the code a bit more time to finish (1 second)
+
+    if (os.path.exists(zeo_folder + 'temp_cif_pd.txt') & os.path.exists(zeo_folder + 'temp_cif_sa.txt') &
+        os.path.exists(zeo_folder + 'temp_cif_av.txt') & os.path.exists(zeo_folder + 'temp_cif_pov.txt')
         ):
-        with open('temp_cif_pd.txt') as f:
+        with open(zeo_folder + 'temp_cif_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
                 largest_included_sphere = float(row.split()[1]) # largest included sphere
                 largest_free_sphere = float(row.split()[2]) # largest free sphere
                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open('temp_cif_sa.txt') as f:
+        with open(zeo_folder + 'temp_cif_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
@@ -341,7 +374,7 @@ def ss_predict():
                     crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open('temp_cif_pov.txt') as f:
+        with open(zeo_folder + 'temp_cif_pov.txt') as f:
             pore_volume_data = f.readlines()
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
@@ -355,16 +388,16 @@ def ss_predict():
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
-        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists('temp_cif_sa.txt'), 
-              '; pd: ',os.path.exists('temp_cif_pd.txt'), '; av: ', os.path.exists('temp_cif_av.txt'),
-              '; pov: ', os.path.exists('temp_cif_pov.txt'))
+        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + 'temp_cif_sa.txt'), 
+              '; pd: ',os.path.exists(zeo_folder + 'temp_cif_pd.txt'), '; av: ', os.path.exists(zeo_folder + 'temp_cif_av.txt'),
+              '; pov: ', os.path.exists(zeo_folder + 'temp_cif_pov.txt'))
         return 'FAILED'
     geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
                 'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
                 'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
     dict_list.append(geo_dict)
     geo_df = pd.DataFrame(dict_list)
-    geo_df.to_csv('geometric_parameters.csv',index=False)
+    geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
 
 
     timeDelta = time.time() - timeStarted # get execution time
@@ -373,9 +406,9 @@ def ss_predict():
     print('TIME CHECK 4')
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-    lc_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/lc_descriptors.csv") 
-    sbu_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/sbu_descriptors.csv")
-    linker_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/linker_descriptors.csv")
+    lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+    sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+    linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
 
     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
     sbu_df = sbu_df.mean().to_frame().transpose()
@@ -383,18 +416,15 @@ def ss_predict():
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
 
-    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
+    merged_df.to_csv(temp_file_folder + 'merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
 
-    os.chdir('..')
-    os.chdir('..')
-    os.chdir('model/solvent/ANN')
-
+    ANN_folder = MOFSIMPLIFY_PATH + 'model/solvent/ANN/'
 
     # Here, I do a check to see if the current MOF is in the training data.
     # If it is, then I return the known truth for the MOF, rather than make a prediction.
 
     # Will iterate through the rows of the train pandas dataframe
-    train_df = pd.read_csv('dropped_connectivity_dupes/train.csv')
+    train_df = pd.read_csv(ANN_folder + 'dropped_connectivity_dupes/train.csv')
 
     in_train = False
 
@@ -440,14 +470,11 @@ def ss_predict():
 
     timeStarted = time.time() # save start time (debugging)
 
-    os.system('python solvent_ANN.py > solvent_prediction.txt')
-    # import for_GT
-    # prediction = for_GT.main()
-
+    os.system('python ' + ANN_folder + 'solvent_ANN.py ' + str(session['ID']) + ' > ' + temp_file_folder + 'solvent_prediction.txt') 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    f = open("solvent_prediction.txt", "r")
+    f = open(temp_file_folder + "solvent_prediction.txt", "r")
     line = f.readline()
     line = line.split('[')
     line = line[2]
@@ -488,37 +515,47 @@ def ts_predict():
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
     # Then, apply Aditya's model to make prediction.
 
-    print('TIME CHECK 1')
+    print('TIME CHECK 1 ' + str(session['ID']))
 
-    # To begin, always go to main directory.
-    os.chdir(MOFSIMPLIFY_PATH)
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
     # Grab data
     my_data = json.loads(flask.request.get_data())
 
-    os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
+    #os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
 
-    # Write the data back to a cif file
-    cif_file = open('temp_cif.cif', 'w')
+    # Write the data back to a cif file.
+    cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
     cif_file.write(my_data)
     cif_file.close()
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
-    shutil.rmtree('RACs')
-    os.mkdir('RACs')
+    shutil.rmtree(temp_file_folder + 'RACs')
+    os.mkdir(temp_file_folder + 'RACs')
 
-    os.chdir("RACs") # move to RACs folder
+    # Doing the same with the Zeo++ folder.
+    shutil.rmtree(temp_file_folder + 'zeo++')
+    os.mkdir(temp_file_folder + 'zeo++')
 
-    print('TIME CHECK 2')
+    # os.chdir("RACs") # move to RACs folder
 
-    # Next, running MOF featurization.
+    print('TIME CHECK 2 ' + str(session['ID']))
+
+    # Next, running MOF featurization
     try:
-        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+        get_primitive(temp_file_folder + 'temp_cif.cif', temp_file_folder + 'RACs/temp_cif_primitive.cif');
     except ValueError:
         return 'FAILED'
 
+    # if not (os.path.exists('temp_cif_primitive.cif')):
+
+    #     print('time out for ' + str(session['ID']))
+    #     time.sleep(10) # give the code more time to finish (10 seconds)
+
+    RACs_folder = temp_file_folder +  'RACs/'
+
     try:
-        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+        full_names, full_descriptors = get_MOF_descriptors(RACs_folder + 'temp_cif_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + 'temp_cif.xyz');
             # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
@@ -530,21 +567,20 @@ def ts_predict():
     if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
         return 'FAILED'
 
-    print('TIME CHECK 3')
+    print('TIME CHECK 3 ' + str(session['ID']))
 
     # At this point, have the RAC featurization. Need geometry information next.
 
     # Run Zeo++
-    os.chdir('..')
-    os.chdir('zeo++')
+    zeo_folder = temp_file_folder + 'zeo++/'
 
     import time # debugging
     timeStarted = time.time() # save start time (debugging)
 
-    cmd1 = '../../zeo++-0.3/network -ha -res temp_cif_pd.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd2 = '../../zeo++-0.3/network -sa 1.86 1.86 10000 temp_cif_sa.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd3 = '../../zeo++-0.3/network -ha -vol 1.86 1.86 10000 temp_cif_av.txt ' + '../RACs/temp_cif_primitive.cif'
-    cmd4 = '../../zeo++-0.3/network -volpo 1.86 1.86 10000 temp_cif_pov.txt '+ '../RACs/temp_cif_primitive.cif'
+    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + 'temp_cif_pd.txt ' + RACs_folder + 'temp_cif_primitive.cif'
+    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_sa.txt ' + RACs_folder + 'temp_cif_primitive.cif'
+    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -vol 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_av.txt ' + RACs_folder + 'temp_cif_primitive.cif'
+    cmd4 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_pov.txt '+ RACs_folder + 'temp_cif_primitive.cif'
     # four parallelized Zeo++ commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -584,16 +620,28 @@ def ts_predict():
     unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
     VPOV, GPOV = np.nan, np.nan
     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-    if (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
-        os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
+
+    print('MY ID CHECK 3')
+    print(session['ID'])
+
+    # if not (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
+    #     os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
+    #     ):
+
+    #     print('time out for ' + str(session['ID']))
+    #     print(os.getcwd())
+    #     time.sleep(10) # give the code more time to finish (10 seconds)
+
+    if (os.path.exists(zeo_folder + 'temp_cif_pd.txt') & os.path.exists(zeo_folder + 'temp_cif_sa.txt') &
+        os.path.exists(zeo_folder + 'temp_cif_av.txt') & os.path.exists(zeo_folder + 'temp_cif_pov.txt')
         ):
-        with open('temp_cif_pd.txt') as f:
+        with open(zeo_folder + 'temp_cif_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
                 largest_included_sphere = float(row.split()[1]) # largest included sphere
                 largest_free_sphere = float(row.split()[2]) # largest free sphere
                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open('temp_cif_sa.txt') as f:
+        with open(zeo_folder + 'temp_cif_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
@@ -601,7 +649,7 @@ def ts_predict():
                     crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open('temp_cif_pov.txt') as f:
+        with open(zeo_folder + 'temp_cif_pov.txt') as f:
             pore_volume_data = f.readlines()
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
@@ -615,46 +663,42 @@ def ts_predict():
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
-        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists('temp_cif_sa.txt'), 
-              '; pd: ',os.path.exists('temp_cif_pd.txt'), '; av: ', os.path.exists('temp_cif_av.txt'),
-              '; pov: ', os.path.exists('temp_cif_pov.txt'))
+        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + 'temp_cif_sa.txt'), 
+              '; pd: ',os.path.exists(zeo_folder + 'temp_cif_pd.txt'), '; av: ', os.path.exists(zeo_folder + 'temp_cif_av.txt'),
+              '; pov: ', os.path.exists(zeo_folder + 'temp_cif_pov.txt'))
         return 'FAILED'
     geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
                 'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
                 'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
     dict_list.append(geo_dict)
     geo_df = pd.DataFrame(dict_list)
-    geo_df.to_csv('geometric_parameters.csv',index=False)
+    geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
 
 
-    print('TIME CHECK 4')
+    print('TIME CHECK 4 ' + str(session['ID']))
 
     # Applying the model next.
 
-    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv).
-
-    lc_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/lc_descriptors.csv") 
-    sbu_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/sbu_descriptors.csv")
-    linker_df = pd.read_csv("../../temp_file_creation_" + str(session['ID']) + "/RACs/linker_descriptors.csv")
+    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+    lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+    sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+    linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
 
     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
     sbu_df = sbu_df.mean().to_frame().transpose()
     linker_df = linker_df.mean().to_frame().transpose()
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
-    merged_df.to_csv('../merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
 
-    os.chdir('..')
-    os.chdir('..')
-    os.chdir('model/thermal/ANN')
+    merged_df.to_csv(temp_file_folder + 'merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
 
-
+    ANN_folder = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
 
     # Here, I do a check to see if the current MOF is in the training data.
     # If it is, then I return the known truth for the MOF, rather than make a prediction.
 
     # Will iterate through the rows of the train pandas dataframe
-    train_df = pd.read_csv('train.csv')
+    train_df = pd.read_csv(ANN_folder + 'train.csv')
 
     in_train = False
 
@@ -702,16 +746,16 @@ def ts_predict():
 
 
 
-    print('TIME CHECK 5')
+    print('TIME CHECK 5 ' + str(session['ID']))
 
     timeStarted = time.time() # save start time (debugging)
 
-    os.system('python thermal_ANN.py > thermal_prediction.txt')
+    os.system('python ' + ANN_folder + 'thermal_ANN.py ' + str(session['ID']) + ' > ' + temp_file_folder + 'thermal_prediction.txt')
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    f = open("thermal_prediction.txt", "r")
+    f = open(temp_file_folder + "thermal_prediction.txt", "r")
     prediction = f.readline()
     f.readline() # skip a line
     neighbor_names = f.readline()
@@ -738,7 +782,7 @@ def ts_predict():
         'neighbor_distances': neighbor_distances,
         'in_train': False} # a prediction was made. Requested MOF was not in the training data.
 
-    print('TIME CHECK 6')
+    print('TIME CHECK 6 ' + str(session['ID']))
 
     return results
 
@@ -746,9 +790,6 @@ def ts_predict():
 def plot_thermal_stability():
     # Returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on.
     # Additionally, displays the position of the current MOF's thermal breakdown temperature.
-
-    # To begin, always go to main directory 
-    os.chdir(MOFSIMPLIFY_PATH)
 
     # Grab data
     info = json.loads(flask.request.get_data()) 
@@ -759,7 +800,7 @@ def plot_thermal_stability():
     print(my_data)
 
     # Getting the temperature data
-    temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
+    temps_df = pd.read_csv(MOFSIMPLIFY_PATH + "model/thermal/ANN/adjusted_TSD_df_all.csv")
 
     import matplotlib
     matplotlib.use('Agg') # noninteractive backend
@@ -793,9 +834,6 @@ def thermal_stability_percentile():
     # Returns what percentile the thermal breakdown temperature of the selected MOF lies in
     # with respect to the MOFs used to train the ANN for thermal stability predictions.
 
-    # To begin, always go to main directory. 
-    os.chdir(MOFSIMPLIFY_PATH)
-
     # Grab data.
     my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
@@ -803,7 +841,7 @@ def thermal_stability_percentile():
     print(my_data)
 
     # Getting the temperature data.
-    temps_df = pd.read_csv("model/thermal/ANN/adjusted_TSD_df_all.csv")
+    temps_df = pd.read_csv(MOFSIMPLIFY_PATH + "model/thermal/ANN/adjusted_TSD_df_all.csv")
 
     # Will find what percentile our prediction belongs to, by checking the 100 percentiles and seeing which is closest to our prediction.
     difference = np.Infinity
@@ -849,15 +887,12 @@ def seg_intersect(a1,a2, b1,b2) :
 @app.route('/TGA_plot', methods=['POST'])
 def TGA_plot():
 
-    # To begin, always go to main directory 
-    os.chdir(MOFSIMPLIFY_PATH)
-
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
     my_data = my_data[:6] # only want the first six letters
 
     # Grab data 
-    slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
+    slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
 
     x_values = []
     y_values = []
@@ -895,33 +930,30 @@ def get_components():
     # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
     # Also in the dictionary: SMILES string for each of the linkers and sbus
 
-    # To begin, always go to main directory.
-    os.chdir(MOFSIMPLIFY_PATH);
-
     # Grab data
     my_data = json.loads(flask.request.get_data());
 
-    os.chdir("temp_file_creation_" + str(session['ID'])); # changing directory
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
     # Write the data back to a cif file.
-    cif_file = open('temp_cif.cif', 'w');
+    cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
     cif_file.write(my_data);
     cif_file.close();
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
-    shutil.rmtree('RACs');
-    os.mkdir('RACs');
+    shutil.rmtree(temp_file_folder + 'RACs')
+    os.mkdir(temp_file_folder + 'RACs')
 
-    os.chdir("RACs"); # move to RACs folder
-
-    # Next, running MOF featurization.
+    # Next, running MOF featurization
     try:
-        get_primitive('../temp_cif.cif', 'temp_cif_primitive.cif');
+        get_primitive(temp_file_folder + 'temp_cif.cif', temp_file_folder + 'RACs/temp_cif_primitive.cif');
     except ValueError:
         return 'FAILED'
 
+    RACs_folder = temp_file_folder +  'RACs/'
+
     try:
-        full_names, full_descriptors = get_MOF_descriptors('temp_cif_primitive.cif',3,path= str(pathlib.Path().absolute()), xyzpath= 'temp_cif.xyz');
+        full_names, full_descriptors = get_MOF_descriptors(RACs_folder + 'temp_cif_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + 'temp_cif.xyz');
             # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
@@ -942,10 +974,10 @@ def get_components():
     
     linker_num = 0;
     while True:
-        if not os.path.exists('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz'):
+        if not os.path.exists(RACs_folder + 'linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz'):
             break
         else:
-            linker_file = open('linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz', 'r');
+            linker_file = open(RACs_folder + 'linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz', 'r');
             linker_info = linker_file.read();
             linker_file.close();
 
@@ -956,10 +988,10 @@ def get_components():
 
     sbu_num = 0;
     while True:
-        if not os.path.exists('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz'):
+        if not os.path.exists(RACs_folder + 'sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz'):
             break
         else:
-            sbu_file = open('sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz', 'r');
+            sbu_file = open(RACs_folder + 'sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz', 'r');
             sbu_info = sbu_file.read();
             sbu_file.close();
 
@@ -971,8 +1003,6 @@ def get_components():
     dictionary['total_linkers'] = linker_num;
     dictionary['total_sbus'] = sbu_num;
 
-
-    os.chdir("linkers"); # move to linkers folder
 
     # Identifying which linkers and sbus have different connectivities.
 
@@ -986,7 +1016,7 @@ def get_components():
     from molSimplify.Classes.mol3D import mol3D
     import glob
     MOF_of_interest = 'temp_cif_primitive'
-    XYZs = sorted(glob.glob('*'+MOF_of_interest+'*xyz'))
+    XYZs = sorted(glob.glob(RACs_folder + 'linkers/*'+MOF_of_interest+'*xyz'))
     det_list = []
 
     for xyz in XYZs:
@@ -1016,9 +1046,7 @@ def get_components():
     for item in unique_linker_det:
         unique_linker_indices.append(linker_det_list.index(item)) # indices of the unique linkers in the list of linkers
 
-    os.chdir("../sbus"); # move to sbus folder
-
-    XYZs = sorted(glob.glob('*'+MOF_of_interest+'*xyz'))
+    XYZs = sorted(glob.glob(RACs_folder + 'sbus/*'+MOF_of_interest+'*xyz'))
     det_list = []
     for xyz in XYZs:
         net = xyz.replace('xyz', 'net') # substring replacement; getting the appropriate .net file
@@ -1054,28 +1082,28 @@ def get_components():
     # Write the smiles strings to file, then read the file.
     import pybel
 
-    os.chdir("../linkers"); # move to linkers folder
+    linkers_folder = RACs_folder + 'linkers/'
 
     for i in range(dictionary['total_linkers']): # 0, 1, 2, ..., numberoflinkersminus1
-        smilesFile = pybel.Outputfile('smi', 'temp_cif_primitive_linker_' + str(i) + '.txt') # smi refers to SMILES
-        smilesFile.write(next(pybel.readfile('xyz', 'temp_cif_primitive_linker_' + str(i) + '.xyz'))) # writes SMILES string to the text file
+        smilesFile = pybel.Outputfile('smi', linkers_folder + 'temp_cif_primitive_linker_' + str(i) + '.txt') # smi refers to SMILES
+        smilesFile.write(next(pybel.readfile('xyz', linkers_folder + 'temp_cif_primitive_linker_' + str(i) + '.xyz'))) # writes SMILES string to the text file
 
         # Next, get the SMILES string from the text file.
-        f = open('temp_cif_primitive_linker_' + str(i) + '.txt', 'r')
+        f = open(linkers_folder + 'temp_cif_primitive_linker_' + str(i) + '.txt', 'r')
         line = f.readline()
         line = line.split('\t') # split at tabs
         smiles_ID = line[0]
         dictionary['linker_' + str(i) + '_SMILES'] = smiles_ID
         f.close()
 
-    os.chdir("../sbus"); # move to sbus folder
+    sbus_folder = RACs_folder + 'sbus/'
 
     for i in range(dictionary['total_sbus']):
-        smilesFile = pybel.Outputfile('smi', 'temp_cif_primitive_sbu_' + str(i) + '.txt') # smi refers to SMILES
-        smilesFile.write(next(pybel.readfile('xyz', 'temp_cif_primitive_sbu_' + str(i) + '.xyz'))) # writes SMILES string to the text file
+        smilesFile = pybel.Outputfile('smi', sbus_folder + 'temp_cif_primitive_sbu_' + str(i) + '.txt') # smi refers to SMILES
+        smilesFile.write(next(pybel.readfile('xyz', sbus_folder + 'temp_cif_primitive_sbu_' + str(i) + '.xyz'))) # writes SMILES string to the text file
 
         # Next, get the SMILES string from the text file.
-        f = open('temp_cif_primitive_sbu_' + str(i) + '.txt', 'r')
+        f = open(sbus_folder + 'temp_cif_primitive_sbu_' + str(i) + '.txt', 'r')
         line = f.readline()
         line = line.split('\t') # split at tabs
         smiles_ID = line[0]
@@ -1096,23 +1124,15 @@ def is_stable():
 
     print(my_data)
     
-    # To begin, always go to main directory. 
-    os.chdir(MOFSIMPLIFY_PATH);
-
-    os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
-    solvent_flags_df = pd.read_csv('train.csv')
+    my_folder = MOFSIMPLIFY_PATH + 'model/solvent/ANN/dropped_connectivity_dupes/'
+    solvent_flags_df = pd.read_csv(my_folder + 'train.csv')
 
     this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
 
     this_neighbor_flag = this_neighbor['flag'] # getting the flag value
-
     this_neighbor_flag =  str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
 
-    os.chdir(MOFSIMPLIFY_PATH);
     # next, getting DOI
-    os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
-    solvent_flags_df = pd.read_csv('train.csv')
-    this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
     this_neighbor_doi = this_neighbor['doi'] # getting the doi
     this_neighbor_doi = this_neighbor_doi.iloc[0]
 
@@ -1130,18 +1150,16 @@ def breakdown_T():
     print(my_data)
     
     # To begin, always go to main directory 
-    os.chdir(MOFSIMPLIFY_PATH);
+    ANN_folder = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
 
-    os.chdir('model/thermal/ANN')
-    breakdown_T_df = pd.read_csv('train.csv')
+    breakdown_T_df = pd.read_csv(ANN_folder + 'train.csv')
     this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
     this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
     this_neighbor_T =  str(round(this_neighbor_T.iloc[0], 1)) # extract the breakdown temperature value and return it as a string. Want just one decimal place
 
 
-    os.chdir(MOFSIMPLIFY_PATH);
-    os.chdir('TGA')
-    TGA_df = pd.read_excel('TGA_info_log.xlsx')
+    TGA_folder = MOFSIMPLIFY_PATH + 'TGA/'
+    TGA_df = pd.read_excel(TGA_folder + 'TGA_info_log.xlsx')
     this_neighbor = TGA_df[TGA_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
     this_neighbor_doi = this_neighbor['doi'] # getting the doi
     this_neighbor_doi = this_neighbor_doi.iloc[0]
@@ -1157,9 +1175,6 @@ def neighbor_writer():
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is a dictionary with information about the neighbor and the MOF that was analyzed by an ANN
 
-    # To begin, always go to main directory. 
-    os.chdir(MOFSIMPLIFY_PATH);
-
     print('neighbor writer check')
     print(my_data)
 
@@ -1170,8 +1185,8 @@ def neighbor_writer():
 
     # next, getting neighbor_truth
     if prediction_type == 'solvent':
-        os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
-        solvent_flags_df = pd.read_csv('train.csv')
+        my_folder = MOFSIMPLIFY_PATH + 'model/solvent/ANN/dropped_connectivity_dupes/'
+        solvent_flags_df = pd.read_csv(my_folder + 'train.csv')
         this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
         this_neighbor_flag = this_neighbor['flag'] # getting the flag value
         neighbor_truth = str(this_neighbor_flag.iloc[0]) # extract the flag value and convert it into a string
@@ -1181,36 +1196,33 @@ def neighbor_writer():
             neighbor_truth = 'Unstable upon solvent removal'
 
     else: # thermal stability
-        os.chdir('model/thermal/ANN')
-        breakdown_T_df = pd.read_csv('train.csv')
+        my_folder = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
+        breakdown_T_df = pd.read_csv(my_folder + 'train.csv')
         this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
         this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
         neighbor_truth = str(round(this_neighbor_T.iloc[0], 1)) # extract the flag value and convert it into a string. Want just one decimal place
 
 
-    os.chdir(MOFSIMPLIFY_PATH);
     # next, getting DOI
     if prediction_type == 'solvent':
-        os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
-        solvent_flags_df = pd.read_csv('train.csv')
+        # os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
+        # solvent_flags_df = pd.read_csv('train.csv')
         this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
         this_neighbor_doi = this_neighbor['doi'] # getting the doi
         this_neighbor_doi = this_neighbor_doi.iloc[0]
     else: # thermal
-        os.chdir('TGA')
-        TGA_df = pd.read_excel('TGA_info_log.xlsx')
+        TGA_df = pd.read_excel(MOFSIMPLIFY_PATH + 'TGA/TGA_info_log.xlsx')
         this_neighbor = TGA_df[TGA_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
         this_neighbor_doi = this_neighbor['doi'] # getting the doi
         this_neighbor_doi = this_neighbor_doi.iloc[0]
 
     # Now, writing all of this information to a string
-    os.chdir(MOFSIMPLIFY_PATH);
 
     # Delete and remake the latent_neighbor folder each time, so only one file is ever in it
-    shutil.rmtree('temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
-    os.mkdir('temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
+    shutil.rmtree(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
+    os.mkdir(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
 
-    with open('temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '__' + current_MOF + '__' + selected_neighbor + '.out','w') as f:
+    with open(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '__' + current_MOF + '__' + selected_neighbor + '.out','w') as f:
         f.write('Prediction type: ' + prediction_type + '\n')
         f.write('Current MOF: ' + current_MOF + '\n')
         f.write('Selected CoRE nearest neighbor in latent space: ' + selected_neighbor + '\n')
@@ -1228,9 +1240,6 @@ def TGA_maker():
     # Making the TGA plot and saving it, for it to be downloaded
     from bokeh.io import export_png
 
-    # To begin, always go to main directory. 
-    os.chdir(MOFSIMPLIFY_PATH);
-
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
     my_data = my_data[:6] # only want the first six letters
@@ -1238,7 +1247,7 @@ def TGA_maker():
     print('neighbor writer check 3')
 
     # Grab data 
-    slopes_df = pd.read_csv("TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
+    slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
 
     x_values = []
     y_values = []
@@ -1276,3 +1285,4 @@ def TGA_maker():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
+    #app.run(host='0.0.0.0', port=8000, threaded=False, processes=10)

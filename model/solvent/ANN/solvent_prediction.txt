@@ -1,4 +1,0 @@
-[[0.87]]
-(1394, 200) (1, 200)
-['RUBTAK01_SL', 'EWILON_clean', 'RICHIV_clean', 'IXEJIG_clean', 'NAWHOL_clean']
-[1.750766, 5.965368, 6.701346, 6.765671, 6.938796]

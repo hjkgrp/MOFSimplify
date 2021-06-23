@@ -155,12 +155,15 @@ geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
  
 other = ['cif_file','name','filename']
 
+user_id = sys.argv[1]
 
-path = os.getcwd()+'/'
-df_train_all = pd.read_csv(path+"/train.csv").append(pd.read_csv(path+"/val.csv"))
-df_train = pd.read_csv(path+"/train.csv")
+path = os.getcwd()+'/' # This is the main mofSimplify folder
+ANN_path = path + 'model/thermal/ANN/'
+temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+df_train_all = pd.read_csv(ANN_path+"train.csv").append(pd.read_csv(ANN_path+"val.csv"))
+df_train = pd.read_csv(ANN_path+"train.csv")
 df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
-df_newMOF = pd.read_csv('../../../temp_file_creation/merged_descriptors.csv') # Assume temp_file_creation/ in parent directory
+df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors.csv') # Assume temp_file_creation/ in parent directory
 features = [val for val in df_train.columns.values if val in RACs+geo]
 
 X_train, X_newMOF, y_train, x_scaler, y_scaler = normalize_data(df_train, df_newMOF, features, ["T"], unit_trans=1, debug=False)
@@ -171,7 +174,7 @@ steps = 200
 import keras
 import keras.backend as K
 dependencies = {'precision':precision,'recall':recall,'f1':f1}
-model = keras.models.load_model('final_model_T_few_epochs.h5',custom_objects=dependencies)
+model = keras.models.load_model(ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
 new_MOF_pred = y_scaler.inverse_transform(model.predict(X_newMOF))
 new_MOF_pred = np.round(new_MOF_pred,1) # round to 1 decimal
 
@@ -201,7 +204,7 @@ print(training_latent.shape,design_latent.shape)
 # Compute the pairwise distances between the test latent vectors and the train latent vectors to get latent distances
 d1 = pairwise_distances(design_latent,training_latent,n_jobs=30)
 df1 = pd.DataFrame(data=d1, columns=df_train['CoRE_name'].tolist())
-df1.to_csv('solvent_test_latent_dists.csv')
+df1.to_csv(temp_file_path + 'solvent_test_latent_dists.csv')
 
 # Want to find the closest points (let's say the closest 5 points); so, smallest values in df1
 neighbors = 5 # number of closest points

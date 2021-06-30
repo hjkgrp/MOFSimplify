@@ -161,7 +161,7 @@ def file_age_in_seconds(pathname):
 
 @app.route('/curr_users', methods=['GET'])
 def curr_num_users():
-    # Returns the current number of users on mofSimplify. 
+    # Returns the current number of users on MOFSimplify. 
     # Indicative of the expected success rate of prediction operations, since two users can't run a prediction (or Get Components) at the same time
 
     sum = 0
@@ -212,7 +212,7 @@ def bb_generate():
 
     # run the command to construct the MOF
     os.chdir(tobacco_folder) 
-    # note: os.chdir here could cause issues if multiple users are using the website and try to make a building block generated MOF at the same time, since mofSimplify server might chdir when someone else is in the middle of an operation
+    # note: os.chdir here could cause issues if multiple users are using the website and try to make a building block generated MOF at the same time, since MOFSimplify server might chdir when someone else is in the middle of an operation
     # luckily, it is a quick operation, so this is unlikely
     subprocess.run(['python', 'tobacco.py']) 
     os.chdir(MOFSIMPLIFY_PATH)

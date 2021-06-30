@@ -1,4 +1,0 @@
-333.3°C
-(2005, 200) (1, 200)
-['TATSIS_clean', 'HOHJAR_clean', 'CAXXEG_clean', 'YOZRUC_clean', 'LULVOF_clean']
-[0.5891439, 4.2722254, 4.310128, 4.615823, 4.6213193]

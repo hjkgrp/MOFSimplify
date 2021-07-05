@@ -1,1 +1,0 @@
-[Zr]1234O[C]O[Zr]5678O[C]O[Zr]9(O[C]O2)(O[C]O[Zr]2%10(O[C]O6)O[C]O[Zr](O[C]O9)(O[C]O[Zr](O[C]O3)(O[C]O2)(O[C]O5)(O8)O%10)O[C]O1)(O7)O4.[OH].[OH].[OH].[OH]	temp_cif_primitive_sbu_0.xyz

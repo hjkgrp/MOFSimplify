@@ -1,1 +1,0 @@
-O=C(c1ccc(cc1)C(=O)[O])[O]	temp_cif_primitive_linker_4.xyz

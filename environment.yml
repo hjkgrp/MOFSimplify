@@ -3,8 +3,8 @@ channels:
   - omnia
   - openbabel
   - anaconda
-  - defaults
   - conda-forge
+  - defaults
   - hjkgroup
 dependencies:
   - absl-py=0.12.0=pyhd8ed1ab_0
@@ -17,7 +17,9 @@ dependencies:
   - async-timeout=3.0.1=py_1000
   - async_generator=1.10=py36h28b3542_0
   - attrs=20.3.0=pyhd3deb0d_0
+  - automat=20.2.0=py_0
   - backcall=0.2.0=py_0
+  - bcrypt=3.2.0=py36haf1e3a3_0
   - beautifulsoup4=4.9.3=pyhb0f4dca_0
   - blas=1.0=mkl
   - bleach=3.2.1=py_0
@@ -25,15 +27,16 @@ dependencies:
   - brotlipy=0.7.0=py36h20b66c6_1001
   - bzip2=1.0.8=h1de35cc_0
   - c-ares=1.17.1=h0d85af4_1
-  - ca-certificates=2020.12.5=h033912b_0
+  - ca-certificates=2020.10.14=0
   - cachetools=4.2.1=pyhd8ed1ab_0
   - cairo=1.16.0=h8023c5d_1
-  - certifi=2020.12.5=py36h79c6626_1
+  - certifi=2020.6.20=py36_0
   - cffi=1.14.5=py36hfaecaff_0
   - cftime=1.2.1=py36hf1fa96c_0
   - chardet=4.0.0=py36h79c6626_1
   - click=7.1.2=pyhd3eb1b0_0
   - cloudpickle=1.6.0=py_0
+  - constantly=15.1.0=py36h28b3542_0
   - contextvars=2.4=py_0
   - cryptography=3.4.7=py36h3d45be8_0
   - curl=7.76.1=h06286d4_0
@@ -47,11 +50,13 @@ dependencies:
   - entrypoints=0.3=py36_0
   - expat=2.3.0=he49afe7_0
   - ffmpeg=4.3.1=hb787a4c_2
+  - firefox=89.0=he49afe7_0
   - flask=1.1.2=py_0
   - fontconfig=2.13.1=ha9ee91d_0
   - freetype=2.10.4=ha233b18_0
   - future=0.18.2=py36h79c6626_3
   - gast=0.4.0=py_0
+  - geckodriver=0.29.0=h970cd5f_0
   - gettext=0.21.0=h7535e17_0
   - gl2ps=1.4.2=h4cff582_0
   - glew=2.1.0=h046ec9c_2
@@ -70,12 +75,14 @@ dependencies:
   - hdf4=4.2.13=hefd3b78_1005
   - hdf5=1.10.6=nompi_h3e39495_100
   - httplib2=0.19.1=pyhd8ed1ab_0
+  - hyperlink=20.0.1=py_0
   - hyperopt=0.2.3=pyh9f0ad1d_0
   - icu=58.2=h0a44026_3
   - idna=2.10=pyh9f0ad1d_0
   - idna_ssl=1.1.0=py36h9f0ad1d_1001
   - immutables=0.15=py36h49ba835_0
   - importlib-metadata=3.10.1=py36h79c6626_0
+  - incremental=17.5.0=py36_0
   - intel-openmp=2019.4=233
   - ipykernel=5.3.4=py36h5ca1d4c_0
   - ipython=7.16.1=py36h5ca1d4c_0
@@ -178,6 +185,7 @@ dependencies:
   - pybtex=0.24.0=py36h79c6626_0
   - pycparser=2.20=pyh9f0ad1d_2
   - pygpu=0.7.6=py36hf1fa96c_0
+  - pyhamcrest=2.0.2=py_0
   - pymatgen=2020.10.20=py36hadcdec8_0
   - pymongo=3.11.3=py36h23ab428_0
   - pyopenssl=20.0.1=pyhd8ed1ab_0
@@ -202,7 +210,9 @@ dependencies:
   - ruamel.yaml.clib=0.2.2=py36h20b66c6_2
   - scikit-learn=0.22.1=py36h3dc85bc_1
   - scipy=1.4.1=py36h1dac7e4_3
+  - selenium=3.141.0=py36h20b66c6_1002
   - send2trash=1.5.0=py36_0
+  - service_identity=18.1.0=py36h28b3542_0
   - setuptools=52.0.0=py36hecd8cb5_0
   - simplejson=3.17.2=py36h20b66c6_2
   - sip=4.19.24=py36hb1e8313_0
@@ -226,6 +236,7 @@ dependencies:
   - tornado=6.1=py36h9ed2024_0
   - tqdm=4.60.0=pyhd8ed1ab_0
   - traitlets=4.3.3=py36_0
+  - twisted=20.3.0=py36h1de35cc_0
   - typing-extensions=3.7.4.3=0
   - typing_extensions=3.7.4.3=py_0
   - tzlocal=2.1=pyh9f0ad1d_0
@@ -241,15 +252,20 @@ dependencies:
   - widgetsnbextension=3.5.1=py36_0
   - wrapt=1.12.1=py36h20b66c6_3
   - x264=1!161.3030=h35c211d_0
+  - xlrd=1.2.0=py36_0
   - xz=5.2.5=h1de35cc_0
   - yaml=0.2.5=haf1e3a3_0
   - yarl=1.6.3=py36h20b66c6_1
   - zeromq=4.3.3=hb1e8313_3
   - zipp=3.4.1=pyhd8ed1ab_0
   - zlib=1.2.11=h1de35cc_3
+  - zope=1.0=py36_1
+  - zope.interface=5.1.2=py36haf1e3a3_0
   - zstd=1.4.9=h322a384_0
   - pip:
     - appnope==0.1.2
+    - flask-cors==3.0.10
+    - gunicorn==20.1.0
     - ipython-genutils==0.2.0
     - parso==0.8.2
     - pickleshare==0.7.5

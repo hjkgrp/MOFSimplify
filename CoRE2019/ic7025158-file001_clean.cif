@@ -1,0 +1,35 @@
+data_crystal
+
+_cell_length_a 9.05500
+_cell_length_b 9.05500
+_cell_length_c 14.44680
+_cell_angle_alpha 90.00000
+_cell_angle_beta  90.00000
+_cell_angle_gamma 120.00000
+
+_symmetry_space_group_name_	'P 1'
+_symmetry_space_group_name_H-M	'P 1'
+
+loop_
+_symmetry_equiv_pos_as_xyz
+  x,y,z
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_charge
+Si	Si	0.66667 0.33334 0.20412 0.49200
+Si	Si	0.66667 0.33334 0.60310 0.49900
+Si	Si	0.33333 0.66666 0.10310 0.47700
+Si	Si	0.33333 0.66666 0.70412 0.49800
+I 	I 	0.66667 0.33334 0.40370 -0.24000
+I 	I 	0.40176 0.00001 0.15366 -0.25500
+I 	I 	0.40175 0.40176 0.65366 -0.24700
+I 	I 	0.33333 0.66666 0.90370 -0.21600
+I 	I 	0.59825 0.59824 0.15366 -0.25700
+I 	I 	0.99999 0.40175 0.15366 -0.25400
+I 	I 	0.59824 0.99999 0.65366 -0.24800
+I 	I 	0.00001 0.59825 0.65366 -0.24900

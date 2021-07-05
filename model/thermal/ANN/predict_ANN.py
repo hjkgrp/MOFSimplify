@@ -1,3 +1,5 @@
+# This file was the template for thermal_ANN.py. thermal_ANN.py is used by mofSimplify.
+
 import os, sys
 import pandas as pd
 import numpy as np

@@ -1,9 +1,7 @@
-<!-- Hi guys, this code uses the bulk of the code from molSimplify Lite. I have added buttons for solvent and thermal stability, and an upload button that communicates with an input html object. Visualization can be done directly from an uploaded cif file. An example MOF is prepared by default, using fetch. 
+<!-- This code uses much of the code from molSimplify Lite. There are additional buttons for solvent removal and thermal stability predictions, and many MOF centered operations (visualization, component identification, etc). An example MOF is prepared by default, using fetch. 
 
-In order to get code to work, use Safari and select Develop -> Disable Cross-Origin Restrictions.
-
-In a terminal, navigate to folder containing app.py
-Then, to open the website, run python app.py in the terminal
+In a terminal, navigate to folder containing app.py.
+Then, to open the website, run python app.py in the terminal. Copy and paste http://0.0.0.0:8000/ into the Safari URL bar.
 
 -->
 
@@ -29,14 +27,6 @@ Then, to open the website, run python app.py in the terminal
   margin-top: 3px;
 }
 
-.viewportwrapper {
-
-}
-
-.cifviewport {
-
-}
-
 .mol-container {
   width: 100%;
   height: 400px;
@@ -47,7 +37,12 @@ Then, to open the website, run python app.py in the terminal
   margin-bottom:0.1cm;
 }
 
-#viewportwrapper { grid-area: viz; } /* Gianmarco Terrones addition, for MOF visualization */
+#viewportwrapper { grid-area: viz; } /* For MOF visualization */
+
+body {
+  /* The font to be used everywhere */
+  font-family:Tahoma, Geneva, sans-serif
+}
 
 </style>
 
@@ -55,7 +50,6 @@ Then, to open the website, run python app.py in the terminal
 <!-- Empty head section: place meta tags and favicon here -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition, debugging -->
-
 
 <title>mofSimplify</title> 
 <meta name="description" content="mofSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
@@ -75,7 +69,7 @@ Then, to open the website, run python app.py in the terminal
     <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
       <div class="container">
         <a href="../" class="navbar-brand">molSimplify</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
@@ -123,28 +117,26 @@ Then, to open the website, run python app.py in the terminal
     <!-- Create a column containing MOF viewer and buttons -->
     <div class='col-lg-6'>
 
-        <div id="viewportwrapper" style="border-style: solid;" class="content inactive"> <!-- Gianmarco Terrones addition -->
+        <div id="viewportwrapper" style="border-style: solid;" class="content inactive"> <!-- MOF visualization -->
           <div id="viewportnote" style="position: relative; top: 13em; text-align: center; z-index: 2;">(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)</div>
           <div id="cifviewport" style="width:534px; height:406px;"></div>
         </div>
         <div style="margin-bottom:0.5cm;"></div>
-        <button class='btn btn-primary' id='load' type="button">Load example MOF</button>
-        <button class='btn btn-primary' id='visualize' type="button">Visualize MOF</button>
+        <button class='btn btn-primary' id='load' type='button'>Load example MOF</button>
+        <button class='btn btn-primary' id='visualize' type='button'>Visualize MOF</button>
     </div>
     
     <!-- Create a column containing selection boxes and buttons -->
     <div class='col-lg-6'>
 
-        <div style="margin-bottom:0.5cm;"></div>
+        <!-- <div style="margin-bottom:0.5cm;"></div> -->
 
         A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb). Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF visualization and construction code. 
 
-
-        <!-- Selection box for Axial Ligand 1 (gets replaced immediately by JavaScript code) -->
+        <!-- Selection box for the linker building block -->
         <div  style="padding-top: 30px">
           Linker, the connecting building block
           <input id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
-
         </div>
 
         <!-- Default linkers -->
@@ -153,11 +145,10 @@ Then, to open the website, run python app.py in the terminal
         </datalist>
 
 
-        <!-- Selection box for metal -->
+        <!-- Selection box for metal SBU building block -->
         <div>
           sbu, the metal-centered nodular building block 
           <input id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
-
         </div>
 
         <!-- Default sbus -->
@@ -166,9 +157,8 @@ Then, to open the website, run python app.py in the terminal
         </datalist>
         
         <div>
-          MOF Net (selection)
+          MOF Net
           <input id="nets_option" class='form-control locksMetrics' list = 'nets_list' onmousedown="value = '';" />
-
         </div>
 
         <!-- Default nets -->
@@ -176,38 +166,63 @@ Then, to open the website, run python app.py in the terminal
           <!-- Defined near the end of the Javascript section below -->
         </datalist>
 
-        <button class='btn btn-primary' id='generate' type="button">Make bb-generated MOF</button>
-        <button class='btn btn-primary' id='download_generated' type="button">Download bb-generated MOF</button>
-
+        <button class='btn btn-primary' id='generate' type='button'>Make bb-generated MOF</button>
+        <button class='btn btn-primary' id='download_generated' type='button'>Download bb-generated MOF</button>
 
 
       <div style="margin-top:1cm;"></div>
         <!-- Button for uploading MOF cif file -->
-        <button class='btn btn-primary' id='upload' type="button">Upload MOF cif file</button>
+        <button class='btn btn-primary' id='upload' type='button'>Upload MOF cif file</button>
 
         <!-- Button for getting MOF components for visualization  -->
         <button class='btn btn-primary' id='get_components' type='button'>Get MOF components</button>
 
         <!-- Button for predicting solvent removal stability of MOF -->
-        <button class='btn btn-primary' id='predict_s' type="button">Predict stability upon solvent removal</button> <!-- Gianmarco Terrones addition -->
+        <button class='btn btn-primary' id='predict_s' type='button'>Predict stability upon solvent removal</button>
+
         <!-- Button for predicting thermal stability of MOF -->
-        <button class='btn btn-primary' id='predict_t' type="button">Predict thermal stability</button> <!-- Gianmarco Terrones addition -->
-        <!-- Button for plotting the distribution of thermal stabilities of MOFs, and where the loaded MOF lies -->
-        <!-- <button class='btn btn-primary' id='plot_t' type="button">Plot thermal stability distribution</button> --> <!-- Gianmarco Terrones addition -->
+        <button class='btn btn-primary' id='predict_t' type='button'>Predict thermal stability</button> 
 
       </div>
     </div>
-    <!-- Empty spot where the MOF prediction text is placed. -->
+
+    <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
     <div class='row' style='margin-top: 0.5cm;'>
         <b> Status messages and MOF predictions </b>
-        <div class='col-12' id='upload_status'></div> <!-- Gianmarco Terrones addition -->
-        <div class='col-12' id='status_visualization'></div> <!-- Gianmarco Terrones addition -->
-        <div class='col-12' id='solvent_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
-        <div class='col-12' id='thermal_stability_prediction'></div> <!-- Gianmarco Terrones addition -->
-        <div class='col-12' id='thermal_stability_percentile'></div> <!-- Gianmarco Terrones addition -->
-        <div class='col-12' id='loading'></div>
+        <div class='col-12' id='upload_status'></div> 
+        <div class='col-12' id='status_visualization'></div> 
+        <div class='col-12' id='solvent_stability_prediction'></div> 
+        <div class='col-12' id='thermal_stability_prediction'></div> 
+        <div class='col-12' id='thermal_stability_percentile'></div> 
         <div class='col-12' id='chart'></div>
-        <div class='col-12' id='tga_plot'></div>
+        <div class='col-12' id='currently_visualized'></div> 
+
+        <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN.</p>
+
+        <div class = 'col-6'>
+        Solvent removal stability ANN nearest neighbors in latent space
+        <select class='form-control' id='solvent_neighbors'>
+        </select>
+
+        <button class='btn btn-primary' id='s_neighbor' type='button'>Show solvent neighbor info</button> 
+        <button class='btn btn-primary' id='download_s_neighbor' type='button'>Download solvent neighbor info</button> 
+        <button class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize solvent neighbor</button> 
+        <button class='btn btn-primary' id='comp_s_neighbor' type='button'>Get solvent neighbor components</button> 
+        <p id='s_neighbor_info'></p>
+        </div>
+
+        <div class = 'col-6'>
+        Thermal stability ANN nearest neighbors in latent space
+        <select class='form-control' id='thermal_neighbors'>
+        </select>
+
+        <button class='btn btn-primary' id='t_neighbor' type='button'>Show thermal neighbor info</button> 
+        <button class='btn btn-primary' id='download_t_neighbor' type='button'>Download thermal neighbor info</button> 
+        <button class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize thermal neighbor</button> 
+        <button class='btn btn-primary' id='comp_t_neighbor' type='button'>Get thermal neighbor components</button> 
+        <p id='t_neighbor_info'></p>
+        <div class='col-6' id='tga_plot'></div>
+        </div>
 
     </div>
 
@@ -221,12 +236,13 @@ Then, to open the website, run python app.py in the terminal
       <button class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
       <button class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
       <button class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
-
     </div>
 
     <div class='col-lg-6' style='margin-top: 0.5cm;'>
+      <p> Can display MOF's linkers and sbus after clicking the Get MOF Components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
 
-      <p> Can display MOF's linkers and sbus after clicking the Get MOF Components button. Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
+      <div id='comp_MOF'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+
       <div>
         Linkers
         <select class='form-control' id='linker'>
@@ -240,15 +256,10 @@ Then, to open the website, run python app.py in the terminal
 
       <button class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
 
-      <div class='col-12' id='component_SMILES'></div> <!-- Gianmarco Terrones addition -->
-
+      <div class='col-12' id='component_SMILES'></div>
     </div>
-
   </div>
-
 </div>
-
-
 
 
 
@@ -263,18 +274,23 @@ Then, to open the website, run python app.py in the terminal
 </div>
 
 <!-- For cif file upload -->
- <input id="fileinput" type="file" name="fileinput" style="display:none"/>  <!-- Gianmarco Terrones addition -->
-<!-- This will never display anything. Just used to store a MOF cif file if the button "Upload MOF file" is used -->
+ <input id="file_input" type="file" name="file_input" style="display:none"/>  
+<!-- This will never display anything. Just used to store a MOF cif file if the button "Upload MOF file" is used. -->
 
 <!-- For example MOF file -->
-<p id="exampleholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
+<p id="example_holder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used. -->
 
 <!-- For building block-generated MOF file -->
-<p id="bbgMOFholder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used -->
-
+<p id="bbg_MOF_holder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used. -->
 
 <!-- For MOF components (xyz file text) -->
-<p id="componentsholder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used TODO -->
+<p id="components_holder"> </p> <!-- This will never display anything. Just used to store components if the button "Get MOF components" is used. -->
+
+<!-- For solvent removal stability ANN nearest neighbors -->
+<p id="solvent_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Predict stability upon solvent removal" is used. -->
+
+<!-- For thermal stability ANN nearest neighbors -->
+<p id="thermal_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Predict thermal stability" is used. -->
 
 </body>
 
@@ -282,10 +298,10 @@ Then, to open the website, run python app.py in the terminal
 
 <!-- Begin JavaScript section -->
 <script>
-  // lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization
+  // Lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization.
 
-  // beginning of section with a lot of copied code
-
+  // ***** Beginning of section with a lot of copied code from the Snurr group's GitHub. *****
+  // With some modifications for our purposes, specifically in the handleInput function. Also, the OOM message
 
   var stage;
 
@@ -421,25 +437,73 @@ Then, to open the website, run python app.py in the terminal
     return lines.join('.');
   }
 
-  handleInput = function() {
-    console.log('Check D')
-    if (document.getElementById("fileinput").files[0] !== undefined) {
-      console.log('Check E')
-      console.log(document.getElementById("fileinput").files[0])
-      console.log(document.getElementById("fileinput").files[0] !== undefined)
-      var ciffile = document.getElementById("fileinput").files[0];
-    }
-    else if (document.getElementById("exampleholder").value !== null) {
-      console.log('Check F')
-      var ciffile = document.getElementById("exampleholder").value;
-    }
-    else {
-      console.log('Check G')
-      var ciffile = document.getElementById('bbgMOFholder').value;
-    }
-        
+  handleInput = function(s_neighbor, t_neighbor) {
 
-    
+    // s_neighbor and t_neighbor are booleans, indicate if we are visualizing a neighbor
+    // if not, default to visualize the MOF that is queued up
+
+    if (s_neighbor) { // In this case, want to visualize the solvent stability ANN neighbor
+      console.log('Check A')
+
+      // grab the current solvent neighbor MOF cif file
+
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      console.log(my_neighbor)
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var ciffile = new File([blob], "solvent_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+        handleVisualization(ciffile)
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
+
+    }
+    else if (t_neighbor) { // In this case, want to visualize the thermal stability ANN neighbor
+
+      // grab the current solvent neighbor MOF cif file
+
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var ciffile = new File([blob], "thermal_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+        handleVisualization(ciffile)
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
+
+    }
+    else { // Visualize the queued up MOF (either the default MOF, the uploaded MOF, or the building block MOF)
+      // Code elsewhere in this file makes it so only one of the three will be available, if any of them are available
+
+      if (document.getElementById("file_input").files[0] !== undefined) {
+        var ciffile = document.getElementById("file_input").files[0];
+      }
+      else if (document.getElementById("example_holder").value !== null) {
+        var ciffile = document.getElementById("example_holder").value;
+      }
+      else {
+        var ciffile = document.getElementById('bbg_MOF_holder').value;
+      }
+    }
+
+    handleVisualization(ciffile)
+  }
+
+  handleVisualization = function(ciffile) {
     //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
     var cifreader = new FileReader();
     cifreader.onload = function(event) {
@@ -611,13 +675,16 @@ Then, to open the website, run python app.py in the terminal
   window.onerror = function(event) {
     Module.setStatus('Exception thrown in visualization, see JavaScript console and refresh page (refreshing fixes the OOM, or out of memory, error).');
     //spinnerElement.style.display = 'none';
+
+    $('#currently_visualized').text(''); // clear the message about which MOF is visualized if OOM occurs
+
     Module.setStatus = function(text) {
       if (text) Module.printErr('[post-exception status] ' + text);
     };
 
   };
 
-  // end of section with a lot of copied code
+  // ***** End of section with a lot of copied code. *****
 
 
   $(function() {
@@ -629,114 +696,182 @@ Then, to open the website, run python app.py in the terminal
     let component_viewer = $3Dmol.createViewer( element, config );
     data = {};
 
-    // Reset zoom level
+    // Reset zoom level.
     $('#reset').click(function() {
       component_viewer.zoomTo();
     })
 
-
-    // Upload MOF cif file  <!-- Gianmarco Terrones addition -->
+    // Upload MOF cif file.  
     $(function() {
       $('#upload').on('click', function() { // button triggers upload
-        $('#fileinput').trigger('click'); // OS file selection
+        $('#file_input').trigger('click'); // OS file selection
       });
     });
 
-
-    // Used for ensuring that only .cif files are uploaded  <!-- Gianmarco Terrones addition -->
+    // Used for ensuring that only .cif files are uploaded.  
     function getExtension(filename) {
       var parts = filename.split('.');
       return parts[parts.length - 1];
     }
 
-    // Used for ensuring that only .cif files are uploaded   <!-- Gianmarco Terrones addition -->
+    // Used for ensuring that only .cif files are uploaded.
     function isCif(filename) {
       var ext = getExtension(filename);
       return ext == 'cif';
     }
 
-    // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks
+    // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
     function renew(action) { // something else was already called reset, so we're calling this renew
         // action will be either 'example', 'input', or 'bb'
         if (action != 'example') {
-          document.getElementById('exampleholder').value = null; // clears example cif
+          document.getElementById('example_holder').value = null; // clears example cif
         }
         else if (action != 'input') {
-          document.getElementById('fileinput').value = null; // clearing any cifs loaded by the user
+          document.getElementById('file_input').value = null; // clearing any cifs loaded by the user
         }
         else if (action != 'bb') {
-          document.getElementById('bbgMOFholder').value = null; // clearing bb-generated MOFs holder
+          document.getElementById('bbg_MOF_holder').value = null; // clearing bb-generated MOFs holder
         }
-
-
 
         // clearing previous predictions
         $('#solvent_stability_prediction').text('');
         $('#thermal_stability_prediction').text('');
         $('#thermal_stability_percentile').text('');
 
-        $('#loading').text('');
+        // Clearing everything in the Status messages and MOF predictions section of the website, and the holders. Also clearing SMILES strings of components.
+        $('#currently_visualized').text('');
         $('#upload_status').text(''); // now nothing is uploaded
         $('#chart').text('');
         $('#tga_plot').text('');
-        document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
-        document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
+        $('#s_neighbor_info').text('');
+        $('#t_neighbor_info').text('');
+        $('#comp_MOF').text('')
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
+        document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
+        document.getElementById('solvent_neighbors_holder').value = undefined
+        document.getElementById('thermal_neighbors_holder').value = undefined
+        document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
 
+        // Clearing visualizations and dropdowns.
         clearViewer(stage); // no MOF is displayed in the visualizer now
         component_viewer.clear(); // likewise, clear component visualizer
-        clear_component_dropdowns();
+        clear_component_dropdowns(); 
+        clear_neighbor_dropdowns(); // clear the nearest neighbor dropdowns
 
-        // re-display messages in the two visualizers
+        // Re-display messages in the two visualizers.
         document.getElementById('viewportnote').style.display = 'block';
         document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
         document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
-
     }
 
-    $("#fileinput").change(function () { // once file has been uploaded   <!-- Gianmarco Terrones addition -->
+    // This function triggers once the user uploads a file.
+    $("#file_input").change(function () { 
         renew('input');
 
-        // check if uploaded file is a .cif
+        // Check if uploaded file is a .cif.
         if (! isCif(this.value)) { // if the uploaded file is not a cif
             this.value = null; // clear the non-cif file
             alert("Must be a cif file.");
             return; // if not a cif, doesn't continue     
         }
 
-        let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
+        let myFile = document.getElementById('file_input').files[0]; // the uploaded file
         $('#upload_status').text('File uploaded: ' + myFile.name);
-
     });
 
+    // This function triggers when someone clicks the Visualize MOF button.
     $("#visualize").on('click', function() {
-        let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-        let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
-        let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
+        let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+        let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
+        let myFile3 = document.getElementById('bbg_MOF_holder').value; // the generated MOF, if Make bb-generated MOF has been used
 
         // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
         if (myFile == null && myFile2 == null && myFile3 == null) {
-          alert("Must upload a cif file first.");
+          alert("Must upload/generate a cif file first.");
           return;
         }
 
-        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // based on NaX.cif
+        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
-        handleInput(); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+        handleInput(false, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
-        $('#loading').text('');
-        $('#chart').text('');
+        var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+        name = name.split(' ');
+        name = name.slice(-1)[0]; // getting the last element of the array
+        if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+          name = 'exampleMOF'
+        } 
+
+        message = 'Currently visualized MOF: '
+        message = message + name
+
+        $('#currently_visualized').text(message);
     })
 
-    // Generate solvent removal stability prediction
-    $('#predict_s').click(function() {  // <!-- Gianmarco Terrones addition -->
-      // check if a cif is uploaded
-      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
-      let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
+    // This function triggers when someone clicks the Visualize solvent neighbor button. 
+    $("#visualize_s_neighbor").on('click', function() {
 
+        // Ensure there are neighbors to display information on
+        if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+          alert('Must make solvent removal stability prediction first.');
+          return;
+        }
+
+        if (document.getElementById('solvent_neighbors_holder').value == 1) {
+          alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+          return;
+        }
+
+        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
+
+        document.getElementById("viewportnote").innerHTML = "Loading visualization...";
+
+        handleInput(true, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+
+        my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+        message = 'Currently visualized MOF: '
+        message = message + my_neighbor
+
+        $('#currently_visualized').text(message);
+    })
+
+    // This function triggers when someone clicks the Visualize thermal neighbor button. 
+    $("#visualize_t_neighbor").on('click', function() {
+
+        // Ensure there are neighbors to display information on
+        if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+          alert('Must make thermal stability prediction first.');
+          return;
+        }
+
+        if (document.getElementById('thermal_neighbors_holder').value == 1) {
+          alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+          return;
+        }
+
+        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
+
+        document.getElementById("viewportnote").innerHTML = "Loading visualization...";
+
+        handleInput(false, true); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+
+        my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+        message = 'Currently visualized MOF: '
+        message = message + my_neighbor
+
+        $('#currently_visualized').text(message);
+    })
+
+    // Generate solvent removal stability prediction when the Predict stability upon solvent removal button is clicked.
+    $('#predict_s').click(function() {
+      // check if a cif is uploaded
+      let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+      let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
+      let myFile3 = document.getElementById('bbg_MOF_holder').value; // the generated MOF, if Make bb-generated MOF has been used
 
       // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
@@ -759,52 +894,108 @@ Then, to open the website, run python app.py in the terminal
         $.post("/predict_solvent_stability", JSON.stringify(result)).done(
             function(response) {
 
-                  if (response == 'FAILED') { // (!response.ok) || 
+                  if (response == 'FAILED') { 
                       alert('Failed to featurize')
-                      //$('#solvent_stability_prediction').text('Solvent stability prediction failed.');
-                    return; // Do not update solvent stability prediction if prediction failed
+                    return; // Do not update solvent stability prediction if prediction failed.
                   }
 
-                  // var result = JSON.parse(response);
-                  // console.log('check Q')
-                  // console.log(result)
-                  // console.log(result.sbu_0)
+                  if (! response['in_train']) { // a prediction was made
+                    var prediction = response['prediction']
 
-                  console.log('check Q')
-                  console.log(response)
+                    // preparing the human-interpretable solvent removal stability prediction
+                    if (prediction <= 0.2) {
+                      verdict = 'Very confident the MOF is unstable upon solvent removal.';
+                      my_color = '#ffad97'
+                    }
+                    else if (prediction <= 0.4) {
+                      verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
+                      my_color = '#ffcd97'
+                    }
+                    else if (prediction <= 0.5) {
+                      verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
+                      my_color = '#fffa97'
+                    }
+                    else if (prediction <= 0.6) {
+                      verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
+                      my_color = '#fffa97'
+                    }
+                    else if (prediction <= 0.8) {
+                      verdict = 'Fairly confident the MOF is stable upon solvent removal.';
+                      my_color = '#e7ff97'
+                    }
+                    else {
+                      verdict = 'Very confident the MOF is stable upon solvent removal.';
+                      my_color = '#90ee90'
+                    }
 
-                  // preparing the human-interpretable solvent removal stability prediction
-                  if (response <= 0.2) {
-                    verdict = 'Very confident the MOF is unstable upon solvent removal.';
+                    $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + prediction.toString() + '. ' + verdict ); 
+
+                    stability_field = document.getElementById('solvent_stability_prediction');
+                    setColor(stability_field, my_color) // color background based on the prediction
+
+                    // Now that the prediction has been displayed, can move on to the neighbors display.
+                    var neighbor_names = response['neighbor_names']
+                    var neighbor_distances = response['neighbor_distances'] 
+
+                    // Convert these arrays into a dictionary called neighbors.
+                    var neighbors = {}
+                    for (i = 0; i < neighbor_names.length; i++) {
+                      neighbors[neighbor_names[i]] = neighbor_distances[i]
+                    }
+
+                    // Storing the information on the neighbors.
+                    document.getElementById('solvent_neighbors_holder').value = neighbors;
+
+                    // Populating the solvent neighbors dropdown.
+                    var solvent_dropdown = document.getElementById("solvent_neighbors");
+
+                    // clear dropdown
+                    var length = solvent_dropdown.options.length;
+                    for (i = length-1; i >= 0; i--) {
+                      solvent_dropdown.options[i] = null;
+                    }
+
+                    // Populating the solvent neighbors dropdown.
+                    for (i = 0; i < neighbor_names.length; i++) {
+                      var option = document.createElement('option');
+                      option.text = neighbor_names[i];
+                      solvent_dropdown.add(option);
+                    }
                   }
-                  else if (response <= 0.4) {
-                    verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
-                  }
-                  else if (response <= 0.5) {
-                    verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
-                  }
-                  else if (response <= 0.6) {
-                    verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
-                  }
-                  else if (response <= 0.8) {
-                    verdict = 'Fairly confident the MOF is stable upon solvent removal.';
-                  }
-                  else {
-                    verdict = 'Very confident the MOF is stable upon solvent removal.';
+                  else { // requested MOF was in the training data
+                    
+                    // Storing information indicating that a prediction was made, but no neighbors are avaialable
+                    document.getElementById('solvent_neighbors_holder').value = 1
+
+                    stability_field = document.getElementById('solvent_stability_prediction');
+                   
+                    if (response['truth'] == 1) {
+                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be stable upon solvent removal.');
+                      setColor(stability_field, '#90ee90') // color background
+                    }
+                    else {
+                      $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be unstable upon solvent removal.'); 
+                      setColor(stability_field, '#ffad97') // color background 
+                    }
+
                   }
 
-                  $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + response.toString() + '. ' + verdict ); 
             });
       })
     });
 
-    // Generate thermal stability prediction
-    $('#predict_t').click(function() {  // <!-- Gianmarco Terrones addition -->
-      // check if a cif is uploaded
-      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
-      let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
 
+    function setColor(element, color)
+    {
+      element.style.backgroundColor = color;
+    }
+
+    // Generate thermal stability prediction when the Predict thermal stability button is clicked.
+    $('#predict_t').click(function() {
+      // check if a cif is uploaded
+      let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+      let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
+      let myFile3 = document.getElementById('bbg_MOF_holder').value; // the generated MOF, if Make bb-generated MOF has been used
 
       // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
@@ -824,51 +1015,123 @@ Then, to open the website, run python app.py in the terminal
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
 
-
       $.post("/predict_thermal_stability", JSON.stringify(result)).done(
           function(response) {
 
-                if (response == 'FAILED') { // (!response.ok) || 
+                if (response == 'FAILED') { 
                     alert('Failed to featurize')
-                    //$('#solvent_stability_prediction').text('Solvent stability prediction failed.');
-                  return; // Do not update solvent stability prediction if prediction failed
+                  return; // Do not update solvent stability prediction if prediction failed.
                 }
 
-                console.log('check R')
-                console.log(response)
+                if (! response['in_train']) { // a prediction was made
+                  prediction = response['prediction'];
+                  $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
 
-                prediction = response.toString();
-                $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
+                  $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
+                    $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
 
-                $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
-                  $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-                })   
+                    percentile_field = document.getElementById('thermal_stability_percentile');
+                    if (response >= 80) {
+                      setColor(percentile_field, '#90ee90')
+                    }
+                    else if (response >= 60) {
+                      setColor(percentile_field, '#e7ff97')
+                    }
+                    else if (response >= 40) {
+                      setColor(percentile_field, '#fffa97')
+                    }
+                    else if (response >= 20) {
+                      setColor(percentile_field, '#ffcd97')
+                    }
+                    else {
+                      setColor(percentile_field, '#ffad97')
+                    }
+                  })   
 
-                $.post("/plot_thermal_stability", JSON.stringify(prediction)).done(function(response) { // making the thermal breakdown temperatures plot
-                  $('#chart').html(response);
-                }) 
+                  myDict = {'prediction': true, 'temperature': prediction}
+                  $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
+                    $('#chart').html(response);
+                  }) 
 
-                $.post("/TGA_plot").done(function(response) { // TODO edit later, once have latent space plot implemented
-                  $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
-                })
+                  // Now that the prediction has been displayed, can move on to the neighbors display.
+                  var neighbor_names = response['neighbor_names']
+                  var neighbor_distances = response['neighbor_distances'] 
 
+                  // Converting these arrays into a dictionary called neighbors.
+                  var neighbors = {}
+                  for (i = 0; i < neighbor_names.length; i++) {
+                    neighbors[neighbor_names[i]] = neighbor_distances[i]
+                  }
+
+                  // Storing the information on the neighbors.
+                  document.getElementById('thermal_neighbors_holder').value = neighbors;
+
+                  // Populating the thermal neighbors dropdown.
+                  var thermal_dropdown = document.getElementById("thermal_neighbors");
+
+                  // clear dropdown
+                  var length = thermal_dropdown.options.length;
+                  for (i = length-1; i >= 0; i--) {
+                    thermal_dropdown.options[i] = null;
+                  }
+
+                  // Populating the thermal neighbors dropdown.
+                  for (i = 0; i < neighbor_names.length; i++) {
+                    var option = document.createElement('option');
+                    option.text = neighbor_names[i];
+                    thermal_dropdown.add(option);
+                  }
+                }
+
+                else { // requested MOF was in the training data
+                    // Storing information indicating that a prediction was made, but no neighbors are avaialable
+                    document.getElementById('thermal_neighbors_holder').value = 1
+                   
+                    $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
+
+                    $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function(response) {
+                      $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+
+                      console.log('check check')
+                      console.log(response)
+                      console.log(response >= 60)
+
+                      percentile_field = document.getElementById('thermal_stability_percentile');
+                      if (response >= 80) {
+                        setColor(percentile_field, '#90ee90')
+                      }
+                      else if (response >= 60) {
+                        setColor(percentile_field, '#e7ff97')
+                        console.log('hit')
+                      }
+                      else if (response >= 40) {
+                        setColor(percentile_field, '#fffa97')
+                      }
+                      else if (response >= 20) {
+                        setColor(percentile_field, '#ffcd97')
+                      }
+                      else {
+                        setColor(percentile_field, '#ffad97')
+                      }
+                  })   
+
+                    myDict = {'prediction': false, 'temperature': response['truth']}
+                    $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
+                      $('#chart').html(response);
+                    }) 
+                }
           });
       })
     });
 
 
-    // Generate MOF from building blocks
+    // Generate MOF from building blocks when the Make bb-generated MOF button is clicked.
     $('#generate').click(function() {
       renew('bb');
 
-      my_linker = $('#linker_option').val() // Check which linker is selected in the linker building block construction dropdown 
-      my_sbu = $('#sbu_option').val() // Check which sbu is selected in the sbu building block construction dropdown 
-      my_net = $('#nets_option').val() // Check which net is selected in the net building block dropdown 
-
-      console.log('Check G')
-      console.log(my_linker)
-      console.log(my_sbu)
-      console.log(my_net)
+      my_linker = $('#linker_option').val() // Check which linker is selected in the linker building block construction dropdown.
+      my_sbu = $('#sbu_option').val() // Check which sbu is selected in the sbu building block construction dropdown.
+      my_net = $('#nets_option').val() // Check which net is selected in the net building block dropdown.
 
       if (my_linker === '') {
         alert("Must choose a linker building block first.");
@@ -876,6 +1139,10 @@ Then, to open the website, run python app.py in the terminal
       }
       else if (my_sbu === '') {
         alert("Must choose an sbu building block first.");
+        return;  
+      }
+      else if (my_net === '') {
+        alert("Must choose a net first.");
         return;  
       }
 
@@ -889,7 +1156,7 @@ Then, to open the website, run python app.py in the terminal
 
             if (response == 'FAILED') { 
               alert('Failed to generate MOF')
-              document.getElementById('bbgMOFholder').value = undefined; // clearing the value
+              document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
               return; 
             }
 
@@ -897,51 +1164,73 @@ Then, to open the website, run python app.py in the terminal
 
             var name = result.mof_name;
 
-            console.log('Check H')
-            console.log(name)
+            // The function corresponding to @app.route('/get_bb_generated_MOF', methods=['POST']) on the backend will make a cif file of the building block generated MOF if successful, using ToBaCCo 3.0 code. Files are made in the temp_file_creation/tobacco_3.0/output_cifs folder.
 
-            // the function corresponding to @app.route('/get_bb_generated_MOF', methods=['POST']) on the backend will make a cif file of the building block generated MOF if successful, using ToBaCCo 3.0 code. Files are made in output_cifs folder
+            // grab user ID, then feed that into the fetch operation
+            // fetch was having issues with the ID key of session on the backend, so this is a workaround
+            $.get("/get_ID").done(
+              function(response) {
+                my_ID = response 
+                console.log('ID check')
+                console.log(response)
 
-            fetch('http://localhost:8000/temp_file_creation/tobacco_3.0/output_cifs/primitive_' + name).then(response => { // grabbing the MOF from local host
-              if(!response.ok) { // catching 404 and other issues
-                document.getElementById('bbgMOFholder').value = undefined; // clearing the value
-                throw Error(response.statusText);
-              } 
-                return response.blob();
-              }).then(function(blob) { 
-                var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
-                document.getElementById('bbgMOFholder').value = myFile; //bbMOF
+                fetch('http://localhost:8000/bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
+                  if(!response.ok) { // catching 404 and other issues
+                    document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
+                    throw Error(response.statusText);
+                  } 
+                    return response.blob();
+                  }).then(function(blob) { 
+                    var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
+                    document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
 
-                $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
-
-
-
-              }).catch(error => {
-                $('#upload_status').text('Failed to upload example MOF');
-                console.error('There has been a problem with your fetch operation:', error);
-              })     
-
-
-
+                    $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+                  }).catch(error => {
+                    $('#upload_status').text('Failed to load');
+                    console.error('There has been a problem with your fetch operation:', error);
+                  })    
+                })
+ 
         });
     });  
 
+    // Triggers when the Download bb-generated MOF button is clicked.
     $('#download_generated').click(function() {
-      if (document.getElementById('bbgMOFholder').value == undefined) {
-        alert('Must generate MOF with building blocks first, using Make bb-generated MOF button'); 
+      if (document.getElementById('bbg_MOF_holder').value == undefined) {
+        alert('Must generate MOF with building blocks first, using Make bb-generated MOF button.'); 
         return;
       }
 
-      var myFile = document.getElementById('bbgMOFholder').value;
-      var name = document.getElementById('upload_status').innerHTML;
+      var myFile = document.getElementById('bbg_MOF_holder').value;
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
 
-      window.location = '/bbcif/'.concat(name);
-      // assuming primitive is same as normal file
+      $.get("/get_ID").done(
+        function(response) {
+          my_ID = response 
+          window.location = '/bbcif/' + name + '~' + my_ID // get file from the temp_file_creation_USERID/tobacco_3.0/output_cifs folder
+          // assuming primitive is same as normal file
+
+          fetch('http://localhost:8000/bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
+            if(!response.ok) { // catching 404 and other issues
+              document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
+              throw Error(response.statusText);
+            } 
+              return response.blob();
+            }).then(function(blob) { 
+              var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
+              document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
+
+              $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+            }).catch(error => {
+              $('#upload_status').text('Failed to load');
+              console.error('There has been a problem with your fetch operation:', error);
+            })    
+        })
     })
 
-      // Load example MOF
+    // Load example MOF when the Load example MOF button is clicked.
     $('#load').click(function() {
 
       fetch('http://localhost:8000/mof_examples/jz4002345_si_002_primitive.cif').then(response => { // grabbing the example MOF from local host
@@ -952,9 +1241,8 @@ Then, to open the website, run python app.py in the terminal
         }).then(function(blob) {
           renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
-          document.getElementById('exampleholder').value = myFile; // setting the value of exampleholder
+          document.getElementById('example_holder').value = myFile; // setting the value of example_holder
           $('#upload_status').text('File uploaded: Example MOF cif file (UiO-66 from https://doi.org/10.1021/jz4002345, primitive cell attained via molSimplify)'); // indicating that the example MOF has been uploaded
-
 
         }).catch(error => {
           $('#upload_status').text('Failed to upload example MOF');
@@ -963,22 +1251,20 @@ Then, to open the website, run python app.py in the terminal
     });
 
 
-    // Get MOF linkers and sbus
+    // Get MOF linkers and sbus when the Get MOF components button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function() {
-      // check if a cif is uploaded
-      let myFile = document.getElementById('fileinput').files[0]; // the uploaded file
-      let myFile2 = document.getElementById('exampleholder').value; // the example MOF, if Load example MOF has been used
-      let myFile3 = document.getElementById('bbgMOFholder').value; // the generated MOF, if Make bb-generated MOF has been used
+      console.log('print check A')
 
-      console.log('check A0')
+      // check if a cif is uploaded
+      let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+      let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
+      let myFile3 = document.getElementById('bbg_MOF_holder').value; // the generated MOF, if Make bb-generated MOF has been used
 
       // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
       if (myFile==undefined) {
-        console.log('check A')
         myFile = myFile2;
         if (myFile2 == undefined) {
-          console.log('check B')
           myFile = myFile3;
           if (myFile3 == undefined) {
             alert("Must upload/generate a cif file first.");
@@ -987,92 +1273,274 @@ Then, to open the website, run python app.py in the terminal
         }
       }
 
+      console.log('print check B')
+
       // myFile.text() is a promise
       myFile.text().then(function(result){
+
+        console.log('print check B2')
+
         // result is the text of the loaded .cif file
         $.post("/get_components", JSON.stringify(result)).done(
           function(response) {
 
+            console.log('print check C')
+
             if (response == 'FAILED') { 
-              alert('Failed to featurize')
-              document.getElementById('componentsholder').value = undefined; // clearing the value, so no component visualization is possible
+              alert('Failed to featurize.')
+              document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
               return; 
             }
 
             var result = JSON.parse(response);
-            console.log('check Q')
-            console.log(typeof result)
-            console.log(result)
-            console.log(result.sbu_0_SMILES)
-
 
             clear_component_dropdowns();
-            var linker_dropdown = document.getElementById("linker");
-            var sbu_dropdown = document.getElementById("sbu");
+            var linker_dropdown = document.getElementById('linker');
+            var sbu_dropdown = document.getElementById('sbu');
 
             num_linkers = result.total_linkers;
             num_sbus = result.total_sbus;
 
-            // populating linker dropdown
+            // Populating the linker dropdown.
             for (i = 1; i <= num_linkers; i++) {
               var option = document.createElement('option');
               option.text = 'Linker ' + i.toString();
               linker_dropdown.add(option);
             }
 
-            // populating sbu dropdown
+            // Populating the sbu dropdown.
             for (i = 1; i <= num_sbus; i++) {
               var option = document.createElement('option');
               option.text = 'sbu ' + i.toString();
               sbu_dropdown.add(option);
             }
 
-            // storing the linker and sbu data
-            document.getElementById('componentsholder').value = result; //convert(result);
+            console.log('print check D')
+
+            // Storing the linker and sbu data.
+            document.getElementById('components_holder').value = result; 
+
+
+            var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+            name = name.split(' ');
+            name = name.slice(-1)[0]; // getting the last element of the array
+            if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+              name = 'exampleMOF'
+            } 
+
+            console.log('print check E')
+
+            $('#comp_MOF').text('MOF for which components are listed below: ' + name)
+
+            document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+            $('#component_SMILES').text('') // clear the SMILES text
+            component_viewer.clear(); // clear component visualizer
 
         });
       })
     });
+
+
+    // Get MOF linkers and sbus when the Get solvent neighbor components button is clicked.
+    // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
+    $('#comp_s_neighbor').click(function() {
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+        alert('Must make solvent removal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('solvent_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var myFile = new File([blob], "solvent_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+
+        // next, do the component breakdown
+
+        // myFile.text() is a promise
+        myFile.text().then(function(result){
+          // result is the text of the loaded .cif file
+          $.post("/get_components", JSON.stringify(result)).done(
+            function(response) {
+
+              if (response == 'FAILED') { 
+                alert('Failed to featurize.')
+                document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+                return; 
+              }
+
+              var result = JSON.parse(response);
+
+              clear_component_dropdowns();
+              var linker_dropdown = document.getElementById('linker');
+              var sbu_dropdown = document.getElementById('sbu');
+
+              num_linkers = result.total_linkers;
+              num_sbus = result.total_sbus;
+
+              // Populating the linker dropdown.
+              for (i = 1; i <= num_linkers; i++) {
+                var option = document.createElement('option');
+                option.text = 'Linker ' + i.toString();
+                linker_dropdown.add(option);
+              }
+
+              // Populating the sbu dropdown.
+              for (i = 1; i <= num_sbus; i++) {
+                var option = document.createElement('option');
+                option.text = 'sbu ' + i.toString();
+                sbu_dropdown.add(option);
+              }
+
+              // Storing the linker and sbu data.
+              document.getElementById('components_holder').value = result; 
+
+              $('#comp_MOF').text('MOF for which components are listed below: ' + my_neighbor)
+
+              document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+              $('#component_SMILES').text('') // clear the SMILES text
+              component_viewer.clear(); // clear component visualizer
+
+          });
+        })
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
+
+    });
     
+    // Get MOF linkers and sbus when the Get thermal neighbor components button is clicked.
+    // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
+    $('#comp_t_neighbor').click(function() {
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+        alert('Must make thermal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('thermal_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
+
+      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      if(!response.ok) { // catching 404 and other issues
+        throw Error(response.statusText);
+      } 
+        return response.blob();
+      }).then(function(blob) { 
+        var myFile = new File([blob], "thermal_neighbor.cif", {type: "", lastModified: Date.now()}) // making a cif file
+
+        // next, do the component breakdown
+
+        // myFile.text() is a promise
+        myFile.text().then(function(result){
+          // result is the text of the loaded .cif file
+          $.post("/get_components", JSON.stringify(result)).done(
+            function(response) {
+
+              if (response == 'FAILED') { 
+                alert('Failed to featurize.')
+                document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+                return; 
+              }
+
+              var result = JSON.parse(response);
+
+              clear_component_dropdowns();
+              var linker_dropdown = document.getElementById('linker');
+              var sbu_dropdown = document.getElementById('sbu');
+
+              num_linkers = result.total_linkers;
+              num_sbus = result.total_sbus;
+
+              // Populating the linker dropdown.
+              for (i = 1; i <= num_linkers; i++) {
+                var option = document.createElement('option');
+                option.text = 'Linker ' + i.toString();
+                linker_dropdown.add(option);
+              }
+
+              // Populating the sbu dropdown.
+              for (i = 1; i <= num_sbus; i++) {
+                var option = document.createElement('option');
+                option.text = 'sbu ' + i.toString();
+                sbu_dropdown.add(option);
+              }
+
+              // Storing the linker and sbu data.
+              document.getElementById('components_holder').value = result; 
+
+              $('#comp_MOF').text('MOF for which components are listed below: ' + my_neighbor)
+
+              document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+              $('#component_SMILES').text('') // clear the SMILES text
+              component_viewer.clear(); // clear component visualizer
+
+          });
+        })
+
+      }).catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      }) 
+
+    });
+
 
     function clear_component_dropdowns() { // clear dropdowns when upload new file
-      // clearing linker dropdown
-      var linker_dropdown = document.getElementById("linker");
+      // Clearing the linker dropdown.
+      var linker_dropdown = document.getElementById('linker');
       var length = linker_dropdown.options.length;
       for (i = length-1; i >= 0; i--) {
         linker_dropdown.options[i] = null;
       }
 
-      // clearing sbu dropdown
-      var sbu_dropdown = document.getElementById("sbu");
+      // Clearing the sbu dropdown.
+      var sbu_dropdown = document.getElementById('sbu');
       var length = sbu_dropdown.options.length;
       for (i = length-1; i >= 0; i--) {
         sbu_dropdown.options[i] = null;
       }
     }
 
+    // Triggers when the Only components with unique connectivites button (or the All components button) is clicked.
     $('#toggle_unique_components').click(function() {
 
       // Ensure there are components to visualize
-      if (document.getElementById('componentsholder').value == undefined) {
+      if (document.getElementById('components_holder').value == undefined) {
         alert('Must get MOF components first.');
         return;
       }
 
       clear_component_dropdowns();
 
-      // find the dropdowns
-      var linker_dropdown = document.getElementById("linker");
-      var sbu_dropdown = document.getElementById("sbu");
+      // Find the dropdowns.
+      var linker_dropdown = document.getElementById('linker');
+      var sbu_dropdown = document.getElementById('sbu');
 
-      if (document.getElementById('toggle_unique_components').textContent == 'Only components with unique connectivities') {
+      if (document.getElementById('toggle_unique_components').textContent == 'Only components with unique connectivities') { // Want only unique components.
         document.getElementById('toggle_unique_components').textContent = 'All components'; // cycle the button text on click
 
-        // getting the unique indices
-        unique_linker_indices = document.getElementById('componentsholder').value.unique_linker_indices;
-        unique_sbu_indices = document.getElementById('componentsholder').value.unique_sbu_indices;
+        // Getting the unique indices (used to determine which linkers/sbus are unique).
+        unique_linker_indices = document.getElementById('components_holder').value.unique_linker_indices;
+        unique_sbu_indices = document.getElementById('components_holder').value.unique_sbu_indices;
 
-        // populating linker dropdown
+        // Populating the linker dropdown.
         for (i in unique_linker_indices) {
           j = parseInt(i) + 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
           var option = document.createElement('option');
@@ -1080,7 +1548,7 @@ Then, to open the website, run python app.py in the terminal
           linker_dropdown.add(option);
         }
 
-        // populating sbu dropdown
+        // Populating the sbu dropdown.
         for (i in unique_sbu_indices) {
           j = parseInt(i) + 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
           var option = document.createElement('option');
@@ -1090,37 +1558,35 @@ Then, to open the website, run python app.py in the terminal
 
 
       }
-      else if (document.getElementById('toggle_unique_components').textContent == 'All components') {
+      else if (document.getElementById('toggle_unique_components').textContent == 'All components') { // Want all components.
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // cycle the button text on click
 
-        // getting the total number of linkers and sbus
-        num_linkers = document.getElementById('componentsholder').value.total_linkers;
-        num_sbus = document.getElementById('componentsholder').value.total_sbus;
+        // Getting the total number of linkers and sbus.
+        num_linkers = document.getElementById('components_holder').value.total_linkers;
+        num_sbus = document.getElementById('components_holder').value.total_sbus;
 
-        // populating linker dropdown
+        // Populating the linker dropdown.
         for (i = 1; i <= num_linkers; i++) {
           var option = document.createElement('option');
           option.text = 'Linker ' + i.toString();
           linker_dropdown.add(option);
         }
 
-        // populating sbu dropdown
+        // Populating the sbu dropdown.
         for (i = 1; i <= num_sbus; i++) {
           var option = document.createElement('option');
           option.text = 'sbu ' + i.toString();
           sbu_dropdown.add(option);
         }
-
       }
-
     })
 
 
-    // Visualize the linker after MOF components have been resolved
+    // Visualize the linker after MOF components have been resolved when the Visualize linker button is clicked.
     $('#visualize_linker').click(function() {
 
-      // Ensure there are components to visualize
-      if (document.getElementById('componentsholder').value == undefined) {
+      // Ensure there are components to visualize.
+      if (document.getElementById('components_holder').value == undefined) {
         alert('Must get MOF components first.');
         return;
       }
@@ -1130,8 +1596,8 @@ Then, to open the website, run python app.py in the terminal
       linker_number = parseInt(linker_number[1]); // gets the number
       linker_number = linker_number - 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
 
-      // getting xyz data
-      dictionary = document.getElementById('componentsholder').value;
+      // Getting xyz data.
+      dictionary = document.getElementById('components_holder').value;
       my_key = 'linker_' + linker_number;
 
       geometry = dictionary[my_key];  
@@ -1143,16 +1609,16 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.zoomTo();
       component_viewer.render();
 
-      // showing the SMILES string
+      // Showing the SMILES string.
       $('#component_SMILES').text('The currently visualized linker\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
     })
 
 
-    // Visualize the sbu after MOF components have been resolved
+    // Visualize the sbu after MOF components have been resolved when the Visualize sbu button is clicked.
     $('#visualize_sbu').click(function() {
 
-      // Ensure there are components to visualize
-      if (document.getElementById('componentsholder').value == undefined) {
+      // Ensure there are components to visualize.
+      if (document.getElementById('components_holder').value == undefined) {
         alert('Must get MOF components first.');
         return;
       }
@@ -1162,8 +1628,8 @@ Then, to open the website, run python app.py in the terminal
       sbu_number = parseInt(sbu_number[1]); // gets the number
       sbu_number = sbu_number - 1; // due to 1 vs 0 indexing; Aditya's code zero indexes, but for web display we 1 index
 
-      // getting xyz data
-      dictionary = document.getElementById('componentsholder').value;
+      // Getting xyz data.
+      dictionary = document.getElementById('components_holder').value;
       my_key = 'sbu_' + sbu_number;
 
       geometry = dictionary[my_key];
@@ -1175,53 +1641,234 @@ Then, to open the website, run python app.py in the terminal
       component_viewer.zoomTo();
       component_viewer.render();
 
-      // showing the SMILES string
-      $('#component_SMILES').text('The currently visualized sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
+      // Showing the SMILES string.
+      $('#component_SMILES').text('The currently visualized sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES']);
+    })
+
+    function clear_neighbor_dropdowns() { // clear dropdowns when upload new file
+      // Clearing solvent stability ANN nearest neighbors dropdown.
+      var solvent_dropdown = document.getElementById("solvent_neighbors");
+      var length = solvent_dropdown.options.length;
+      for (i = length-1; i >= 0; i--) {
+        solvent_dropdown.options[i] = null;
+      }
+
+      // Clearing thermal stability ANN nearest neighbors dropdown.
+      var thermal_dropdown = document.getElementById("thermal_neighbors");
+      var length = thermal_dropdown.options.length;
+      for (i = length-1; i >= 0; i--) {
+        thermal_dropdown.options[i] = null;
+      }
+    }
+
+    // Get information on a nearest neighbor in solvent removal stability ANN latent space when the Show solvent neighbor info button is clicked.
+    $('#s_neighbor').click(function() {
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+        alert('Must make solvent removal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('solvent_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      // Get the latent space distance from the information returned from the prediction.
+      dictionary = document.getElementById('solvent_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      // Grab the solvent stability flag and DOI from the appropriate Excel sheet with a POST request.
+      $.post("/solvent_neighbor_flag", JSON.stringify(my_neighbor)).done(
+        function(response) {
+          flag = response['flag'] 
+          if (flag == 1) {
+            document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+              + '<br />Experimentally observed to be stable upon solvent removal? Yes <br />Nearest neighbor DOI: ' 
+              + response['doi']; // <br /> for a new line in display
+          }
+          else {
+            document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+              + '<br />Experimentally observed to be stable upon solvent removal? No <br />Nearest neighbor DOI: '
+              + response['doi']; // <br /> for a new line in display
+          }
+      })
+    })
+
+
+    // Download the cif file of the nearest neighbor in solvent removal stability ANN latent space when the Download solvent neighbor info button is clicked. 
+    // Also download a .out file that contains information on the nearest neighbor.
+    $('#download_s_neighbor').click(function() {
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('solvent_neighbors_holder').value == undefined) {
+        alert('Must make solvent removal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('solvent_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+
+      // Making the txt file with information about the neighbor
+      // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
+      var dict = {}
+      dict['prediction_type'] = 'solvent'
+
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+        name = 'exampleMOF'
+      } 
+
+      dict['current_MOF'] = name
+      dict['selected_neighbor'] = my_neighbor
+
+      // Get the latent space distance from the information returned from the prediction.
+      dictionary = document.getElementById('solvent_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      dict['latent_space_distance'] = latent_distance
+
+      $.post("/neighbor_writer", JSON.stringify(dict)).done(
+        function(response) {
+          // I don't really care about the response, I just want download the .out file after it is written
+          window.location = '/neighbor_info/solvent__' + name + '__' + my_neighbor + '.out'
+          // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
+      })
+
+      setTimeout(function(){
+        window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
+      }, 1000); // the delay is to make it possible to download multiple files in the same function
+
+    })
+
+    // Get information on a nearest neighbor in thermal stability ANN latent space when the Show thermal neighbor info button is clicked.
+    $('#t_neighbor').click(function() {
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Ensure there are neighbors to display information on.
+      if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+        alert('Must make thermal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('thermal_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      // Get the latent space distance from the information returned from the prediction.
+      dictionary = document.getElementById('thermal_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }  
+
+      // Grab the thermal breakdown temperature from the appropriate Excel sheet with a POST request.
+      $.post("/thermal_neighbor_T", JSON.stringify(my_neighbor)).done(
+        function(response) {
+            document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: ' 
+              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+              + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
+              + '&#8451 <br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
+              + response['doi']; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+        })
+
+      $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { 
+        $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
+      })      
+    })
+
+
+    // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the Download thermal neighbor info button is clicked. 
+    // Also download a .out file that contains information on the nearest neighbor.
+    $('#download_t_neighbor').click(function() {
+
+      // Ensure there are neighbors to display information on
+      if (document.getElementById('thermal_neighbors_holder').value == undefined) {
+        alert('Must make thermal stability prediction first.');
+        return;
+      }
+
+      if (document.getElementById('thermal_neighbors_holder').value == 1) {
+        alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
+        return;
+      }
+
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+
+      // Making the txt file with information about the neighbor
+      // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
+      var dict = {}
+      dict['prediction_type'] = 'thermal'
+
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+        name = 'exampleMOF'
+      } 
+
+      dict['current_MOF'] = name
+      dict['selected_neighbor'] = my_neighbor
+
+      // Get the latent space distance from the information returned from the prediction.
+      dictionary = document.getElementById('thermal_neighbors_holder').value;
+      latent_distance = dictionary[my_neighbor];
+
+      if (latent_distance.charAt(0) == '.') { // If the latent distance starts with a decimal, add a zero in front of it
+       latent_distance = '0' + latent_distance; 
+      }
+
+      dict['latent_space_distance'] = latent_distance
+
+      $.post("/neighbor_writer", JSON.stringify(dict)).done(
+        function(response) {
+          // I don't really care about the response, I just want download the .out file after it is written
+          window.location = '/neighbor_info/thermal__' + name + '__' + my_neighbor + '.out'
+          // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
+      })
+
+      // setTimeout(function(){
+      //   console.log('Check Check Check')
+      //   $.post("/TGA_maker", JSON.stringify(my_neighbor)).done(
+      //     function(response){
+      //       console.log('Check Check Check 2')
+      //       window.location = '/neighbor_info/'.concat(my_neighbor.substring(0,6), '_simplified_TGA.png') // download the simplified TGA plot
+      //     })
+      // }, 500) // TODO if you ever use this code, consider that the 6 thing will not work for longer file names
+
+      setTimeout(function(){
+        window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
+      }, 1000); // the delay is to make it possible to download multiple files in the same function
 
     })
 
 
-    // Make a neural network prediction (the display text is defined in app.py)
-    // $('#predict').click(function() {
-    //   data.ox = $('#ox').val()
-    //   data.hfx = $('#hfx').val()
-    //   data.metal = $('#metal').val()
-    //   data.ax1 = $('#ligand').val()
-    //   data.ax2 = $('#ligand').val()
-    //   data.eq = $('#ligand').val()
-    //   data.spin = $('#spin').val()
-    //   $('#loading').html('loading...');
-    //   $.post("/nn_predict", JSON.stringify(data)).done(function(response){
-    //     data.sseplot = response.result; // Set the sseplot value used for plotting
-    //     if (data.sseplot != 'Error') {
-    //       unlockPlot();
-    //     }
-    //     $("#loading").html(response.resulttext);
-    //     document.getElementById('loading').scrollIntoView();
-    //     });
-    // });
 
-    // Define the behavior of the download button
-    $('#download').click(function() {
-      function download(filename, text) {
-          var element = document.createElement('a');
-          element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-          element.setAttribute('download', filename);
-
-          element.style.display = 'none';
-          document.body.appendChild(element);
-
-          element.click();
-
-          document.body.removeChild(element);
-      }
-      download('mol.xyz', data.geometry);
-    });
-
-    // Start up page by virtually clicking the "Load example MOF" button
+    // Start up page by virtually clicking the Load example MOF button
     $('#load').click();
 
-    // Below: populate the linkers, sbus, and net dropdowns in the building block section
+    // Below: populate the linkers, sbus, and net dropdowns in the building block section.
     // I run a script (tobacco_3.0/scrap_cifs.py) in the tobacco_3.0/edges_database folder, the tobacco_3.0/nodes_database folder, and the tobacco_3.0/template_database folder to get a nice array form of all of the available files. I then paste the array into the appropriate places below (for example, my_linkers = ARRAYOFOPTIONS)
 
     // Populating the linkers in the building block section
@@ -1235,9 +1882,9 @@ Then, to open the website, run python app.py in the terminal
       options += '<option value="' + my_linkers[i] + '" />';
     }
 
-    document.getElementById('linkers_list').innerHTML = options;
+    document.getElementById('linkers_list').innerHTML = options; // populating the linkers dropdown
 
-    // Next, populating the nodes in the building block section
+    // Next, populating the nodes in the building block section.
 
     var my_sbus = new Array();
     my_sbus = ['12c_Ce_1_Ch', '12c_Eu_1_Ch', '12c_Mn_1_Ch', '12c_Tb_1_Ch', '12c_Ti_1_Ch', '12c_Zr_1_Ch', '3c_B_Ch', '3c_Cu_imadazoline_Ch', '3c_pyrrole_Ch', '3c_triazine_Ch', '3c_uranyl', '4c_1anC_Ch', '4c_4B_fused_Ch', '4c_B_Ch', '4c_Cd_1_Ch', '4c_Cu_1_Ch', '4c_In_1_Ch', '4c_Ni_1_Ch', '4c_V_1_Ch', '4c_bicyclooctane_Ch', '4c_ethene_Ch', '4c_porphyrin_Ch', '4c_pyrene_Ch', '4c_pyrene_NU_Ch', '4c_tetrathiafulvalene_Ch', '5c_bicyclooctane_Ch', '5c_pyrrole_Ch', '6c_3B_bicylcooctane_Ch', '6c_Al_1', '6c_Al_1_Ch', '6c_B_Ch', '6c_CdZn_1_Ch', '6c_Cr_1_Ch', '6c_Cu_1_Ch', '6c_Fe_1_Ch', '6c_Mg_1_Ch', '6c_Ni_1_Ch', '6c_Zn_1_Ch', '6c_Zr_1_Ch', '6c_bicyclooctane_Ch', '8c_Co_1_Ch', '8c_Co_2_Ch', '8c_Mn_1_Ch', '8c_Tb_1_Ch', '8c_Zr_1_Ch'];
@@ -1248,7 +1895,7 @@ Then, to open the website, run python app.py in the terminal
       options += '<option value="' + my_sbus[i] + '" />';
     }
 
-    document.getElementById('sbus_list').innerHTML = options;
+    document.getElementById('sbus_list').innerHTML = options; // populating the sbus dropdown
 
     // Last, populating the nets in the building block section
 
@@ -1261,28 +1908,28 @@ Then, to open the website, run python app.py in the terminal
       options += '<option value="' + my_nets[i] + '" />';
     }
 
-    document.getElementById('nets_list').innerHTML = options;
+    document.getElementById('nets_list').innerHTML = options; // populating the nets dropdown
+
+
+    // TODO 
+    // 
+
+    $.get("/new_user").done(
+      function(response) {
+        // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
+        console.log(response)
+    })
+
+
+    // Let the new user know how many people are currently using mofSimplify
+    $.get("/curr_users").done(
+      function(response) {
+        // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
+        alert('The current number of users on mofSimplify: ' + response)
+    })
 
   });
 
-
-  // $('#plot').click(function() {
-  //   // For testing.
-  //   // data.sseplot = -15 
-  //   $.post("/plot", JSON.stringify(data)).done(function(response) { 
-  //     $('#chart').html(response)
-  //   })
-  // });
-
-  // $('#plot_pca').click(function() {
-  //   // For testing
-  //   // data.ox = -2
-  //   // data.hfx = 0.2
-  //   // data.sseplot = -15
-  //   $.post("/plotpca", JSON.stringify(data)).done(function(response) { 
-  //     $('#chart').html(response)
-  //   })
-  // });
 
 </script>
 

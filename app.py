@@ -28,15 +28,47 @@ from bokeh.models import Span
 from bokeh.models import ColorBar, LinearColorMapper, LogColorMapper, HoverTool
 from bokeh.models.markers import Circle
 from bokeh.palettes import Inferno256#,RdBu11#,Viridis256
-from flask import jsonify
+from flask import jsonify, render_template, redirect, request, url_for
+import flask_login
+from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
 
 cmap_bokeh = Inferno256
 # cmap_bokeh = RdBu11 # optional select other colormaps
 
-app = flask.Flask(__name__)
-
 MOFSIMPLIFY_PATH = os.path.abspath('.')
+USE_SPLASH_PAGE = False
+
+app = flask.Flask(__name__)
+app.secret_key = 'super secret key'
+
+# login management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask
+login_manager = LoginManager()
+login_manager.init_app(app)
+users = {'user1':{'password':'MOFSimplify!Beta2021'}}
+
+class User(UserMixin):
+  pass
+
+@login_manager.user_loader
+def user_loader(username):
+  if username not in users:
+    return
+  user = User()
+  user.id = username
+  return user
+
+@login_manager.request_loader
+def request_loader(request):
+  username = request.form.get('username')
+  if username not in users:
+    return
+  user = User()
+  user.id = username
+
+  user.is_authenticated = request.form['password'] == users[username]['password']
+
+  return user
 
 @app.route('/demo')
 def serve_demo():
@@ -51,10 +83,29 @@ def serve_logo():
 def serve_truncated_logo():
     return flask.send_from_directory('.', 'truncated_logo.png')
 
-@app.route('/')
-def serve_homepage():
-    # Serves homepage
+#@app.route('/')
+#def serve_homepage():
+#    # Serves homepage
+#    if USE_SPLASH_PAGE:
+#        return flask.send_from_directory('./splash_page/', path)
+#    else:
+#        return flask.send_from_directory('.', 'index.html')
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/<path:path>', methods=['GET', 'POST'])
+def index(path='index.html'):
+  if request.method == 'POST':
+    username = 'user1'
+    if request.form.get('password') == users[username]['password']:
+      user = User()
+      user.id = 'user1'
+      flask_login.login_user(user)
+  print('is user authenticated?')
+  print(current_user.is_authenticated)
+  if current_user.is_authenticated:
     return flask.send_from_directory('.', 'index.html')
+  else:
+    return flask.send_from_directory('./splash_page/', path)
 
 @app.route('/about.html')
 def serve_about():

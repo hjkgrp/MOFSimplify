@@ -122,6 +122,10 @@ def serve_logo():
 def serve_truncated_logo():
     return flask.send_from_directory('.', 'truncated_logo.png')
 
+# @app.route('/TGA_graphic.png')
+# def serve_TGA_graphic():
+#     return flask.send_from_directory('.', 'TGA_graphic.png')
+
 #@app.route('/')
 #def serve_homepage():
 #    # Serves homepage
@@ -972,7 +976,7 @@ def TGA_plot():
     ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
         
     # Plotting the graph.
-    graph.multi_line(xs, ys) 
+    graph.multi_line(xs, ys, line_dash='dashed') 
     graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
     graph.xaxis.axis_label = 'Temperature (°C)'
     graph.yaxis.axis_label = 'Percentage mass remaining or Mass'    

@@ -41,7 +41,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
 body {
   /* The font to be used everywhere */
-  font-family:Tahoma, Geneva, sans-serif
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif
 }
 
 </style>
@@ -51,11 +51,11 @@ body {
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition, debugging -->
 
-<title>mofSimplify</title> 
-<meta name="description" content="mofSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
+<title>MOFSimplify</title> 
+<meta name="description" content="MOFSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
 <meta property="og:type" content="website" />
-<meta property="og:description" content="mofSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
-<meta property="og:title" content="mofSimplify" /> 
+<meta property="og:description" content="MOFSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." /> 
+<meta property="og:title" content="MOFSimplify" /> 
 <meta property="og:image" content="https://molsimplify.mit.edu/logo.png" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:image" content="https://molsimplify.mit.edu/logo.png" />
@@ -103,7 +103,7 @@ body {
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
             <!-- Title -->
-            <h1>mofSimplify <span style="font-size: 24px;">  (powered by <a href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
+            <h1>MOFSimplify <span style="font-size: 24px;">  (powered by <a href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
             <!-- Subtitle -->
             <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
             
@@ -222,6 +222,12 @@ body {
         <button class='btn btn-primary' id='comp_t_neighbor' type='button'>Get thermal neighbor components</button> 
         <p id='t_neighbor_info'></p>
         <div class='col-6' id='tga_plot'></div>
+
+        <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
+          <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 140%;'>
+          <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
+        </div>
+
         </div>
 
     </div>
@@ -751,6 +757,8 @@ body {
         document.getElementById('solvent_neighbors_holder').value = undefined
         document.getElementById('thermal_neighbors_holder').value = undefined
         document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+        $('#tga_explanation').hide() // hide the explanatory TGA graphic on simplified TGA plots
+
 
         // Clearing visualizations and dropdowns.
         clearViewer(stage); // no MOF is displayed in the visualizer now
@@ -1795,7 +1803,11 @@ body {
 
       $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function(response) { 
         $('#tga_plot').html(response) // a simplified TGA plot (the two slopes, intersecting at breakdown temperature)
-      })      
+      })
+
+      $('#tga_explanation').show() // show the explanatory TGA graphic on simplified TGA plots
+
+
     })
 
 
@@ -1916,16 +1928,16 @@ body {
 
     $.get("/new_user").done(
       function(response) {
-        // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
+        // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
         console.log(response)
     })
 
 
-    // Let the new user know how many people are currently using mofSimplify
+    // Let the new user know how many people are currently using MOFSimplify
     $.get("/curr_users").done(
       function(response) {
-        // Purpose of this is just to make a user ID for the new browser that has accessed mofSimplify, so I don't care about the response
-        alert('The current number of users on mofSimplify: ' + response)
+        // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
+        alert('The current number of users on MOFSimplify: ' + response)
     })
 
   });

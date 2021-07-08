@@ -28,9 +28,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 }
 
 .mol-container {
-  width: 100%;
   height: 400px;
   position: relative;
+/*  width: 500px;
+  height: 400px;
+  position: relative;*/
 }
 
 .form-control {
@@ -98,173 +100,229 @@ body {
       </div>
     </div>
 
-    <div class="container">
-      <div class="page-header" id="banner">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <!-- Title -->
-            <h1>MOFSimplify <span style="font-size: 24px;">  (powered by <a href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
-            <!-- Subtitle -->
-            <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
-            
-            <!-- Lead text -->
-            <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a href="about.html">About</a> tab.</p>
+  <div class="container">
+    <div class="page-header" id="banner">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <!-- Title -->
+          <h1>MOFSimplify <span style="font-size: 24px;">  (powered by <a href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
+          <!-- Subtitle -->
+          <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
+          
+          <!-- Lead text -->
+          <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a href="about.html">About</a> tab.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- The 4 tabs of the website -->
+    <ul class="nav nav-pills mb-3" id="pills-tab">
+<!--     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+ --><!--       <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
+      </li> -->
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-home-tab">Home</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-vis-tab">MOF Visualization</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-comp-tab"-->MOF Component Analysis</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-bb-tab">MOF Building Block Construction</button>
+      </li>
+<!--       <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-stat-tab" data-toggle="pill" data-target="#pills-stat" type="button" role="tab" aria-controls="pills-stat" aria-selected="false">Status messages and MOF predictions</button>
+      </li> -->
+    </ul>
+
+    <div id="pills-home">
+      <div class='row'>
+      
+        <b> Select a MOF for analysis </b>
+        <!-- Create a section containing buttons -->
+        <div class='col-lg-12'>
+
+          <!-- Button for queuing up the example MOF cif file -->
+          <button class='btn btn-primary' id='load' type='button'>Load example MOF</button>
+
+          <!-- Button for uploading MOF cif file -->
+          <button class='btn btn-primary' id='upload' type='button'>Upload MOF cif file</button>
+
+          <!-- Button for uploading MOF cif file -->
+          <button class='btn btn-primary' id='bb-redirect' type='button'>Construct MOF from building blocks</button>
+
+        </div>
+
+        <b style='margin-top: 0.5cm;'> Predict properties of the selected MOF </b>
+        <!-- Create a section containing buttons -->
+        <div class='col-lg-12'>
+
+            <!-- <div style="margin-bottom:0.5cm;"></div> -->
+
+          <!-- Button for predicting solvent removal stability of MOF -->
+          <button class='btn btn-primary' id='predict_s' type='button'>Predict stability upon solvent removal</button>
+
+          <!-- Button for predicting thermal stability of MOF -->
+          <button class='btn btn-primary' id='predict_t' type='button'>Predict thermal stability</button> 
+
+        </div>
+
+      </div>
+
+      <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
+      <div class='row' style='margin-top: 0.5cm;'>
+          <b> Status messages and MOF predictions </b>
+          <div class='col-12' id='upload_status'></div> 
+          <div class='col-12' id='solvent_stability_prediction'></div> 
+          <div class='col-12' id='thermal_stability_prediction'></div> 
+          <div class='col-12' id='thermal_stability_percentile'></div> 
+          <div class='col-12' id='chart'></div>
+
+          <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN.</p>
+
+          <div class = 'col-6'>
+          Solvent removal stability ANN nearest neighbors in latent space
+          <select class='form-control' id='solvent_neighbors'>
+          </select>
+
+          <button class='btn btn-primary' id='s_neighbor' type='button'>Show solvent neighbor info</button> 
+          <button class='btn btn-primary' id='download_s_neighbor' type='button'>Download solvent neighbor info</button> 
+          <button class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize solvent neighbor</button> 
+          <button class='btn btn-primary' id='comp_s_neighbor' type='button'>Get solvent neighbor components</button> 
+          <p id='s_neighbor_info'></p>
           </div>
-        </div>
-      </div>
 
-  <div class='row'>
-    <!-- Create a column containing MOF viewer and buttons -->
-    <div class='col-lg-6'>
+          <div class = 'col-6'>
+          Thermal stability ANN nearest neighbors in latent space
+          <select class='form-control' id='thermal_neighbors'>
+          </select>
 
-        <div id="viewportwrapper" style="border-style: solid;" class="content inactive"> <!-- MOF visualization -->
-          <div id="viewportnote" style="position: relative; top: 13em; text-align: center; z-index: 2;">(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)</div>
-          <div id="cifviewport" style="width:534px; height:406px;"></div>
-        </div>
-        <div style="margin-bottom:0.5cm;"></div>
-        <button class='btn btn-primary' id='load' type='button'>Load example MOF</button>
-        <button class='btn btn-primary' id='visualize' type='button'>Visualize MOF</button>
-    </div>
-    
-    <!-- Create a column containing selection boxes and buttons -->
-    <div class='col-lg-6'>
+          <button class='btn btn-primary' id='t_neighbor' type='button'>Show thermal neighbor info</button> 
+          <button class='btn btn-primary' id='download_t_neighbor' type='button'>Download thermal neighbor info</button> 
+          <button class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize thermal neighbor</button> 
+          <button class='btn btn-primary' id='comp_t_neighbor' type='button'>Get thermal neighbor components</button> 
+          <p id='t_neighbor_info'></p>
+          <div class='col-6' id='tga_plot'></div>
 
-        <!-- <div style="margin-bottom:0.5cm;"></div> -->
+          <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
+            <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 140%;'>
+            <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
+          </div>
 
-        A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb). Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF visualization and construction code. 
-
-        <!-- Selection box for the linker building block -->
-        <div  style="padding-top: 30px">
-          Linker, the connecting building block
-          <input id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
-        </div>
-
-        <!-- Default linkers -->
-        <datalist id = 'linkers_list'>
-          <!-- Defined near the end of the Javascript section below -->
-        </datalist>
-
-
-        <!-- Selection box for metal SBU building block -->
-        <div>
-          sbu, the metal-centered nodular building block 
-          <input id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
-        </div>
-
-        <!-- Default sbus -->
-        <datalist id = 'sbus_list'>
-          <!-- Defined near the end of the Javascript section below -->
-        </datalist>
-        
-        <div>
-          MOF Net
-          <input id="nets_option" class='form-control locksMetrics' list = 'nets_list' onmousedown="value = '';" />
-        </div>
-
-        <!-- Default nets -->
-        <datalist id = 'nets_list'>
-          <!-- Defined near the end of the Javascript section below -->
-        </datalist>
-
-        <button class='btn btn-primary' id='generate' type='button'>Make bb-generated MOF</button>
-        <button class='btn btn-primary' id='download_generated' type='button'>Download bb-generated MOF</button>
-
-
-      <div style="margin-top:1cm;"></div>
-        <!-- Button for uploading MOF cif file -->
-        <button class='btn btn-primary' id='upload' type='button'>Upload MOF cif file</button>
-
-        <!-- Button for getting MOF components for visualization  -->
-        <button class='btn btn-primary' id='get_components' type='button'>Get MOF components</button>
-
-        <!-- Button for predicting solvent removal stability of MOF -->
-        <button class='btn btn-primary' id='predict_s' type='button'>Predict stability upon solvent removal</button>
-
-        <!-- Button for predicting thermal stability of MOF -->
-        <button class='btn btn-primary' id='predict_t' type='button'>Predict thermal stability</button> 
+          </div>
 
       </div>
-    </div>
 
-    <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
-    <div class='row' style='margin-top: 0.5cm;'>
-        <b> Status messages and MOF predictions </b>
-        <div class='col-12' id='upload_status'></div> 
-        <div class='col-12' id='status_visualization'></div> 
-        <div class='col-12' id='solvent_stability_prediction'></div> 
-        <div class='col-12' id='thermal_stability_prediction'></div> 
-        <div class='col-12' id='thermal_stability_percentile'></div> 
-        <div class='col-12' id='chart'></div>
-        <div class='col-12' id='currently_visualized'></div> 
-
-        <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN.</p>
-
-        <div class = 'col-6'>
-        Solvent removal stability ANN nearest neighbors in latent space
-        <select class='form-control' id='solvent_neighbors'>
-        </select>
-
-        <button class='btn btn-primary' id='s_neighbor' type='button'>Show solvent neighbor info</button> 
-        <button class='btn btn-primary' id='download_s_neighbor' type='button'>Download solvent neighbor info</button> 
-        <button class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize solvent neighbor</button> 
-        <button class='btn btn-primary' id='comp_s_neighbor' type='button'>Get solvent neighbor components</button> 
-        <p id='s_neighbor_info'></p>
-        </div>
-
-        <div class = 'col-6'>
-        Thermal stability ANN nearest neighbors in latent space
-        <select class='form-control' id='thermal_neighbors'>
-        </select>
-
-        <button class='btn btn-primary' id='t_neighbor' type='button'>Show thermal neighbor info</button> 
-        <button class='btn btn-primary' id='download_t_neighbor' type='button'>Download thermal neighbor info</button> 
-        <button class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize thermal neighbor</button> 
-        <button class='btn btn-primary' id='comp_t_neighbor' type='button'>Get thermal neighbor components</button> 
-        <p id='t_neighbor_info'></p>
-        <div class='col-6' id='tga_plot'></div>
-
-        <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
-          <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 140%;'>
-          <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
-        </div>
-
-        </div>
 
     </div>
 
+    <div id="pills-vis">
+      <!-- MOF viewer and buttons -->
 
-  <div class='row'>
-    <div class='col-lg-6' style='margin-top: 0.5cm;'>
-      <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;'>
-          <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
-        </div>
+      <div id="viewportwrapper" style="border-style: solid;border-width:2px;" class="content inactive"> <!-- MOF visualization -->
+        <div id="viewportnote" style="position: relative; top: 13em; text-align: center; z-index: 2;">(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)</div>
+        <div id="cifviewport" style="height:500px;"></div>
+      </div>
       <div style="margin-bottom:0.5cm;"></div>
-      <button class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
-      <button class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
-      <button class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
+      <button class='btn btn-primary' id='visualize' type='button'>Visualize selected MOF</button>
+
+      <div id='currently_visualized'></div> 
+      <div id='status_visualization'></div> 
+
+
     </div>
 
-    <div class='col-lg-6' style='margin-top: 0.5cm;'>
-      <p> Can display MOF's linkers and sbus after clicking the Get MOF Components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
+    <div id="pills-comp">
+      <div class='row'>
+        <div class='col-lg-6' style='margin-top: 0.5cm;'>
+          <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;'> 
+              <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
+            </div>
+          <div style="margin-bottom:0.5cm;"></div>
+          <button class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
+          <button class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
+          <button class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
+        </div>
 
-      <div id='comp_MOF'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+        <div class='col-lg-6' style='margin-top: 0.5cm;'>
+          <!-- Button for getting MOF components for visualization  -->
+          <button class='btn btn-primary' id='get_components' type='button'>Get selected MOF components</button>
 
-      <div>
-        Linkers
-        <select class='form-control' id='linker'>
-        </select>
+          <p style='margin-top: 0.5cm;'> Can display MOF's linkers and sbus after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
+
+          <div id='comp_MOF'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+
+          <div>
+            Linkers
+            <select class='form-control' id='linker'>
+            </select>
+          </div>
+
+          <div>
+            sbus
+            <select class='form-control' id='sbu'> </select>
+          </div>
+
+          <button class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
+
+          <div class='col-12' id='component_SMILES'></div>
+        </div>
       </div>
-
-      <div>
-        sbus
-        <select class='form-control' id='sbu'> </select>
-      </div>
-
-      <button class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
-
-      <div class='col-12' id='component_SMILES'></div>
     </div>
-  </div>
+
+    <div id="pills-bb">
+      A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb). Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF visualization and construction code. <br> <br>
+
+      Note: not every combination of linker, SBU, and net is compatible.
+
+      <!-- Selection box for the linker building block -->
+      <div  style="padding-top: 30px">
+        Linker, the connecting building block
+        <input id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
+      </div>
+
+      <!-- Default linkers -->
+      <datalist id = 'linkers_list'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+
+
+      <!-- Selection box for metal SBU building block -->
+      <div>
+        sbu, the metal-centered nodular building block 
+        <input id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
+      </div>
+
+      <!-- Default sbus -->
+      <datalist id = 'sbus_list'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+      
+      <div>
+        MOF Net
+        <input id="nets_option" class='form-control locksMetrics' list = 'nets_list' onmousedown="value = '';" />
+      </div>
+
+      <!-- Default nets -->
+      <datalist id = 'nets_list'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+
+      <button class='btn btn-primary' id='generate' type='button'>Make bb-generated MOF</button>
+      <button class='btn btn-primary' id='download_generated' type='button'>Download bb-generated MOF</button>
+    </div>
+
+<!--       <div class="tab-pane fade" id="pills-stat" role="tabpanel" aria-labelledby="pills-stat-tab">
+
+    </div> -->
+
+
+
+
 </div>
 
 
@@ -290,7 +348,7 @@ body {
 <p id="bbg_MOF_holder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used. -->
 
 <!-- For MOF components (xyz file text) -->
-<p id="components_holder"> </p> <!-- This will never display anything. Just used to store components if the button "Get MOF components" is used. -->
+<p id="components_holder"> </p> <!-- This will never display anything. Just used to store components if the button "Get selected MOF components" is used. -->
 
 <!-- For solvent removal stability ANN nearest neighbors -->
 <p id="solvent_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Predict stability upon solvent removal" is used. -->
@@ -593,6 +651,9 @@ body {
       /* See class documentation at http://nglviewer.org/ngl/api/class/src/stage/stage.js~Stage.html */
       /* See also the general documentation at http://nglviewer.org/ngl/api/manual/ */
     } );
+    // console.log('PDB check') // TODO debugging
+    // console.log(path_to_cif)
+    // console.log(ngl_stage)
     return component;
   }
 
@@ -787,7 +848,7 @@ body {
         $('#upload_status').text('File uploaded: ' + myFile.name);
     });
 
-    // This function triggers when someone clicks the Visualize MOF button.
+    // This function triggers when someone clicks the Visualize selected MOF button.
     $("#visualize").on('click', function() {
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
         let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
@@ -1192,7 +1253,7 @@ body {
                     var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
                     document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
 
-                    $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+                    $('#upload_status').text('MOF constructed with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
                   }).catch(error => {
                     $('#upload_status').text('Failed to load');
                     console.error('There has been a problem with your fetch operation:', error);
@@ -1230,7 +1291,7 @@ body {
               var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
               document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
 
-              $('#upload_status').text('MOF generated with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+              $('#upload_status').text('MOF constructed with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
             }).catch(error => {
               $('#upload_status').text('Failed to load');
               console.error('There has been a problem with your fetch operation:', error);
@@ -1259,7 +1320,7 @@ body {
     });
 
 
-    // Get MOF linkers and sbus when the Get MOF components button is clicked.
+    // Get MOF linkers and sbus when the Get selected MOF components button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function() {
       console.log('print check A')
@@ -1531,7 +1592,7 @@ body {
 
       // Ensure there are components to visualize
       if (document.getElementById('components_holder').value == undefined) {
-        alert('Must get MOF components first.');
+        alert('Must get a MOF\'s components first.');
         return;
       }
 
@@ -1595,7 +1656,7 @@ body {
 
       // Ensure there are components to visualize.
       if (document.getElementById('components_holder').value == undefined) {
-        alert('Must get MOF components first.');
+        alert('Must get a MOF\'s components first.');
         return;
       }
 
@@ -1627,7 +1688,7 @@ body {
 
       // Ensure there are components to visualize.
       if (document.getElementById('components_holder').value == undefined) {
-        alert('Must get MOF components first.');
+        alert('Must get a MOF\'s components first.');
         return;
       }
 
@@ -1875,7 +1936,57 @@ body {
 
     })
 
+    // TODO testing out tab functionality
+    // https://getbootstrap.com/docs/5.0/components/navs-tabs/
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll
+    const container = document.querySelector('#pills-tab')
+    const matches = container.querySelectorAll('li.nav-item > button') // Getting the tab options
+    var triggerTabList = [].slice.call(matches) // making the tab options into a list
+    triggerTabList.forEach(function (triggerEl) { // going through each of the tab options
+      console.log('Check hit')
+      console.log(triggerEl)
+      var tabTrigger = new bootstrap.Tab(triggerEl)
 
+      triggerEl.addEventListener('click', function (event) {
+        event.preventDefault()
+        tabTrigger.show()
+      })
+    })
+
+    $('#bb-redirect').click(function(){
+      $('#pills-bb-tab').click()
+    })
+
+    
+    // TODO
+    $('#pills-home-tab').click(function(){
+      $('#pills-home').show() 
+      $('#pills-vis').hide()
+      $('#pills-comp').hide()
+      $('#pills-bb').hide()
+    })
+
+    $('#pills-vis-tab').click(function(){
+      // console.log('vis tab clicked')
+      $('#pills-home').hide() 
+      $('#pills-vis').show()
+      $('#pills-comp').hide()
+      $('#pills-bb').hide()
+    })
+
+    $('#pills-comp-tab').click(function(){
+      $('#pills-home').hide() 
+      $('#pills-vis').hide()
+      $('#pills-comp').show()
+      $('#pills-bb').hide()
+    })
+
+    $('#pills-bb-tab').click(function(){
+      $('#pills-home').hide() 
+      $('#pills-vis').hide()
+      $('#pills-comp').hide()
+      $('#pills-bb').show()
+    })
 
     // Start up page by virtually clicking the Load example MOF button
     $('#load').click();
@@ -1922,10 +2033,6 @@ body {
 
     document.getElementById('nets_list').innerHTML = options; // populating the nets dropdown
 
-
-    // TODO 
-    // 
-
     $.get("/new_user").done(
       function(response) {
         // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
@@ -1933,12 +2040,25 @@ body {
     })
 
 
-    // Let the new user know how many people are currently using MOFSimplify
-    $.get("/curr_users").done(
-      function(response) {
-        // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
-        alert('The current number of users on MOFSimplify: ' + response)
-    })
+    // // Let the new user know how many people are currently using MOFSimplify
+    // $.get("/curr_users").done(
+    //   function(response) {
+    //     // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
+    //     alert('The current number of users on MOFSimplify: ' + response)
+    // })
+
+    // On start up, hide certain sections
+    // $('#pills-vis').hide()
+    $('#pills-comp').hide()
+    $('#pills-bb').hide()
+
+    function viewer_hider() {
+      $('#pills-vis').hide()
+    }
+
+    // This is my hacky way to get around the fact that the full MOF viewport does not work if it is immediately hidden.
+    // I just wait a bit, then hide it
+    window.setTimeout(viewer_hider, 5)
 
   });
 

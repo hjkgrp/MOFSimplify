@@ -122,9 +122,9 @@ def serve_logo():
 def serve_truncated_logo():
     return flask.send_from_directory('.', 'truncated_logo.png')
 
-# @app.route('/TGA_graphic.png')
-# def serve_TGA_graphic():
-#     return flask.send_from_directory('.', 'TGA_graphic.png')
+@app.route('/TGA_graphic.png')
+def serve_TGA_graphic():
+    return flask.send_from_directory('.', 'TGA_graphic.png')
 
 #@app.route('/')
 #def serve_homepage():
@@ -968,16 +968,29 @@ def TGA_plot():
 
     intersection_point = seg_intersect(p1, p2, p3, p4)
 
+    # Want lines to extend beyond intersection point. I will make it 20%
+    x_extension = [None] * 2 # will hold the x values of the two extension points
+    y_extension = [None] * 2 # will hold the y values of the two extension points
+    slope = [None] * 2 # will hold the slopes of the two lines
+
+    x_extension[0] = intersection_point[0] + (intersection_point[0] - x_values[0])*0.2 # x_values[0] is the smallest value, x_values[3] is the largest value
+    x_extension[1] = intersection_point[0] - (x_values[3] - intersection_point[0])*0.2
+    slope[0] = (y_values[1] - y_values[0])/(x_values[1] - x_values[0])
+    slope[1] = (y_values[3] - y_values[2])/(x_values[3] - x_values[2])
+    y_extension[0] = intersection_point[1] + slope[0] * (x_extension[0] - intersection_point[0]) # y2 = y1 + m(x2-x1)
+    y_extension[1] = intersection_point[1] + slope[1] * (x_extension[1] - intersection_point[0]) # y2 = y1 + m(x2-x1)
+
     # Instantiating the figure object. 
     graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
          
     # The points to be plotted.
-    xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
-    ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
+    xs = [[x_values[0], x_values[1],intersection_point[0], x_extension[0]], [x_values[2], x_values[3],intersection_point[0], x_extension[1]]] 
+    ys = [[y_values[0], y_values[1],intersection_point[1], y_extension[0]], [y_values[2], y_values[3],intersection_point[1], y_extension[1]]] 
         
     # Plotting the graph.
     graph.multi_line(xs, ys, line_dash='dashed') 
-    graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
+    graph.circle([intersection_point[0]], [intersection_point[1]], size=20, fill_color="red", line_color='black')
+    graph.star(x=x_values, y=y_values, size=20, fill_color="yellow", line_color='black') # four stars
     graph.xaxis.axis_label = 'Temperature (°C)'
     graph.yaxis.axis_label = 'Percentage mass remaining or Mass'    
 

@@ -39,6 +39,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   margin-bottom:0.1cm;
 }
 
+#link {
+  color: #00BFFF;
+}
+
 #viewportwrapper { grid-area: viz; } /* For MOF visualization */
 
 body {
@@ -105,12 +109,12 @@ body {
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <!-- Title -->
-          <h1>MOFSimplify <span style="font-size: 24px;">  (powered by <a href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
+          <h1 style="color:black">MOFSimplify <span style="font-size: 24px;">  (powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
           <!-- Subtitle -->
           <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
           
           <!-- Lead text -->
-          <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a href="about.html">About</a> tab.</p>
+          <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.</p>
         </div>
       </div>
     </div>
@@ -122,52 +126,57 @@ body {
  --><!--       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
       </li> -->
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-home-tab">Home</button>
+      <li class="nav-item" role="presentation" style='width:25%'>
+        <button class="nav-link active" id="pills-start-tab" style='width:100%'>Start</button>
       </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-vis-tab">MOF Visualization</button>
+      <li class="nav-item" role="presentation" style='width:25%'>
+        <button class="nav-link" id="pills-vis-tab" style='width:100%'>Visualization</button>
       </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-comp-tab"-->MOF Component Analysis</button>
+      <li class="nav-item" role="presentation" style='width:25%'>
+        <button class="nav-link" id="pills-comp-tab" style='width:100%'>Component Analysis</button>
       </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-bb-tab">MOF Building Block Construction</button>
+      <li class="nav-item" role="presentation" style='width:25%'>
+        <button class="nav-link" id="pills-bb-tab" style='width:100%'>Building Block Construction</button>
       </li>
 <!--       <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-stat-tab" data-toggle="pill" data-target="#pills-stat" type="button" role="tab" aria-controls="pills-stat" aria-selected="false">Status messages and MOF predictions</button>
       </li> -->
     </ul>
 
-    <div id="pills-home">
+    <div id="pills-start">
       <div class='row'>
       
-        <b> Select a MOF for analysis </b>
+        <b> 1) Select a MOF for analysis </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
-          <!-- Button for queuing up the example MOF cif file -->
-          <button class='btn btn-primary' id='load' type='button'>Load example MOF</button>
+          <div style='width:100%; text-align:center;'>
 
-          <!-- Button for uploading MOF cif file -->
-          <button class='btn btn-primary' id='upload' type='button'>Upload MOF cif file</button>
+            <!-- Button for queuing up the example MOF cif file -->
+            <button style='display:inline-block; width:33%' class='btn btn-primary' id='load' type='button'>Load example</button>
 
-          <!-- Button for uploading MOF cif file -->
-          <button class='btn btn-primary' id='bb-redirect' type='button'>Construct MOF from building blocks</button>
+            <!-- Button for uploading MOF cif file -->
+            <button style='display:inline-block; width:33%' class='btn btn-primary' id='upload' type='button'>Upload cif file</button>
+
+            <!-- Button for uploading MOF cif file -->
+            <button style='display:inline-block; width:33%' class='btn btn-primary' id='bb-redirect' type='button'>Construct from building blocks</button>
+          </div> 
 
         </div>
 
-        <b style='margin-top: 0.5cm;'> Predict properties of the selected MOF </b>
+        <b style='margin-top: 0.5cm;'> 2) Predict properties of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
-            <!-- <div style="margin-bottom:0.5cm;"></div> -->
+          <div style='width:100%; text-align:center;'>
 
-          <!-- Button for predicting solvent removal stability of MOF -->
-          <button class='btn btn-primary' id='predict_s' type='button'>Predict stability upon solvent removal</button>
+            <!-- Button for predicting solvent removal stability of MOF -->
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='predict_s' type='button'>Stability upon solvent removal</button>
 
-          <!-- Button for predicting thermal stability of MOF -->
-          <button class='btn btn-primary' id='predict_t' type='button'>Predict thermal stability</button> 
+            <!-- Button for predicting thermal stability of MOF -->
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='predict_t' type='button'>Thermal stability</button> 
+
+          </div>
 
         </div>
 
@@ -189,10 +198,14 @@ body {
           <select class='form-control' id='solvent_neighbors'>
           </select>
 
-          <button class='btn btn-primary' id='s_neighbor' type='button'>Show solvent neighbor info</button> 
-          <button class='btn btn-primary' id='download_s_neighbor' type='button'>Download solvent neighbor info</button> 
-          <button class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize solvent neighbor</button> 
-          <button class='btn btn-primary' id='comp_s_neighbor' type='button'>Get solvent neighbor components</button> 
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='s_neighbor' type='button'>Show</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='download_s_neighbor' type='button'>Download</button> 
+          </div>
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='comp_s_neighbor' type='button'>Get components</button> 
+          </div>
           <p id='s_neighbor_info'></p>
           </div>
 
@@ -201,15 +214,19 @@ body {
           <select class='form-control' id='thermal_neighbors'>
           </select>
 
-          <button class='btn btn-primary' id='t_neighbor' type='button'>Show thermal neighbor info</button> 
-          <button class='btn btn-primary' id='download_t_neighbor' type='button'>Download thermal neighbor info</button> 
-          <button class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize thermal neighbor</button> 
-          <button class='btn btn-primary' id='comp_t_neighbor' type='button'>Get thermal neighbor components</button> 
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='t_neighbor' type='button'>Show</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='download_t_neighbor' type='button'>Download</button> 
+          </div>
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary' id='comp_t_neighbor' type='button'>Get components</button> 
+          </div>
           <p id='t_neighbor_info'></p>
           <div class='col-6' id='tga_plot'></div>
 
           <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
-            <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 140%;'>
+            <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
             <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
           </div>
 
@@ -228,10 +245,15 @@ body {
         <div id="cifviewport" style="height:500px;"></div>
       </div>
       <div style="margin-bottom:0.5cm;"></div>
-      <button class='btn btn-primary' id='visualize' type='button'>Visualize selected MOF</button>
-
-      <div id='currently_visualized'></div> 
-      <div id='status_visualization'></div> 
+      <div style='width:100%; text-align:center;'>
+        <button class='btn btn-primary' style='display:inline-block; width:50%;' id='visualize' type='button'>Visualize selected MOF</button>
+      </div>
+      <div style='width:100%; text-align:center;'>
+        <div style='display:inline-block;' id='currently_visualized'></div> 
+      </div>
+      <div style='width:100%; text-align:center;'>
+        <div style='display:inline-block;' id='status_visualization'></div> 
+      </div>
 
 
     </div>
@@ -243,14 +265,19 @@ body {
               <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
             </div>
           <div style="margin-bottom:0.5cm;"></div>
-          <button class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
-          <button class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
-          <button class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:32%' class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
+            <button style='display:inline-block; width:32%' class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
+            <button style='display:inline-block; width:32%' class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
+          </div>
         </div>
 
         <div class='col-lg-6' style='margin-top: 0.5cm;'>
           <!-- Button for getting MOF components for visualization  -->
-          <button class='btn btn-primary' id='get_components' type='button'>Get selected MOF components</button>
+          <div style='width:100%; text-align:center;'>
+
+            <button style='display:inline-block; width:70%' class='btn btn-primary' id='get_components' type='button'>Get selected MOF components</button>
+          </div>
 
           <p style='margin-top: 0.5cm;'> Can display MOF's linkers and sbus after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
 
@@ -267,7 +294,10 @@ body {
             <select class='form-control' id='sbu'> </select>
           </div>
 
-          <button class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:70%' class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
+
+          </div>
 
           <div class='col-12' id='component_SMILES'></div>
         </div>
@@ -312,8 +342,12 @@ body {
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
 
-      <button class='btn btn-primary' id='generate' type='button'>Make bb-generated MOF</button>
-      <button class='btn btn-primary' id='download_generated' type='button'>Download bb-generated MOF</button>
+      <div style='width:100%; text-align:center;'>
+
+        <button style='display:inline-block; width:49%' class='btn btn-primary' id='generate' type='button'>Make bb-generated MOF</button>
+        <button style='display:inline-block; width:49%' class='btn btn-primary' id='download_generated' type='button'>Download bb-generated MOF</button>
+      </div>
+
     </div>
 
 <!--       <div class="tab-pane fade" id="pills-stat" role="tabpanel" aria-labelledby="pills-stat-tab">
@@ -895,6 +929,8 @@ body {
 
         alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
 
+        $('#pills-vis-tab').click() // redirecting to appropriate tab
+
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
         handleInput(true, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
@@ -922,6 +958,8 @@ body {
         }
 
         alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
+
+        $('#pills-vis-tab').click() // redirecting to appropriate tab
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
@@ -1425,6 +1463,8 @@ body {
         return;
       }
 
+      $('#pills-comp-tab').click() // redirecting to appropriate tab
+
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
       fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
@@ -1504,6 +1544,8 @@ body {
         alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
         return;
       }
+
+      $('#pills-comp-tab').click() // redirecting to appropriate tab
 
       my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
 
@@ -1959,8 +2001,8 @@ body {
 
     
     // TODO
-    $('#pills-home-tab').click(function(){
-      $('#pills-home').show() 
+    $('#pills-start-tab').click(function(){
+      $('#pills-start').show() 
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
@@ -1968,21 +2010,21 @@ body {
 
     $('#pills-vis-tab').click(function(){
       // console.log('vis tab clicked')
-      $('#pills-home').hide() 
+      $('#pills-start').hide() 
       $('#pills-vis').show()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
     })
 
     $('#pills-comp-tab').click(function(){
-      $('#pills-home').hide() 
+      $('#pills-start').hide() 
       $('#pills-vis').hide()
       $('#pills-comp').show()
       $('#pills-bb').hide()
     })
 
     $('#pills-bb-tab').click(function(){
-      $('#pills-home').hide() 
+      $('#pills-start').hide() 
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').show()

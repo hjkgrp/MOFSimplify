@@ -45,9 +45,17 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
 #viewportwrapper { grid-area: viz; } /* For MOF visualization */
 
+.round_button {
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 body {
   /* The font to be used everywhere */
-  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif
+  font-family: Arial, Helvetica, sans-serif;
+  color: black;
+  font-size: 16px;
 }
 
 </style>
@@ -109,7 +117,7 @@ body {
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <!-- Title -->
-          <h1 style="color:black">MOFSimplify <span style="font-size: 24px;">  (powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
+          <h1 style="color:black; font-family: Helvetica";>MOFSimplify <span style="font-size: 24px;">  (powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
           <!-- Subtitle -->
           <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
           
@@ -150,16 +158,16 @@ body {
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
-          <div style='width:100%; text-align:center;'>
+          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
 
             <!-- Button for queuing up the example MOF cif file -->
-            <button style='display:inline-block; width:33%' class='btn btn-primary' id='load' type='button'>Load example</button>
+            <button style='display:inline-block; width:33%' class='btn btn-primary round_button' id='load' type='button'>Load example</button>
 
             <!-- Button for uploading MOF cif file -->
-            <button style='display:inline-block; width:33%' class='btn btn-primary' id='upload' type='button'>Upload cif file</button>
+            <button style='display:inline-block; width:33%' class='btn btn-primary round_button' id='upload' type='button'>Upload cif file</button>
 
             <!-- Button for uploading MOF cif file -->
-            <button style='display:inline-block; width:33%' class='btn btn-primary' id='bb-redirect' type='button'>Construct from building blocks</button>
+            <button style='display:inline-block; width:33%' class='btn btn-primary round_button' id='bb-redirect' type='button'>Construct from building blocks</button>
           </div> 
 
         </div>
@@ -168,13 +176,13 @@ body {
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
-          <div style='width:100%; text-align:center;'>
+          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
 
             <!-- Button for predicting solvent removal stability of MOF -->
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='predict_s' type='button'>Stability upon solvent removal</button>
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='predict_s' type='button'>Stability upon solvent removal</button>
 
             <!-- Button for predicting thermal stability of MOF -->
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='predict_t' type='button'>Thermal stability</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='predict_t' type='button'>Thermal stability</button> 
 
           </div>
 
@@ -198,13 +206,13 @@ body {
           <select class='form-control' id='solvent_neighbors'>
           </select>
 
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='s_neighbor' type='button'>Show</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='download_s_neighbor' type='button'>Download</button> 
+          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
           </div>
           <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='visualize_s_neighbor' type='button'>Visualize</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='comp_s_neighbor' type='button'>Get components</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
           </div>
           <p id='s_neighbor_info'></p>
           </div>
@@ -214,13 +222,13 @@ body {
           <select class='form-control' id='thermal_neighbors'>
           </select>
 
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='t_neighbor' type='button'>Show</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='download_t_neighbor' type='button'>Download</button> 
+          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
           </div>
           <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='visualize_t_neighbor' type='button'>Visualize</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary' id='comp_t_neighbor' type='button'>Get components</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
+            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
           </div>
           <p id='t_neighbor_info'></p>
           <div class='col-6' id='tga_plot'></div>
@@ -246,7 +254,7 @@ body {
       </div>
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
-        <button class='btn btn-primary' style='display:inline-block; width:50%;' id='visualize' type='button'>Visualize selected MOF</button>
+        <button class='btn btn-primary round_button' style='display:inline-block; width:50%;' id='visualize' type='button'>Visualize selected MOF</button>
       </div>
       <div style='width:100%; text-align:center;'>
         <div style='display:inline-block;' id='currently_visualized'></div> 
@@ -266,9 +274,9 @@ body {
             </div>
           <div style="margin-bottom:0.5cm;"></div>
           <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:32%' class='btn btn-primary' id='visualize_linker' type='button'>Visualize linker</button>
-            <button style='display:inline-block; width:32%' class='btn btn-primary' id='visualize_sbu' type='button'>Visualize sbu</button>
-            <button style='display:inline-block; width:32%' class='btn btn-primary' id='reset' type='button'>Reset zoom level</button>
+            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_linker' type='button'>Visualize linker</button>
+            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_sbu' type='button'>Visualize sbu</button>
+            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='reset' type='button'>Reset zoom level</button>
           </div>
         </div>
 
@@ -276,7 +284,7 @@ body {
           <!-- Button for getting MOF components for visualization  -->
           <div style='width:100%; text-align:center;'>
 
-            <button style='display:inline-block; width:70%' class='btn btn-primary' id='get_components' type='button'>Get selected MOF components</button>
+            <button style='display:inline-block; width:80%' class='btn btn-primary round_button' id='get_components' type='button'>Get selected MOF components</button>
           </div>
 
           <p style='margin-top: 0.5cm;'> Can display MOF's linkers and sbus after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
@@ -294,8 +302,8 @@ body {
             <select class='form-control' id='sbu'> </select>
           </div>
 
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:70%' class='btn btn-primary' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
+          <div style='width:100%; text-align:center; margin-top:0.5cm;'> 
+            <button style='display:inline-block; width:80%' class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
 
           </div>
 
@@ -342,10 +350,10 @@ body {
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
 
-      <div style='width:100%; text-align:center;'>
+      <div style='width:100%; text-align:center; margin-top:0.5cm;'>
 
-        <button style='display:inline-block; width:49%' class='btn btn-primary' id='generate' type='button'>Make bb-generated MOF</button>
-        <button style='display:inline-block; width:49%' class='btn btn-primary' id='download_generated' type='button'>Download bb-generated MOF</button>
+        <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='generate' type='button'>Make bb-generated MOF</button>
+        <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_generated' type='button'>Download bb-generated MOF</button>
       </div>
 
     </div>

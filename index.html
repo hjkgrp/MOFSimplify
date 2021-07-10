@@ -117,7 +117,7 @@ body {
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <!-- Title -->
-          <h1 style="color:black; font-family: Helvetica";>MOFSimplify <span style="font-size: 24px;">  (powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
+          <h1 style="color:black;"> <span style='font-family: Helvetica;'> MOFSimplify </span> <span style="font-size: 24px;">  (powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
           <!-- Subtitle -->
           <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
           
@@ -270,12 +270,12 @@ body {
       <div class='row'>
         <div class='col-lg-6' style='margin-top: 0.5cm;'>
           <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;'> 
-              <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
+              <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and SBUs are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
             </div>
           <div style="margin-bottom:0.5cm;"></div>
           <div style='width:100%; text-align:center;'>
             <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_linker' type='button'>Visualize linker</button>
-            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_sbu' type='button'>Visualize sbu</button>
+            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_sbu' type='button'>Visualize SBU</button>
             <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='reset' type='button'>Reset zoom level</button>
           </div>
         </div>
@@ -287,7 +287,7 @@ body {
             <button style='display:inline-block; width:80%' class='btn btn-primary round_button' id='get_components' type='button'>Get selected MOF components</button>
           </div>
 
-          <p style='margin-top: 0.5cm;'> Can display MOF's linkers and sbus after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or sbu, then click Visualize linker or Visualize sbu.</p>
+          <p style='margin-top: 0.5cm;'> Can display MOF's linkers and SBUs after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Visualize linker or Visualize SBU.</p>
 
           <div id='comp_MOF'> </div> <!-- Will display information on what MOF's components are currently visualized -->
 
@@ -298,7 +298,7 @@ body {
           </div>
 
           <div>
-            sbus
+            SBUs
             <select class='form-control' id='sbu'> </select>
           </div>
 
@@ -331,7 +331,7 @@ body {
 
       <!-- Selection box for metal SBU building block -->
       <div>
-        sbu, the metal-centered nodular building block 
+        SBU, the metal-centered nodular building block 
         <input id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
       </div>
 
@@ -872,7 +872,7 @@ body {
         // Re-display messages in the two visualizers.
         document.getElementById('viewportnote').style.display = 'block';
         document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
-        document.getElementById('container-01-note').innerHTML = '(MOF linkers and sbus are visualized here. Left click to rotate, scroll with mouse to zoom.)';
+        document.getElementById('container-01-note').innerHTML = '(MOF linkers and SBUs are visualized here. Left click to rotate, scroll with mouse to zoom.)';
     }
 
     // This function triggers once the user uploads a file.

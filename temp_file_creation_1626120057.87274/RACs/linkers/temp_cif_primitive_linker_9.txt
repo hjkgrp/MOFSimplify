@@ -1,1 +1,0 @@
-C(=O)(c1cc(C(=O)[O])ccc1)[O]	/Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626120057.87274/RACs/linkers/temp_cif_primitive_linker_9.xyz

@@ -892,6 +892,8 @@ body {
 
     // This function triggers when someone clicks the Visualize selected MOF button.
     $("#visualize").on('click', function() {
+        clearViewer(stage); // no MOF is displayed in the visualizer now
+
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
         let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
         let myFile3 = document.getElementById('bbg_MOF_holder').value; // the generated MOF, if Make bb-generated MOF has been used
@@ -923,6 +925,7 @@ body {
 
     // This function triggers when someone clicks the Visualize solvent neighbor button. 
     $("#visualize_s_neighbor").on('click', function() {
+        clearViewer(stage); // no MOF is displayed in the visualizer now
 
         // Ensure there are neighbors to display information on
         if (document.getElementById('solvent_neighbors_holder').value == undefined) {
@@ -953,6 +956,7 @@ body {
 
     // This function triggers when someone clicks the Visualize thermal neighbor button. 
     $("#visualize_t_neighbor").on('click', function() {
+        clearViewer(stage); // no MOF is displayed in the visualizer now
 
         // Ensure there are neighbors to display information on
         if (document.getElementById('thermal_neighbors_holder').value == undefined) {

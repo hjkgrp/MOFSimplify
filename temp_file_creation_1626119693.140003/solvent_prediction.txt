@@ -1,4 +1,0 @@
-[[0.76]]
-(1394, 200) (1, 200)
-['GUNFAW01_neutral', 'HIFGIO_SL', 'XIYYEL_clean', 'NAHNES_clean', 'WAYMAM_clean']
-[5.636941, 5.941049, 6.0654182, 6.146232, 6.4546375]

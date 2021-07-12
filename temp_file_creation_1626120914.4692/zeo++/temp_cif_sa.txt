@@ -1,3 +1,0 @@
-@ /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626120914.4692/zeo++/temp_cif_sa.txt Unitcell_volume: 2271.31   Density: 1.21659   ASA_A^2: 226.309 ASA_m^2/cm^3: 996.381 ASA_m^2/g: 818.998 NASA_A^2: 61.8093 NASA_m^2/cm^3: 272.13 NASA_m^2/g: 223.684
-Number_of_channels: 1 Channel_surface_area_A^2: 226.309  
-Number_of_pockets: 1 Pocket_surface_area_A^2: 61.8093  

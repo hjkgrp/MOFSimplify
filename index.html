@@ -557,7 +557,7 @@ body {
 
       console.log(my_neighbor)
 
-      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
         throw Error(response.statusText);
       } 
@@ -578,7 +578,7 @@ body {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
 
-      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
         throw Error(response.statusText);
       } 
@@ -1289,7 +1289,7 @@ body {
                 console.log('ID check')
                 console.log(response)
 
-                fetch('http://localhost:8000/bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
+                fetch('bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
                   if(!response.ok) { // catching 404 and other issues
                     document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
                     throw Error(response.statusText);
@@ -1327,7 +1327,7 @@ body {
           window.location = '/bbcif/' + name + '~' + my_ID // get file from the temp_file_creation_USERID/tobacco_3.0/output_cifs folder
           // assuming primitive is same as normal file
 
-          fetch('http://localhost:8000/bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
+          fetch('bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
             if(!response.ok) { // catching 404 and other issues
               document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
               throw Error(response.statusText);
@@ -1348,7 +1348,7 @@ body {
     // Load example MOF when the Load example MOF button is clicked.
     $('#load').click(function() {
 
-      fetch('http://localhost:8000/mof_examples/jz4002345_si_002_primitive.cif').then(response => { // grabbing the example MOF from local host
+      fetch('mof_examples/jz4002345_si_002_primitive.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         } 
@@ -1475,7 +1475,7 @@ body {
 
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
-      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
         throw Error(response.statusText);
       } 
@@ -1557,7 +1557,7 @@ body {
 
       my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
 
-      fetch('http://localhost:8000/neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
         throw Error(response.statusText);
       } 

@@ -494,8 +494,9 @@ def ss_predict():
         row_match = True # gets set to false if any values don't match 
 
         for col in merged_df.columns: # iterate through columns
-            if col == 'name' or col == 'cif_file':
+            if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
+                # Dif was sometimes differing between new Zeo++ call and training data value
             # print('Column: ')
             # print(col)
             # print(row[col])
@@ -503,9 +504,10 @@ def ss_predict():
             if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some same values being idenfitied as different b/c of some floating 10^-15 values 
                 row_match = False
 
-                # debugging
-                # print('TAGBUZ check')
-                # if row['CoRE_name'] == 'TAGBUZ_clean':
+                # print(row['CoRE_name'])
+                # # debugging
+                # if row['CoRE_name'] == 'HISJAW_clean':
+                #     print('HISJAW check')
                 #     print(col)
                 #     print(row[col])
                 #     print(merged_df.iloc[0][col])
@@ -768,8 +770,9 @@ def ts_predict():
         row_match = True # gets set to false if any values don't match 
 
         for col in merged_df.columns: # iterate through columns
-            if col == 'name' or col == 'cif_file':
+            if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
+                # Dif was sometimes differing between new Zeo++ call and training data value
             # print('Column: ')
             # print(col)
             # print(row[col])
@@ -777,9 +780,9 @@ def ts_predict():
             if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some identical values being identified as different b/c of some small differences 
                 row_match = False
 
-                # debugging
-                # print('BETDAH check')
-                # if row['CoRE_name'] == 'BETDAH_clean':
+                # # debugging
+                # print('AFUKIX check')
+                # if row['CoRE_name'] == 'AFUKIX_clean':
                 #     print(col)
                 #     print(row[col])
                 #     print(merged_df.iloc[0][col])

@@ -51,6 +51,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   font-weight: bold;
 }
 
+.selection_button{
+  display:inline-block; 
+  width:33%; 
+}
+
+
 body {
   /* The font to be used everywhere */
   font-family: Arial, Helvetica, sans-serif;
@@ -62,6 +68,7 @@ body {
 
 
 <!-- Empty head section: place meta tags and favicon here -->
+
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition, debugging -->
 
@@ -161,13 +168,16 @@ body {
           <div style='width:100%; text-align:center; margin-top:0.25cm;'>
 
             <!-- Button for queuing up the example MOF cif file -->
-            <button style='display:inline-block; width:33%' class='btn btn-primary round_button' id='load' type='button'>Load example</button>
+            <button class='btn btn-primary round_button selection_button' id='load' type='button'>Load example</button>
 
             <!-- Button for uploading MOF cif file -->
-            <button style='display:inline-block; width:33%' class='btn btn-primary round_button' id='upload' type='button'>Upload cif file</button>
+            <button class='btn btn-primary round_button selection_button' id='upload' type='button'>Upload cif file</button>
 
             <!-- Button for uploading MOF cif file -->
-            <button style='display:inline-block; width:33%' class='btn btn-primary round_button' id='bb-redirect' type='button'>Construct from building blocks</button>
+            <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'>Construct from building blocks</button>
+
+<!--             0E3A98 TODO  darker blue on hover -->
+
           </div> 
 
         </div>
@@ -796,6 +806,14 @@ body {
   // ***** End of section with a lot of copied code. *****
 
 
+  // tags for changing the selection button colors
+  failure_red = '#853013';
+  success_green = '#0D8025';
+  original_blue = '#2c3e50';
+  load_color = original_blue;
+  upload_color = original_blue;
+  bb_redirect_color = original_blue;
+
   $(function() {
 
 
@@ -811,10 +829,8 @@ body {
     })
 
     // Upload MOF cif file.  
-    $(function() {
-      $('#upload').on('click', function() { // button triggers upload
-        $('#file_input').trigger('click'); // OS file selection
-      });
+    $('#upload').on('click', function() { // button triggers upload
+      $('#file_input').trigger('click'); // OS file selection
     });
 
     // Used for ensuring that only .cif files are uploaded.  
@@ -841,6 +857,8 @@ body {
         else if (action != 'bb') {
           document.getElementById('bbg_MOF_holder').value = null; // clearing bb-generated MOFs holder
         }
+
+        color_reset(); // resetting selection button colors 
 
         // clearing previous predictions
         $('#solvent_stability_prediction').text('');
@@ -875,6 +893,16 @@ body {
         document.getElementById('container-01-note').innerHTML = '(MOF linkers and SBUs are visualized here. Left click to rotate, scroll with mouse to zoom.)';
     }
 
+    function color_reset() { // resets the colors of the selection buttons
+      load_color = original_blue;
+      upload_color = original_blue;
+      bb_redirect_color = original_blue;
+
+      $('#load').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#upload').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#bb-redirect').css({'background-color': original_blue, 'border-color': original_blue})
+    }
+
     // This function triggers once the user uploads a file.
     $("#file_input").change(function () { 
         renew('input');
@@ -882,12 +910,16 @@ body {
         // Check if uploaded file is a .cif.
         if (! isCif(this.value)) { // if the uploaded file is not a cif
             this.value = null; // clear the non-cif file
+            upload_color = failure_red;
+            $('#upload').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
             alert("Must be a cif file.");
             return; // if not a cif, doesn't continue     
         }
 
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
         $('#upload_status').text('File uploaded: ' + myFile.name);
+        upload_color = success_green;
+        $('#upload').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
     });
 
     // This function triggers when someone clicks the Visualize selected MOF button.
@@ -1275,6 +1307,8 @@ body {
 
             if (response == 'FAILED') { 
               alert('Failed to generate MOF')
+              bb_redirect_color = failure_red;
+              $('#bb-redirect').css({'background-color':failure_red, 'border-color': failure_red}); // setting button color to indicate failure
               document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
               return; 
             }
@@ -1304,6 +1338,9 @@ body {
                     document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
 
                     $('#upload_status').text('MOF constructed with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+                    bb_redirect_color = success_green;
+                    $('#bb-redirect').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+                    $('#pills-start-tab').click() // redirecting to appropriate tab
                   }).catch(error => {
                     $('#upload_status').text('Failed to load');
                     console.error('There has been a problem with your fetch operation:', error);
@@ -1354,6 +1391,8 @@ body {
 
       fetch('mof_examples/jz4002345_si_002_primitive.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
+          load_color = failure_red;
+          $('#load').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
           throw Error(response.statusText);
         } 
           return response.blob();
@@ -1362,8 +1401,12 @@ body {
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
           document.getElementById('example_holder').value = myFile; // setting the value of example_holder
           $('#upload_status').text('File uploaded: Example MOF cif file (UiO-66 from https://doi.org/10.1021/jz4002345, primitive cell attained via molSimplify)'); // indicating that the example MOF has been uploaded
+          load_color = success_green;
+          $('#load').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
         }).catch(error => {
+          load_color = failure_red;
+          $('#load').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
           $('#upload_status').text('Failed to upload example MOF');
           console.error('There has been a problem with your fetch operation:', error);
         })      
@@ -2118,6 +2161,33 @@ body {
     // This is my hacky way to get around the fact that the full MOF viewport does not work if it is immediately hidden.
     // I just wait a bit, then hide it
     window.setTimeout(viewer_hider, 5)
+
+
+    // functions to handle the selection button color change upon mouse hover
+    // since we change the selection button colors and lose the default hover color change
+    $("#load").hover(function(){ 
+      $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", load_color);
+      $(this).css("border-color", load_color);
+     });
+
+    $("#upload").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", upload_color);
+      $(this).css("border-color", upload_color);
+     });
+
+    $("#bb-redirect").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", bb_redirect_color);
+      $(this).css("border-color", bb_redirect_color);
+     });
 
   });
 

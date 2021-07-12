@@ -1,0 +1,1 @@
+[c]1c([c][c][c]c1[N]C(=O)C(=O)[O])[N]C(=O)C(=O)[O]	/Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626119693.140003/RACs/linkers/temp_cif_primitive_linker_3.xyz

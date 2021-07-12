@@ -1,0 +1,1 @@
+[Zn@@]1(N2[CH]N3[Zn@@](=N[C])([O])O[C]O[Zn@@](N3[CH]2)(N([C])N([Zn@]([N][C][N][Zn](N([C])N1[C])(O[C])O[C])(N([C])[C])O[C])[C])O[C])(N([C])[C])O[C]	/Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626120057.87274/RACs/sbus/temp_cif_primitive_sbu_0.xyz

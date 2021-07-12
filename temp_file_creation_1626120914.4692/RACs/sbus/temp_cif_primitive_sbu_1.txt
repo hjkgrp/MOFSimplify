@@ -1,0 +1,1 @@
+O1[Zr]2345O[C]O[Zr]6O[C]O[Zr]78(O[Zr]1(O2)(O[C]=O)(O[C]O6)O8)(O[Zr](O[C]=O)(O3)(O4)(O7)O[C]=O)O[C]O[Zr]O[C]O5	/Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626120914.4692/RACs/sbus/temp_cif_primitive_sbu_1.xyz

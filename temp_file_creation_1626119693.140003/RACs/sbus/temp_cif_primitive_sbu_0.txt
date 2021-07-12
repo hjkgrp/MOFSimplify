@@ -1,0 +1,1 @@
+[Li]O[C]1C(=O)O[Ni]23(N1[C])(N([C])C(=O)C(=O)O2)N([C])C(=O)C(=O)O3.[Li]O[C]1C(=O)O[Ni]23(N([C])C(=O)C(=O)O2)(N1[C])N([C])[C](C(=O)O3)O[Li]	/Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626119693.140003/RACs/sbus/temp_cif_primitive_sbu_0.xyz

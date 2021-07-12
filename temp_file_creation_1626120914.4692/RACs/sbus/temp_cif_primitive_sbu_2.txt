@@ -1,0 +1,1 @@
+O([Zr]123(O[C]=O)O[Zr]456(O[C]O[Zr]O[C]O[Zr]7(O1)(O[Zr](O4)(O[C]=O)(O[C]=O)(O7)O6)(O[C]O[Zr]O[C]O5)O3)O2)[C]=O	/Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626120914.4692/RACs/sbus/temp_cif_primitive_sbu_2.xyz

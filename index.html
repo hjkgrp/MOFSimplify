@@ -693,7 +693,7 @@ body {
       /* See class documentation at http://nglviewer.org/ngl/api/class/src/stage/stage.js~Stage.html */
       /* See also the general documentation at http://nglviewer.org/ngl/api/manual/ */
     } );
-    // console.log('PDB check') // TODO debugging
+    // console.log('PDB check') // debugging
     // console.log(path_to_cif)
     // console.log(ngl_stage)
     return component;
@@ -1371,6 +1371,13 @@ body {
     $('#get_components').click(function() {
       console.log('print check A')
 
+      // Clearing things
+      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+      $('#component_SMILES').text('') // clear the SMILES text
+      component_viewer.clear(); // clear component visualizer
+      $('#comp_MOF').text('') // clear the text about which MOF is broken into components
+      clear_component_dropdowns();
+
       // check if a cif is uploaded
       let myFile = document.getElementById('file_input').files[0]; // the uploaded file
       let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
@@ -1409,7 +1416,6 @@ body {
 
             var result = JSON.parse(response);
 
-            clear_component_dropdowns();
             var linker_dropdown = document.getElementById('linker');
             var sbu_dropdown = document.getElementById('sbu');
 
@@ -1447,10 +1453,6 @@ body {
 
             $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 
-            document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
-            $('#component_SMILES').text('') // clear the SMILES text
-            component_viewer.clear(); // clear component visualizer
-
         });
       })
     });
@@ -1459,6 +1461,13 @@ body {
     // Get MOF linkers and sbus when the Get solvent neighbor components button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#comp_s_neighbor').click(function() {
+
+      // Clearing things
+      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+      $('#component_SMILES').text('') // clear the SMILES text
+      component_viewer.clear(); // clear component visualizer
+      $('#comp_MOF').text('') // clear the text about which MOF is broken into components
+      clear_component_dropdowns();
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('solvent_neighbors_holder').value == undefined) {
@@ -1499,7 +1508,6 @@ body {
 
               var result = JSON.parse(response);
 
-              clear_component_dropdowns();
               var linker_dropdown = document.getElementById('linker');
               var sbu_dropdown = document.getElementById('sbu');
 
@@ -1525,10 +1533,6 @@ body {
 
               $('#comp_MOF').text('MOF for which components are listed below: ' + my_neighbor)
 
-              document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
-              $('#component_SMILES').text('') // clear the SMILES text
-              component_viewer.clear(); // clear component visualizer
-
           });
         })
 
@@ -1541,6 +1545,13 @@ body {
     // Get MOF linkers and sbus when the Get thermal neighbor components button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#comp_t_neighbor').click(function() {
+
+      // Clearing things
+      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+      $('#component_SMILES').text('') // clear the SMILES text
+      component_viewer.clear(); // clear component visualizer
+      $('#comp_MOF').text('') // clear the text about which MOF is broken into components
+      clear_component_dropdowns();
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('thermal_neighbors_holder').value == undefined) {
@@ -1581,7 +1592,6 @@ body {
 
               var result = JSON.parse(response);
 
-              clear_component_dropdowns();
               var linker_dropdown = document.getElementById('linker');
               var sbu_dropdown = document.getElementById('sbu');
 
@@ -1606,10 +1616,6 @@ body {
               document.getElementById('components_holder').value = result; 
 
               $('#comp_MOF').text('MOF for which components are listed below: ' + my_neighbor)
-
-              document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
-              $('#component_SMILES').text('') // clear the SMILES text
-              component_viewer.clear(); // clear component visualizer
 
           });
         })
@@ -1986,7 +1992,7 @@ body {
 
     })
 
-    // TODO testing out tab functionality
+    // tab functionality
     // https://getbootstrap.com/docs/5.0/components/navs-tabs/
     // https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll
     const container = document.querySelector('#pills-tab')
@@ -2008,7 +2014,6 @@ body {
     })
 
     
-    // TODO
     $('#pills-start-tab').click(function(){
       $('#pills-start').show() 
       $('#pills-vis').hide()

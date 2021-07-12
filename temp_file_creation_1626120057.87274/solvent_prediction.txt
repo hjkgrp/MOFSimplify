@@ -1,0 +1,4 @@
+[[0.93]]
+(1394, 200) (1, 200)
+['XOVVEK_clean', 'HADDOI_clean', 'KORNAI_clean', 'ILOJEZ_clean', 'FUNLAD_clean']
+[1.9671556, 3.4202182, 3.6605403, 3.7640471, 4.198176]

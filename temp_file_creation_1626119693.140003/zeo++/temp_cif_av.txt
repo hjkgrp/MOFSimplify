@@ -1,0 +1,3 @@
+@ /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1626119693.140003/zeo++/temp_cif_av.txt Unitcell_volume: 4467.79   Density: 0.647122   AV_A^3: 1423.88 AV_Volume_fraction: 0.3187 AV_cm^3/g: 0.492488 NAV_A^3: 0 NAV_Volume_fraction: 0 NAV_cm^3/g: 0
+Number_of_channels: 1 Channel_volume_A^3: 1423.88  
+Number_of_pockets: 0 Pocket_volume_A^3: 

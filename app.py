@@ -489,11 +489,11 @@ def ss_predict():
 
     # print('In train check')
 
-    for index, row in train_df.iterrows(): # iterate through rows
+    for index, row in train_df.iterrows(): # iterate through rows of the training data MOFs
 
         row_match = True # gets set to false if any values don't match 
 
-        for col in merged_df.columns: # iterate through columns
+        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on
             if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
                 # Dif was sometimes differing between new Zeo++ call and training data value
@@ -501,6 +501,9 @@ def ss_predict():
             # print(col)
             # print(row[col])
             # print(merged_df.iloc[0][col])
+
+            # If for any property a training MOF and the new MOF we are predicting on differ too much, we know they are not the same MOF
+            # So row_match is set to false for this training MOF
             if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some same values being idenfitied as different b/c of some floating 10^-15 values 
                 row_match = False
 
@@ -514,7 +517,7 @@ def ss_predict():
 
                 break
         
-        if row_match: # all columns for row match!
+        if row_match: # all columns for row match! Training MOF is the same as new MOF
             in_train = True
             match_truth = row['flag'] # the flag for the MOF that matches the current MOF
             print(row['CoRE_name'])
@@ -765,11 +768,11 @@ def ts_predict():
 
     # print('In train check')
 
-    for index, row in train_df.iterrows(): # iterate through rows
+    for index, row in train_df.iterrows():  # iterate through rows of the training data MOFs, where each row represents a train MOF
 
         row_match = True # gets set to false if any values don't match 
 
-        for col in merged_df.columns: # iterate through columns
+        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on
             if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
                 # Dif was sometimes differing between new Zeo++ call and training data value
@@ -777,6 +780,9 @@ def ts_predict():
             # print(col)
             # print(row[col])
             # print(merged_df.iloc[0][col])
+
+            # If for any property a training MOF and the new MOF we are predicting on differ too much, we know they are not the same MOF
+            # So row_match is set to false for this training MOF
             if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some identical values being identified as different b/c of some small differences 
                 row_match = False
 
@@ -789,7 +795,7 @@ def ts_predict():
 
                 break
         
-        if row_match: # all columns for row match!
+        if row_match: # all columns for row match! Training MOF is the same as new MOF
             in_train = True
             match_truth = row['T'] # the flag for the MOF that matches the current MOF
 

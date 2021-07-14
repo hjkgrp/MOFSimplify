@@ -493,7 +493,7 @@ def ss_predict():
 
         row_match = True # gets set to false if any values don't match 
 
-        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on
+        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on (merged_df is just one row)
             if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
                 # Dif was sometimes differing between new Zeo++ call and training data value
@@ -772,7 +772,7 @@ def ts_predict():
 
         row_match = True # gets set to false if any values don't match 
 
-        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on
+        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on (merged_df is just one row)
             if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
                 # Dif was sometimes differing between new Zeo++ call and training data value

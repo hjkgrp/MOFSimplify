@@ -1389,7 +1389,7 @@ body {
     // Load example MOF when the Load example MOF button is clicked.
     $('#load').click(function() {
 
-      fetch('mof_examples/jz4002345_si_002_primitive.cif').then(response => { // grabbing the example MOF from local host
+      fetch('mof_examples/HEBTAL.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           load_color = failure_red;
           $('#load').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
@@ -1400,7 +1400,7 @@ body {
           renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
           document.getElementById('example_holder').value = myFile; // setting the value of example_holder
-          $('#upload_status').text('File uploaded: Example MOF cif file (UiO-66 from https://doi.org/10.1021/jz4002345, primitive cell attained via molSimplify)'); // indicating that the example MOF has been uploaded
+          $('#upload_status').text('File uploaded: Example MOF cif file (HEBTAL) from Solid State Sciences 14 (2012) 1263-1266'); // indicating that the example MOF has been uploaded
           load_color = success_green;
           $('#load').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 

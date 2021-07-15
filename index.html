@@ -66,6 +66,22 @@ body {
   font-size: 16px;
 }
 
+.pill-custom {
+  border-radius: 0px 0px 0px 0px !important;
+  border: 0px;
+  color: black !important;
+  background-color: white !important;
+}
+
+.pill-custom.active {
+  background-color: #f7f7f7 !important;
+  border-bottom: 5px solid black !important;
+}
+
+.pill-custom:hover {
+  color: #18bc9c !important;
+}
+
 </style>
 
 
@@ -138,32 +154,32 @@ body {
 
 
     <!-- The 4 tabs of the website -->
-    <ul class="nav nav-pills mb-3" id="pills-tab">
+    <ul class="nav nav-pills mb-3" id="pills-tab" style="overflow-x: auto;text-align: center;margin-bottom: 10px;border-bottom-width: 1px;border-bottom-style: solid; border-bottom-color:#d6d9dc;">
 <!--     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
  --><!--       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
       </li> -->
       <li class="nav-item" role="presentation" style='width:25%'>
-        <button class="nav-link active" id="pills-start-tab" style='width:100%; font-weight: bold;'>Start</button>
+        <button class="nav-link pill-custom active" id="pills-start-tab" style='width:100%; height:100%; font-weight: bold;'>Start</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%'>
-        <button class="nav-link" id="pills-vis-tab" style='width:100%; font-weight: bold;'>Visualization</button>
+        <button class="nav-link pill-custom" id="pills-vis-tab" style='width:100%; height: 100%; font-weight: bold;'>Visualization</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%'>
-        <button class="nav-link" id="pills-comp-tab" style='width:100%; font-weight: bold;'>Component Analysis</button>
+        <button class="nav-link pill-custom" id="pills-comp-tab" style='width:100%; height: 100%; font-weight: bold;'>Component Analysis</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%'>
-        <button class="nav-link" id="pills-bb-tab" style='width:100%; font-weight: bold;'>Building Block Assembly</button>
+        <button class="nav-link pill-custom" id="pills-bb-tab" style='width:100%; height: 100%; font-weight: bold;'>Building Block Assembly</button>
       </li>
 <!--       <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-stat-tab" data-toggle="pill" data-target="#pills-stat" type="button" role="tab" aria-controls="pills-stat" aria-selected="false">Status messages and MOF predictions</button>
       </li> -->
     </ul>
 
-    <div id="pills-start">
+    <div id="pills-start" class="container">
       <div class='row'>
       
-        <b> 1) Select a MOF for analysis </b>
+        <b> 1) Select a MOF for analysis (example loaded by default)</b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
@@ -203,13 +219,16 @@ body {
       </div>
 
       <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
-      <div class='row' style='margin-top: 0.5cm;'>
+      <div class='row' style='margin-top: 0.5cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
           <b> Status messages and MOF predictions </b>
           <div class='col-12' id='upload_status'></div> 
           <div class='col-12' id='solvent_stability_prediction'></div> 
           <div class='col-12' id='thermal_stability_prediction'></div> 
           <div class='col-12' id='thermal_stability_percentile'></div> 
           <div class='col-12' id='chart'></div>
+      </div>
+
+      <div class='row'>
 
           <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN.</p>
 
@@ -810,7 +829,7 @@ body {
 
   // tags for changing the selection button colors
   failure_red = '#853013';
-  success_green = '#0D8025';
+  success_green = '#18bc9c';
   original_blue = '#2c3e50';
   load_color = original_blue;
   upload_color = original_blue;

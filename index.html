@@ -30,9 +30,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 .mol-container {
   height: 400px;
   position: relative;
-/*  width: 500px;
-  height: 400px;
-  position: relative;*/
 }
 
 .form-control {
@@ -1061,27 +1058,27 @@ body {
                     // preparing the human-interpretable solvent removal stability prediction
                     if (prediction <= 0.2) {
                       verdict = 'Very confident the MOF is unstable upon solvent removal.';
-                      my_color = '#ffad97'
+                      my_color = '#ffad97' // color background, light red
                     }
                     else if (prediction <= 0.4) {
                       verdict = 'Fairly confident the MOF is unstable upon solvent removal.';
-                      my_color = '#ffcd97'
+                      my_color = '#ffcd97' // light orange
                     }
                     else if (prediction <= 0.5) {
                       verdict = 'Uncertain, but predict the MOF is unstable upon solvent removal.';
-                      my_color = '#fffa97'
+                      my_color = '#fffa97' // light yellow
                     }
                     else if (prediction <= 0.6) {
                       verdict = 'Uncertain, but predict the MOF is stable upon solvent removal.';
-                      my_color = '#fffa97'
+                      my_color = '#fffa97' // light yellow
                     }
                     else if (prediction <= 0.8) {
                       verdict = 'Fairly confident the MOF is stable upon solvent removal.';
-                      my_color = '#e7ff97'
+                      my_color = '#e7ff97' // light lime
                     }
                     else {
                       verdict = 'Very confident the MOF is stable upon solvent removal.';
-                      my_color = '#90ee90'
+                      my_color = '#90ee90' // light green
                     }
 
                     $('#solvent_stability_prediction').text('The solvent removal stability prediction is: ' + prediction.toString() + '. ' + verdict ); 
@@ -1127,11 +1124,11 @@ body {
                    
                     if (response['truth'] == 1) {
                       $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be stable upon solvent removal.');
-                      setColor(stability_field, '#90ee90') // color background
+                      setColor(stability_field, '#90ee90') // color background, light green
                     }
                     else {
                       $('#solvent_stability_prediction').text('This MOF is in the training data and is reported to be unstable upon solvent removal.'); 
-                      setColor(stability_field, '#ffad97') // color background 
+                      setColor(stability_field, '#ffad97') // color background, light red
                     }
 
                   }
@@ -1188,19 +1185,19 @@ body {
 
                     percentile_field = document.getElementById('thermal_stability_percentile');
                     if (response >= 80) {
-                      setColor(percentile_field, '#90ee90')
+                      setColor(percentile_field, '#90ee90') // color background, light green
                     }
                     else if (response >= 60) {
-                      setColor(percentile_field, '#e7ff97')
+                      setColor(percentile_field, '#e7ff97') // light lime
                     }
                     else if (response >= 40) {
-                      setColor(percentile_field, '#fffa97')
+                      setColor(percentile_field, '#fffa97') // light yellow
                     }
                     else if (response >= 20) {
-                      setColor(percentile_field, '#ffcd97')
+                      setColor(percentile_field, '#ffcd97') // light orange
                     }
                     else {
-                      setColor(percentile_field, '#ffad97')
+                      setColor(percentile_field, '#ffad97') // light red
                     }
                   })   
 
@@ -1254,20 +1251,20 @@ body {
 
                       percentile_field = document.getElementById('thermal_stability_percentile');
                       if (response >= 80) {
-                        setColor(percentile_field, '#90ee90')
+                        setColor(percentile_field, '#90ee90') // light green
                       }
                       else if (response >= 60) {
-                        setColor(percentile_field, '#e7ff97')
+                        setColor(percentile_field, '#e7ff97') // light lime
                         console.log('hit')
                       }
                       else if (response >= 40) {
-                        setColor(percentile_field, '#fffa97')
+                        setColor(percentile_field, '#fffa97') // light yellow
                       }
                       else if (response >= 20) {
-                        setColor(percentile_field, '#ffcd97')
+                        setColor(percentile_field, '#ffcd97') // light orange
                       }
                       else {
-                        setColor(percentile_field, '#ffad97')
+                        setColor(percentile_field, '#ffad97') // light red
                       }
                   })   
 

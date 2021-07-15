@@ -864,8 +864,8 @@ def plot_thermal_stability():
     my_data = info['temperature'] # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
     my_data = float(my_data)
-    print('checkerino')
-    print(my_data)
+    # print('checkerino')
+    # print(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv(MOFSIMPLIFY_PATH + "model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -874,6 +874,7 @@ def plot_thermal_stability():
     matplotlib.use('Agg') # noninteractive backend
     import matplotlib.pyplot as plt
     plt.close("all")
+    plt.rcParams.update({'font.size': 16}) # large font
     import scipy.stats as stats
 
     # In training data, smallest T breakdown is 35, and largest T breakdown is 654.
@@ -881,7 +882,7 @@ def plot_thermal_stability():
     # use stats.gaussian_kde to estimate the probability density function from the histogram
     density = stats.gaussian_kde(temps_df['T'])
     x = np.arange(30,661,1) # in training data, smallest T breakdown is 35, and largest T breakdown is 654
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10, 6), dpi=80) # set figure size
     ax = fig.add_subplot(1,1,1)
     plt.plot(x, density(x))
     plt.plot(my_data, density(my_data), "or") # the current MOF's predicted thermal breakdown temperature

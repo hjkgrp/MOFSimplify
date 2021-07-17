@@ -48,7 +48,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 }
 
 #link {
-  color: #00BFFF; /* hyperlinks are light blue */
+  color: #2AAE54; /* hyperlinks are green */
 }
 
 #viewportwrapper { grid-area: viz; } /* For MOF visualization */
@@ -58,6 +58,29 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   text-align:center; /* thermal breakdown plot is centered, when thermal stability prediction is made */
 }
 
+/*#dimmadome {
+  background-image: url('great_dome.png');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  background-position: center;
+}*/
+
+#dimmadome {
+  position: relative;  
+  opacity: 1;
+}
+
+#dimmadome::before { /*background image*/
+  content: "";
+  background-image:  url('great_dome.png');
+  background-size: cover;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  opacity: 0.3;
+}
 
 body {
   /* The font to be used everywhere */
@@ -140,14 +163,23 @@ body {
   <div class="container">
     <div class="page-header" id="banner">
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="col-lg-12 col-md-12 col-sm-12" id='dimmadome'>
           <!-- Title -->
-          <h1 style="color:black;"> <span style='font-family: Helvetica;'> MOFSimplify </span> <span style="font-size: 24px;">  (powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT!) </span></h1>
-          <!-- Subtitle -->
-          <p class="lead">Predict and view structures and properties of MOFs in your browser below!</p>
+          <span style='position:relative;'>
+            <h1 style="color:black; width:100%; text-align:center; font-family: Helvetica; margin-top: 0.5cm;">MOFSimplify</h1>
+
+            <p style="font-size: 24px; width:100%; text-align:center;">(powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik group</a> at MIT)</p>
+            
+            <!-- Subtitle -->
+            <p style="width:100%; text-align:center;">
+              <span style="font-size:18px;">Predict and view structures and properties of metal-organic frameworks (MOFs) in your browser below!</span><br>
+              For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.
+            </p>
           
           <!-- Lead text -->
-          <p>For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.</p>
+<!--           <p">For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.</p>
+ -->        
+          </span>
         </div>
       </div>
     </div>
@@ -200,7 +232,7 @@ body {
 
         </div>
 
-        <b style='margin-top: 0.5cm;'> 2) Predict properties of the selected MOF </b>
+        <b style='margin-top: 1cm;'> 2) Predict properties of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
@@ -219,7 +251,7 @@ body {
       </div>
 
       <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
-      <div class='row' style='margin-top: 0.5cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
+      <div class='row' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
           <b> Status messages and MOF predictions </b>
           <div class='col-12' id='upload_status'></div> 
           <div class='col-12' id='solvent_stability_prediction'></div> 
@@ -237,7 +269,7 @@ body {
           <select class='form-control' id='solvent_neighbors'>
           </select>
 
-          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
             <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
             <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
           </div>
@@ -253,7 +285,7 @@ body {
           <select class='form-control' id='thermal_neighbors'>
           </select>
 
-          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
             <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
             <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
           </div>
@@ -286,7 +318,9 @@ body {
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
         <button class='btn btn-primary round_button' style='display:inline-block; width:50%;' id='visualize' type='button'>Visualize selected MOF</button>
+        <p style='display:inline-block; width:50%;'> Special thanks to the Snurr group for developing MOF visualization code. </p>
       </div>
+
       <div style='width:100%; text-align:center;'>
         <div style='display:inline-block;' id='currently_visualized'></div> 
       </div>
@@ -344,9 +378,12 @@ body {
     </div>
 
     <div id="pills-bb">
-      A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb). Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF visualization and construction code. <br> <br>
+      A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb).  <br>
 
-      Note: not every combination of linker, SBU, and net is compatible.
+      Not every combination of linker, SBU, and net is compatible. <br>
+
+      Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF building block assembly code.
+
 
       <!-- Selection box for the linker building block -->
       <div  style="padding-top: 30px">

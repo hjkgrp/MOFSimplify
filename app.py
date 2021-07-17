@@ -116,15 +116,19 @@ def serve_demo():
 
 @app.route('/logo.png')
 def serve_logo():
-    return flask.send_from_directory('.', 'logo.png')
+    return flask.send_from_directory('images', 'logo.png')
 
 @app.route('/truncated_logo.png')
 def serve_truncated_logo():
-    return flask.send_from_directory('.', 'truncated_logo.png')
+    return flask.send_from_directory('images', 'truncated_logo.png')
 
 @app.route('/TGA_graphic.png')
 def serve_TGA_graphic():
-    return flask.send_from_directory('.', 'TGA_graphic.png')
+    return flask.send_from_directory('images', 'TGA_graphic.png')
+
+@app.route('/great_dome.png')
+def serve_dome():
+    return flask.send_from_directory('images', 'great_dome.png')
 
 #@app.route('/')
 #def serve_homepage():

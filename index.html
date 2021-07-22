@@ -59,21 +59,14 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   text-align:center; /* thermal breakdown plot is centered, when thermal stability prediction is made */
 }
 
-/*#dimmadome {
-  background-image: url('great_dome.png');
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: center;
-}*/
-
-#dimmadome {
+#header_background {
   position: relative;  
   opacity: 1;
 }
 
-#dimmadome::before { /*background image in header of website*/
+#header_background::before { /*background image in header of website*/
   content: "";
-  background-image:  url('great_dome.png');
+  background-image:  url('MOF5_background.png');
   background-size: cover;
   position: absolute;
   top: 0px;
@@ -166,7 +159,7 @@ body {
   <div class="container">
     <div class="page-header" id="banner">
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12" id='dimmadome'>
+        <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
           <!-- Title -->
           <span style='position:relative;'>
             <h1 style="color:black; width:100%; text-align:center; font-family: Helvetica; margin-top: 0.5cm;">MOFSimplify</h1>

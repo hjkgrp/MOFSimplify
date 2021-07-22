@@ -126,9 +126,9 @@ def serve_truncated_logo():
 def serve_TGA_graphic():
     return flask.send_from_directory('images', 'TGA_graphic.png')
 
-@app.route('/great_dome.png')
+@app.route('/MOF5_background.png')
 def serve_dome():
-    return flask.send_from_directory('images', 'great_dome.png')
+    return flask.send_from_directory('images', 'MOF5_background.png')
 
 #@app.route('/')
 #def serve_homepage():

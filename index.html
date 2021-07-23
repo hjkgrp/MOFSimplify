@@ -224,8 +224,6 @@ body {
             <!-- Button for uploading MOF cif file -->
             <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'>Construct from building blocks</button>
 
-<!--             0E3A98 TODO  darker blue on hover -->
-
           </div> 
 
         </div>
@@ -449,10 +447,10 @@ body {
 
 <!-- For cif file upload -->
  <input id="file_input" type="file" name="file_input" style="display:none"/>  
-<!-- This will never display anything. Just used to store a MOF cif file if the button "Upload MOF file" is used. -->
+<!-- This will never display anything. Just used to store a MOF cif file if the button "Custom (upload cif file)" is used. -->
 
 <!-- For example MOF file -->
-<p id="example_holder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Load example MOF" is used. -->
+<p id="example_holder"> </p> <!-- This will never display anything. Just used to store a MOF cif file if the button "Example MOF" is used. -->
 
 <!-- For building block-generated MOF file -->
 <p id="bbg_MOF_holder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used. -->
@@ -461,10 +459,10 @@ body {
 <p id="components_holder"> </p> <!-- This will never display anything. Just used to store components if the button "Get selected MOF components" is used. -->
 
 <!-- For solvent removal stability ANN nearest neighbors -->
-<p id="solvent_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Predict stability upon solvent removal" is used. -->
+<p id="solvent_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Stability upon solvent removal" is used. -->
 
 <!-- For thermal stability ANN nearest neighbors -->
-<p id="thermal_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Predict thermal stability" is used. -->
+<p id="thermal_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Thermal stability" is used. -->
 
 </body>
 
@@ -1013,7 +1011,7 @@ body {
         $('#currently_visualized').text(message);
     })
 
-    // This function triggers when someone clicks the Visualize solvent neighbor button. 
+    // This function triggers when someone clicks the "Visualize" button in the solvent section. 
     $("#visualize_s_neighbor").on('click', function() {
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
@@ -1044,7 +1042,7 @@ body {
         $('#currently_visualized').text(message);
     })
 
-    // This function triggers when someone clicks the Visualize thermal neighbor button. 
+    // This function triggers when someone clicks the "Visualize" button in the thermal section. 
     $("#visualize_t_neighbor").on('click', function() {
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
@@ -1075,7 +1073,7 @@ body {
         $('#currently_visualized').text(message);
     })
 
-    // Generate solvent removal stability prediction when the Predict stability upon solvent removal button is clicked.
+    // Generate solvent removal stability prediction when the "Stability upon solvent removal" button is clicked.
     $('#predict_s').click(function() {
       // check if a cif is uploaded
       let myFile = document.getElementById('file_input').files[0]; // the uploaded file
@@ -1199,7 +1197,7 @@ body {
       element.style.backgroundColor = color;
     }
 
-    // Generate thermal stability prediction when the Predict thermal stability button is clicked.
+    // Generate thermal stability prediction when the "Thermal stability" button is clicked.
     $('#predict_t').click(function() {
       // check if a cif is uploaded
       let myFile = document.getElementById('file_input').files[0]; // the uploaded file
@@ -1334,7 +1332,7 @@ body {
     });
 
 
-    // Generate MOF from building blocks when the Make bb-generated MOF button is clicked.
+    // Generate MOF from building blocks when the "Make bb-generated MOF" button is clicked.
     $('#generate').click(function() {
       renew('bb');
 
@@ -1408,7 +1406,7 @@ body {
         });
     });  
 
-    // Triggers when the Download bb-generated MOF button is clicked.
+    // Triggers when the "Download bb-generated MOF" button is clicked.
     $('#download_generated').click(function() {
       if (document.getElementById('bbg_MOF_holder').value == undefined) {
         alert('Must generate MOF with building blocks first, using Make bb-generated MOF button.'); 
@@ -1444,7 +1442,7 @@ body {
         })
     })
 
-    // Load example MOF when the Load example MOF button is clicked.
+    // Load example MOF when the "Example MOF" button is clicked.
     $('#load').click(function() {
 
       fetch('mof_examples/HEBTAL_clean.cif').then(response => { // grabbing the example MOF from local host
@@ -1471,7 +1469,7 @@ body {
     });
 
 
-    // Get MOF linkers and sbus when the Get selected MOF components button is clicked.
+    // Get MOF linkers and sbus when the "Get selected MOF components" button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function() {
       console.log('print check A')
@@ -1563,7 +1561,7 @@ body {
     });
 
 
-    // Get MOF linkers and sbus when the Get solvent neighbor components button is clicked.
+    // Get solvent removal stability latent space nearest neighbor MOF linkers and sbus when the "Get components" button in the solvent section is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#comp_s_neighbor').click(function() {
 
@@ -1647,7 +1645,7 @@ body {
 
     });
     
-    // Get MOF linkers and sbus when the Get thermal neighbor components button is clicked.
+    // Get thermal stability latent space nearest neighbor MOF linkers and sbus when the "Get components" button in the thermal section is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#comp_t_neighbor').click(function() {
 
@@ -1748,7 +1746,7 @@ body {
       }
     }
 
-    // Triggers when the Only components with unique connectivites button (or the All components button) is clicked.
+    // Triggers when the "Only components with unique connectivites" button (or the "All components" button) is clicked.
     $('#toggle_unique_components').click(function() {
 
       // Ensure there are components to visualize
@@ -1812,7 +1810,7 @@ body {
     })
 
 
-    // Visualize the linker after MOF components have been resolved when the Visualize linker button is clicked.
+    // Visualize the linker after MOF components have been resolved when the "Visualize linker" button is clicked.
     $('#visualize_linker').click(function() {
 
       // Ensure there are components to visualize.
@@ -1844,7 +1842,7 @@ body {
     })
 
 
-    // Visualize the sbu after MOF components have been resolved when the Visualize sbu button is clicked.
+    // Visualize the sbu after MOF components have been resolved when the "Visualize SBU" button is clicked.
     $('#visualize_sbu').click(function() {
 
       // Ensure there are components to visualize.
@@ -1891,7 +1889,7 @@ body {
       }
     }
 
-    // Get information on a nearest neighbor in solvent removal stability ANN latent space when the Show solvent neighbor info button is clicked.
+    // Get information on a nearest neighbor in solvent removal stability ANN latent space when the "Show" button in the solvent section is clicked.
     $('#s_neighbor').click(function() {
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
@@ -1934,7 +1932,7 @@ body {
     })
 
 
-    // Download the cif file of the nearest neighbor in solvent removal stability ANN latent space when the Download solvent neighbor info button is clicked. 
+    // Download the cif file of the nearest neighbor in solvent removal stability ANN latent space when the "Download" button in the solvent section is clicked. 
     // Also download a .out file that contains information on the nearest neighbor.
     $('#download_s_neighbor').click(function() {
 
@@ -1990,7 +1988,7 @@ body {
 
     })
 
-    // Get information on a nearest neighbor in thermal stability ANN latent space when the Show thermal neighbor info button is clicked.
+    // Get information on a nearest neighbor in thermal stability ANN latent space when the "Show" button in the thermal section is clicked.
     $('#t_neighbor').click(function() {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
 
@@ -2033,7 +2031,7 @@ body {
     })
 
 
-    // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the Download thermal neighbor info button is clicked. 
+    // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the "Download" button in the thermal section is clicked. 
     // Also download a .out file that contains information on the nearest neighbor.
     $('#download_t_neighbor').click(function() {
 
@@ -2148,7 +2146,7 @@ body {
       $('#pills-bb').show()
     })
 
-    // Start up page by virtually clicking the Load example MOF button
+    // Start up page by virtually clicking the "Example MOF" button
     $('#load').click();
 
     // Below: populate the linkers, sbus, and net dropdowns in the building block section.

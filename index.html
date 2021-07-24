@@ -853,6 +853,9 @@ body {
 
     $('#currently_visualized').text(''); // clear the message about which MOF is visualized if OOM occurs
 
+    visualize_color = failure_red;
+    $('#visualize').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+
     Module.setStatus = function(text) {
       if (text) Module.printErr('[post-exception status] ' + text);
     };
@@ -865,10 +868,16 @@ body {
   // tags for changing the selection button colors
   failure_red = '#853013';
   success_green = '#18bc9c';
+  inprogress_yellow = '#8B8000'
   original_blue = '#2c3e50';
+
   load_color = original_blue;
   upload_color = original_blue;
   bb_redirect_color = original_blue;
+  solvent_pred_color = original_blue;
+  thermal_pred_color = original_blue;
+  visualize_color = original_blue
+  component_color = original_blue
 
   $(function() {
 
@@ -914,7 +923,7 @@ body {
           document.getElementById('bbg_MOF_holder').value = null; // clearing bb-generated MOFs holder
         }
 
-        color_reset(); // resetting selection button colors 
+        color_reset(); // resetting selection and prediction and visualize and component button colors 
 
         // clearing previous predictions
         $('#solvent_stability_prediction').text('');
@@ -949,14 +958,22 @@ body {
         document.getElementById('container-01-note').innerHTML = '(MOF linkers and SBUs are visualized here. Left click to rotate, scroll with mouse to zoom.)';
     }
 
-    function color_reset() { // resets the colors of the selection buttons
+    function color_reset() { // resets the colors of the selection and prediction and visualize and component buttons
       load_color = original_blue;
       upload_color = original_blue;
       bb_redirect_color = original_blue;
+      solvent_pred_color = original_blue;
+      thermal_pred_color = original_blue;
+      visualize_color = original_blue;
+      component_color = original_blue
 
       $('#load').css({'background-color': original_blue, 'border-color': original_blue})
       $('#upload').css({'background-color': original_blue, 'border-color': original_blue})
       $('#bb-redirect').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#predict_s').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#predict_t').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#visualize').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#get_components').css({'background-color': original_blue, 'border-color': original_blue})
     }
 
     // This function triggers once the user uploads a file.
@@ -978,8 +995,12 @@ body {
         $('#upload').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
     });
 
-    // This function triggers when someone clicks the Visualize selected MOF button.
+    // This function triggers when someone clicks the "Visualize selected MOF" button.
     $("#visualize").on('click', function() {
+        visualize_color = inprogress_yellow; // TODO fix
+        // alert(visualize_color)
+        $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
+
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
@@ -989,6 +1010,8 @@ body {
         // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
         if (myFile == null && myFile2 == null && myFile3 == null) {
           alert("Must upload/generate a cif file first.");
+          visualize_color = failure_red;
+          $('#visualize').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
           return;
         }
 
@@ -1009,6 +1032,9 @@ body {
         message = message + name
 
         $('#currently_visualized').text(message);
+
+        visualize_color = success_green;
+        $('#visualize').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
     })
 
     // This function triggers when someone clicks the "Visualize" button in the solvent section. 
@@ -1087,12 +1113,19 @@ body {
           myFile = myFile3;
           if (myFile3 == undefined) {
             alert("Must upload/generate a cif file first.");
+
+            solvent_pred_color = failure_red;
+            $('#predict_s').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+
             return;  
           }
         }
       }
 
       alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
+
+      solvent_pred_color = inprogress_yellow;
+      $('#predict_s').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
@@ -1103,8 +1136,15 @@ body {
 
                   if (response == 'FAILED') { 
                       alert('Failed to featurize')
+                      solvent_pred_color = failure_red;
+                      $('#predict_s').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+
                     return; // Do not update solvent stability prediction if prediction failed.
                   }
+
+                  solvent_pred_color = success_green;
+                  $('#predict_s').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+
 
                   if (! response['in_train']) { // a prediction was made
                     var prediction = response['prediction']
@@ -1211,97 +1251,40 @@ body {
           myFile = myFile3;
           if (myFile3 == undefined) {
             alert("Must upload/generate a cif file first.");
+            thermal_pred_color = failure_red;
+            $('#predict_t').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
             return;  
           }
         }
       }
 
-      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
+      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.')
+      thermal_pred_color = inprogress_yellow;
+      $('#predict_t').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress 
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
 
-      $.post("/predict_thermal_stability", JSON.stringify(result)).done(
-          function(response) {
+        $.post("/predict_thermal_stability", JSON.stringify(result)).done(
+            function(response) {
 
-                if (response == 'FAILED') { 
-                    alert('Failed to featurize')
-                  return; // Do not update solvent stability prediction if prediction failed.
-                }
-
-                if (! response['in_train']) { // a prediction was made
-                  prediction = response['prediction'];
-                  $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
-
-                  $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
-                    $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-
-                    percentile_field = document.getElementById('thermal_stability_percentile');
-                    if (response >= 80) {
-                      setColor(percentile_field, '#90ee90') // color background, light green
-                    }
-                    else if (response >= 60) {
-                      setColor(percentile_field, '#e7ff97') // light lime
-                    }
-                    else if (response >= 40) {
-                      setColor(percentile_field, '#fffa97') // light yellow
-                    }
-                    else if (response >= 20) {
-                      setColor(percentile_field, '#ffcd97') // light orange
-                    }
-                    else {
-                      setColor(percentile_field, '#ffad97') // light red
-                    }
-                  })   
-
-                  myDict = {'prediction': true, 'temperature': prediction}
-                  $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
-                    $('#chart').html(response);
-                  }) 
-
-                  // Now that the prediction has been displayed, can move on to the neighbors display.
-                  var neighbor_names = response['neighbor_names']
-                  var neighbor_distances = response['neighbor_distances'] 
-
-                  // Converting these arrays into a dictionary called neighbors.
-                  var neighbors = {}
-                  for (i = 0; i < neighbor_names.length; i++) {
-                    neighbors[neighbor_names[i]] = neighbor_distances[i]
+                  if (response == 'FAILED') { 
+                      alert('Failed to featurize')
+                      thermal_pred_color = failure_red;
+                       $('#predict_t').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+                    return; // Do not update solvent stability prediction if prediction failed.
                   }
 
-                  // Storing the information on the neighbors.
-                  document.getElementById('thermal_neighbors_holder').value = neighbors;
+                  thermal_pred_color = success_green;
+                  $('#predict_t').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
-                  // Populating the thermal neighbors dropdown.
-                  var thermal_dropdown = document.getElementById("thermal_neighbors");
+                  if (! response['in_train']) { // a prediction was made
+                    prediction = response['prediction'];
+                    $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
 
-                  // clear dropdown
-                  var length = thermal_dropdown.options.length;
-                  for (i = length-1; i >= 0; i--) {
-                    thermal_dropdown.options[i] = null;
-                  }
-
-                  // Populating the thermal neighbors dropdown.
-                  for (i = 0; i < neighbor_names.length; i++) {
-                    var option = document.createElement('option');
-                    option.text = neighbor_names[i];
-                    thermal_dropdown.add(option);
-                  }
-                }
-
-                else { // requested MOF was in the training data
-                    // Storing information indicating that a prediction was made, but no neighbors are avaialable
-                    document.getElementById('thermal_neighbors_holder').value = 1
-                   
-                    $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
-
-                    $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function(response) {
+                    $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function(response) {
                       $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-
-                      console.log('check check')
-                      console.log(response)
-                      console.log(response >= 60)
 
                       percentile_field = document.getElementById('thermal_stability_percentile');
                       if (response >= 80) {
@@ -1309,7 +1292,6 @@ body {
                       }
                       else if (response >= 60) {
                         setColor(percentile_field, '#e7ff97') // light lime
-                        console.log('hit')
                       }
                       else if (response >= 40) {
                         setColor(percentile_field, '#fffa97') // light yellow
@@ -1320,14 +1302,81 @@ body {
                       else {
                         setColor(percentile_field, '#ffad97') // light red
                       }
-                  })   
+                    })   
 
-                    myDict = {'prediction': false, 'temperature': response['truth']}
+                    myDict = {'prediction': true, 'temperature': prediction}
                     $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
                       $('#chart').html(response);
                     }) 
-                }
-          });
+
+                    // Now that the prediction has been displayed, can move on to the neighbors display.
+                    var neighbor_names = response['neighbor_names']
+                    var neighbor_distances = response['neighbor_distances'] 
+
+                    // Converting these arrays into a dictionary called neighbors.
+                    var neighbors = {}
+                    for (i = 0; i < neighbor_names.length; i++) {
+                      neighbors[neighbor_names[i]] = neighbor_distances[i]
+                    }
+
+                    // Storing the information on the neighbors.
+                    document.getElementById('thermal_neighbors_holder').value = neighbors;
+
+                    // Populating the thermal neighbors dropdown.
+                    var thermal_dropdown = document.getElementById("thermal_neighbors");
+
+                    // clear dropdown
+                    var length = thermal_dropdown.options.length;
+                    for (i = length-1; i >= 0; i--) {
+                      thermal_dropdown.options[i] = null;
+                    }
+
+                    // Populating the thermal neighbors dropdown.
+                    for (i = 0; i < neighbor_names.length; i++) {
+                      var option = document.createElement('option');
+                      option.text = neighbor_names[i];
+                      thermal_dropdown.add(option);
+                    }
+                  }
+
+                  else { // requested MOF was in the training data
+                      // Storing information indicating that a prediction was made, but no neighbors are avaialable
+                      document.getElementById('thermal_neighbors_holder').value = 1
+                     
+                      $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
+
+                      $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function(response) {
+                        $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+
+                        console.log('check check')
+                        console.log(response)
+                        console.log(response >= 60)
+
+                        percentile_field = document.getElementById('thermal_stability_percentile');
+                        if (response >= 80) {
+                          setColor(percentile_field, '#90ee90') // color background, light green
+                        }
+                        else if (response >= 60) {
+                          setColor(percentile_field, '#e7ff97') // light lime
+                          console.log('hit')
+                        }
+                        else if (response >= 40) {
+                          setColor(percentile_field, '#fffa97') // light yellow
+                        }
+                        else if (response >= 20) {
+                          setColor(percentile_field, '#ffcd97') // light orange
+                        }
+                        else {
+                          setColor(percentile_field, '#ffad97') // light red
+                        }
+                    })   
+
+                      myDict = {'prediction': false, 'temperature': response['truth']}
+                      $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function(response) { // making the thermal breakdown temperatures plot
+                        $('#chart').html(response);
+                      }) 
+                  }
+            });
       })
     });
 
@@ -1493,12 +1542,18 @@ body {
           myFile = myFile3;
           if (myFile3 == undefined) {
             alert("Must upload/generate a cif file first.");
+            component_color = failure_red;
+            $('#get_components').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
             return;  
           }
         }
       }
 
       console.log('print check B')
+      component_color = inprogress_yellow;
+      $('#get_components').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
+
+
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
@@ -1514,8 +1569,13 @@ body {
             if (response == 'FAILED') { 
               alert('Failed to featurize.')
               document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+              component_color = failure_red;
+              $('#get_components').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
               return; 
             }
+
+            component_color = success_green;
+            $('#get_components').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
             var result = JSON.parse(response);
 
@@ -2219,8 +2279,8 @@ body {
     window.setTimeout(viewer_hider, 5)
 
 
-    // functions to handle the selection button color change upon mouse hover
-    // since we change the selection button colors and lose the default hover color change
+    // functions to handle the selection and prediction and visualize and component button color change upon mouse hover
+    // since we change the selection and prediction and visualize and component button colors and lose the default hover color change
     $("#load").hover(function(){ 
       $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
       $(this).css("border-color", "#1D2B37");
@@ -2243,6 +2303,38 @@ body {
       }, function(){
       $(this).css("background-color", bb_redirect_color);
       $(this).css("border-color", bb_redirect_color);
+     });
+
+    $("#predict_s").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", solvent_pred_color);
+      $(this).css("border-color", solvent_pred_color);
+     });
+
+    $("#predict_t").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", thermal_pred_color);
+      $(this).css("border-color", thermal_pred_color);
+     });
+
+    $("#visualize").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", visualize_color);
+      $(this).css("border-color", visualize_color);
+     });
+
+    $("#get_components").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", component_color);
+      $(this).css("border-color", component_color);
      });
 
   });

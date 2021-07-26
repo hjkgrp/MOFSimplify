@@ -780,7 +780,7 @@ body {
   }
 
 
-  var statusElement = document.getElementById('status_visualization');
+  // var statusElement = document.getElementById('status_visualization');
   //var progressElement = document.getElementById('progress');
   //var spinnerElement = document.getElementById('spinner');
 
@@ -838,7 +838,7 @@ body {
         //progressElement.hidden = true;
         //if (!text) spinnerElement.style.display = 'none';
       //}
-      statusElement.innerHTML = text;
+      // statusElement.innerHTML = text;
     },
     totalDependencies: 0,
     monitorRunDependencies: function(left) {
@@ -848,7 +848,10 @@ body {
   };
   Module.setStatus('Downloading...');
   window.onerror = function(event) {
-    Module.setStatus('Exception thrown in visualization, see JavaScript console and refresh page (refreshing fixes the OOM, or out of memory, error).');
+    //Module.setStatus('Exception thrown in visualization; please retry the operation.');
+    alert('Exception thrown in visualization; please retry the operation.')    
+    // $('#status_visualization').text('Exception thrown in visualization; please retry the operation.'); // out of memory (OOM)
+
     //spinnerElement.style.display = 'none';
 
     $('#currently_visualized').text(''); // clear the message about which MOF is visualized if OOM occurs
@@ -995,12 +998,21 @@ body {
         $('#upload').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
     });
 
+
     // This function triggers when someone clicks the "Visualize selected MOF" button.
     $("#visualize").on('click', function() {
         visualize_color = inprogress_yellow; // TODO fix
-        // alert(visualize_color)
         $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
 
+        var vis_color = $('#visualize').css('background-color')
+
+        while (vis_color != inprogress_yellow){
+          alert('waiting')
+        }
+        reroute()
+    })
+
+    function reroute() {
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
@@ -1035,7 +1047,8 @@ body {
 
         visualize_color = success_green;
         $('#visualize').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
-    })
+        // $('status_visualization').text(''); // clear the OOM message
+    }
 
     // This function triggers when someone clicks the "Visualize" button in the solvent section. 
     $("#visualize_s_neighbor").on('click', function() {
@@ -1066,6 +1079,7 @@ body {
         message = message + my_neighbor
 
         $('#currently_visualized').text(message);
+        // $('status_visualization').text(''); // clear the OOM message
     })
 
     // This function triggers when someone clicks the "Visualize" button in the thermal section. 
@@ -1097,6 +1111,7 @@ body {
         message = message + my_neighbor
 
         $('#currently_visualized').text(message);
+        // $('status_visualization').text(''); // clear the OOM message
     })
 
     // Generate solvent removal stability prediction when the "Stability upon solvent removal" button is clicked.

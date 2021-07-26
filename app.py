@@ -966,7 +966,7 @@ def TGA_plot():
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
-    my_data = my_data[:6] # only want the first six letters
+    my_data = my_data[:-6] # don't want the '_clean' part
 
     # Grab data 
     slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
@@ -1325,53 +1325,53 @@ def neighbor_writer():
     return 'Success!'
 
 
-@app.route('/TGA_maker', methods=['POST']) 
-def TGA_maker():
-    # Making the TGA plot and saving it, for it to be downloaded
-    from bokeh.io import export_png
+# @app.route('/TGA_maker', methods=['POST']) 
+# def TGA_maker():
+#     # Making the TGA plot and saving it, for it to be downloaded
+#     from bokeh.io import export_png
 
-    # Grab data
-    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
-    my_data = my_data[:6] # only want the first six letters
+#     # Grab data
+#     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+#     my_data = my_data[:6] # only want the first six letters
 
-    print('neighbor writer check 3')
+#     print('neighbor writer check 3')
 
-    # Grab data 
-    slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
+#     # Grab data 
+#     slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
 
-    x_values = []
-    y_values = []
-    for i in range(4): # 0, 1, 2, 3
-        x_values.append(slopes_df.iloc[[i]]['T (degrees C)'][i])
-        y_values.append(slopes_df.iloc[[i]]['mass (arbitrary units)'][i])
+#     x_values = []
+#     y_values = []
+#     for i in range(4): # 0, 1, 2, 3
+#         x_values.append(slopes_df.iloc[[i]]['T (degrees C)'][i])
+#         y_values.append(slopes_df.iloc[[i]]['mass (arbitrary units)'][i])
 
-    # Making the four points.
-    p1 = np.array( [x_values[0], y_values[0]] )
-    p2 = np.array( [x_values[1], y_values[1]] )
+#     # Making the four points.
+#     p1 = np.array( [x_values[0], y_values[0]] )
+#     p2 = np.array( [x_values[1], y_values[1]] )
 
-    p3 = np.array( [x_values[2], y_values[2]] )
-    p4 = np.array( [x_values[3], y_values[3]] )
+#     p3 = np.array( [x_values[2], y_values[2]] )
+#     p4 = np.array( [x_values[3], y_values[3]] )
 
-    intersection_point = seg_intersect(p1, p2, p3, p4)
+#     intersection_point = seg_intersect(p1, p2, p3, p4)
 
-    # Instantiating the figure object. 
-    graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
+#     # Instantiating the figure object. 
+#     graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
          
-    # The points to be plotted.
-    xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
-    ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
+#     # The points to be plotted.
+#     xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
+#     ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
         
-    # Plotting the graph.
-    graph.multi_line(xs, ys) 
-    graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
-    graph.xaxis.axis_label = 'Temperature (°C)'
-    graph.yaxis.axis_label = 'Percentage mass remaining or Mass' 
+#     # Plotting the graph.
+#     graph.multi_line(xs, ys) 
+#     graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
+#     graph.xaxis.axis_label = 'Temperature (°C)'
+#     graph.yaxis.axis_label = 'Percentage mass remaining or Mass' 
 
-    print('neighbor writer check 4')
+#     print('neighbor writer check 4')
 
-    export_png(graph, filename='temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + my_data + "_simplified_TGA.png")
+#     export_png(graph, filename='temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + my_data + "_simplified_TGA.png")
     
-    return 'Success!'
+#     return 'Success!'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

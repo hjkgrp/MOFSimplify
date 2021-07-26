@@ -170,9 +170,9 @@ body {
             
             <!-- Subtitle -->
             <p style="width:100%; text-align:center;">
-              <span style="font-size:18px;">Predict and view structures and properties of metal-organic frameworks (MOFs) in your browser below!</span><br>
-              For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.
-            </p>
+              <span style="font-size:18px;">Analyze metal-organic frameworks (MOFs) below!</span><br>
+<!--               For more on MOF analysis, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.
+ -->            </p>
           
           <!-- Lead text -->
 <!--           <p">For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.</p>
@@ -190,7 +190,7 @@ body {
         <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
       </li> -->
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
-        <button class="nav-link pill-custom active" id="pills-start-tab" style='width:100%; height:100%; font-weight: bold;'>Start</button>
+        <button class="nav-link pill-custom active" id="pills-main-tab" style='width:100%; height:100%; font-weight: bold;'>Main</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-vis-tab" style='width:100%; height: 100%; font-weight: bold;'>Visualization</button>
@@ -206,29 +206,29 @@ body {
       </li> -->
     </ul>
 
-    <div id="pills-start" class="container">
-      <div class='row'>
+    <div id="pills-main" class="container">
       
-        <b> 1) Select a MOF for analysis (example loaded by default)</b>
-        <!-- Create a section containing buttons -->
-        <div class='col-lg-12'>
+      <b> 1) Select a MOF for analysis</b>
+      <!-- Create a section containing buttons -->
+      <div class='col-lg-12'>
 
-          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+        <div style='width:100%; text-align:center; margin-top:0.25cm;'>
 
-            <!-- Button for queuing up the example MOF cif file -->
-            <button class='btn btn-primary round_button selection_button' id='load' type='button'>Example MOF</button>
+          <!-- Button for queuing up the example MOF cif file -->
+          <button class='btn btn-primary round_button selection_button' id='load' type='button'>Example MOF</button>
 
-            <!-- Button for uploading MOF cif file -->
-            <button class='btn btn-primary round_button selection_button' id='upload' type='button'>Custom (upload cif file)</button>
+          <!-- Button for uploading MOF cif file -->
+          <button class='btn btn-primary round_button selection_button' id='upload' type='button'>Custom (upload cif file)</button>
 
-            <!-- Button for uploading MOF cif file -->
-            <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'>Construct from building blocks</button>
+          <!-- Button for uploading MOF cif file -->
+          <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'>Construct from building blocks</button>
 
-          </div> 
+        </div> 
 
-        </div>
+      </div>
 
-        <b style='margin-top: 1cm;'> 2) Predict properties of the selected MOF </b>
+      <div id='predict_section' style='margin-top: 1cm;'>
+        <b> 2) Predict properties of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
@@ -243,11 +243,11 @@ body {
           </div>
 
         </div>
-
       </div>
 
+
       <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
-      <div class='row' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
+      <div id='status_section' class='row' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
           <b> Status messages and MOF predictions </b>
           <div class='col-12' id='upload_status'></div> 
           <div class='col-12' id='solvent_stability_prediction'></div> 
@@ -256,52 +256,54 @@ body {
           <div class='col-12' id='chart'></div>
       </div>
 
-      <div class='row'>
+      <status id='neighbors_section'>
+        <div class='row'>
 
-          <p class = 'col-12' style='margin-top: 0.5cm;'> Information on ANN latent space nearest neighbors can be attained after the corresponding prediction has been executed. Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train the ANN.</p>
-      </div>
-      <div class='row'>
+          <p class = 'col-12' style='margin-top: 0.5cm;'> Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train an ANN.</p>
+        </div>
+        <div class='row'>
 
-          <div class = 'col-6'>
-          Solvent removal stability ANN nearest neighbors in latent space
-          <select class='form-control' id='solvent_neighbors'>
-          </select>
+            <div class = 'col-6'>
+            Solvent removal stability ANN nearest neighbors in latent space
+            <select class='form-control' id='solvent_neighbors'>
+            </select>
 
-          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
-          </div>
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
-          </div>
-          <p id='s_neighbor_info'></p>
-          </div>
+            <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
+            </div>
+            <div style='width:100%; text-align:center;'>
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
+            </div>
+            <p id='s_neighbor_info'></p>
+            </div>
 
-          <div class = 'col-6'>
-          Thermal stability ANN nearest neighbors in latent space
-          <select class='form-control' id='thermal_neighbors'>
-          </select>
+            <div class = 'col-6'>
+            Thermal stability ANN nearest neighbors in latent space
+            <select class='form-control' id='thermal_neighbors'>
+            </select>
 
-          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
-          </div>
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
-          </div>
-          <p id='t_neighbor_info'></p>
-          <div class='col-6' id='tga_plot'></div>
+            <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
+            </div>
+            <div style='width:100%; text-align:center;'>
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
+              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
+            </div>
+            <p id='t_neighbor_info'></p>
+            <div class='col-6' id='tga_plot'></div>
 
-          <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
-            <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
-            <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
-          </div>
+            <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
+              <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
+              <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
+            </div>
 
-          </div>
+            </div>
 
-      </div>
+        </div>
+      </status>
 
 
     </div>
@@ -316,7 +318,7 @@ body {
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
         <button class='btn btn-primary round_button' style='display:inline-block; width:50%;' id='visualize' type='button'>Visualize selected MOF</button>
-        <p style='display:inline-block; width:50%;'> Special thanks to the Snurr group for developing MOF visualization code. </p>
+        <p style='display:inline-block; width:60%;'> Special thanks to the Koes and Snurr groups for developing visualization code. </p>
       </div>
 
       <div style='width:100%; text-align:center;'>
@@ -366,11 +368,14 @@ body {
           </div>
 
           <div style='width:100%; text-align:center; margin-top:0.5cm;'> 
-            <button style='display:inline-block; width:80%' class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
+            <button style='display:inline-block; width:80%; margin-bottom: 0.5cm;' class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
 
           </div>
 
-          <div class='col-12' id='component_SMILES'></div>
+          <div class='col-12'>
+            <p id='component_SMILES' style='margin-top:0.5cm; margin: auto; width:100%; text-align: center'> </p>
+            <p id='resize_hint' style='display: none; margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-style:italic'>Component not visualizing? Try resizing the browser window.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -380,8 +385,9 @@ body {
 
       Not every combination of linker, SBU, and net is compatible. <br>
 
-      Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF building block assembly code.
+      Special thanks to the Snurr and the G&oacutemez-Gualdr&oacuten groups for developing MOF building block assembly code. <br>
 
+      For information on net (topology) abbreviations, refer to 10.1021/acs.cgd.7b00848 and 10.1039/c8ce01637b.
 
       <!-- Selection box for the linker building block -->
       <div  style="padding-top: 30px">
@@ -869,9 +875,9 @@ body {
 
 
   // tags for changing the selection button colors
-  failure_red = '#853013';
+  failure_red = '#A33B20';
   success_green = '#18bc9c';
-  inprogress_yellow = '#8B8000'
+  inprogress_yellow = '#F7B801'
   original_blue = '#2c3e50';
 
   load_color = original_blue;
@@ -928,6 +934,13 @@ body {
 
         color_reset(); // resetting selection and prediction and visualize and component button colors 
 
+        // hiding sections
+        // $('#predict_section').hide()
+        $('#predict_section').hide()
+        $('#neighbors_section').hide()
+        $('#status_section').hide()
+
+
         // clearing previous predictions
         $('#solvent_stability_prediction').text('');
         $('#thermal_stability_prediction').text('');
@@ -942,6 +955,7 @@ body {
         $('#t_neighbor_info').text('');
         $('#comp_MOF').text('')
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
+        $('#resize_hint').hide()
         document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
         document.getElementById('solvent_neighbors_holder').value = undefined
         document.getElementById('thermal_neighbors_holder').value = undefined
@@ -996,6 +1010,8 @@ body {
         $('#upload_status').text('File uploaded: ' + myFile.name);
         upload_color = success_green;
         $('#upload').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+        $('#predict_section').show()
+        $('#status_section').show()
     });
 
 
@@ -1014,13 +1030,13 @@ body {
 
         // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
         if (myFile == null && myFile2 == null && myFile3 == null) {
-          alert("Must upload/generate a cif file first.");
+          alert("Must select a MOF for analysis first.");
           visualize_color = failure_red;
           $('#visualize').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
           return;
         }
 
-        alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
+        // alert('Visualization loading, may take up to 30 seconds. Close this alert after reading.') // timing upper limit based on NaX.cif
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
@@ -1075,6 +1091,9 @@ body {
 
         $('#currently_visualized').text(message);
         // $('status_visualization').text(''); // clear the OOM message
+
+        visualize_color = original_blue;
+        $('#visualize').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color 
     })
 
     // This function triggers when someone clicks the "Visualize" button in the thermal section. 
@@ -1107,6 +1126,9 @@ body {
 
         $('#currently_visualized').text(message);
         // $('status_visualization').text(''); // clear the OOM message
+
+        visualize_color = original_blue;
+        $('#visualize').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color 
     })
 
     // Generate solvent removal stability prediction when the "Stability upon solvent removal" button is clicked.
@@ -1122,7 +1144,7 @@ body {
         if (myFile2 == undefined) {
           myFile = myFile3;
           if (myFile3 == undefined) {
-            alert("Must upload/generate a cif file first.");
+            alert("Must select a MOF for analysis first.");
 
             solvent_pred_color = failure_red;
             $('#predict_s').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
@@ -1132,7 +1154,8 @@ body {
         }
       }
 
-      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
+      // alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
+      $('#solvent_stability_prediction').text('The solvent removal stability prediction is loading...'); 
 
       solvent_pred_color = inprogress_yellow;
       $('#predict_s').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
@@ -1148,6 +1171,7 @@ body {
                       alert('Failed to featurize')
                       solvent_pred_color = failure_red;
                       $('#predict_s').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+                      $('#solvent_stability_prediction').text(''); 
 
                     return; // Do not update solvent stability prediction if prediction failed.
                   }
@@ -1155,6 +1179,7 @@ body {
                   solvent_pred_color = success_green;
                   $('#predict_s').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
+                  $('#neighbors_section').show() // show nearest neighbors section
 
                   if (! response['in_train']) { // a prediction was made
                     var prediction = response['prediction']
@@ -1260,7 +1285,7 @@ body {
         if (myFile2 == undefined) {
           myFile = myFile3;
           if (myFile3 == undefined) {
-            alert("Must upload/generate a cif file first.");
+            alert("Must select a MOF for analysis first.");
             thermal_pred_color = failure_red;
             $('#predict_t').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
             return;  
@@ -1268,9 +1293,11 @@ body {
         }
       }
 
-      alert('Prediction loading, please wait for a few seconds. Close this alert after reading.')
+      // alert('You are about to begin a thermal stability prediction. Ck=')
       thermal_pred_color = inprogress_yellow;
       $('#predict_t').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress 
+      $('#thermal_stability_prediction').text('The thermal stability prediction is loading...'); // display prediction result
+
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
@@ -1283,11 +1310,14 @@ body {
                       alert('Failed to featurize')
                       thermal_pred_color = failure_red;
                        $('#predict_t').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+                       $('#thermal_stability_prediction').text('')
                     return; // Do not update solvent stability prediction if prediction failed.
                   }
 
                   thermal_pred_color = success_green;
                   $('#predict_t').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+
+                  $('#neighbors_section').show() // show nearest neighbors section
 
                   if (! response['in_train']) { // a prediction was made
                     prediction = response['prediction'];
@@ -1455,7 +1485,9 @@ body {
                     $('#upload_status').text('MOF constructed with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
                     bb_redirect_color = success_green;
                     $('#bb-redirect').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
-                    $('#pills-start-tab').click() // redirecting to appropriate tab
+                    $('#pills-main-tab').click() // redirecting to appropriate tab
+                    $('#predict_section').show() // show the prediction button section
+                    $('#status_section').show() // show the status section
                   }).catch(error => {
                     $('#upload_status').text('Failed to load');
                     console.error('There has been a problem with your fetch operation:', error);
@@ -1518,7 +1550,10 @@ body {
           $('#upload_status').text('File uploaded: Example MOF cif file (HEBTAL)'); // indicating that the example MOF has been uploaded
           load_color = success_green;
           $('#load').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+          $('#predict_section').show() // show the prediction button section
+          $('#status_section').show() // show the status section
 
+          alert('Example MOF loaded!')
         }).catch(error => {
           load_color = failure_red;
           $('#load').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
@@ -1536,6 +1571,7 @@ body {
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
+      $('#resize_hint').hide()
       component_viewer.clear(); // clear component visualizer
       $('#comp_MOF').text('') // clear the text about which MOF is broken into components
       clear_component_dropdowns();
@@ -1551,7 +1587,7 @@ body {
         if (myFile2 == undefined) {
           myFile = myFile3;
           if (myFile3 == undefined) {
-            alert("Must upload/generate a cif file first.");
+            alert("Must select a MOF for analysis first.");
             component_color = failure_red;
             $('#get_components').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
             return;  
@@ -1635,9 +1671,13 @@ body {
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#comp_s_neighbor').click(function() {
 
+      component_color = original_blue;
+      $('#get_components').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color
+
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
+      $('#resize_hint').hide()
       component_viewer.clear(); // clear component visualizer
       $('#comp_MOF').text('') // clear the text about which MOF is broken into components
       clear_component_dropdowns();
@@ -1719,9 +1759,13 @@ body {
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#comp_t_neighbor').click(function() {
 
+      component_color = original_blue;
+      $('#get_components').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color
+
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
+      $('#resize_hint').hide()
       component_viewer.clear(); // clear component visualizer
       $('#comp_MOF').text('') // clear the text about which MOF is broken into components
       clear_component_dropdowns();
@@ -1909,6 +1953,8 @@ body {
 
       // Showing the SMILES string.
       $('#component_SMILES').text('The currently visualized linker\'s SMILES string is ' + dictionary[my_key + '_SMILES'])
+
+      $('#resize_hint').show() // show the hint to resize browser if component not showing up
     })
 
 
@@ -1940,7 +1986,9 @@ body {
       component_viewer.render();
 
       // Showing the SMILES string.
-      $('#component_SMILES').text('The currently visualized sbu\'s SMILES string is ' + dictionary[my_key + '_SMILES']);
+      $('#component_SMILES').text('The currently visualized SBU\'s SMILES string is ' + dictionary[my_key + '_SMILES']);
+
+      $('#resize_hint').show() // show the hint to resize browser if component not showing up
     })
 
     function clear_neighbor_dropdowns() { // clear dropdowns when upload new file
@@ -2187,8 +2235,8 @@ body {
     })
 
     
-    $('#pills-start-tab').click(function(){
-      $('#pills-start').show() 
+    $('#pills-main-tab').click(function(){
+      $('#pills-main').show() 
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
@@ -2196,28 +2244,28 @@ body {
 
     $('#pills-vis-tab').click(function(){
       // console.log('vis tab clicked')
-      $('#pills-start').hide() 
+      $('#pills-main').hide() 
       $('#pills-vis').show()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
     })
 
     $('#pills-comp-tab').click(function(){
-      $('#pills-start').hide() 
+      $('#pills-main').hide() 
       $('#pills-vis').hide()
       $('#pills-comp').show()
       $('#pills-bb').hide()
     })
 
     $('#pills-bb-tab').click(function(){
-      $('#pills-start').hide() 
+      $('#pills-main').hide() 
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').show()
     })
 
-    // Start up page by virtually clicking the "Example MOF" button
-    $('#load').click();
+    // // Start up page by virtually clicking the "Example MOF" button
+    // $('#load').click();
 
     // Below: populate the linkers, sbus, and net dropdowns in the building block section.
     // I run a script (tobacco_3.0/scrap_cifs.py) in the tobacco_3.0/edges_database folder, the tobacco_3.0/nodes_database folder, and the tobacco_3.0/template_database folder to get a nice array form of all of the available files. I then paste the array into the appropriate places below (for example, my_linkers = ARRAYOFOPTIONS)
@@ -2279,6 +2327,9 @@ body {
     // $('#pills-vis').hide()
     $('#pills-comp').hide()
     $('#pills-bb').hide()
+    $('#predict_section').hide()
+    $('#neighbors_section').hide()
+    $('#status_section').hide()
 
     function viewer_hider() {
       $('#pills-vis').hide()

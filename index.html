@@ -48,7 +48,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   width:33%; 
 }
 
-#link {
+.link {
   color: #00008b; /* hyperlinks are dark blue */
 }
 
@@ -166,7 +166,7 @@ body {
  -->
             <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
 
-            <p style="font-size: 24px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
+            <p style="font-size: 24px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
             
             <!-- Subtitle -->
             <p style="width:100%; text-align:center;">
@@ -626,6 +626,7 @@ body {
       // grab the current solvent neighbor MOF cif file
 
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       console.log(my_neighbor)
 
@@ -648,7 +649,7 @@ body {
       // grab the current solvent neighbor MOF cif file
 
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
-
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
@@ -1085,6 +1086,7 @@ body {
         handleInput(true, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
         my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+        my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
         message = 'Currently visualized MOF: '
         message = message + my_neighbor
@@ -1119,7 +1121,8 @@ body {
 
         handleInput(false, true); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
-        my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+        my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
+        my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
         message = 'Currently visualized MOF: '
         message = message + my_neighbor
@@ -1240,7 +1243,9 @@ body {
                     // Populating the solvent neighbors dropdown.
                     for (i = 0; i < neighbor_names.length; i++) {
                       var option = document.createElement('option');
-                      option.text = neighbor_names[i];
+                      var num = String(i+1)
+                      num = num.concat('. ') // formatting to make it look like a list
+                      option.text = num.concat(neighbor_names[i]);
                       solvent_dropdown.add(option);
                     }
                   }
@@ -1374,7 +1379,9 @@ body {
                     // Populating the thermal neighbors dropdown.
                     for (i = 0; i < neighbor_names.length; i++) {
                       var option = document.createElement('option');
-                      option.text = neighbor_names[i];
+                      var num = String(i+1)
+                      num = num.concat('. ') // formatting to make it look like a list
+                      option.text = num.concat(neighbor_names[i]);
                       thermal_dropdown.add(option);
                     }
                   }
@@ -1696,6 +1703,7 @@ body {
       $('#pills-comp-tab').click() // redirecting to appropriate tab
 
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
@@ -1784,6 +1792,7 @@ body {
       $('#pills-comp-tab').click() // redirecting to appropriate tab
 
       my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
       if(!response.ok) { // catching 404 and other issues
@@ -2010,6 +2019,9 @@ body {
     // Get information on a nearest neighbor in solvent removal stability ANN latent space when the "Show" button in the solvent section is clicked.
     $('#s_neighbor').click(function() {
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
+      console.log('check check')
+      console.log(my_neighbor)
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('solvent_neighbors_holder').value == undefined) {
@@ -2066,7 +2078,7 @@ body {
       }
 
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
-
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Making the txt file with information about the neighbor
       // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
@@ -2109,6 +2121,7 @@ body {
     // Get information on a nearest neighbor in thermal stability ANN latent space when the "Show" button in the thermal section is clicked.
     $('#t_neighbor').click(function() {
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Ensure there are neighbors to display information on.
       if (document.getElementById('thermal_neighbors_holder').value == undefined) {
@@ -2165,6 +2178,7 @@ body {
       }
 
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Making the txt file with information about the neighbor
       // The txt file will contain the following information: prediction type, current MOF, selected CoRE nearest neighbor, latent space distance, and property for nearest neighbor
@@ -2396,6 +2410,12 @@ body {
       }, function(){
       $(this).css("background-color", component_color);
       $(this).css("border-color", component_color);
+     });
+
+    $(".link").hover(function(){ // for hyperlinks
+      $(this).css("color", '#18bc9c');
+      }, function(){
+      $(this).css("color", '#00008b');
      });
 
   });

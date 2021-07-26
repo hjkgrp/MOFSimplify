@@ -321,7 +321,10 @@ def ss_predict():
     my_data = json.loads(flask.request.get_data())
 
     # Write the data back to a cif file.
-    cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+    try:
+        cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+    except FileNotFoundError:
+        return 'FAILED'
     cif_file.write(my_data)
     cif_file.close()
 
@@ -597,7 +600,11 @@ def ts_predict():
     #os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
 
     # Write the data back to a cif file.
-    cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+    try:
+        cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+    except FileNotFoundError:
+        return 'FAILED'
+
     cif_file.write(my_data)
     cif_file.close()
 
@@ -1026,7 +1033,10 @@ def get_components():
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
     # Write the data back to a cif file.
-    cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+    try:
+        cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+    except FileNotFoundError:
+        return 'FAILED'
     cif_file.write(my_data);
     cif_file.close();
 

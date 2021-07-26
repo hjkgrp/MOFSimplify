@@ -164,7 +164,7 @@ body {
           <span style='position:relative;'>
 <!--             <h1 style="color:black; width:100%; text-align:center; font-family: Helvetica; margin-top: 0.5cm;">MOFSimplify</h1>
  -->
-            <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo_transparent.png' alt='MOFSimplify logo'> 
+            <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
 
             <p style="font-size: 24px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a id="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a id="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
             
@@ -1006,13 +1006,6 @@ body {
 
         var vis_color = $('#visualize').css('background-color')
 
-        while (vis_color != inprogress_yellow){
-          alert('waiting')
-        }
-        reroute()
-    })
-
-    function reroute() {
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
@@ -1048,7 +1041,9 @@ body {
         visualize_color = success_green;
         $('#visualize').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
         // $('status_visualization').text(''); // clear the OOM message
-    }
+
+    })
+
 
     // This function triggers when someone clicks the "Visualize" button in the solvent section. 
     $("#visualize_s_neighbor").on('click', function() {

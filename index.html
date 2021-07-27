@@ -126,11 +126,11 @@ body {
     <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
     <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
       <div class="container">
-        <a href="../" class="navbar-brand">MOFSimplify</a>
+        <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
         <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
+        <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
           <ul class="navbar-nav">
             <!-- <li class="nav-item">
               <a class="nav-link" href="about.html">About</a> TODO?
@@ -173,11 +173,11 @@ body {
  -->
             <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
 
-            <p style="font-size: 24px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
+            <p style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
             
             <!-- Subtitle -->
             <p style="width:100%; text-align:center;">
-              <span style="font-size:18px;">Analyze metal-organic frameworks (MOFs) below!</span><br>
+              <span style="font-size:26px;">Analyze metal-organic frameworks (MOFs) below!</span><br>
 <!--               For more on MOF analysis, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.
  -->            </p>
           
@@ -196,18 +196,18 @@ body {
  --><!--       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
       </li> -->
-      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
-        <button class="nav-link pill-custom active" id="pills-main-tab" style='width:100%; height:100%; font-weight: bold;'>Main</button>
+      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+        <button class="nav-link pill-custom active" id="pills-main-tab" style='width:100%; height:100%; font-weight: bold; font-size:24px;'>Main</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
-        <button class="nav-link pill-custom" id="pills-vis-tab" style='width:100%; height: 100%; font-weight: bold;'>Visualization</button>
+      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+        <button class="nav-link pill-custom" id="pills-vis-tab" style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Visualization</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
-        <button class="nav-link pill-custom" id="pills-comp-tab" style='width:100%; height: 100%; font-weight: bold;'>Component Analysis</button>
+      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+        <button class="nav-link pill-custom" id="pills-comp-tab" style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Component Analysis</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
+<!--       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-bb-tab" style='width:100%; height: 100%; font-weight: bold;'>Building Block Assembly</button>
-      </li>
+      </li> -->
 <!--       <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-stat-tab" data-toggle="pill" data-target="#pills-stat" type="button" role="tab" aria-controls="pills-stat" aria-selected="false">Status messages and MOF predictions</button>
       </li> -->
@@ -215,37 +215,37 @@ body {
 
     <div id="pills-main" class="container">
       
-      <b> 1) Select a MOF for analysis</b>
+      <b style='font-size:22px;'> 1) Select a MOF for analysis</b>
       <!-- Create a section containing buttons -->
       <div class='col-lg-12'>
 
         <div style='width:100%; text-align:center; margin-top:0.25cm;'>
 
           <!-- Button for queuing up the example MOF cif file -->
-          <button class='btn btn-primary round_button selection_button' id='load' type='button'>Example MOF</button>
+          <button class='btn btn-primary round_button selection_button' id='load' type='button' style='font-size:22px;'>Example MOF</button>
 
           <!-- Button for uploading MOF cif file -->
-          <button class='btn btn-primary round_button selection_button' id='upload' type='button'>Custom (upload cif file)</button>
+          <button class='btn btn-primary round_button selection_button' id='upload' type='button' style='font-size:22px;'>Custom (upload cif file)</button>
 
           <!-- Button for uploading MOF cif file -->
-          <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'>Construct from building blocks</button>
+          <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button' style='font-size:22px;'>Building block assembly</button>
 
         </div> 
 
       </div>
 
       <div id='predict_section' style='margin-top: 1cm;'>
-        <b> 2) Predict properties of the selected MOF </b>
+        <b style='font-size:22px;'> 2) Predict properties of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
           <div style='width:100%; text-align:center; margin-top:0.25cm;'>
 
             <!-- Button for predicting solvent removal stability of MOF -->
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='predict_s' type='button'>Stability upon solvent removal</button>
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='predict_s' type='button'>Stability upon solvent removal</button>
 
             <!-- Button for predicting thermal stability of MOF -->
-            <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='predict_t' type='button'>Thermal stability</button> 
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='predict_t' type='button'>Thermal stability</button> 
 
           </div>
 
@@ -255,52 +255,52 @@ body {
 
       <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
       <div id='status_section' class='row' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
-          <b> Status messages and MOF predictions </b>
-          <div class='col-12' id='upload_status'></div> 
-          <div class='col-12' id='solvent_stability_prediction'></div> 
-          <div class='col-12' id='thermal_stability_prediction'></div> 
-          <div class='col-12' id='thermal_stability_percentile'></div> 
-          <div class='col-12' id='chart'></div>
+          <b style='font-size:22px;'> Status messages and MOF predictions </b>
+          <div class='col-12' style='font-size:22px;' id='upload_status'></div> 
+          <div class='col-12' style='font-size:22px;' id='solvent_stability_prediction'></div> 
+          <div class='col-12' style='font-size:22px;' id='thermal_stability_prediction'></div> 
+          <div class='col-12' style='font-size:22px;' id='thermal_stability_percentile'></div> 
+          <div class='col-12' style='font-size:22px;' id='chart'></div>
       </div>
 
       <status id='neighbors_section'>
         <div class='row'>
 
-          <p class = 'col-12' style='margin-top: 0.5cm;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
+          <p class = 'col-12' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
 
         </div>
         <div class='row'>
 
-            <div class = 'col-6'>
-            Solvent removal stability ANN nearest neighbors in latent space
-            <select class='form-control' id='solvent_neighbors'>
+            <div class = 'col-6' style='font-size:22px;'>
+            Solvent removal stability ANN nearest neighbors <br> in latent space
+            <select class='form-control' id='solvent_neighbors' style='font-size:22px;'>
             </select>
 
             <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
             </div>
             <div style='width:100%; text-align:center;'>
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
             </div>
-            <p id='s_neighbor_info'></p>
+            <p id='s_neighbor_info' style='font-size:20px;'></p>
             </div>
 
-            <div class = 'col-6'>
-            Thermal stability ANN nearest neighbors in latent space
-            <select class='form-control' id='thermal_neighbors'>
+            <div class = 'col-6' style='font-size:22px;'>
+            Thermal stability ANN nearest neighbors <br> in latent space
+            <select class='form-control' id='thermal_neighbors' style='font-size:22px;'>
             </select>
 
             <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
             </div>
             <div style='width:100%; text-align:center;'>
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
-              <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
+              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
             </div>
-            <p id='t_neighbor_info'></p>
+            <p id='t_neighbor_info' style='font-size:20px;'></p>
             <div class='col-6' id='tga_plot'></div>
 
             <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
@@ -320,20 +320,20 @@ body {
       <!-- MOF viewer and buttons -->
 
       <div id="viewportwrapper" style="border-style: solid;border-width:2px;" class="content inactive"> <!-- MOF visualization -->
-        <div id="viewportnote" style="position: relative; top: 13em; text-align: center; z-index: 2;">(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)</div>
+        <div id="viewportnote" style="position: relative; top: 9em; text-align: center; z-index: 2; font-size: 28px;">MOFs are visualized here. <br> Left click to rotate, right click with mouse to move, scroll with mouse to zoom.</div>
         <div id="cifviewport" style="height:500px;"></div>
       </div>
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
-        <button class='btn btn-primary round_button' style='display:inline-block; width:50%;' id='visualize' type='button'>Visualize selected MOF</button>
-        <p style='display:inline-block; width:60%;'> Special thanks to the Koes and Snurr groups for developing visualization code. </p>
+        <button class='btn btn-primary round_button' style='display:inline-block; width:50%; font-size: 22px' id='visualize' type='button'>Visualize selected MOF</button>
+        <p style='display:inline-block; width:100%; font-size: 22px'> Special thanks to the Koes and Snurr groups for developing visualization code. </p>
       </div>
 
       <div style='width:100%; text-align:center;'>
-        <div style='display:inline-block;' id='currently_visualized'></div> 
+        <div style='display:inline-block; font-size: 22px;' id='currently_visualized'></div> 
       </div>
       <div style='width:100%; text-align:center;'>
-        <div style='display:inline-block;' id='status_visualization'></div> 
+        <div style='display:inline-block; font-size: 22px;' id='status_visualization'></div> 
       </div>
 
 
@@ -343,13 +343,13 @@ body {
       <div class='row'>
         <div class='col-lg-6' style='margin-top: 0.5cm;'>
           <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;'> 
-              <div id='container-01-note' style='position: relative; top: 13em; text-align: center; z-index: 2;'>(MOF linkers and SBUs are visualized here. Left click to rotate, scroll with mouse to zoom.)</div>
+              <div id='container-01-note' style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px; '>MOF linkers and SBUs are visualized here. <br> Left click to rotate, scroll with mouse to zoom.</div>
             </div>
           <div style="margin-bottom:0.5cm;"></div>
           <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_linker' type='button'>Visualize linker</button>
-            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='visualize_sbu' type='button'>Visualize SBU</button>
-            <button style='display:inline-block; width:32%' class='btn btn-primary round_button' id='reset' type='button'>Reset zoom level</button>
+            <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button' id='visualize_linker' type='button'>Linker</button>
+            <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button' id='visualize_sbu' type='button'>SBU</button>
+            <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button' id='reset' type='button'>Reset zoom</button>
           </div>
         </div>
 
@@ -357,38 +357,38 @@ body {
           <!-- Button for getting MOF components for visualization  -->
           <div style='width:100%; text-align:center;'>
 
-            <button style='display:inline-block; width:80%' class='btn btn-primary round_button' id='get_components' type='button'>Get selected MOF components</button>
+            <button style='display:inline-block; width:80%; font-size: 22px; margin-bottom: 0.5cm;' class='btn btn-primary round_button' id='get_components' type='button'>Get selected MOF components</button>
           </div>
 
-          <p style='margin-top: 0.5cm;'> Can display MOF's linkers and SBUs after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Visualize linker or Visualize SBU.</p>
+<!--           <p style='margin-top: 0.5cm; font-size: 22px;'> Can display MOF's linkers and SBUs after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Linker or SBU.</p> -->
 
-          <div id='comp_MOF'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+          <div id='comp_MOF' style='font-size: 22px;'> </div> <!-- Will display information on what MOF's components are currently visualized -->
 
-          <div>
+          <div style='font-size: 22px; margin-top: 0.5cm'>
             Linkers
-            <select class='form-control' id='linker'>
+            <select style='font-size: 22px;' class='form-control' id='linker'>
             </select>
           </div>
 
-          <div>
+          <div style='font-size: 22px;'>
             SBUs
-            <select class='form-control' id='sbu'> </select>
+            <select style='font-size: 22px;' class='form-control' id='sbu'> </select>
           </div>
 
           <div style='width:100%; text-align:center; margin-top:0.5cm;'> 
-            <button style='display:inline-block; width:80%; margin-bottom: 0.5cm;' class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Only components with unique connectivities</button>
+            <button style='display:inline-block; width:80%; margin-bottom: 0.5cm; font-size: 22px;' class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Filter by connectivity</button>
 
           </div>
 
           <div class='col-12'>
-            <p id='component_SMILES' style='margin-top:0.5cm; margin: auto; width:100%; text-align: center'> </p>
-            <p id='resize_hint' style='display: none; margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-style:italic'>Component not visualizing? Try resizing the browser window.</p>
+            <p id='component_SMILES' style='margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-size: 22px;'> </p>
+            <p id='resize_hint' style='display: none; margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-style:italic; font-size: 20px;'>Component not visualizing? Try resizing the browser window.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="pills-bb">
+    <div id="pills-bb" style='font-size: 20px;'>
       A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb).  <br>
 
       Not every combination of linker, SBU, and net is compatible. <br>
@@ -398,21 +398,21 @@ body {
       For information on net (topology) abbreviations, refer to 10.1021/acs.cgd.7b00848 and 10.1039/c8ce01637b.
 
       <!-- Selection box for the linker building block -->
-      <div  style="padding-top: 30px">
+      <div  style="padding-top: 30px; font-size: 22px;">
         Linker, the connecting building block
-        <input id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
+        <input style='font-size: 22px;' id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
       </div>
 
       <!-- Default linkers -->
-      <datalist id = 'linkers_list'>
+      <datalist id = 'linkers_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
 
 
       <!-- Selection box for metal SBU building block -->
-      <div>
+      <div style='font-size: 22px;'>
         SBU, the metal-centered nodular building block 
-        <input id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
+        <input style='font-size: 22px;' id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
       </div>
 
       <!-- Default sbus -->
@@ -420,9 +420,9 @@ body {
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
       
-      <div>
+      <div style='font-size: 22px;'>
         MOF Net
-        <input id="nets_option" class='form-control locksMetrics' list = 'nets_list' onmousedown="value = '';" />
+        <input style='font-size: 22px;' id="nets_option" class='form-control locksMetrics' list = 'nets_list' onmousedown="value = '';" />
       </div>
 
       <!-- Default nets -->
@@ -432,8 +432,8 @@ body {
 
       <div style='width:100%; text-align:center; margin-top:0.5cm;'>
 
-        <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='generate' type='button'>Make bb-generated MOF</button>
-        <button style='display:inline-block; width:49%' class='btn btn-primary round_button' id='download_generated' type='button'>Download bb-generated MOF</button>
+        <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='generate' type='button'>Make bb-generated MOF</button>
+        <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='download_generated' type='button'>Download bb-generated MOF</button>
       </div>
 
     </div>
@@ -449,7 +449,7 @@ body {
 
 
 
-<div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px;">
+<div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
   <div class="container">
       <ul class="navbar-nav">
           <li class="nav-item">
@@ -969,7 +969,7 @@ body {
         $('#comp_MOF').text('')
         $('#component_SMILES').text(''); // clear the SMILES string of any component that was present
         $('#resize_hint').hide()
-        document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // setting button text
+        document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // setting button text
         document.getElementById('solvent_neighbors_holder').value = undefined
         document.getElementById('thermal_neighbors_holder').value = undefined
         document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
@@ -984,8 +984,8 @@ body {
 
         // Re-display messages in the two visualizers.
         document.getElementById('viewportnote').style.display = 'block';
-        document.getElementById('viewportnote').innerHTML = '(MOFs are visualized here. Left click to rotate, right click with mouse to move, scroll with mouse to zoom.)';
-        document.getElementById('container-01-note').innerHTML = '(MOF linkers and SBUs are visualized here. Left click to rotate, scroll with mouse to zoom.)';
+        document.getElementById('viewportnote').innerHTML = 'MOFs are visualized here. <br> Left click to rotate, right click with mouse to move, scroll with mouse to zoom.';
+        document.getElementById('container-01-note').innerHTML = 'MOF linkers and SBUs are visualized here. <br> Left click to rotate, scroll with mouse to zoom.';
     }
 
     function color_reset() { // resets the colors of the selection and prediction and visualize and component buttons
@@ -1589,7 +1589,7 @@ body {
       console.log('print check A')
 
       // Clearing things
-      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+      document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
       $('#resize_hint').hide()
       component_viewer.clear(); // clear component visualizer
@@ -1695,7 +1695,7 @@ body {
       $('#get_components').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color
 
       // Clearing things
-      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+      document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
       $('#resize_hint').hide()
       component_viewer.clear(); // clear component visualizer
@@ -1784,7 +1784,7 @@ body {
       $('#get_components').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color
 
       // Clearing things
-      document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // reset the uniqueness-filter button
+      document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
       $('#resize_hint').hide()
       component_viewer.clear(); // clear component visualizer
@@ -1882,7 +1882,7 @@ body {
       }
     }
 
-    // Triggers when the "Only components with unique connectivites" button (or the "All components" button) is clicked.
+    // Triggers when the "Filter by connectivity" button (or the "No filter" button) is clicked.
     $('#toggle_unique_components').click(function() {
 
       // Ensure there are components to visualize
@@ -1897,8 +1897,8 @@ body {
       var linker_dropdown = document.getElementById('linker');
       var sbu_dropdown = document.getElementById('sbu');
 
-      if (document.getElementById('toggle_unique_components').textContent == 'Only components with unique connectivities') { // Want only unique components.
-        document.getElementById('toggle_unique_components').textContent = 'All components'; // cycle the button text on click
+      if (document.getElementById('toggle_unique_components').textContent == 'Filter by connectivity') { // Want only unique components.
+        document.getElementById('toggle_unique_components').textContent = 'No filter'; // cycle the button text on click
 
         // Getting the unique indices (used to determine which linkers/sbus are unique).
         unique_linker_indices = document.getElementById('components_holder').value.unique_linker_indices;
@@ -1922,8 +1922,8 @@ body {
 
 
       }
-      else if (document.getElementById('toggle_unique_components').textContent == 'All components') { // Want all components.
-        document.getElementById('toggle_unique_components').textContent = 'Only components with unique connectivities'; // cycle the button text on click
+      else if (document.getElementById('toggle_unique_components').textContent == 'No filter') { // Want No filter.
+        document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // cycle the button text on click
 
         // Getting the total number of linkers and sbus.
         num_linkers = document.getElementById('components_holder').value.total_linkers;
@@ -1946,7 +1946,7 @@ body {
     })
 
 
-    // Visualize the linker after MOF components have been resolved when the "Visualize linker" button is clicked.
+    // Visualize the linker after MOF components have been resolved when the "Linker" button is clicked.
     $('#visualize_linker').click(function() {
 
       // Ensure there are components to visualize.
@@ -1980,7 +1980,7 @@ body {
     })
 
 
-    // Visualize the sbu after MOF components have been resolved when the "Visualize SBU" button is clicked.
+    // Visualize the sbu after MOF components have been resolved when the "SBU" button is clicked.
     $('#visualize_sbu').click(function() {
 
       // Ensure there are components to visualize.
@@ -2265,7 +2265,11 @@ body {
     })
 
     $('#bb-redirect').click(function(){
-      $('#pills-bb-tab').click()
+      // $('#pills-bb-tab').click()
+      $('#pills-main').hide() 
+      $('#pills-vis').hide()
+      $('#pills-comp').hide()
+      $('#pills-bb').show()
     })
 
     
@@ -2291,12 +2295,12 @@ body {
       $('#pills-bb').hide()
     })
 
-    $('#pills-bb-tab').click(function(){
-      $('#pills-main').hide() 
-      $('#pills-vis').hide()
-      $('#pills-comp').hide()
-      $('#pills-bb').show()
-    })
+    // $('#pills-bb-tab').click(function(){
+    //   $('#pills-main').hide() 
+    //   $('#pills-vis').hide()
+    //   $('#pills-comp').hide()
+    //   $('#pills-bb').show()
+    // })
 
     // // Start up page by virtually clicking the "Example MOF" button
     // $('#load').click();

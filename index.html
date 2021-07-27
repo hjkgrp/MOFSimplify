@@ -266,7 +266,8 @@ body {
       <status id='neighbors_section'>
         <div class='row'>
 
-          <p class = 'col-12' style='margin-top: 0.5cm;'> Nearest neighbors come from the pool of training data (i.e. CoRE MOFs) used to train an ANN.</p>
+          <p class = 'col-12' style='margin-top: 0.5cm;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
+
         </div>
         <div class='row'>
 
@@ -2114,7 +2115,6 @@ body {
 
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
-          // I don't really care about the response, I just want download the .txt file after it is written
           // window.location = '/neighbor_info/solvent-' + name + '-' + my_neighbor + '.out'
           download(response['file_name'],response['contents']);
       })
@@ -2214,19 +2214,9 @@ body {
 
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
-          // I don't really care about the response, I just want download the .txt file after it is written
           // window.location = '/neighbor_info/thermal-' + name + '-' + my_neighbor + '.out'
           download(response['file_name'],response['contents']);
       })
-
-      // setTimeout(function(){
-      //   console.log('Check Check Check')
-      //   $.post("/TGA_maker", JSON.stringify(my_neighbor)).done(
-      //     function(response){
-      //       console.log('Check Check Check 2')
-      //       window.location = '/neighbor_info/'.concat(my_neighbor.substring(0,6), '_simplified_TGA.png') // download the simplified TGA plot
-      //     })
-      // }, 500) // TODO if you ever use this code, consider that the 6 thing will not work for longer file names
 
       setTimeout(function(){
         window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder

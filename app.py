@@ -1322,17 +1322,26 @@ def neighbor_writer():
     shutil.rmtree(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
     os.mkdir(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor')
 
-    with open(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '__' + current_MOF + '__' + selected_neighbor + '.out','w') as f:
+    with open(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt','w') as f:
         f.write('Prediction type: ' + prediction_type + '\n')
         f.write('Current MOF: ' + current_MOF + '\n')
         f.write('Selected CoRE nearest neighbor in latent space: ' + selected_neighbor + '\n')
         f.write('Latent space distance: ' + latent_space_distance + '\n')
-        f.write('Property for nearest neighbor: ' + neighbor_truth + '\n')
+        if prediction_type == 'solvent':
+            f.write('Property for nearest neighbor: ' + neighbor_truth + '\n')
+        else:
+            degree_sign= u'\N{DEGREE SIGN}'
+            f.write('Property for nearest neighbor: ' + neighbor_truth + ' ' + degree_sign + 'C\n')
         f.write('Neighbor DOI: ' + this_neighbor_doi + '\n')
+
+    with open(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt','r') as f:
+        contents = f.read()
 
     print('neighbor writer check 2')
 
-    return 'Success!'
+    my_dict = {'contents': contents, 'file_name': prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt'}
+
+    return my_dict
 
 
 # @app.route('/TGA_maker', methods=['POST']) 

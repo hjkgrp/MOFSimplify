@@ -2063,7 +2063,7 @@ body {
 
 
     // Download the cif file of the nearest neighbor in solvent removal stability ANN latent space when the "Download" button in the solvent section is clicked. 
-    // Also download a .out file that contains information on the nearest neighbor.
+    // Also download a .txt file that contains information on the nearest neighbor.
     $('#download_s_neighbor').click(function() {
 
       // Ensure there are neighbors to display information on
@@ -2107,9 +2107,9 @@ body {
 
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
-          // I don't really care about the response, I just want download the .out file after it is written
-          window.location = '/neighbor_info/solvent__' + name + '__' + my_neighbor + '.out'
-          // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
+          // I don't really care about the response, I just want download the .txt file after it is written
+          // window.location = '/neighbor_info/solvent-' + name + '-' + my_neighbor + '.out'
+          download(response['file_name'],response['contents']);
       })
 
       setTimeout(function(){
@@ -2163,7 +2163,7 @@ body {
 
 
     // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the "Download" button in the thermal section is clicked. 
-    // Also download a .out file that contains information on the nearest neighbor.
+    // Also download a .txt file that contains information on the nearest neighbor.
     $('#download_t_neighbor').click(function() {
 
       // Ensure there are neighbors to display information on
@@ -2207,9 +2207,9 @@ body {
 
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
-          // I don't really care about the response, I just want download the .out file after it is written
-          window.location = '/neighbor_info/thermal__' + name + '__' + my_neighbor + '.out'
-          // I make it a .out file rather than a .txt file to force a download, rather than it being opened in the browser
+          // I don't really care about the response, I just want download the .txt file after it is written
+          // window.location = '/neighbor_info/thermal-' + name + '-' + my_neighbor + '.out'
+          download(response['file_name'],response['contents']);
       })
 
       // setTimeout(function(){
@@ -2226,6 +2226,24 @@ body {
       }, 1000); // the delay is to make it possible to download multiple files in the same function
 
     })
+
+
+    // This function is for downlooding information on nearest neighbors
+    function download(filename, text) {
+      var element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+      element.setAttribute('download', filename);
+
+      element.style.display = 'none';
+      document.body.appendChild(element);
+
+      element.click();
+
+      document.body.removeChild(element);
+    }
+
+
+
 
     // tab functionality
     // https://getbootstrap.com/docs/5.0/components/navs-tabs/

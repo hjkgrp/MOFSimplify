@@ -134,14 +134,6 @@ def serve_MOF5():
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
 
-#@app.route('/')
-#def serve_homepage():
-#    # Serves homepage
-#    if USE_SPLASH_PAGE:
-#        return flask.send_from_directory('./splash_page/', path)
-#    else:
-#        return flask.send_from_directory('.', 'index.html')
-
 ## Splash page management
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
@@ -157,31 +149,21 @@ def index(path='index.html'):
   print('input check')
   print(request.form.get('password'))
   if current_user.is_authenticated:
-    # flask.flash('Correct password')
     return flask.send_from_directory('.', 'index.html')
   elif request.form.get('password') == None:
-    # flask.flash('Incorrect password')
     return flask.send_from_directory('./splash_page/', path)
   else:
     return flask.send_from_directory('./splash_page/', 'index_wrong_password.html')
-
-
 
 @app.route('/about.html')
 def serve_about():
     # Serves homepage
     return flask.send_from_directory('.', 'about.html')
 
-
 @app.route('/mof_examples/<path:path>') # needed for fetch
 def serve_example(path):
     # Serves example
     return flask.send_from_directory('mof_examples', path)
-
-# @app.route('/temp_file_creation/tobacco_3.0/output_cifs/<path:path>') # needed for fetch
-# def serve_bb(path):
-#     # Serves bb-generated MOF
-#     return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/tobacco_3.0/output_cifs', path)
 
 @app.route('/ris_files/<path:path>')
 def serve_ris(path):
@@ -248,16 +230,6 @@ def curr_num_users():
                 sum += 1
 
     return str(sum+1)
-
-
-# @app.route('/flask_messages', methods=['GET'])
-# def get_flask_messages():
-#     # TODO
-#     print('message check')
-#     print(flask.get_flashed_messages())
-
-#     return flask.get_flashed_messages()[-1]
-
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 
 def bb_generate():

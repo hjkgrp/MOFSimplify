@@ -1059,7 +1059,7 @@ body {
         name = name.split(' ');
         name = name.slice(-1)[0]; // getting the last element of the array
         if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-          name = 'exampleMOF'
+          name = 'Example MOF'
         } 
 
         message = 'Currently visualized MOF: '
@@ -1556,7 +1556,7 @@ body {
     // Load example MOF when the "Example MOF" button is clicked.
     $('#load').click(function() {
 
-      fetch('mof_examples/HEBTAL_clean.cif').then(response => { // grabbing the example MOF from local host
+      fetch('mof_examples/TISPAO_clean.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           load_color = failure_red;
           $('#load').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
@@ -1567,7 +1567,7 @@ body {
           renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
           document.getElementById('example_holder').value = myFile; // setting the value of example_holder
-          $('#upload_status').text('File uploaded: Example MOF cif file (HEBTAL)'); // indicating that the example MOF has been uploaded
+          $('#upload_status').text('File uploaded: Example MOF cif file (HKUST-1)'); // indicating that the example MOF has been uploaded
           load_color = success_green;
           $('#load').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
           $('#predict_section').show() // show the prediction button section
@@ -1675,7 +1675,7 @@ body {
             name = name.split(' ');
             name = name.slice(-1)[0]; // getting the last element of the array
             if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-              name = 'exampleMOF'
+              name = 'Example MOF'
             } 
 
             console.log('print check E')
@@ -2102,7 +2102,7 @@ body {
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
       if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'exampleMOF'
+        name = 'Example MOF'
       } 
 
       dict['current_MOF'] = name
@@ -2201,7 +2201,7 @@ body {
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
       if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'exampleMOF'
+        name = 'Example MOF'
       } 
 
       dict['current_MOF'] = name

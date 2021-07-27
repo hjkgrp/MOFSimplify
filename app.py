@@ -78,7 +78,7 @@ def request_loader(request):
 
 @app.route('/new_user', methods=['GET'])
 def set_ID():
-    # sets the session user ID. This is used to generate unique folders, so that multiple users can ue the website at a time 
+    # sets the session user ID. This is used to generate unique folders, so that multiple users can use the website at a time 
     # specifically, copies of the temp_file_creation folder
     session['ID'] = time.time() # a unique ID for this session
     print('MY ID CHECK 1')
@@ -157,6 +157,7 @@ def index(path='index.html'):
   if current_user.is_authenticated:
     return flask.send_from_directory('.', 'index.html')
   else:
+    flask.flash('Incorrect password')
     return flask.send_from_directory('./splash_page/', path)
 
 @app.route('/about.html')
@@ -240,6 +241,14 @@ def curr_num_users():
                 sum += 1
 
     return str(sum+1)
+
+
+@app.route('/flask_messages', methods=['GET'])
+def get_flask_messages():
+    # TODO
+
+    return flask.get_flashed_messages()[0]
+
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 
 def bb_generate():

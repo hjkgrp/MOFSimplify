@@ -154,11 +154,18 @@ def index(path='index.html'):
       flask_login.login_user(user)
   print('is user authenticated?')
   print(current_user.is_authenticated)
+  print('input check')
+  print(request.form.get('password'))
   if current_user.is_authenticated:
+    # flask.flash('Correct password')
     return flask.send_from_directory('.', 'index.html')
-  else:
-    flask.flash('Incorrect password')
+  elif request.form.get('password') == None:
+    # flask.flash('Incorrect password')
     return flask.send_from_directory('./splash_page/', path)
+  else:
+    return flask.send_from_directory('./splash_page/', 'index_wrong_password.html')
+
+
 
 @app.route('/about.html')
 def serve_about():
@@ -243,11 +250,13 @@ def curr_num_users():
     return str(sum+1)
 
 
-@app.route('/flask_messages', methods=['GET'])
-def get_flask_messages():
-    # TODO
+# @app.route('/flask_messages', methods=['GET'])
+# def get_flask_messages():
+#     # TODO
+#     print('message check')
+#     print(flask.get_flashed_messages())
 
-    return flask.get_flashed_messages()[0]
+#     return flask.get_flashed_messages()[-1]
 
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 

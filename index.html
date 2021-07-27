@@ -943,6 +943,10 @@ body {
 
         color_reset(); // resetting selection and prediction and visualize and component button colors 
 
+
+        stability_field = document.getElementById('solvent_stability_prediction');
+        setColor(stability_field, 'transparent') // color background, transparent                      
+
         // hiding sections
         // $('#predict_section').hide()
         $('#predict_section').hide()
@@ -1166,6 +1170,7 @@ body {
       }
 
       // alert('Prediction loading, please wait for a few seconds. Close this alert after reading.') 
+      
       $('#solvent_stability_prediction').text('The solvent removal stability prediction is loading...'); 
 
       solvent_pred_color = inprogress_yellow;

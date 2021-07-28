@@ -2249,6 +2249,62 @@ body {
       document.body.removeChild(element);
     }
 
+    // Two functions to deal with requests to download a selected component's xyz file
+    $('#download_linker').click(function() {
+      download_component('Linker')
+    })
+
+    $('#download_sbu').click(function() {
+      download_component('SBU')
+    })
+
+    // This function is called when "Download linker" or "Download SBU" are clicked
+    // Input will either be 'Linker' or 'SBU'
+    // Downloads an xyz file
+    function download_component(component) {
+      // Get the currently selected component from the appropriate dropdown menu
+      
+      // Ensure there are components to visualize.
+      if (document.getElementById('components_holder').value == undefined) {
+        alert('Must get a MOF\'s components first.');
+        return;
+      }
+
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+        name = 'Example MOF'
+      } 
+
+      // I do this instead of redirecting to the xyz file (which would be simpler) in order to specify the name of the downloaded xyz file, make it more informative
+      if (component == 'Linker'){
+        my_linker = $('#linker').val() // Check which linker is selected in the linker dropdown 
+        linker_number = my_linker.split(" "); // an array, split at the space
+        linker_number = parseInt(linker_number[1]); // gets the number
+
+        // Getting xyz data.
+        dictionary = document.getElementById('components_holder').value;
+        my_key = 'linker_' + linker_number;
+
+        geometry = dictionary[my_key]; 
+
+        download(name + '-' + my_key + '.xyz', geometry) 
+      }
+      else {
+        my_sbu = $('#sbu').val() // Check which sbu is selected in the linker dropdown 
+        sbu_number = my_sbu.split(" "); // an array, split at the space
+        sbu_number = parseInt(sbu_number[1]); // gets the number
+
+        // Getting xyz data.
+        dictionary = document.getElementById('components_holder').value;
+        my_key = 'sbu_' + sbu_number;
+
+        geometry = dictionary[my_key];
+        download(name + '-' + my_key + '.xyz', geometry) 
+      }
+    }
+
     // When the Dark mode button is clicked:
     black = '#000000'
     white = '#FFFFFF'
@@ -2265,9 +2321,6 @@ body {
         $('.zebra').css('color', black)   
       }
     })
-
-
-
 
     // tab functionality
     // https://getbootstrap.com/docs/5.0/components/navs-tabs/

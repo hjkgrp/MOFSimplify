@@ -1561,7 +1561,7 @@ body {
     // Load example MOF when the "Example MOF" button is clicked.
     $('#load').click(function() {
 
-      fetch('mof_examples/TISPAO_clean.cif').then(response => { // grabbing the example MOF from local host
+      fetch('mof_examples/HKUST1.cif').then(response => { // grabbing the example MOF from local host
         if(!response.ok) { // catching 404 and other issues
           load_color = failure_red;
           $('#load').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure

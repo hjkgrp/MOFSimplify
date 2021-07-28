@@ -963,7 +963,11 @@ def TGA_plot():
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
-    my_data = my_data[:-6] # don't want the '_clean' part
+
+    # cut off these endings, in order to access the TGA file correctly:
+    # _clean, _ion_b, _neutral_b, _SL, _charged, _clean_h, _manual, _auto, _charged, etc
+    cut_index = my_data.find('_') # gets index of the first underscore
+    my_data = my_data[:cut_index] 
 
     # Grab data 
     slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")

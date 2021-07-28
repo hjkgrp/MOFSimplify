@@ -2270,12 +2270,11 @@ body {
         return;
       }
 
-      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
-      name = name.split(' ');
+      var name = document.getElementById('comp_MOF').innerHTML; // getting the name of the MOF
+      console.log(name)
+      name = name.split(': ');
       name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'Example MOF'
-      } 
+      console.log(name)
 
       // I do this instead of redirecting to the xyz file (which would be simpler) in order to specify the name of the downloaded xyz file, make it more informative
       if (component == 'Linker'){

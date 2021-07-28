@@ -328,7 +328,7 @@ body {
       </div>
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
-        <button class='btn btn-primary round_button' style='display:inline-block; width:50%; font-size: 22px' id='visualize' type='button'>Visualize selected MOF</button>
+        <button class='btn btn-primary round_button' style='display:inline-block; width:50%; font-size: 22px' id='visualize' type='button'>Visualize selected (1) MOF</button>
         <p class='zebra' style='display:inline-block; width:100%; font-size: 22px'> Special thanks to the Koes and Snurr groups for developing visualization code. </p>
       </div>
 
@@ -362,10 +362,10 @@ body {
           <!-- Button for getting MOF components for visualization  -->
           <div style='width:100%; text-align:center;'>
 
-            <button style='display:inline-block; width:80%; font-size: 22px; margin-bottom: 0.5cm;' class='btn btn-primary round_button' id='get_components' type='button'>Get selected MOF components</button>
+            <button style='display:inline-block; width:80%; font-size: 22px; margin-bottom: 0.5cm;' class='btn btn-primary round_button' id='get_components' type='button'>Get selected (1) MOF components</button>
           </div>
 
-<!--           <p style='margin-top: 0.5cm; font-size: 22px;'> Can display MOF's linkers and SBUs after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Linker or SBU.</p> -->
+<!--           <p style='margin-top: 0.5cm; font-size: 22px;'> Can display MOF's linkers and SBUs after clicking the Get selected (1) MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Linker or SBU.</p> -->
 
           <div id='comp_MOF' style='font-size: 22px;' class='zebra'> </div> <!-- Will display information on what MOF's components are currently visualized -->
 
@@ -475,7 +475,7 @@ body {
 <p id="bbg_MOF_holder"> </p> <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used. -->
 
 <!-- For MOF components (xyz file text) -->
-<p id="components_holder"> </p> <!-- This will never display anything. Just used to store components if the button "Get selected MOF components" is used. -->
+<p id="components_holder"> </p> <!-- This will never display anything. Just used to store components if the button "Get selected (1) MOF components" is used. -->
 
 <!-- For solvent removal stability ANN nearest neighbors -->
 <p id="solvent_neighbors_holder"> </p> <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Stability upon solvent removal" is used. -->
@@ -1033,7 +1033,7 @@ body {
     });
 
 
-    // This function triggers when someone clicks the "Visualize selected MOF" button.
+    // This function triggers when someone clicks the "Visualize selected (1) MOF" button.
     $("#visualize").on('click', function() {
         visualize_color = inprogress_yellow; // TODO fix
         $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
@@ -1588,7 +1588,7 @@ body {
     });
 
 
-    // Get MOF linkers and sbus when the "Get selected MOF components" button is clicked.
+    // Get MOF linkers and sbus when the "Get selected (1) MOF components" button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function() {
       console.log('print check A')

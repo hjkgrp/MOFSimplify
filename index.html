@@ -49,7 +49,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 }
 
 .link {
-  color: #00008b; /* hyperlinks are dark blue */
+  color: #279AF1; /* hyperlinks are blue */
 }
 
 #viewportwrapper { grid-area: viz; } /* For MOF visualization */
@@ -81,7 +81,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   color: black;
   font-size: 16px;
-}
+
+  /*background color*/
+/*  background-color: black;
+*/}
 
 .pill-custom {
   border-radius: 0px 0px 0px 0px !important;
@@ -156,12 +159,10 @@ body {
             <li class="nav-item" style='padding-left: 30px;'>
               <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF Code</a>
             </li>
-            <li class="nav-item" style='padding-left: 30px;'>
-              <a class="nav-link" id="dark_mode">Dark mode</a>
-            </li>
           </ul>
 
         </div>
+        <button class='btn btn-primary round_button selection_button' id='dark_mode' type='button' style='font-size:22px;'>Dark mode</button>
       </div>
     </div>
 
@@ -175,11 +176,11 @@ body {
  -->
             <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
 
-            <p style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
+            <p class='zebra' style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
             
             <!-- Subtitle -->
             <p style="width:100%; text-align:center;">
-              <span style="font-size:26px;">Analyze metal-organic frameworks (MOFs) below!</span><br>
+              <span style="font-size:26px;" class='zebra'>Analyze metal-organic frameworks (MOFs) below!</span><br>
 <!--               For more on MOF analysis, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.
  -->            </p>
           
@@ -217,7 +218,7 @@ body {
 
     <div id="pills-main" class="container">
       
-      <b style='font-size:22px;'> 1) Select a MOF for analysis</b>
+      <b style='font-size:22px;' class='zebra'> 1) Select a MOF for analysis</b>
       <!-- Create a section containing buttons -->
       <div class='col-lg-12'>
 
@@ -237,7 +238,7 @@ body {
       </div>
 
       <div id='predict_section' style='margin-top: 1cm;'>
-        <b style='font-size:22px;'> 2) Predict properties of the selected MOF </b>
+        <b style='font-size:22px;' class='zebra'> 2) Predict properties of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
 
@@ -268,12 +269,12 @@ body {
       <status id='neighbors_section'>
         <div class='row'>
 
-          <p class = 'col-12' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
+          <p class = 'col-12 zebra' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
 
         </div>
         <div class='row'>
 
-            <div class = 'col-6' style='font-size:22px;'>
+            <div class = 'col-6 zebra' style='font-size:22px;'>
             Solvent removal stability ANN nearest neighbors <br> in latent space
             <select class='form-control' id='solvent_neighbors' style='font-size:22px;'>
             </select>
@@ -286,10 +287,10 @@ body {
               <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
               <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
             </div>
-            <p id='s_neighbor_info' style='font-size:20px;'></p>
+            <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
             </div>
 
-            <div class = 'col-6' style='font-size:22px;'>
+            <div class = 'col-6 zebra' style='font-size:22px;'>
             Thermal stability ANN nearest neighbors <br> in latent space
             <select class='form-control' id='thermal_neighbors' style='font-size:22px;'>
             </select>
@@ -302,10 +303,10 @@ body {
               <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
               <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
             </div>
-            <p id='t_neighbor_info' style='font-size:20px;'></p>
+            <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
             <div class='col-6' id='tga_plot'></div>
 
-            <div id='tga_explanation' style='display: none; margin-top: 0.5cm;'> 
+            <div id='tga_explanation' style='display: none; margin-top: 0.5cm;' class='zebra'> 
               <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
               <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
             </div>
@@ -328,11 +329,11 @@ body {
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
         <button class='btn btn-primary round_button' style='display:inline-block; width:50%; font-size: 22px' id='visualize' type='button'>Visualize selected MOF</button>
-        <p style='display:inline-block; width:100%; font-size: 22px'> Special thanks to the Koes and Snurr groups for developing visualization code. </p>
+        <p class='zebra' style='display:inline-block; width:100%; font-size: 22px'> Special thanks to the Koes and Snurr groups for developing visualization code. </p>
       </div>
 
       <div style='width:100%; text-align:center;'>
-        <div style='display:inline-block; font-size: 22px;' id='currently_visualized'></div> 
+        <div style='display:inline-block; font-size: 22px;' id='currently_visualized' class='zebra'></div> 
       </div>
       <div style='width:100%; text-align:center;'>
         <div style='display:inline-block; font-size: 22px;' id='status_visualization'></div> 
@@ -344,8 +345,8 @@ body {
     <div id="pills-comp">
       <div class='row'>
         <div class='col-lg-6' style='margin-top: 0.5cm;'>
-          <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;'> 
-              <div id='container-01-note' style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px; '>MOF linkers and SBUs are visualized here. <br> Left click to rotate, scroll with mouse to zoom.</div>
+          <div id='container-01' class='mol-container' style='border-style:solid;border-width:2px;background-color: white;'> 
+              <div id='container-01-note' style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px;'>MOF linkers and SBUs are visualized here. <br> Left click to rotate, scroll with mouse to zoom.</div>
             </div>
           <div style="margin-bottom:0.5cm;"></div>
           <div style='width:100%; text-align:center;'>
@@ -364,15 +365,15 @@ body {
 
 <!--           <p style='margin-top: 0.5cm; font-size: 22px;'> Can display MOF's linkers and SBUs after clicking the Get selected MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Linker or SBU.</p> -->
 
-          <div id='comp_MOF' style='font-size: 22px;'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+          <div id='comp_MOF' style='font-size: 22px;' class='zebra'> </div> <!-- Will display information on what MOF's components are currently visualized -->
 
-          <div style='font-size: 22px; margin-top: 0.5cm'>
+          <div style='font-size: 22px; margin-top: 0.5cm' class='zebra'>
             Linkers
             <select style='font-size: 22px;' class='form-control' id='linker'>
             </select>
           </div>
 
-          <div style='font-size: 22px;'>
+          <div style='font-size: 22px;' class='zebra'>
             SBUs
             <select style='font-size: 22px;' class='form-control' id='sbu'> </select>
           </div>
@@ -382,7 +383,7 @@ body {
 
           </div>
 
-          <div class='col-12'>
+          <div class='col-12 zebra'>
             <p id='component_SMILES' style='margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-size: 22px;'> </p>
             <p id='resize_hint' style='display: none; margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-style:italic; font-size: 20px;'>Component not visualizing? Try resizing the browser window.</p>
           </div>
@@ -390,7 +391,7 @@ body {
       </div>
     </div>
 
-    <div id="pills-bb" style='font-size: 20px;'>
+    <div id="pills-bb" style='font-size: 20px;' class='zebra'>
       A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building blocks (bb).  <br>
 
       Not every combination of linker, SBU, and net is compatible. <br>
@@ -400,7 +401,7 @@ body {
       For information on net (topology) abbreviations, refer to 10.1021/acs.cgd.7b00848 and 10.1039/c8ce01637b.
 
       <!-- Selection box for the linker building block -->
-      <div  style="padding-top: 30px; font-size: 22px;">
+      <div  style="padding-top: 30px; font-size: 22px;" class='zebra'>
         Linker, the connecting building block
         <input style='font-size: 22px;' id="linker_option" class='form-control locksMetrics' list = 'linkers_list' onmousedown="value = '';" />
       </div>
@@ -412,7 +413,7 @@ body {
 
 
       <!-- Selection box for metal SBU building block -->
-      <div style='font-size: 22px;'>
+      <div style='font-size: 22px;' class='zebra'>
         SBU, the metal-centered nodular building block 
         <input style='font-size: 22px;' id="sbu_option" class='form-control locksMetrics' list = 'sbus_list' onmousedown="value = '';" />
       </div>
@@ -2246,6 +2247,23 @@ body {
       document.body.removeChild(element);
     }
 
+    // When the Dark mode button is clicked:
+    black = '#000000'
+    white = '#FFFFFF'
+    $('#dark_mode').click(function(){ // change background and button text depending on button state
+      button_text = document.getElementById('dark_mode').textContent
+      if (button_text == 'Dark mode'){
+        $('body').css("background-color", black);    
+        document.getElementById('dark_mode').textContent = 'Light mode';   
+        $('.zebra').css('color', white)
+      }
+      else {
+        $('body').css("background-color", white);   
+        document.getElementById('dark_mode').textContent = 'Dark mode';
+        $('.zebra').css('color', black)   
+      }
+    })
+
 
 
 
@@ -2441,7 +2459,7 @@ body {
     $(".link").hover(function(){ // for hyperlinks
       $(this).css("color", '#18bc9c');
       }, function(){
-      $(this).css("color", '#00008b');
+      $(this).css("color", '#279AF1');
      });
 
   });

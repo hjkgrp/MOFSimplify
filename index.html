@@ -255,6 +255,20 @@ body {
         </div>
       </div>
 
+      <div id='descriptor_section' style='margin-top: 1cm;'>
+        <b style='font-size:22px;' class='zebra'> 3) Download descriptors of the selected MOF </b>
+        <!-- Create a section containing buttons -->
+        <div class='col-lg-12'>
+
+          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+
+            <!-- Button for downloading descriptors of MOF -->
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_descriptors' type='button'>Download descriptors</button> 
+
+          </div>
+
+        </div>
+      </div>
 
       <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
       <div id='status_section' class='row' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
@@ -957,6 +971,8 @@ body {
         $('#predict_section').hide()
         $('#neighbors_section').hide()
         $('#status_section').hide()
+        $('#descriptor_section').hide()
+        
 
 
         // clearing previous predictions
@@ -1025,7 +1041,7 @@ body {
         }
 
         let myFile = document.getElementById('file_input').files[0]; // the uploaded file
-        $('#upload_status').text('File uploaded: ' + myFile.name);
+        $('#upload_status').text('Selected MOF (uploaded): ' + myFile.name);
         upload_color = success_green;
         $('#upload').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
         $('#predict_section').show()
@@ -1060,12 +1076,7 @@ body {
 
         handleInput(false, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
-        var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
-        name = name.split(' ');
-        name = name.slice(-1)[0]; // getting the last element of the array
-        if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-          name = 'Example MOF'
-        } 
+        name = get_selected_MOF();
 
         message = 'Currently visualized MOF: '
         message = message + name
@@ -1181,11 +1192,21 @@ body {
       solvent_pred_color = inprogress_yellow;
       $('#predict_s').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
 
+      // getting the name of the selected MOF
+      var name = document.getElementById('upload_status').innerHTML; 
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+        name = 'HKUST-1'
+      } 
+
       // myFile.text() is a promise
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
 
-        $.post("/predict_solvent_stability", JSON.stringify(result)).done(
+        myDict = {'name': name, 'structure': result}
+
+        $.post("/predict_solvent_stability", JSON.stringify(myDict)).done(
             function(response) {
 
                   if (response == 'FAILED') { 
@@ -1201,6 +1222,7 @@ body {
                   $('#predict_s').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
                   $('#neighbors_section').show() // show nearest neighbors section
+                  $('#descriptor_section').show() // show section where can download descriptors
 
                   if (! response['in_train']) { // a prediction was made
                     var prediction = response['prediction']
@@ -1321,12 +1343,21 @@ body {
       $('#predict_t').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress 
       $('#thermal_stability_prediction').text('The thermal stability prediction is loading...'); // display prediction result
 
+      // getting the name of the selected MOF
+      var name = document.getElementById('upload_status').innerHTML; 
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+        name = 'HKUST-1'
+      } 
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
         // result is the text of the loaded .cif file
 
-        $.post("/predict_thermal_stability", JSON.stringify(result)).done(
+        myDict = {'name': name, 'structure': result}
+
+        $.post("/predict_thermal_stability", JSON.stringify(myDict)).done(
             function(response) {
 
                   if (response == 'FAILED') { 
@@ -1341,6 +1372,7 @@ body {
                   $('#predict_t').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
                   $('#neighbors_section').show() // show nearest neighbors section
+                  $('#descriptor_section').show() // show section where can download descriptors
 
                   if (! response['in_train']) { // a prediction was made
                     prediction = response['prediction'];
@@ -1507,7 +1539,7 @@ body {
                     var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
                     document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
 
-                    $('#upload_status').text('MOF constructed with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
+                    $('#upload_status').text('Selected MOF (assembled): ' + name); // TODO make possible for multiple linkers and sbus?
                     bb_redirect_color = success_green;
                     $('#bb-redirect').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
                     $('#pills-main-tab').click() // redirecting to appropriate tab
@@ -1530,31 +1562,13 @@ body {
       }
 
       var myFile = document.getElementById('bbg_MOF_holder').value;
-      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
-      name = name.split(' ');
-      name = name.slice(-1)[0]; // getting the last element of the array
+      name = get_selected_MOF();
 
       $.get("/get_ID").done(
         function(response) {
           my_ID = response 
           window.location = '/bbcif/' + name + '~' + my_ID // get file from the temp_file_creation_USERID/tobacco_3.0/output_cifs folder
-          // assuming primitive is same as normal file
-
-          fetch('bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
-            if(!response.ok) { // catching 404 and other issues
-              document.getElementById('bbg_MOF_holder').value = undefined; // clearing the value
-              throw Error(response.statusText);
-            } 
-              return response.blob();
-            }).then(function(blob) { 
-              var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
-              document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
-
-              $('#upload_status').text('MOF constructed with building blocks: ' + name); // TODO make possible for multiple linkers and sbus?
-            }).catch(error => {
-              $('#upload_status').text('Failed to load');
-              console.error('There has been a problem with your fetch operation:', error);
-            })    
+          // assuming primitive is same as normal file   
         })
     })
 
@@ -1572,7 +1586,7 @@ body {
           renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
           var myFile = new File([blob], "example.cif", {type: "", lastModified: Date.now()}) // making a cif file
           document.getElementById('example_holder').value = myFile; // setting the value of example_holder
-          $('#upload_status').text('File uploaded: Example MOF cif file (HKUST-1)'); // indicating that the example MOF has been uploaded
+          $('#upload_status').text('Selected MOF: HKUST-1'); // indicating that the example MOF has been uploaded
           load_color = success_green;
           $('#load').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
           $('#predict_section').show() // show the prediction button section
@@ -1623,69 +1637,63 @@ body {
       console.log('print check B')
       component_color = inprogress_yellow;
       $('#get_components').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
-
-
+            
+      name = get_selected_MOF();
 
       // myFile.text() is a promise
       myFile.text().then(function(result){
 
-        console.log('print check B2')
+      console.log('print check B2')
 
-        // result is the text of the loaded .cif file
-        $.post("/get_components", JSON.stringify(result)).done(
-          function(response) {
+      myDict = {'name': name, 'structure': result}
 
-            console.log('print check C')
+      // result is the text of the loaded .cif file
+      $.post("/get_components", JSON.stringify(myDict)).done(
+        function(response) {
 
-            if (response == 'FAILED') { 
-              alert('Failed to featurize.')
-              document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
-              component_color = failure_red;
-              $('#get_components').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
-              return; 
-            }
+          console.log('print check C')
 
-            component_color = success_green;
-            $('#get_components').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+          if (response == 'FAILED') { 
+            alert('Failed to featurize.')
+            document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+            component_color = failure_red;
+            $('#get_components').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+            return; 
+          }
 
-            var result = JSON.parse(response);
+          component_color = success_green;
+          $('#get_components').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
-            var linker_dropdown = document.getElementById('linker');
-            var sbu_dropdown = document.getElementById('sbu');
+          var result = JSON.parse(response);
 
-            num_linkers = result.total_linkers;
-            num_sbus = result.total_sbus;
+          var linker_dropdown = document.getElementById('linker');
+          var sbu_dropdown = document.getElementById('sbu');
 
-            // Populating the linker dropdown.
-            for (i = 1; i <= num_linkers; i++) {
-              var option = document.createElement('option');
-              option.text = 'Linker ' + i.toString();
-              linker_dropdown.add(option);
-            }
+          num_linkers = result.total_linkers;
+          num_sbus = result.total_sbus;
 
-            // Populating the sbu dropdown.
-            for (i = 1; i <= num_sbus; i++) {
-              var option = document.createElement('option');
-              option.text = 'SBU ' + i.toString();
-              sbu_dropdown.add(option);
-            }
+          // Populating the linker dropdown.
+          for (i = 1; i <= num_linkers; i++) {
+            var option = document.createElement('option');
+            option.text = 'Linker ' + i.toString();
+            linker_dropdown.add(option);
+          }
 
-            console.log('print check D')
+          // Populating the sbu dropdown.
+          for (i = 1; i <= num_sbus; i++) {
+            var option = document.createElement('option');
+            option.text = 'SBU ' + i.toString();
+            sbu_dropdown.add(option);
+          }
 
-            // Storing the linker and sbu data.
-            document.getElementById('components_holder').value = result; 
+          console.log('print check D')
 
+          // Storing the linker and sbu data.
+          document.getElementById('components_holder').value = result; 
 
-            var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
-            name = name.split(' ');
-            name = name.slice(-1)[0]; // getting the last element of the array
-            if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-              name = 'Example MOF'
-            } 
+          console.log('print check E')
 
-            console.log('print check E')
-
-            $('#comp_MOF').text('MOF for which components are listed below: ' + name)
+          $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 
         });
       })
@@ -1736,7 +1744,10 @@ body {
         // myFile.text() is a promise
         myFile.text().then(function(result){
           // result is the text of the loaded .cif file
-          $.post("/get_components", JSON.stringify(result)).done(
+
+          myDict = {'name': my_neighbor, 'structure': result}
+
+          $.post("/get_components", JSON.stringify(myDict)).done(
             function(response) {
 
               if (response == 'FAILED') { 
@@ -1825,7 +1836,10 @@ body {
         // myFile.text() is a promise
         myFile.text().then(function(result){
           // result is the text of the loaded .cif file
-          $.post("/get_components", JSON.stringify(result)).done(
+
+          myDict = {'name': my_neighbor, 'structure': result}
+
+          $.post("/get_components", JSON.stringify(myDict)).done(
             function(response) {
 
               if (response == 'FAILED') { 
@@ -2103,12 +2117,7 @@ body {
       var dict = {}
       dict['prediction_type'] = 'solvent'
 
-      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
-      name = name.split(' ');
-      name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'Example MOF'
-      } 
+      name = get_selected_MOF();
 
       dict['current_MOF'] = name
       dict['selected_neighbor'] = my_neighbor
@@ -2125,7 +2134,6 @@ body {
 
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
-          // window.location = '/neighbor_info/solvent-' + name + '-' + my_neighbor + '.out'
           download(response['file_name'],response['contents']);
       })
 
@@ -2202,12 +2210,7 @@ body {
       var dict = {}
       dict['prediction_type'] = 'thermal'
 
-      var name = document.getElementById('upload_status').innerHTML; // getting the name of the MOF
-      name = name.split(' ');
-      name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'Example MOF'
-      } 
+      name = get_selected_MOF();
 
       dict['current_MOF'] = name
       dict['selected_neighbor'] = my_neighbor
@@ -2224,7 +2227,6 @@ body {
 
       $.post("/neighbor_writer", JSON.stringify(dict)).done(
         function(response) {
-          // window.location = '/neighbor_info/thermal-' + name + '-' + my_neighbor + '.out'
           download(response['file_name'],response['contents']);
       })
 
@@ -2270,10 +2272,13 @@ body {
         return;
       }
 
-      var name = document.getElementById('comp_MOF').innerHTML; // getting the name of the MOF
+      var name = document.getElementById('comp_MOF').innerHTML; // getting the name of the MOF for which components are being visualized
       console.log(name)
       name = name.split(': ');
       name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 4) == '.cif') { // getting rid of the .cif part
+        name = name.substring(0, name.length - 4)
+      }
       console.log(name)
 
       // I do this instead of redirecting to the xyz file (which would be simpler) in order to specify the name of the downloaded xyz file, make it more informative
@@ -2303,6 +2308,26 @@ body {
         download(name + '-' + my_key + '.xyz', geometry) 
       }
     }
+
+    
+    // When the "Download descriptors" button is clicked, download the descriptors for the selected MOF
+    $('#download_descriptors').click(function() {
+      name = get_selected_MOF()
+      window.location = '/merged_descriptors/' + name + '_descriptors.csv'; // get file from the temp_file_creation_USERID/merged_descriptors folder
+    })
+
+
+    // This function returns the name of the selected MOF
+    function get_selected_MOF() {
+      var name = document.getElementById('upload_status').innerHTML; // getting the name of the selected MOF
+      name = name.split(' ');
+      name = name.slice(-1)[0]; // getting the last element of the array
+      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
+        name = 'HKUST-1'
+      } 
+      return name
+    }
+
 
     // When the Dark mode button is clicked:
     black = '#000000'
@@ -2440,6 +2465,7 @@ body {
     $('#pills-comp').hide()
     $('#pills-bb').hide()
     $('#predict_section').hide()
+    $('#descriptor_section').hide()
     $('#neighbors_section').hide()
     $('#status_section').hide()
 

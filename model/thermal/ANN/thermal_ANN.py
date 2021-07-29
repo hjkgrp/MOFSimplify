@@ -158,12 +158,13 @@ other = ['cif_file','name','filename']
 user_id = sys.argv[1]
 
 path = sys.argv[2] # This is the main mofSimplify folder
+my_name = sys.argv[3] # will be name_primitive, communicated from app.py
 ANN_path = path + 'model/thermal/ANN/'
 temp_file_path = path + 'temp_file_creation_' + user_id + '/'
 df_train_all = pd.read_csv(ANN_path+"train.csv").append(pd.read_csv(ANN_path+"val.csv"))
 df_train = pd.read_csv(ANN_path+"train.csv")
 df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
-df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors.csv') # Assume temp_file_creation/ in parent directory
+df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + my_name + '_descriptors.csv') # Assume temp_file_creation/ in parent directory
 features = [val for val in df_train.columns.values if val in RACs+geo]
 
 X_train, X_newMOF, y_train, x_scaler, y_scaler = normalize_data(df_train, df_newMOF, features, ["T"], unit_trans=1, debug=False)

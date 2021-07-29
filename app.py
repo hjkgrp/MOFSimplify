@@ -197,10 +197,15 @@ def serve_neighbor(path):
     # Serves the neighbor CoRE MOF
     return flask.send_from_directory('CoRE2019', path);
 
-@app.route('/neighbor_info/<path:path>')
-def serve_neighbor_txt(path):
-    # Serves the neighbor CoRE MOF information in txt file format
-    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/latent_neighbor', path);
+# @app.route('/neighbor_info/<path:path>')
+# def serve_neighbor_txt(path):
+#     # Serves the neighbor CoRE MOF information in txt file format
+#     return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/latent_neighbor', path);
+
+@app.route('/merged_descriptors/<path:path>')
+def serve_descriptors(path):
+    # Serves the csv of descriptors for the selected MOF
+    return flask.send_from_directory('merged_descriptors', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     myList = os.listdir(path);
@@ -217,7 +222,6 @@ def file_age_in_seconds(pathname):
 @app.route('/curr_users', methods=['GET'])
 def curr_num_users():
     # Returns the current number of users on MOFSimplify. 
-    # Indicative of the expected success rate of prediction operations, since two users can't run a prediction (or Get Components) at the same time
 
     sum = 0
 
@@ -291,43 +295,35 @@ def bb_generate():
 
     return json_object
 
-    
-# Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14)
-# the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
-@app.route('/predict_solvent_stability', methods=['POST']) 
-def ss_predict():
-    # Generates solvent stability prediction.
-    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
-    # Then, apply Aditya's model to make prediction.
 
-    print('MY ID CHECK 2')
-    print(session['ID'])
+### Next, the prediction functions ### 
 
-    print('TIME CHECK 1')
-
+# This function is used by both ss_predict() and ts_predict() to generate RACs and Zeo++ descriptors
+# These descriptors are subsequently used in ss_predict() and ts_predict() for the ANN models
+# Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated
+# The third input indicates the type of prediction (solvent removal or thermal)
+def descriptor_generator(name, structure, prediction_type):
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-
-    # Grab data
-    my_data = json.loads(flask.request.get_data())
+    cif_folder = temp_file_folder + 'cifs/'
 
     # Write the data back to a cif file.
     try:
-        cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+        cif_file = open(cif_folder + name + '.cif', 'w')
     except FileNotFoundError:
         return 'FAILED'
-    cif_file.write(my_data)
+    cif_file.write(structure)
     cif_file.close()
 
+    RACs_folder = temp_file_folder +  'RACs/'
+    zeo_folder = temp_file_folder + 'zeo++/'
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
-    shutil.rmtree(temp_file_folder + 'RACs')
-    os.mkdir(temp_file_folder + 'RACs')
+    shutil.rmtree(RACs_folder)
+    os.mkdir(RACs_folder)
 
     # Doing the same with the Zeo++ folder.
-    shutil.rmtree(temp_file_folder + 'zeo++')
-    os.mkdir(temp_file_folder + 'zeo++')
-
-    # os.chdir("RACs") # move to RACs folder
+    shutil.rmtree(zeo_folder)
+    os.mkdir(zeo_folder)
 
     print('TIME CHECK 2')
     import time # debugging
@@ -335,7 +331,7 @@ def ss_predict():
 
     # Next, running MOF featurization
     try:
-        get_primitive(temp_file_folder + 'temp_cif.cif', temp_file_folder + 'RACs/temp_cif_primitive.cif');
+        get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
     except ValueError:
         return 'FAILED'
 
@@ -344,10 +340,8 @@ def ss_predict():
 
     timeStarted = time.time() # save start time (debugging)
 
-    RACs_folder = temp_file_folder +  'RACs/'
-
     try:
-        full_names, full_descriptors = get_MOF_descriptors(RACs_folder + 'temp_cif_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + 'temp_cif.xyz');
+        full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
             # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
@@ -367,14 +361,13 @@ def ss_predict():
     # At this point, have the RAC featurization. Need geometry information next.
 
     # Run Zeo++
-    zeo_folder = temp_file_folder + 'zeo++/'
 
     timeStarted = time.time() # save start time (debugging)
 
-    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + 'temp_cif_pd.txt ' + RACs_folder + 'temp_cif_primitive.cif'
-    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_sa.txt ' + RACs_folder + 'temp_cif_primitive.cif'
-    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -vol 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_av.txt ' + RACs_folder + 'temp_cif_primitive.cif'
-    cmd4 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_pov.txt '+ RACs_folder + 'temp_cif_primitive.cif'
+    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
+    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
+    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -vol 1.86 1.86 10000 ' + zeo_folder + name + '_av.txt ' + cif_folder + name + '_primitive.cif'
+    cmd4 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
     # four parallelized Zeo++ commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -405,28 +398,23 @@ def ss_predict():
     timeStarted = time.time() # save start time (debugging)
 
     dict_list = []
-    cif_file = 'temp.cif' # techincally, calculations were with the primitive, but I'll just call it temp
+    cif_file = name + '_primitive.cif' 
     basename = cif_file.strip('.cif')
     largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
     unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
     VPOV, GPOV = np.nan, np.nan
     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
-    # if not (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
-    #     os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
-    #     ):
-    #     time.sleep(1) # give the code a bit more time to finish (1 second)
-
-    if (os.path.exists(zeo_folder + 'temp_cif_pd.txt') & os.path.exists(zeo_folder + 'temp_cif_sa.txt') &
-        os.path.exists(zeo_folder + 'temp_cif_av.txt') & os.path.exists(zeo_folder + 'temp_cif_pov.txt')
+    if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
+        os.path.exists(zeo_folder + name + '_av.txt') & os.path.exists(zeo_folder + name + '_pov.txt')
         ):
-        with open(zeo_folder + 'temp_cif_pd.txt') as f:
+        with open(zeo_folder + name + '_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
                 largest_included_sphere = float(row.split()[1]) # largest included sphere
                 largest_free_sphere = float(row.split()[2]) # largest free sphere
                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open(zeo_folder + 'temp_cif_sa.txt') as f:
+        with open(zeo_folder + name + '_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
@@ -434,7 +422,7 @@ def ss_predict():
                     crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open(zeo_folder + 'temp_cif_pov.txt') as f:
+        with open(zeo_folder + name + '_pov.txt') as f:
             pore_volume_data = f.readlines()
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
@@ -448,9 +436,9 @@ def ss_predict():
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
-        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + 'temp_cif_sa.txt'), 
-              '; pd: ',os.path.exists(zeo_folder + 'temp_cif_pd.txt'), '; av: ', os.path.exists(zeo_folder + 'temp_cif_av.txt'),
-              '; pov: ', os.path.exists(zeo_folder + 'temp_cif_pov.txt'))
+        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
+              '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; av: ', os.path.exists(zeo_folder + name + '_av.txt'),
+              '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
         return 'FAILED'
     geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
                 'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
@@ -476,19 +464,24 @@ def ss_predict():
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
 
-    merged_df.to_csv(temp_file_folder + 'merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
+    merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
 
-    ANN_folder = MOFSIMPLIFY_PATH + 'model/solvent/ANN/'
+    if prediction_type == 'solvent':
+
+        ANN_folder = MOFSIMPLIFY_PATH + 'model/solvent/ANN/'
+        train_df = pd.read_csv(ANN_folder + 'dropped_connectivity_dupes/train.csv')
+
+    if prediction_type == 'thermal':
+        ANN_folder = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
+        train_df = pd.read_csv(ANN_folder + 'train.csv')
 
     # Here, I do a check to see if the current MOF is in the training data.
     # If it is, then I return the known truth for the MOF, rather than make a prediction.
 
     # Will iterate through the rows of the train pandas dataframe
-    train_df = pd.read_csv(ANN_folder + 'dropped_connectivity_dupes/train.csv')
+
 
     in_train = False
-
-    # print('In train check')
 
     for index, row in train_df.iterrows(): # iterate through rows of the training data MOFs
 
@@ -510,7 +503,7 @@ def ss_predict():
 
                 # print(row['CoRE_name'])
                 # # debugging
-                # if row['CoRE_name'] == 'HISJAW_clean':
+                # if row['CoRE_name'] == 'HISJAW_clean': (check with AFUKIX for thermal)
                 #     print('HISJAW check')
                 #     print(col)
                 #     print(row[col])
@@ -518,10 +511,20 @@ def ss_predict():
 
                 break
         
-        if row_match: # all columns for row match! Training MOF is the same as new MOF
+        if row_match and prediction_type == 'solvent': # all columns for row match! Training MOF is the same as new MOF
             in_train = True
             match_truth = row['flag'] # the flag for the MOF that matches the current MOF
             print(row['CoRE_name'])
+            break
+        if row_match and prediction_type =='thermal':
+            in_train = True
+            match_truth = row['T'] # the flag for the MOF that matches the current MOF
+
+            match_truth = np.round(match_truth,1) # round to 1 decimal
+
+            # adding units
+            degree_sign= u'\N{DEGREE SIGN}'
+            match_truth = str(match_truth) + degree_sign + 'C' # degrees Celsius
             break
 
     if in_train:
@@ -530,16 +533,46 @@ def ss_predict():
 
     print('TIME CHECK 5')
 
+    return [temp_file_folder, ANN_folder]
+
+
+    
+# Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14)
+# the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
+@app.route('/predict_solvent_stability', methods=['POST']) 
+def ss_predict():
+    # Generates solvent stability prediction.
+    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
+    # Then, apply Aditya's model to make prediction.
+
+    # Grab data
+    my_data = json.loads(flask.request.get_data())
+    structure = my_data['structure']
+    name = my_data['name']
+    if name == 'Example MOF':
+        name = 'HKUST-1' # spacing in name was causing issues down the line
+    if name[-4:] == '.cif':
+        name = name[:-4]
+
+    output = descriptor_generator(name, structure, 'solvent') # generate descriptors
+    if output == 'FAILED': # model failure
+        return 'FAILED'
+    elif isinstance(output, dict): # MOF was in the training data
+        return output
+    else: # grabbing some variables. We will make a prediction
+        temp_file_folder = output[0]
+        ANN_folder = output[1]
 
     # Applying the model next
 
     timeStarted = time.time() # save start time (debugging)
 
-    os.system('python ' + ANN_folder + 'solvent_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' > ' + temp_file_folder + 'solvent_prediction.txt') 
+    prediction_folder = temp_file_folder + 'predictions/'
+    os.system('python ' + ANN_folder + 'solvent_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' ' + name + ' > ' + prediction_folder + name + '_solvent_prediction.txt') 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    f = open(temp_file_folder + "solvent_prediction.txt", "r")
+    f = open(prediction_folder + name + "_solvent_prediction.txt", "r")
     line = f.readline()
     line = line.split('[')
     line = line[2]
@@ -580,255 +613,36 @@ def ts_predict():
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
     # Then, apply Aditya's model to make prediction.
 
-    print('TIME CHECK 1 ' + str(session['ID']))
-
-    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
     # Grab data
     my_data = json.loads(flask.request.get_data())
+    structure = my_data['structure']
+    name = my_data['name']
+    if name == 'Example MOF':
+        name = 'HKUST-1' # spacing in name was causing issues down the line
+    if name[-4:] == '.cif':
+        name = name[:-4]
 
-    #os.chdir("temp_file_creation_" + str(session['ID'])) # changing directory
-
-    # Write the data back to a cif file.
-    try:
-        cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
-    except FileNotFoundError:
+    output = descriptor_generator(name, structure, 'thermal') # generate descriptors
+    if output == 'FAILED': # model failure
         return 'FAILED'
+    elif isinstance(output, dict): # MOF was in the training data
+        return output
+    else: # grabbing some variables. We will make a prediction
+        temp_file_folder = output[0]
+        ANN_folder = output[1]
 
-    cif_file.write(my_data)
-    cif_file.close()
+    # Applying the model next
 
-    # Delete the RACs folder, then remake it (to start fresh for this prediction).
-    shutil.rmtree(temp_file_folder + 'RACs')
-    os.mkdir(temp_file_folder + 'RACs')
-
-    # Doing the same with the Zeo++ folder.
-    shutil.rmtree(temp_file_folder + 'zeo++')
-    os.mkdir(temp_file_folder + 'zeo++')
-
-    # os.chdir("RACs") # move to RACs folder
-
-    print('TIME CHECK 2 ' + str(session['ID']))
-
-    # Next, running MOF featurization
-    try:
-        get_primitive(temp_file_folder + 'temp_cif.cif', temp_file_folder + 'RACs/temp_cif_primitive.cif');
-    except ValueError:
-        return 'FAILED'
-
-    # if not (os.path.exists('temp_cif_primitive.cif')):
-
-    #     print('time out for ' + str(session['ID']))
-    #     time.sleep(10) # give the code more time to finish (10 seconds)
-
-    RACs_folder = temp_file_folder +  'RACs/'
-
-    try:
-        full_names, full_descriptors = get_MOF_descriptors(RACs_folder + 'temp_cif_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + 'temp_cif.xyz');
-            # makes the linkers and sbus folders
-    except ValueError:
-        return 'FAILED'
-    except NotImplementedError:
-        return 'FAILED'
-    except AssertionError:
-        return 'FAILED'
-
-    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-        return 'FAILED'
-
-    print('TIME CHECK 3 ' + str(session['ID']))
-
-    # At this point, have the RAC featurization. Need geometry information next.
-
-    # Run Zeo++
-    zeo_folder = temp_file_folder + 'zeo++/'
-
-    import time # debugging
     timeStarted = time.time() # save start time (debugging)
 
-    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + 'temp_cif_pd.txt ' + RACs_folder + 'temp_cif_primitive.cif'
-    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_sa.txt ' + RACs_folder + 'temp_cif_primitive.cif'
-    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -vol 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_av.txt ' + RACs_folder + 'temp_cif_primitive.cif'
-    cmd4 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + 'temp_cif_pov.txt '+ RACs_folder + 'temp_cif_primitive.cif'
-    # four parallelized Zeo++ commands
-    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
-    output1 = process1.communicate()[0]
-    output2 = process2.communicate()[0]
-    output3 = process3.communicate()[0]
-    output4 = process4.communicate()[0]
+    prediction_folder = temp_file_folder + 'predictions/'
+    os.system('python ' + ANN_folder + 'thermal_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' ' + name + ' > ' + prediction_folder + name + '_thermal_prediction.txt')
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
-
-    ''' The geometric descriptors are largest included sphere (Di), 
-    largest free sphere (Df), largest included sphere along free path (Dif),
-    crystal density (rho), volumetric surface area (VSA), gravimetric surface (GSA), 
-    volumetric pore volume (VPOV) and gravimetric pore volume (GPOV). 
-    Also, we include cell volume as a descriptor.
-
-    All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
-    '''
-
-    dict_list = []
-    # base_dir = sys.argv[1] #base_dir must be an absolute path
-    # if base_dir[-1] != '/':
-    #     base_dir+='/'
-    # for cif_file in os.listdir(base_dir+'/primitive/'):
-    #     print('---- now on ----, '+cif_file)
-    #     if '.cif' not in cif_file:
-    #         continue
-    #     basename = cif_file.strip('.cif')
-    cif_file = 'temp.cif' # techincally, calculations were with the primitive, but I'll just call it temp
-    basename = cif_file.strip('.cif')
-    largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
-    unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
-    VPOV, GPOV = np.nan, np.nan
-    POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-
-    print('MY ID CHECK 3')
-    print(session['ID'])
-
-    # if not (os.path.exists('temp_cif_pd.txt') & os.path.exists('temp_cif_sa.txt') &
-    #     os.path.exists('temp_cif_av.txt') & os.path.exists('temp_cif_pov.txt')
-    #     ):
-
-    #     print('time out for ' + str(session['ID']))
-    #     print(os.getcwd())
-    #     time.sleep(10) # give the code more time to finish (10 seconds)
-
-    if (os.path.exists(zeo_folder + 'temp_cif_pd.txt') & os.path.exists(zeo_folder + 'temp_cif_sa.txt') &
-        os.path.exists(zeo_folder + 'temp_cif_av.txt') & os.path.exists(zeo_folder + 'temp_cif_pov.txt')
-        ):
-        with open(zeo_folder + 'temp_cif_pd.txt') as f:
-            pore_diameter_data = f.readlines()
-            for row in pore_diameter_data:
-                largest_included_sphere = float(row.split()[1]) # largest included sphere
-                largest_free_sphere = float(row.split()[2]) # largest free sphere
-                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open(zeo_folder + 'temp_cif_sa.txt') as f:
-            surface_area_data = f.readlines()
-            for i, row in enumerate(surface_area_data):
-                if i == 0:
-                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                    crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
-                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
-                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open(zeo_folder + 'temp_cif_pov.txt') as f:
-            pore_volume_data = f.readlines()
-            for i, row in enumerate(pore_volume_data):
-                if i == 0:
-                    density = float(row.split('Density:')[1].split()[0])
-                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
-                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
-                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
-                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
-                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
-                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
-                    VPOV = POAV_volume_fraction+PONAV_volume_fraction
-                    GPOV = VPOV/density
-    else:
-        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + 'temp_cif_sa.txt'), 
-              '; pd: ',os.path.exists(zeo_folder + 'temp_cif_pd.txt'), '; av: ', os.path.exists(zeo_folder + 'temp_cif_av.txt'),
-              '; pov: ', os.path.exists(zeo_folder + 'temp_cif_pov.txt'))
-        return 'FAILED'
-    geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
-                'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
-                'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
-    dict_list.append(geo_dict)
-    geo_df = pd.DataFrame(dict_list)
-    geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
-
-
-    print('TIME CHECK 4 ' + str(session['ID']))
-
-    # Applying the model next.
-
-    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-    lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
-    sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
-    linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
-
-    lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
-    sbu_df = sbu_df.mean().to_frame().transpose()
-    linker_df = linker_df.mean().to_frame().transpose()
-
-    merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
-
-    merged_df.to_csv(temp_file_folder + 'merged_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
-
-    ANN_folder = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
-
-    # Here, I do a check to see if the current MOF is in the training data.
-    # If it is, then I return the known truth for the MOF, rather than make a prediction.
-
-    # Will iterate through the rows of the train pandas dataframe
-    train_df = pd.read_csv(ANN_folder + 'train.csv')
-
-    in_train = False
-
-    # print('In train check')
-
-    for index, row in train_df.iterrows():  # iterate through rows of the training data MOFs, where each row represents a train MOF
-
-        row_match = True # gets set to false if any values don't match 
-
-        for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on (merged_df is just one row)
-            if col == 'name' or col == 'cif_file' or col == 'Dif':
-                continue # skip these
-                # Dif was sometimes differing between new Zeo++ call and training data value, for the same MOF
-            # print('Column: ')
-            # print(col)
-            # print(row[col])
-            # print(merged_df.iloc[0][col])
-
-            # If for any property a training MOF and the new MOF we are predicting on differ too much, we know they are not the same MOF
-            # So row_match is set to false for this training MOF
-            if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some identical values being identified as different b/c of some small differences 
-                row_match = False
-
-                # # debugging
-                # print('AFUKIX check')
-                # if row['CoRE_name'] == 'AFUKIX_clean':
-                #     print(col)
-                #     print(row[col])
-                #     print(merged_df.iloc[0][col])
-
-                break
-        
-        if row_match: # all columns for row match! Training MOF is the same as new MOF
-            in_train = True
-            match_truth = row['T'] # the flag for the MOF that matches the current MOF
-
-            match_truth = np.round(match_truth,1) # round to 1 decimal
-
-            # adding units
-            degree_sign= u'\N{DEGREE SIGN}'
-            match_truth = str(match_truth) + degree_sign + 'C' # degrees Celsius
-
-#            print(row['CoRE_name'])
-            break
-
-    if in_train:
-        myDict = {'in_train': True, 'truth': match_truth}
-        return myDict
-
-
-
-    print('TIME CHECK 5 ' + str(session['ID']))
-
-    timeStarted = time.time() # save start time (debugging)
-
-    os.system('python ' + ANN_folder + 'thermal_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' > ' + temp_file_folder + 'thermal_prediction.txt')
-
-    timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds')
-
-    f = open(temp_file_folder + "thermal_prediction.txt", "r")
+    f = open(prediction_folder + name + "_thermal_prediction.txt", "r")
     prediction = f.readline()
     f.readline() # skip a line
     neighbor_names = f.readline()
@@ -1024,30 +838,36 @@ def get_components():
     # Grab data
     my_data = json.loads(flask.request.get_data());
 
+    structure = my_data['structure']
+    name = my_data['name']
+    if name == 'Example MOF':
+        name = 'HKUST-1' # spacing in name was causing issues down the line
+
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    cif_folder = temp_file_folder + 'cifs/'
 
     # Write the data back to a cif file.
     try:
-        cif_file = open(temp_file_folder + 'temp_cif.cif', 'w')
+        cif_file = open(cif_folder + name + '.cif', 'w')
     except FileNotFoundError:
         return 'FAILED'
-    cif_file.write(my_data);
-    cif_file.close();
-
-    # Delete the RACs folder, then remake it (to start fresh for this prediction).
-    shutil.rmtree(temp_file_folder + 'RACs')
-    os.mkdir(temp_file_folder + 'RACs')
-
-    # Next, running MOF featurization
-    try:
-        get_primitive(temp_file_folder + 'temp_cif.cif', temp_file_folder + 'RACs/temp_cif_primitive.cif');
-    except ValueError:
-        return 'FAILED'
+    cif_file.write(structure)
+    cif_file.close()
 
     RACs_folder = temp_file_folder +  'RACs/'
 
+    # Delete the RACs folder, then remake it (to start fresh for this prediction).
+    shutil.rmtree(RACs_folder)
+    os.mkdir(RACs_folder)
+
+    # Next, running MOF featurization
     try:
-        full_names, full_descriptors = get_MOF_descriptors(RACs_folder + 'temp_cif_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + 'temp_cif.xyz');
+        get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
+    except ValueError:
+        return 'FAILED'
+
+    try:
+        full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
             # makes the linkers and sbus folders
     except ValueError:
         return 'FAILED'
@@ -1061,17 +881,17 @@ def get_components():
 
     # At this point, have the RAC featurization. 
 
-    # will return a json object
+    # will return a json object (dictionary)
     # The fields are string representations of the linkers and sbus, however many there are.
 
     dictionary = {};
     
     linker_num = 0;
     while True:
-        if not os.path.exists(RACs_folder + 'linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz'):
+        if not os.path.exists(RACs_folder + 'linkers/' + name + '_primitive_linker_' + str(linker_num) + '.xyz'):
             break
         else:
-            linker_file = open(RACs_folder + 'linkers/temp_cif_primitive_linker_' + str(linker_num) + '.xyz', 'r');
+            linker_file = open(RACs_folder + 'linkers/' + name + '_primitive_linker_' + str(linker_num) + '.xyz', 'r');
             linker_info = linker_file.read();
             linker_file.close();
 
@@ -1082,10 +902,10 @@ def get_components():
 
     sbu_num = 0;
     while True:
-        if not os.path.exists(RACs_folder + 'sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz'):
+        if not os.path.exists(RACs_folder + 'sbus/' + name + '_primitive_sbu_' + str(sbu_num) + '.xyz'):
             break
         else:
-            sbu_file = open(RACs_folder + 'sbus/temp_cif_primitive_sbu_' + str(sbu_num) + '.xyz', 'r');
+            sbu_file = open(RACs_folder + 'sbus/' + name + '_primitive_sbu_' + str(sbu_num) + '.xyz', 'r');
             sbu_info = sbu_file.read();
             sbu_file.close();
 
@@ -1109,7 +929,7 @@ def get_components():
 
     from molSimplify.Classes.mol3D import mol3D
     import glob
-    MOF_of_interest = 'temp_cif_primitive'
+    MOF_of_interest = name + '_primitive'
     XYZs = sorted(glob.glob(RACs_folder + 'linkers/*'+MOF_of_interest+'*xyz'))
     det_list = []
 
@@ -1179,11 +999,11 @@ def get_components():
     linkers_folder = RACs_folder + 'linkers/'
 
     for i in range(dictionary['total_linkers']): # 0, 1, 2, ..., numberoflinkersminus1
-        smilesFile = pybel.Outputfile('smi', linkers_folder + 'temp_cif_primitive_linker_' + str(i) + '.txt') # smi refers to SMILES
-        smilesFile.write(next(pybel.readfile('xyz', linkers_folder + 'temp_cif_primitive_linker_' + str(i) + '.xyz'))) # writes SMILES string to the text file
+        smilesFile = pybel.Outputfile('smi', linkers_folder + name + '_primitive_linker_' + str(i) + '.txt') # smi refers to SMILES
+        smilesFile.write(next(pybel.readfile('xyz', linkers_folder + name + '_primitive_linker_' + str(i) + '.xyz'))) # writes SMILES string to the text file
 
         # Next, get the SMILES string from the text file.
-        f = open(linkers_folder + 'temp_cif_primitive_linker_' + str(i) + '.txt', 'r')
+        f = open(linkers_folder + name + '_primitive_linker_' + str(i) + '.txt', 'r')
         line = f.readline()
         line = line.split('\t') # split at tabs
         smiles_ID = line[0]
@@ -1193,11 +1013,11 @@ def get_components():
     sbus_folder = RACs_folder + 'sbus/'
 
     for i in range(dictionary['total_sbus']):
-        smilesFile = pybel.Outputfile('smi', sbus_folder + 'temp_cif_primitive_sbu_' + str(i) + '.txt') # smi refers to SMILES
-        smilesFile.write(next(pybel.readfile('xyz', sbus_folder + 'temp_cif_primitive_sbu_' + str(i) + '.xyz'))) # writes SMILES string to the text file
+        smilesFile = pybel.Outputfile('smi', sbus_folder + name + '_primitive_sbu_' + str(i) + '.txt') # smi refers to SMILES
+        smilesFile.write(next(pybel.readfile('xyz', sbus_folder + name + '_primitive_sbu_' + str(i) + '.xyz'))) # writes SMILES string to the text file
 
         # Next, get the SMILES string from the text file.
-        f = open(sbus_folder + 'temp_cif_primitive_sbu_' + str(i) + '.txt', 'r')
+        f = open(sbus_folder + name + '_primitive_sbu_' + str(i) + '.txt', 'r')
         line = f.readline()
         line = line.split('\t') # split at tabs
         smiles_ID = line[0]

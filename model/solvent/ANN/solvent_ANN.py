@@ -159,11 +159,12 @@ def main():
     user_id = sys.argv[1]
 
     path = sys.argv[2] # This is the main mofSimplify folder
+    my_name = sys.argv[3] # will be name_primitive, communicated from app.py
     ANN_path = path + 'model/solvent/ANN/'
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
     df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')
     df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
-    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors.csv') # assumes that temp_file_creation/ is in parent folder
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + my_name + '_descriptors.csv') # assumes that temp_file_creation/ is in parent folder
     features = [val for val in df_train.columns.values if val in RACs+geo]
 
     df_train = standard_labels(df_train, key="flag")

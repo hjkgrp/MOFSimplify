@@ -1017,6 +1017,7 @@ body {
       thermal_pred_color = original_blue;
       visualize_color = original_blue;
       component_color = original_blue
+      descriptor_color = original_blue;
 
       $('#load').css({'background-color': original_blue, 'border-color': original_blue})
       $('#upload').css({'background-color': original_blue, 'border-color': original_blue})
@@ -1025,6 +1026,8 @@ body {
       $('#predict_t').css({'background-color': original_blue, 'border-color': original_blue})
       $('#visualize').css({'background-color': original_blue, 'border-color': original_blue})
       $('#get_components').css({'background-color': original_blue, 'border-color': original_blue})
+      $('#download_descriptors').css({'background-color': original_blue, 'border-color': original_blue})
+
     }
 
     // This function triggers once the user uploads a file.
@@ -2117,7 +2120,7 @@ body {
       var dict = {}
       dict['prediction_type'] = 'solvent'
 
-      name = get_selected_MOF();
+      name = get_selected_MOF(false);
 
       dict['current_MOF'] = name
       dict['selected_neighbor'] = my_neighbor
@@ -2210,7 +2213,7 @@ body {
       var dict = {}
       dict['prediction_type'] = 'thermal'
 
-      name = get_selected_MOF();
+      name = get_selected_MOF(false);
 
       dict['current_MOF'] = name
       dict['selected_neighbor'] = my_neighbor
@@ -2312,12 +2315,14 @@ body {
     
     // When the "Download descriptors" button is clicked, download the descriptors for the selected MOF
     $('#download_descriptors').click(function() {
-      name = get_selected_MOF()
+      name = get_selected_MOF(false) // don't want the .cif extension
       // window.location = '/merged_descriptors/' + name + '_descriptors.csv'; // get file from the temp_file_creation_USERID/merged_descriptors folder
 
       // Grab the contents of the descriptor csv
       $.post("/get_descriptors", JSON.stringify(name)).done(
         function(response) {
+            descriptor_color = success_green;
+            $('#download_descriptors').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
             download(name + '.csv', response)
         })
 
@@ -2325,13 +2330,19 @@ body {
 
 
     // This function returns the name of the selected MOF
-    function get_selected_MOF() {
+    function get_selected_MOF(extension = true) {
       var name = document.getElementById('upload_status').innerHTML; // getting the name of the selected MOF
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
       if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
         name = 'HKUST-1'
       } 
+      if (! extension) {
+        if (name.substring(name.length - 4) == '.cif') { // getting rid of the .cif part
+          name = name.substring(0, name.length - 4)
+        }
+      }
+
       return name
     }
 
@@ -2541,6 +2552,14 @@ body {
       }, function(){
       $(this).css("background-color", component_color);
       $(this).css("border-color", component_color);
+     });
+
+    $("#download_descriptors").hover(function(){ 
+      $(this).css("background-color", "#1D2B37");
+      $(this).css("border-color", "#1D2B37");
+      }, function(){
+      $(this).css("background-color", descriptor_color);
+      $(this).css("border-color", descriptor_color);
      });
 
     $(".link").hover(function(){ // for hyperlinks

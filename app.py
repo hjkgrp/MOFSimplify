@@ -205,7 +205,7 @@ def serve_neighbor(path):
 @app.route('/merged_descriptors/<path:path>')
 def serve_descriptors(path):
     # Serves the csv of descriptors for the selected MOF
-    return flask.send_from_directory('merged_descriptors', path);
+    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/merged_descriptors', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     myList = os.listdir(path);
@@ -842,6 +842,8 @@ def get_components():
     name = my_data['name']
     if name == 'Example MOF':
         name = 'HKUST-1' # spacing in name was causing issues down the line
+    if name[-4:] == '.cif':
+        name = name[:-4]
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
     cif_folder = temp_file_folder + 'cifs/'
@@ -1205,6 +1207,24 @@ def neighbor_writer():
 #     export_png(graph, filename='temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + my_data + "_simplified_TGA.png")
     
 #     return 'Success!'
+
+@app.route('/get_descriptors', methods=['POST']) 
+def descriptor_getter():
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is a dictionary with information about the neighbor and the MOF that was analyzed by an ANN
+    if name == 'Example MOF':
+        name = 'HKUST-1' # spacing in name was causing issues down the line
+    if name[-4:] == '.cif':
+        name = name[:-4]
+
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    descriptors_folder = temp_file_folder + "merged_descriptors/"
+
+    with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
+        contents = f.read()
+
+    return contents
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

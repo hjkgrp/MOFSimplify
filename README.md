@@ -1,4 +1,4 @@
-# mofSimplify 
+# MOFSimplify 
 
 The MOF website for property prediction and community engagement.
 

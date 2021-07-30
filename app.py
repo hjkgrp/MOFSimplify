@@ -130,6 +130,10 @@ def serve_TGA_graphic():
 def serve_MOF5():
     return flask.send_from_directory('images', 'MOF5_background.png')
 
+@app.route('/mof_simplify_light.jpg')
+def serve_banner():
+    return flask.send_from_directory('images', 'mof_simplify_light.jpg')
+
 @app.route('/MOF_logo.png')
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')

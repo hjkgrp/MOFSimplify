@@ -64,16 +64,17 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   opacity: 1;
 }
 
-#header_background::before { /*background image in header of website*/
+/*background image in header of website*/
+#header_background::before { 
   content: "";
-  background-image:  url('MOF5_background.png');
+  background-image:  url('mof_simplify_light.jpg');
   background-size: cover;
   position: absolute;
   top: 0px;
   right: 0px;
   bottom: 0px;
   left: 0px;
-  opacity: 0.1;
+  opacity: 1;
 }
 
 body {
@@ -169,24 +170,18 @@ body {
   <div class="container">
     <div class="page-header" id="banner">
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
+<!--         <img style='width: 100%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='mof_simplify_light.png' alt='MOFSimplify banner'>
+ -->        <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
           <!-- Title -->
           <span style='position:relative;'>
-<!--             <h1 style="color:black; width:100%; text-align:center; font-family: Helvetica; margin-top: 0.5cm;">MOFSimplify</h1>
+<!--             <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
  -->
-            <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
-
-            <p class='zebra' style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50;">Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a> from the <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT</p>
+            <p style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50; margin-top: 6cm;">The <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT <br> Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a></p>
             
             <!-- Subtitle -->
-            <p style="width:100%; text-align:center;">
+<!--             <p style="width:100%; text-align:center;">
               <span style="font-size:26px;" class='zebra'>Analyze metal-organic frameworks (MOFs) below!</span><br>
-<!--               For more on MOF analysis, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.
- -->            </p>
-          
-          <!-- Lead text -->
-<!--           <p">For more geometries, properties, and functionality, check out the full molSimplify utility. Learn more in the <a id="link" href="about.html">About</a> tab.</p>
- -->        
+            </p> -->
           </span>
         </div>
       </div>
@@ -218,7 +213,7 @@ body {
 
     <div id="pills-main" class="container">
       
-      <b style='font-size:22px;' class='zebra'> 1) Select a MOF for analysis</b>
+      <b style='font-size:22px;' class='zebra'> 1) Select a MOF (metal-organic framework) for analysis</b>
       <!-- Create a section containing buttons -->
       <div class='col-lg-12'>
 

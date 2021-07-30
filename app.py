@@ -130,9 +130,13 @@ def serve_TGA_graphic():
 def serve_MOF5():
     return flask.send_from_directory('images', 'MOF5_background.png')
 
-@app.route('/banner')
-def serve_banner():
+@app.route('/banner_light')
+def serve_banner_light():
     return flask.send_from_directory('images', 'MOF_light.webp') # google's webp format. It is optimized for websites and loads fast
+
+@app.route('/banner_dark')
+def serve_banner_dark():
+    return flask.send_from_directory('images', 'MOF_dark.webp') # google's webp format. It is optimized for websites and loads fast
 
 @app.route('/MOF_logo.png')
 def serve_MOFSimplify_logo():
@@ -1215,7 +1219,7 @@ def neighbor_writer():
 @app.route('/get_descriptors', methods=['POST']) 
 def descriptor_getter():
     # Grab data
-    name = json.loads(flask.request.get_data()); # This is a dictionary with information about the neighbor and the MOF that was analyzed by an ANN
+    name = json.loads(flask.request.get_data()); # This is the selected MOF
     if name == 'Example MOF':
         name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
@@ -1229,6 +1233,23 @@ def descriptor_getter():
 
     return contents
 
+@app.route('/get_TGA', methods=['POST']) 
+def TGA_getter():
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is the thermal ANN latent space nearest neighbor
+    
+    # cut off these endings, in order to access the TGA file correctly:
+    # _clean, _ion_b, _neutral_b, _SL, _charged, _clean_h, _manual, _auto, _charged, etc
+    cut_index = my_data.find('_') # gets index of the first underscore
+    my_data = my_data[:cut_index] 
+
+
+    tga_folder = MOFSIMPLIFY_PATH + "raw_TGA_digitization_data/digitized_csv/"
+
+    with open(tga_folder + name + '.csv', 'r') as f:
+        contents = f.read()
+
+    return contents
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

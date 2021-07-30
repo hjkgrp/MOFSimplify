@@ -2238,12 +2238,13 @@ body {
         // Download csv file with TGA data
 
         // Grab the contents of the descriptor csv
-        $.post("/get_TGA", JSON.stringify(name)).done(
+        $.post("/get_TGA", JSON.stringify(my_neighbor)).done(
           function(response) {
               download(my_neighbor + '_TGA.csv', response)
-          })
+        })
 
-      }, 1000); // the delay is to make it possible to download multiple files in the same function
+      }, 2000); // the delay is to make it possible to download multiple files in the same function
+      
     })
 
 

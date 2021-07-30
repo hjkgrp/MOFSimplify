@@ -1240,11 +1240,10 @@ def TGA_getter():
     
     # cut off these endings, in order to access the TGA file correctly:
     # _clean, _ion_b, _neutral_b, _SL, _charged, _clean_h, _manual, _auto, _charged, etc
-    cut_index = my_data.find('_') # gets index of the first underscore
-    my_data = my_data[:cut_index] 
+    cut_index = name.find('_') # gets index of the first underscore
+    name = name[:cut_index] 
 
-
-    tga_folder = MOFSIMPLIFY_PATH + "raw_TGA_digitization_data/digitized_csv/"
+    tga_folder = MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/"
 
     with open(tga_folder + name + '.csv', 'r') as f:
         contents = f.read()

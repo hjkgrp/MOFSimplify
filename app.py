@@ -132,7 +132,7 @@ def serve_MOF5():
 
 @app.route('/banner')
 def serve_banner():
-    return flask.send_from_directory('images', 'MOF_light.webp')
+    return flask.send_from_directory('images', 'MOF_light.webp') # google's webp format. It is optimized for websites and loads fast
 
 @app.route('/MOF_logo.png')
 def serve_MOFSimplify_logo():

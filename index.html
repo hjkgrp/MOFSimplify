@@ -275,56 +275,54 @@ body {
           <div class='col-12' style='font-size:22px;' id='chart'></div>
       </div>
 
-      <status id='neighbors_section'>
-        <div class='row'>
+      <div class='row' id='neighbor_blurb'>
 
-          <p class = 'col-12 zebra' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
+        <p class = 'col-12 zebra' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used to train an ANN.</p>
+
+      </div>
+
+      <div class='row'>
+
+        <div class = 'col-6 zebra' style='font-size:22px;' id='solvent_neighbor_section'>
+          Solvent removal stability ANN nearest neighbors <br> in latent space
+          <select class='form-control' id='solvent_neighbors' style='font-size:22px;'>
+          </select>
+
+          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
+          </div>
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
+          </div>
+          <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
+        </div>
+
+        <div class = 'col-6 zebra' style='font-size:22px;' id='thermal_neighbor_section'>
+          Thermal stability ANN nearest neighbors <br> in latent space
+          <select class='form-control' id='thermal_neighbors' style='font-size:22px;'>
+          </select>
+
+          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
+          </div>
+          <div style='width:100%; text-align:center;'>
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
+            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
+          </div>
+          <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
+          <div class='col-6' id='tga_plot'></div>
+
+          <div id='tga_explanation' style='display: none; margin-top: 0.5cm;' class='zebra'> 
+            <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
+            <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
+          </div>
 
         </div>
-        <div class='row'>
 
-            <div class = 'col-6 zebra' style='font-size:22px;'>
-            Solvent removal stability ANN nearest neighbors <br> in latent space
-            <select class='form-control' id='solvent_neighbors' style='font-size:22px;'>
-            </select>
-
-            <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='s_neighbor' type='button'>Show</button> 
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_s_neighbor' type='button'>Download</button> 
-            </div>
-            <div style='width:100%; text-align:center;'>
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_s_neighbor' type='button'>Visualize</button> 
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_s_neighbor' type='button'>Get components</button> 
-            </div>
-            <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
-            </div>
-
-            <div class = 'col-6 zebra' style='font-size:22px;'>
-            Thermal stability ANN nearest neighbors <br> in latent space
-            <select class='form-control' id='thermal_neighbors' style='font-size:22px;'>
-            </select>
-
-            <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='t_neighbor' type='button'>Show</button> 
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='download_t_neighbor' type='button'>Download</button> 
-            </div>
-            <div style='width:100%; text-align:center;'>
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='visualize_t_neighbor' type='button'>Visualize</button> 
-              <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button' id='comp_t_neighbor' type='button'>Get components</button> 
-            </div>
-            <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
-            <div class='col-6' id='tga_plot'></div>
-
-            <div id='tga_explanation' style='display: none; margin-top: 0.5cm;' class='zebra'> 
-              <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
-              <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they intersect, and the point of intersection is taken to be the breakdown temperature.</p>
-            </div>
-
-            </div>
-
-        </div>
-      </status>
-
+      </div>
 
     </div>
 
@@ -964,7 +962,9 @@ body {
         // hiding sections
         // $('#predict_section').hide()
         $('#predict_section').hide()
-        $('#neighbors_section').hide()
+        $('#neighbor_blurb').hide()
+        $('#solvent_neighbor_section').hide()
+        $('#thermal_neighbor_section').hide()
         $('#status_section').hide()
         $('#descriptor_section').hide()
         
@@ -1219,7 +1219,8 @@ body {
                   solvent_pred_color = success_green;
                   $('#predict_s').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
-                  $('#neighbors_section').show() // show nearest neighbors section
+                  $('#neighbor_blurb').show() // show nearest neighbors section
+                  $('#solvent_neighbor_section').show()
                   $('#descriptor_section').show() // show section where can download descriptors
 
                   if (! response['in_train']) { // a prediction was made
@@ -1369,7 +1370,8 @@ body {
                   thermal_pred_color = success_green;
                   $('#predict_t').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
 
-                  $('#neighbors_section').show() // show nearest neighbors section
+                  $('#neighbor_blurb').show() // show nearest neighbors section
+                  $('#thermal_neighbor_section').show()
                   $('#descriptor_section').show() // show section where can download descriptors
 
                   if (! response['in_train']) { // a prediction was made
@@ -2048,10 +2050,6 @@ body {
 
     // Get information on a nearest neighbor in solvent removal stability ANN latent space when the "Show" button in the solvent section is clicked.
     $('#s_neighbor').click(function() {
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
-      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
-      console.log('check check')
-      console.log(my_neighbor)
 
       // Ensure there are neighbors to display information on
       if (document.getElementById('solvent_neighbors_holder').value == undefined) {
@@ -2063,6 +2061,11 @@ body {
         alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
         return;
       }
+
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
+      console.log('check check')
+      console.log(my_neighbor)
 
       // Get the latent space distance from the information returned from the prediction.
       dictionary = document.getElementById('solvent_neighbors_holder').value;
@@ -2143,8 +2146,6 @@ body {
 
     // Get information on a nearest neighbor in thermal stability ANN latent space when the "Show" button in the thermal section is clicked.
     $('#t_neighbor').click(function() {
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
-      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Ensure there are neighbors to display information on.
       if (document.getElementById('thermal_neighbors_holder').value == undefined) {
@@ -2156,6 +2157,9 @@ body {
         alert('The current MOF was in the training data, where the ground truth was known. The ground truth was returned without neighbors, since the ANN was not necessary.');
         return;
       }
+
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Get the latent space distance from the information returned from the prediction.
       dictionary = document.getElementById('thermal_neighbors_holder').value;
@@ -2495,7 +2499,9 @@ body {
     $('#pills-bb').hide()
     $('#predict_section').hide()
     $('#descriptor_section').hide()
-    $('#neighbors_section').hide()
+    $('#neighbor_blurb').hide()
+    $('#thermal_neighbor_section').hide()
+    $('#solvent_neighbor_section').hide()
     $('#status_section').hide()
 
     function viewer_hider() {

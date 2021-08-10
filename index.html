@@ -960,23 +960,6 @@ body {
       component_viewer.zoomTo();
     })
 
-    // Upload MOF cif file.  
-    $('#upload').on('click', function() { // button triggers upload
-      $('#file_input').trigger('click'); // OS file selection
-    });
-
-    // Used for ensuring that only .cif files are uploaded.  
-    function getExtension(filename) {
-      var parts = filename.split('.');
-      return parts[parts.length - 1];
-    }
-
-    // Used for ensuring that only .cif files are uploaded.
-    function isCif(filename) {
-      var ext = getExtension(filename);
-      return ext == 'cif';
-    }
-
     // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
     function renew(action) { // something else was already called reset, so we're calling this renew
         // action will be either 'example', 'input', or 'bb'
@@ -1060,6 +1043,23 @@ body {
       $('#get_components').css({'background-color': original_blue, 'border-color': original_blue})
       $('#download_descriptors').css({'background-color': original_blue, 'border-color': original_blue})
 
+    }
+
+    // Upload MOF cif file.  
+    $('#upload').on('click', function() { // button triggers upload
+      $('#file_input').trigger('click'); // OS file selection
+    });
+
+    // Used for ensuring that only .cif files are uploaded.  
+    function getExtension(filename) {
+      var parts = filename.split('.');
+      return parts[parts.length - 1];
+    }
+
+    // Used for ensuring that only .cif files are uploaded.
+    function isCif(filename) {
+      var ext = getExtension(filename);
+      return ext == 'cif';
     }
 
     // This function triggers once the user uploads a file.
@@ -1760,7 +1760,7 @@ body {
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
-      $('#resize_hint').hide()
+      $('#resize_hint').hide() // hide the hint on resizing the window if no component appears
       component_viewer.clear(); // clear component visualizer
       $('#comp_MOF').text('') // clear the text about which MOF is broken into components
       clear_component_dropdowns();

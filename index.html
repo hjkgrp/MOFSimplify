@@ -1045,11 +1045,6 @@ body {
 
     }
 
-    // Upload MOF cif file.  
-    $('#upload').on('click', function() { // button triggers upload
-      $('#file_input').trigger('click'); // OS file selection
-    });
-
     // Used for ensuring that only .cif files are uploaded.  
     function getExtension(filename) {
       var parts = filename.split('.');
@@ -1061,6 +1056,11 @@ body {
       var ext = getExtension(filename);
       return ext == 'cif';
     }
+
+    // Upload MOF cif file.  
+    $('#upload').on('click', function() { // button triggers upload
+      $('#file_input').trigger('click'); // OS file selection
+    });
 
     // This function triggers once the user uploads a file.
     $("#file_input").change(function () { 

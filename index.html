@@ -504,6 +504,14 @@ body {
 
   var stage;
 
+  // Variables below: used for MOF visualization re-tries if OOM error appears
+  var vis_error_counter = 0;
+  var vis_failure = false; 
+  var MAX_VIS_ERROR = 3; // maximum number of times a MOF can fail to be visualized before error message is displayed
+  var solvent_neighbor_vis = false
+  var thermal_neighbor_vis = false
+  //
+
   var lsdir = function(path) {
     return FS.readdir(path).filter(function(e) {
       return !['..', '.'].includes(e);  // filter out current and parent dirs
@@ -704,6 +712,7 @@ body {
   }
 
   handleVisualization = function(ciffile) {
+    console.log('handle visualization check')
     //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
     var cifreader = new FileReader();
     cifreader.onload = function(event) {
@@ -739,7 +748,6 @@ body {
     }
     catch(e){
     }
-
   }
 
   getTopology = function(path_to_cgd) {
@@ -884,22 +892,41 @@ body {
     }
   };
   Module.setStatus('Downloading...');
+
+  // If the user chooses to try to visualize a MOF (either the selected MOF or a neighbor MOF), visualization is attempted by the website three times
+  // This is because OOM errors are sometimes thrown upon visualization, but upon retrying, visualization often succeeds
+  // A cap of three is used because some MOFs will always fail visualization (if they are too large, or this code just doesn't like them)
+  // After three failed tries, an error alert is shown to the user
   window.onerror = function(event) {
-    //Module.setStatus('Exception thrown in visualization; please retry the operation.');
-    alert('Exception thrown in visualization; please retry the operation.')    
-    // $('#status_visualization').text('Exception thrown in visualization; please retry the operation.'); // out of memory (OOM)
+    if (vis_error_counter == MAX_VIS_ERROR) {
+      //Module.setStatus('Exception thrown in visualization; please retry the operation.');
+      document.getElementById("viewportnote").innerHTML = "Visualization failed";
+      alert('Exception thrown in visualization; please retry the operation.')    
+      // $('#status_visualization').text('Exception thrown in visualization; please retry the operation.'); // out of memory (OOM)
 
-    //spinnerElement.style.display = 'none';
+      //spinnerElement.style.display = 'none';
 
-    $('#currently_visualized').text(''); // clear the message about which MOF is visualized if OOM occurs
+      $('#currently_visualized').text(''); // clear the message about which MOF is visualized if OOM occurs
 
-    visualize_color = failure_red;
-    $('#visualize').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
+      // visualize_color = failure_red;
+      // $('#visualize').css({'background-color': failure_red, 'border-color': failure_red}); // setting button color to indicate failure
 
-    Module.setStatus = function(text) {
-      if (text) Module.printErr('[post-exception status] ' + text);
-    };
+      Module.setStatus = function(text) {
+        if (text) Module.printErr('[post-exception status] ' + text);
+      };
 
+    }
+    else {
+      // visualize_color = inprogress_yellow;
+      // $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
+      vis_error_counter += 1 
+      vis_failure = true
+      console.log('vis error')
+      console.log(vis_error_counter)
+      console.log(vis_failure)
+
+      handleInput(solvent_neighbor_vis, thermal_neighbor_vis); // handles visualization, will display the MOF in the appropriate box (viewportwrapper) 
+    }         
   };
 
   // ***** End of section with a lot of copied code. *****
@@ -1059,10 +1086,10 @@ body {
 
     // This function triggers when someone clicks the "Visualize selected (1) MOF" button.
     $("#visualize").on('click', function() {
-        visualize_color = inprogress_yellow; // TODO fix
-        $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
-
-        var vis_color = $('#visualize').css('background-color')
+        vis_error_counter = 0 // used to track how many failed visualizations in a row for one MOF
+        vis_failure = false // used to track if OOM error is thrown for this MOF
+        // visualize_color = inprogress_yellow; // TODO fix
+        // $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
 
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
@@ -1082,7 +1109,9 @@ body {
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
-        handleInput(false, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+        solvent_neighbor_vis = false
+        thermal_neighbor_vis = false
+        handleInput(solvent_neighbor_vis, thermal_neighbor_vis); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
         name = get_selected_MOF();
 
@@ -1091,15 +1120,18 @@ body {
 
         $('#currently_visualized').text(message);
 
-        visualize_color = success_green;
-        $('#visualize').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
+        visualize_color = original_blue;
+        $('#visualize').css({'background-color': original_blue, 'border-color': original_blue}); // setting button color
+        // visualize_color = success_green;
+        // $('#visualize').css({'background-color': success_green, 'border-color': success_green}); // setting button color to indicate success
         // $('status_visualization').text(''); // clear the OOM message
 
     })
 
-
     // This function triggers when someone clicks the "Visualize" button in the solvent section. 
     $("#visualize_s_neighbor").on('click', function() {
+        vis_error_counter = 0 // used to track how many failed visualizations in a row for one MOF
+        vis_failure = false // used to track if OOM message is thrown for this MOF
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
         // Ensure there are neighbors to display information on
@@ -1119,7 +1151,10 @@ body {
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
-        handleInput(true, false); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+        solvent_neighbor_vis = true
+        thermal_neighbor_vis = false
+        handleInput(solvent_neighbor_vis, thermal_neighbor_vis); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+
 
         my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
         my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
@@ -1136,6 +1171,8 @@ body {
 
     // This function triggers when someone clicks the "Visualize" button in the thermal section. 
     $("#visualize_t_neighbor").on('click', function() {
+        vis_error_counter = 0 // used to track how many failed visualizations in a row for one MOF
+        vis_failure = false // used to track if OOM message is thrown for this MOF
         clearViewer(stage); // no MOF is displayed in the visualizer now
 
         // Ensure there are neighbors to display information on
@@ -1155,7 +1192,10 @@ body {
 
         document.getElementById("viewportnote").innerHTML = "Loading visualization...";
 
-        handleInput(false, true); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+        solvent_neighbor_vis = false
+        thermal_neighbor_vis = true
+        handleInput(solvent_neighbor_vis, thermal_neighbor_vis); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
+
 
         my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
         my_neighbor = my_neighbor.substring(3) // hack off the list-y number part

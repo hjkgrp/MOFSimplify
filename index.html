@@ -2201,7 +2201,7 @@ body {
 
     // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the "Download" button in the thermal section is clicked. 
     // Also download a .txt file that contains information on the nearest neighbor.
-    // Also download a .csv file with the TGA data for the MOF (TODO)
+    // Also download a .csv file with the TGA data for the MOF
     $('#download_t_neighbor').click(function() {
 
       // Ensure there are neighbors to display information on
@@ -2248,7 +2248,6 @@ body {
       }, 1000); // the delay is to make it possible to download multiple files in the same function
 
       setTimeout(function(){
-        // TODO
         // Download csv file with TGA data
 
         // Grab the contents of the descriptor csv

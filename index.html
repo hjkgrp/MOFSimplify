@@ -730,13 +730,16 @@ body {
         document.getElementById("viewportwrapper").classList.add("inactive");
       }
     };
-    console.log('Check check')
-    console.log(ciffile instanceof Blob)
+    // console.log('Check check')
+    // console.log(ciffile instanceof Blob)
+
+    // The below try-catch fixes a Chrome issue for visualizing neighbors (Uncaught TypeError: Failed to execute 'readAsText' on 'FileReader': parameter 1 is not of type 'Blob'.)
     try {
-      cifreader.readAsText(ciffile); // TODO fix Chrome issue (Uncaught TypeError: Failed to execute 'readAsText' on 'FileReader': parameter 1 is not of type 'Blob'.)
+      cifreader.readAsText(ciffile); 
     }
     catch(e){
     }
+
   }
 
   getTopology = function(path_to_cgd) {

@@ -462,9 +462,12 @@ def descriptor_generator(name, structure, prediction_type):
     print('TIME CHECK 4')
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-    lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
-    sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
-    linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
+    try:
+        lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+        sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+        linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
+    except Exception: # csv files have been deleted
+        return 'FAILED' 
 
     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
     sbu_df = sbu_df.mean().to_frame().transpose()

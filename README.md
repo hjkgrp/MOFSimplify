@@ -1,6 +1,7 @@
 # MOFSimplify 
 
 The MOF website for property prediction and community engagement.
+Runs on Chrome, Safari, Firefox, and Edge.
 
 ### How to run MOFSimplify (tested on Python 3.8.5):
 - Install Flask, molSimplify, and any other necessary dependencies.

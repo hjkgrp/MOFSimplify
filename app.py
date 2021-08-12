@@ -322,8 +322,8 @@ def descriptor_generator(name, structure, prediction_type):
     cif_file.write(structure)
     cif_file.close()
 
-    RACs_folder = temp_file_folder +  'RACs/'
-    zeo_folder = temp_file_folder + 'zeo++/'
+    RACs_folder = temp_file_folder +  prediction_type + '_RACs/'
+    zeo_folder = temp_file_folder + prediction_type + '_zeo++/'
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
     shutil.rmtree(RACs_folder)
@@ -867,7 +867,7 @@ def get_components():
     cif_file.write(structure)
     cif_file.close()
 
-    RACs_folder = temp_file_folder +  'RACs/'
+    RACs_folder = temp_file_folder +  'components_RACs/'
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
     shutil.rmtree(RACs_folder)

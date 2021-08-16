@@ -12,7 +12,16 @@ import numpy as np
 import pandas as pd
 import sklearn.preprocessing
 from scipy.stats import pearsonr, spearmanr
+import sys
+import os
+import json
+import pickle
 from sklearn.metrics import pairwise_distances
+
+blue = "rgba(0, 0, 255, 1)"
+red = "rgba(255, 0, 0, 1)"
+green = "rgba(0, 196, 64, 1)"
+gray = "rgba(140, 140, 140, 1)"
 
 # This function takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
 # This function also takes in fnames (the feature names) and lname (the target property name).
@@ -104,7 +113,7 @@ def f1(y_true, y_pred):
     r = recall(y_true, y_pred)
     return 2 * ((p * r) / (p + r + K.epsilon()))
 
-def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
+def main():
 
     RACs = ['D_func-I-0-all','D_func-I-1-all','D_func-I-2-all','D_func-I-3-all',
      'D_func-S-0-all', 'D_func-S-1-all', 'D_func-S-2-all', 'D_func-S-3-all',
@@ -147,11 +156,15 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
      
     other = ['cif_file','name','filename']
 
+    user_id = sys.argv[1]
+
+    path = sys.argv[2] # This is the main mofSimplify folder
+    my_name = sys.argv[3] # will be name_primitive, communicated from app.py
     ANN_path = path + 'model/solvent/ANN/'
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
     df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')
     df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
-    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors.csv') # assumes that temp_file_creation/ is in parent folder
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + my_name + '_descriptors.csv') # assumes that temp_file_creation/ is in parent folder
     features = [val for val in df_train.columns.values if val in RACs+geo]
 
     df_train = standard_labels(df_train, key="flag")
@@ -169,30 +182,25 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
     # Order of values in X_newMOF matters, but this is taken care of in normalize_data.
     X_train.shape, y_train.reshape(-1, ).shape
 
+    regression_target = 'flag'
     import keras
     import keras.backend as K
     dependencies = {'precision':precision,'recall':recall,'f1':f1}
-    # model = keras.models.load_model(ANN_path + 'final_model_flag_few_epochs.h5',custom_objects=dependencies)
 
-    model = solvent_ANN
+    import time # debugging
+    timeStarted = time.time() # save start time (debugging)
 
+    model = keras.models.load_model(ANN_path + 'final_model_flag_few_epochs.h5',custom_objects=dependencies)
 
-    print('The solvent model:')
-    print(model)
-
-    print('newMOF check')
-    print(type(X_newMOF))
-    print(X_newMOF.shape)
-    print(X_newMOF)
-    print(model.predict(X_newMOF))
-    # debugging
+    timeDelta = time.time() - timeStarted # get execution time
 
     ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
     new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
+    print(new_MOF_pred) # do not get rid of this print statement, since in app.py the output of this file is catted into another file for further use
 
     # Define the function for the latent space. This will depend on the model. We want the layer before the last, in this case this was the 12th one.
     get_latent = K.function([model.layers[0].input],
-                            [model.layers[12].output]) # Last layer before dense-last
+                            [model.layers[12].output]) # TODO ask Aditya what this should be; is it the last layer of any kind? It looks like it is the one before dense-last
 
     # Get the latent vectors for the training data first, then the latent vectors for the test data.
     training_latent = get_latent([X_train, 0])[0]
@@ -220,6 +228,12 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
         df_reformat = df_reformat.drop(name) # dropping the next closest complex, in order to find the next-next closest complex
 
         neighbors_names.append(name)
-        neighbors_distances.append(str(distance))
+        neighbors_distances.append(distance)
 
-    return str(new_MOF_pred[0][0]), neighbors_names, neighbors_distances
+    print(neighbors_names) # do not get rid of this print statement, since in app.py the output of this file is catted into another file for further use
+    print(neighbors_distances) # do not get rid of this print statement, since in app.py the output of this file is catted into another file for further use
+
+    print('Solvent model loading finished in ' + str(timeDelta) + ' seconds')
+
+if __name__ == "__main__":
+    main()

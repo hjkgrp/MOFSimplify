@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 import flask
 import pandas as pd
-import tensorflow.keras
 import numpy as np
 import time
-from tensorflow.keras import backend as K
 import json
 import string
 import os
@@ -18,6 +16,9 @@ import molSimplify.Informatics.RACassemble as ms_RAC
 import molSimplify.python_nn.tf_ANN as ms_ANN
 import pathlib 
 import sys
+import stat
+import keras
+import keras.backend as K
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -27,14 +28,20 @@ from bokeh.embed import file_html
 from bokeh.models import Span
 from bokeh.models import ColorBar, LinearColorMapper, LogColorMapper, HoverTool
 from bokeh.models.markers import Circle
-from bokeh.palettes import Inferno256#,RdBu11#,Viridis256
+from bokeh.palettes import Inferno256
 from flask import jsonify, render_template, redirect, request, url_for, session
 import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
 from flask_cors import CORS
-import stat
 
+import json
+import tensorflow as tf
+from functools import partial
+from keras.callbacks import EarlyStopping
+import sklearn
+import sklearn.preprocessing
+from sklearn.metrics import pairwise_distances
 
 cmap_bokeh = Inferno256
 
@@ -50,6 +57,32 @@ cors = CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 users = {'user1':{'password':'MOFSimplify!Beta2021'}}
+
+def precision(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+def recall(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+def f1(y_true, y_pred):
+    p = precision(y_true, y_pred)
+    r = recall(y_true, y_pred)
+    return 2 * ((p * r) / (p + r + K.epsilon()))
+
+# global variables for the ANN models, loaded once when server first started
+solvent_ANN_path = MOFSIMPLIFY_PATH + 'model/solvent/ANN/' 
+thermal_ANN_path = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
+dependencies = {'precision':precision,'recall':recall,'f1':f1}
+# loading the ANN models to save time later
+tf_session = tf.Session()
+from tensorflow import keras as tf_keras
+tf_keras.backend.set_session(tf_session)
+solvent_model = keras.models.load_model(solvent_ANN_path + 'final_model_flag_few_epochs.h5',custom_objects=dependencies)
+thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
 
 class User(UserMixin):
   pass
@@ -89,7 +122,7 @@ def set_ID():
     shutil.copytree('temp_file_creation', new_folder)
     os.remove(new_folder + '/temp_cif.cif') # remove this, for sole purpose of updating time stamp on the new folder (copytree doesn't)
 
-    print('walk check')
+    # print('walk check')
     # delete all temp_file_creation clone folders that haven't been used for a while, to prevent folder accumulation
     for root, dirs, files in os.walk(MOFSIMPLIFY_PATH):
         for dir in dirs:
@@ -152,10 +185,10 @@ def index(path='index.html'):
       user = User()
       user.id = 'user1'
       flask_login.login_user(user)
-  print('is user authenticated?')
-  print(current_user.is_authenticated)
-  print('input check')
-  print(request.form.get('password'))
+  # print('is user authenticated?')
+  # print(current_user.is_authenticated)
+  # print('input check')
+  # print(request.form.get('password'))
   if current_user.is_authenticated:
     return flask.send_from_directory('.', 'index.html')
   elif request.form.get('password') == None:
@@ -223,8 +256,8 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     return myList
 
 def file_age_in_seconds(pathname): 
-    print('age_check')
-    print(time.time() - os.stat(pathname)[stat.ST_MTIME]) # time since last modification
+    # print('age_check')
+    # print(time.time() - os.stat(pathname)[stat.ST_MTIME]) # time since last modification
     return time.time() - os.stat(pathname)[stat.ST_MTIME]
 
 @app.route('/curr_users', methods=['GET'])
@@ -305,6 +338,260 @@ def bb_generate():
 
 
 ### Next, the prediction functions ### 
+
+# This function takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+# This function also takes in fnames (the feature names) and lname (the target property name).
+# This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
+# It also "normalizes" y_train, which are the solvent stability flags in the training data dataframe, and returns x_scaler (which scaled X_train).
+def normalize_data_solvent(df_train, df_newMOF, fnames, lname, unit_trans=1, debug=False):
+    _df_train = df_train.copy().dropna(subset=fnames+lname)
+    _df_newMOF = df_newMOF.copy().dropna(subset=fnames) 
+    X_train, X_newMOF = _df_train[fnames].values, _df_newMOF[fnames].values # takes care of ensuring ordering is same for both X
+    y_train = _df_train[lname].values
+    if debug:
+        print("training data reduced from %d -> %d because of nan." % (len(df_train), y_train.shape[0]))
+    x_scaler = sklearn.preprocessing.StandardScaler()
+    x_scaler.fit(X_train)
+    X_train = x_scaler.transform(X_train)
+    X_newMOF = x_scaler.transform(X_newMOF)
+    y_train = np.array([1 if x == 1 else 0 for x in y_train.reshape(-1, )])
+    return X_train, X_newMOF, y_train, x_scaler
+
+def standard_labels(df, key="flag"):
+    flags = [1 if row[key] == 1 else 0 for _, row in df.iterrows()]
+    df[key] = flags
+    return df
+
+def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
+
+    RACs = ['D_func-I-0-all','D_func-I-1-all','D_func-I-2-all','D_func-I-3-all',
+     'D_func-S-0-all', 'D_func-S-1-all', 'D_func-S-2-all', 'D_func-S-3-all',
+     'D_func-T-0-all', 'D_func-T-1-all', 'D_func-T-2-all', 'D_func-T-3-all',
+     'D_func-Z-0-all', 'D_func-Z-1-all', 'D_func-Z-2-all', 'D_func-Z-3-all',
+     'D_func-chi-0-all', 'D_func-chi-1-all', 'D_func-chi-2-all',
+     'D_func-chi-3-all', 'D_lc-I-0-all', 'D_lc-I-1-all', 'D_lc-I-2-all',
+     'D_lc-I-3-all', 'D_lc-S-0-all', 'D_lc-S-1-all', 'D_lc-S-2-all',
+     'D_lc-S-3-all', 'D_lc-T-0-all', 'D_lc-T-1-all', 'D_lc-T-2-all',
+     'D_lc-T-3-all', 'D_lc-Z-0-all', 'D_lc-Z-1-all', 'D_lc-Z-2-all',
+     'D_lc-Z-3-all', 'D_lc-chi-0-all', 'D_lc-chi-1-all', 'D_lc-chi-2-all',
+     'D_lc-chi-3-all', 'D_mc-I-0-all', 'D_mc-I-1-all', 'D_mc-I-2-all',
+     'D_mc-I-3-all', 'D_mc-S-0-all', 'D_mc-S-1-all', 'D_mc-S-2-all',
+     'D_mc-S-3-all', 'D_mc-T-0-all', 'D_mc-T-1-all', 'D_mc-T-2-all',
+     'D_mc-T-3-all', 'D_mc-Z-0-all', 'D_mc-Z-1-all', 'D_mc-Z-2-all',
+     'D_mc-Z-3-all', 'D_mc-chi-0-all', 'D_mc-chi-1-all', 'D_mc-chi-2-all',
+     'D_mc-chi-3-all', 'f-I-0-all', 'f-I-1-all', 'f-I-2-all', 'f-I-3-all',
+     'f-S-0-all', 'f-S-1-all', 'f-S-2-all', 'f-S-3-all', 'f-T-0-all', 'f-T-1-all',
+     'f-T-2-all', 'f-T-3-all', 'f-Z-0-all', 'f-Z-1-all', 'f-Z-2-all', 'f-Z-3-all',
+     'f-chi-0-all', 'f-chi-1-all', 'f-chi-2-all', 'f-chi-3-all', 'f-lig-I-0',
+     'f-lig-I-1', 'f-lig-I-2', 'f-lig-I-3', 'f-lig-S-0', 'f-lig-S-1', 'f-lig-S-2',
+     'f-lig-S-3', 'f-lig-T-0', 'f-lig-T-1', 'f-lig-T-2', 'f-lig-T-3', 'f-lig-Z-0',
+     'f-lig-Z-1', 'f-lig-Z-2', 'f-lig-Z-3', 'f-lig-chi-0', 'f-lig-chi-1',
+     'f-lig-chi-2', 'f-lig-chi-3', 'func-I-0-all', 'func-I-1-all',
+     'func-I-2-all', 'func-I-3-all', 'func-S-0-all', 'func-S-1-all',
+     'func-S-2-all', 'func-S-3-all', 'func-T-0-all', 'func-T-1-all',
+     'func-T-2-all', 'func-T-3-all', 'func-Z-0-all', 'func-Z-1-all',
+     'func-Z-2-all', 'func-Z-3-all', 'func-chi-0-all', 'func-chi-1-all',
+     'func-chi-2-all', 'func-chi-3-all', 'lc-I-0-all', 'lc-I-1-all', 'lc-I-2-all',
+     'lc-I-3-all', 'lc-S-0-all', 'lc-S-1-all', 'lc-S-2-all', 'lc-S-3-all',
+     'lc-T-0-all', 'lc-T-1-all', 'lc-T-2-all', 'lc-T-3-all', 'lc-Z-0-all',
+     'lc-Z-1-all', 'lc-Z-2-all', 'lc-Z-3-all', 'lc-chi-0-all', 'lc-chi-1-all',
+     'lc-chi-2-all', 'lc-chi-3-all', 'mc-I-0-all', 'mc-I-1-all', 'mc-I-2-all',
+     'mc-I-3-all', 'mc-S-0-all', 'mc-S-1-all', 'mc-S-2-all', 'mc-S-3-all',
+     'mc-T-0-all', 'mc-T-1-all', 'mc-T-2-all', 'mc-T-3-all', 'mc-Z-0-all',
+     'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-chi-0-all', 'mc-chi-1-all',
+     'mc-chi-2-all', 'mc-chi-3-all']
+    geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
+      'PONAV','PONAV_vol_frac','VPOV','VSA','rho']
+     
+    other = ['cif_file','name','filename']
+
+    ANN_path = path + 'model/solvent/ANN/'
+    temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+    df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')
+    df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors.csv') # assumes that temp_file_creation/ is in parent folder
+    features = [val for val in df_train.columns.values if val in RACs+geo]
+
+    df_train = standard_labels(df_train, key="flag")
+
+    ### The normalize_data_solvent function is expecting a dataframe with each MOF in a separate row, and features in columns
+    ### At this location, use get_MOF_descriptors to get features
+        # Look at the files that are generated: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
+    ### Then store those features in a usable form (df)
+    ### Need to merge with geometry features from Zeo++
+        # done in app.py
+
+    ### Utilize the function below to normalize the RACs + geos of the new MOF
+    # newMOF refers to the MOF that has been uploaded to mofSimplify, for which a prediction will be generated
+    X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], unit_trans=1, debug=False)
+    # Order of values in X_newMOF matters, but this is taken care of in normalize_data_solvent.
+    X_train.shape, y_train.reshape(-1, ).shape
+    model = solvent_ANN
+
+    from tensorflow.python.keras.backend import set_session
+    with tf_session.as_default():
+        with tf_session.graph.as_default():
+            ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
+            new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
+            print('success!')
+
+            # Define the function for the latent space. This will depend on the model. We want the layer before the last, in this case this was the 12th one.
+            get_latent = K.function([model.layers[0].input],
+                                    [model.layers[12].output]) # Last layer before dense-last
+
+            # Get the latent vectors for the training data first, then the latent vectors for the test data.
+            training_latent = get_latent([X_train, 0])[0]
+            design_latent = get_latent([X_newMOF, 0])[0]
+
+            print(training_latent.shape,design_latent.shape)
+
+    # Compute the pairwise distances between the test latent vectors and the train latent vectors to get latent distances
+    d1 = pairwise_distances(design_latent,training_latent,n_jobs=30)
+    df1 = pd.DataFrame(data=d1, columns=df_train['CoRE_name'].tolist())
+    df1.to_csv(temp_file_path + 'solvent_test_latent_dists.csv')
+
+    # Want to find the closest points (let's say the closest 5 points); so, smallest values in df1
+    neighbors = 5 # number of closest points
+
+    # will make arrays of length neighbors, where each entry is the next closest neighbor (will do this for both names and distances)
+    neighbors_names = []
+    neighbors_distances = []
+
+    df_reformat = df1.min(axis='index')
+
+    for i in range(neighbors):
+        name = df_reformat.idxmin() # name of next closest complex in the traiing data
+        distance = df_reformat.min() # distance of the next closest complex in the training data to the new MOF
+        df_reformat = df_reformat.drop(name) # dropping the next closest complex, in order to find the next-next closest complex
+
+        neighbors_names.append(name)
+        neighbors_distances.append(str(distance))
+
+    return str(new_MOF_pred[0][0]), neighbors_names, neighbors_distances
+
+# This function takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+# This function also takes in fnames (the feature names) and lname (the target property name).
+# This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
+# It also normalizes y_train, which are the thermal breakdown temperatures in the training data dataframe, and returns x_scaler (which scaled X_train) and y_scaler (which scaled y_train).
+def normalize_data_thermal(df_train, df_newMOF, fnames, lname, unit_trans=1, debug=False): # assumes gets Pandas dataframes with MOFs as rows and features as columns
+    _df_train = df_train.copy().dropna(subset=fnames+lname)
+    _df_newMOF = df_newMOF.copy().dropna(subset=fnames) 
+    X_train, X_newMOF = _df_train[fnames].values, _df_newMOF[fnames].values # takes care of ensuring ordering is same for both X
+    y_train = _df_train[lname].values
+    if debug:
+        print("training data reduced from %d -> %d because of nan." % (len(df_train), y_train.shape[0]))
+    x_scaler = sklearn.preprocessing.StandardScaler()
+    x_scaler.fit(X_train)
+    X_train = x_scaler.transform(X_train)
+    X_newMOF = x_scaler.transform(X_newMOF)
+    y_scaler = sklearn.preprocessing.StandardScaler()
+    y_scaler.fit(y_train)
+    y_train = y_scaler.transform(y_train)
+    return X_train, X_newMOF, y_train, x_scaler, y_scaler
+
+def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
+
+    RACs = ['D_func-I-0-all','D_func-I-1-all','D_func-I-2-all','D_func-I-3-all',
+     'D_func-S-0-all', 'D_func-S-1-all', 'D_func-S-2-all', 'D_func-S-3-all',
+     'D_func-T-0-all', 'D_func-T-1-all', 'D_func-T-2-all', 'D_func-T-3-all',
+     'D_func-Z-0-all', 'D_func-Z-1-all', 'D_func-Z-2-all', 'D_func-Z-3-all',
+     'D_func-chi-0-all', 'D_func-chi-1-all', 'D_func-chi-2-all',
+     'D_func-chi-3-all', 'D_lc-I-0-all', 'D_lc-I-1-all', 'D_lc-I-2-all',
+     'D_lc-I-3-all', 'D_lc-S-0-all', 'D_lc-S-1-all', 'D_lc-S-2-all',
+     'D_lc-S-3-all', 'D_lc-T-0-all', 'D_lc-T-1-all', 'D_lc-T-2-all',
+     'D_lc-T-3-all', 'D_lc-Z-0-all', 'D_lc-Z-1-all', 'D_lc-Z-2-all',
+     'D_lc-Z-3-all', 'D_lc-chi-0-all', 'D_lc-chi-1-all', 'D_lc-chi-2-all',
+     'D_lc-chi-3-all', 'D_mc-I-0-all', 'D_mc-I-1-all', 'D_mc-I-2-all',
+     'D_mc-I-3-all', 'D_mc-S-0-all', 'D_mc-S-1-all', 'D_mc-S-2-all',
+     'D_mc-S-3-all', 'D_mc-T-0-all', 'D_mc-T-1-all', 'D_mc-T-2-all',
+     'D_mc-T-3-all', 'D_mc-Z-0-all', 'D_mc-Z-1-all', 'D_mc-Z-2-all',
+     'D_mc-Z-3-all', 'D_mc-chi-0-all', 'D_mc-chi-1-all', 'D_mc-chi-2-all',
+     'D_mc-chi-3-all', 'f-I-0-all', 'f-I-1-all', 'f-I-2-all', 'f-I-3-all',
+     'f-S-0-all', 'f-S-1-all', 'f-S-2-all', 'f-S-3-all', 'f-T-0-all', 'f-T-1-all',
+     'f-T-2-all', 'f-T-3-all', 'f-Z-0-all', 'f-Z-1-all', 'f-Z-2-all', 'f-Z-3-all',
+     'f-chi-0-all', 'f-chi-1-all', 'f-chi-2-all', 'f-chi-3-all', 'f-lig-I-0',
+     'f-lig-I-1', 'f-lig-I-2', 'f-lig-I-3', 'f-lig-S-0', 'f-lig-S-1', 'f-lig-S-2',
+     'f-lig-S-3', 'f-lig-T-0', 'f-lig-T-1', 'f-lig-T-2', 'f-lig-T-3', 'f-lig-Z-0',
+     'f-lig-Z-1', 'f-lig-Z-2', 'f-lig-Z-3', 'f-lig-chi-0', 'f-lig-chi-1',
+     'f-lig-chi-2', 'f-lig-chi-3', 'func-I-0-all', 'func-I-1-all',
+     'func-I-2-all', 'func-I-3-all', 'func-S-0-all', 'func-S-1-all',
+     'func-S-2-all', 'func-S-3-all', 'func-T-0-all', 'func-T-1-all',
+     'func-T-2-all', 'func-T-3-all', 'func-Z-0-all', 'func-Z-1-all',
+     'func-Z-2-all', 'func-Z-3-all', 'func-chi-0-all', 'func-chi-1-all',
+     'func-chi-2-all', 'func-chi-3-all', 'lc-I-0-all', 'lc-I-1-all', 'lc-I-2-all',
+     'lc-I-3-all', 'lc-S-0-all', 'lc-S-1-all', 'lc-S-2-all', 'lc-S-3-all',
+     'lc-T-0-all', 'lc-T-1-all', 'lc-T-2-all', 'lc-T-3-all', 'lc-Z-0-all',
+     'lc-Z-1-all', 'lc-Z-2-all', 'lc-Z-3-all', 'lc-chi-0-all', 'lc-chi-1-all',
+     'lc-chi-2-all', 'lc-chi-3-all', 'mc-I-0-all', 'mc-I-1-all', 'mc-I-2-all',
+     'mc-I-3-all', 'mc-S-0-all', 'mc-S-1-all', 'mc-S-2-all', 'mc-S-3-all',
+     'mc-T-0-all', 'mc-T-1-all', 'mc-T-2-all', 'mc-T-3-all', 'mc-Z-0-all',
+     'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-chi-0-all', 'mc-chi-1-all',
+     'mc-chi-2-all', 'mc-chi-3-all']
+    geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
+      'PONAV','PONAV_vol_frac','VPOV','VSA','rho']
+     
+    other = ['cif_file','name','filename']
+
+    ANN_path = path + 'model/thermal/ANN/'
+    temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+    df_train_all = pd.read_csv(ANN_path+"train.csv").append(pd.read_csv(ANN_path+"val.csv"))
+    df_train = pd.read_csv(ANN_path+"train.csv")
+    df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors.csv') # Assume temp_file_creation/ in parent directory
+    features = [val for val in df_train.columns.values if val in RACs+geo]
+
+    X_train, X_newMOF, y_train, x_scaler, y_scaler = normalize_data_thermal(df_train, df_newMOF, features, ["T"], unit_trans=1, debug=False)
+    X_train.shape, y_train.reshape(-1, ).shape 
+
+    model = thermal_ANN
+
+    from tensorflow.python.keras.backend import set_session
+    with tf_session.as_default():
+        with tf_session.graph.as_default():
+            new_MOF_pred = y_scaler.inverse_transform(model.predict(X_newMOF))
+            new_MOF_pred = np.round(new_MOF_pred,1) # round to 1 decimal
+
+            # isolating just the prediction, since the model spits out the prediction like [[PREDICTION]], as in, in hard brackets
+            new_MOF_pred = new_MOF_pred[0][0]
+            new_MOF_pred = str(new_MOF_pred)
+
+            # adding units
+            degree_sign= u'\N{DEGREE SIGN}'
+            new_MOF_pred = new_MOF_pred + degree_sign + 'C' # degrees Celsius
+
+            # Define the function for the latent space. This will depend on the model. We want the layer before the last, in this case this was the 8th one.
+            get_latent = K.function([model.layers[0].input],
+                                    [model.layers[8].output]) # Last layer before dense-last
+
+            # Get the latent vectors for the training data first, then the latent vectors for the test data.
+            training_latent = get_latent([X_train, 0])[0]
+            design_latent = get_latent([X_newMOF, 0])[0]
+
+            print(training_latent.shape,design_latent.shape)
+
+    # Compute the pairwise distances between the test latent vectors and the train latent vectors to get latent distances
+    d1 = pairwise_distances(design_latent,training_latent,n_jobs=30)
+    df1 = pd.DataFrame(data=d1, columns=df_train['CoRE_name'].tolist())
+    df1.to_csv(temp_file_path + 'solvent_test_latent_dists.csv')
+
+    # Want to find the closest points (let's say the closest 5 points); so, smallest values in df1
+    neighbors = 5 # number of closest points
+
+    # will make arrays of length neighbors, where each entry is the next closest neighbor (will do this for both names and distances)
+    neighbors_names = []
+    neighbors_distances = []
+
+    df_reformat = df1.min(axis='index')
+
+    for i in range(neighbors):
+        name = df_reformat.idxmin() # name of next closest complex in the traiing data
+        distance = df_reformat.min() # distance of the next closest complex in the training data to the new MOF
+        df_reformat = df_reformat.drop(name) # dropping the next closest complex, in order to find the next-next closest complex
+
+        neighbors_names.append(name)
+        neighbors_distances.append(str(distance))
+
+    return new_MOF_pred, neighbors_names, neighbors_distances
 
 # This function is used by both ss_predict() and ts_predict() to generate RACs and Zeo++ descriptors
 # These descriptors are subsequently used in ss_predict() and ts_predict() for the ANN models
@@ -577,37 +864,17 @@ def ss_predict():
     # Applying the model next
 
     timeStarted = time.time() # save start time (debugging)
-
-    prediction_folder = temp_file_folder + 'predictions/'
-    os.system('python ' + ANN_folder + 'solvent_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' ' + name + ' > ' + prediction_folder + name + '_solvent_prediction.txt') 
+    prediction, neighbor_names, neighbor_distances = run_solvent_ANN(str(session['ID']), MOFSIMPLIFY_PATH, name, solvent_model)
     timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds')
-
-    f = open(prediction_folder + name + "_solvent_prediction.txt", "r")
-    line = f.readline()
-    line = line.split('[')
-    line = line[2]
-    line = line.split(']')
-    prediction = line[0] # isolating just the prediction, since the model spits out the prediction like [[PREDICTION]], as in, in hard brackets
-    f.readline() # skip a line
-    neighbor_names = f.readline()
-    neighbor_distances = f.readline()
-    f.close()
-
-    # Next, some hacky stuff to convert strings back into lists
-    neighbor_names = neighbor_names.split('\', \'')
-    neighbor_names[0] = neighbor_names[0][2:]
-    neighbor_names[-1] = neighbor_names[-1][:-3]
-
-    neighbor_distances = neighbor_distances.split(', ')
-    neighbor_distances[0] = neighbor_distances[0][2:]
-    neighbor_distances[-1] = neighbor_distances[-1][:-2]    
+    print('Finished process in ' + str(timeDelta) + ' seconds') 
 
     print('check check')
     print(neighbor_names) # debugging
     print(neighbor_distances) # debugging
     print(type(neighbor_names)) # debugging
-    print(type(neighbor_distances)) # debugging    
+    print(type(neighbor_distances)) # debugging
+    print(prediction) # debugging
+    print(type(prediction))  # debugging  
 
     results = {'prediction': prediction,
         'neighbor_names': neighbor_names,
@@ -615,6 +882,8 @@ def ss_predict():
         'in_train': False} # a prediction was made. Requested MOF was not in the training data.
 
     print('TIME CHECK 6')
+    print(results) # debugging
+    print(type(results)) # debugging
 
     return results
 
@@ -647,27 +916,10 @@ def ts_predict():
 
     timeStarted = time.time() # save start time (debugging)
 
-    prediction_folder = temp_file_folder + 'predictions/'
-    os.system('python ' + ANN_folder + 'thermal_ANN.py ' + str(session['ID']) + ' ' + MOFSIMPLIFY_PATH + ' ' + name + ' > ' + prediction_folder + name + '_thermal_prediction.txt')
+    prediction, neighbor_names, neighbor_distances = run_thermal_ANN(str(session['ID']), MOFSIMPLIFY_PATH, name, thermal_model)
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
-
-    f = open(prediction_folder + name + "_thermal_prediction.txt", "r")
-    prediction = f.readline()
-    f.readline() # skip a line
-    neighbor_names = f.readline()
-    neighbor_distances = f.readline()
-    f.close()
-
-    # Next, some hacky stuff to convert strings back into lists.
-    neighbor_names = neighbor_names.split('\', \'')
-    neighbor_names[0] = neighbor_names[0][2:]
-    neighbor_names[-1] = neighbor_names[-1][:-3]
-
-    neighbor_distances = neighbor_distances.split(', ')
-    neighbor_distances[0] = neighbor_distances[0][2:]
-    neighbor_distances[-1] = neighbor_distances[-1][:-2]    
 
     print('check check')
     print(neighbor_names) # debugging

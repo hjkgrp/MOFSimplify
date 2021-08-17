@@ -429,7 +429,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
     model = solvent_ANN
 
     from tensorflow.python.keras.backend import set_session
-    with tf_session.as_default():
+    with tf_session.as_default(): # session stuff is needed because the model was loaded from h5 a while ago
         with tf_session.graph.as_default():
             ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
             new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
@@ -598,6 +598,10 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
 # Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated
 # The third input indicates the type of prediction (solvent removal or thermal)
 def descriptor_generator(name, structure, prediction_type):
+    print('TIME CHECK 2')
+    import time # debugging
+    timeStarted = time.time() # save start time (debugging)
+
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
     cif_folder = temp_file_folder + 'cifs/'
 
@@ -620,20 +624,11 @@ def descriptor_generator(name, structure, prediction_type):
     shutil.rmtree(zeo_folder)
     os.mkdir(zeo_folder)
 
-    print('TIME CHECK 2')
-    import time # debugging
-    timeStarted = time.time() # save start time (debugging)
-
     # Next, running MOF featurization
     try:
         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
     except ValueError:
         return 'FAILED'
-
-    timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds')
-
-    timeStarted = time.time() # save start time (debugging)
 
     try:
         full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
@@ -673,9 +668,6 @@ def descriptor_generator(name, structure, prediction_type):
     output3 = process3.communicate()[0]
     output4 = process4.communicate()[0]
 
-    timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds')
-
     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
     ''' The geometric descriptors are largest included sphere (Di), 
@@ -686,11 +678,6 @@ def descriptor_generator(name, structure, prediction_type):
 
     All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
     '''
-
-    print('MY ID CHECK 3')
-    print(session['ID'])
-
-    timeStarted = time.time() # save start time (debugging)
 
     dict_list = []
     cif_file = name + '_primitive.cif' 
@@ -747,6 +734,8 @@ def descriptor_generator(name, structure, prediction_type):
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
     print('TIME CHECK 4')
+
+    timeStarted = time.time() # save start time
 
     # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
     try:
@@ -829,6 +818,9 @@ def descriptor_generator(name, structure, prediction_type):
         myDict = {'in_train': True, 'truth': match_truth}
         return myDict
 
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
+
     print('TIME CHECK 5')
 
     return [temp_file_folder, ANN_folder]
@@ -843,6 +835,10 @@ def ss_predict():
     # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
     # Then, apply Aditya's model to make prediction.
 
+    print('TIME CHECK 1')
+    import time
+    timeStarted = time.time() # save start time (debugging)
+
     # Grab data
     my_data = json.loads(flask.request.get_data())
     structure = my_data['structure']
@@ -851,6 +847,9 @@ def ss_predict():
         name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
         name = name[:-4]
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds')
 
     output = descriptor_generator(name, structure, 'solvent') # generate descriptors
     if output == 'FAILED': # model failure
@@ -865,8 +864,6 @@ def ss_predict():
 
     timeStarted = time.time() # save start time (debugging)
     prediction, neighbor_names, neighbor_distances = run_solvent_ANN(str(session['ID']), MOFSIMPLIFY_PATH, name, solvent_model)
-    timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds') 
 
     print('check check')
     print(neighbor_names) # debugging
@@ -881,9 +878,13 @@ def ss_predict():
         'neighbor_distances': neighbor_distances,
         'in_train': False} # a prediction was made. Requested MOF was not in the training data.
 
-    print('TIME CHECK 6')
     print(results) # debugging
     print(type(results)) # debugging
+
+    timeDelta = time.time() - timeStarted # get execution time
+    print('Finished process in ' + str(timeDelta) + ' seconds') 
+
+    print('TIME CHECK 6')
 
     return results
 

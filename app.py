@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import flask
+import tensorflow as tf
 import pandas as pd
 import numpy as np
 import time
@@ -19,6 +20,9 @@ import sys
 import stat
 import keras
 import keras.backend as K
+import sklearn
+import sklearn.preprocessing
+from sklearn.metrics import pairwise_distances
 from molSimplify.Scripts.generator import startgen_pythonic
 from molSimplify.Scripts.molSimplify_io import getlicores
 from bokeh.plotting import figure
@@ -30,18 +34,12 @@ from bokeh.models import ColorBar, LinearColorMapper, LogColorMapper, HoverTool
 from bokeh.models.markers import Circle
 from bokeh.palettes import Inferno256
 from flask import jsonify, render_template, redirect, request, url_for, session
-import flask_login
+from functools import partial
+from keras.callbacks import EarlyStoppingimport flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
 
-import json
-import tensorflow as tf
-from functools import partial
-from keras.callbacks import EarlyStopping
-import sklearn
-import sklearn.preprocessing
-from sklearn.metrics import pairwise_distances
 
 cmap_bokeh = Inferno256
 

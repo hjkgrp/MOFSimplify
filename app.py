@@ -32,7 +32,7 @@ from bokeh.palettes import Inferno256
 from flask import jsonify, render_template, redirect, request, url_for, session
 import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
-from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors;
+from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
 
 import json
@@ -114,8 +114,8 @@ def set_ID():
     # sets the session user ID. This is used to generate unique folders, so that multiple users can use the website at a time 
     # specifically, copies of the temp_file_creation folder
     session['ID'] = time.time() # a unique ID for this session
-    print('MY ID CHECK 1')
-    print(session['ID'])
+    # print('MY ID CHECK 1')
+    # print(session['ID'])
 
     # make a version of the temp_file_creation folder for this user
     new_folder = MOFSIMPLIFY_PATH + '/temp_file_creation_' + str(session['ID'])
@@ -433,7 +433,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
         with tf_session.graph.as_default():
             ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
             new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
-            print('success!')
+            # print('success!')
 
             # Define the function for the latent space. This will depend on the model. We want the layer before the last, in this case this was the 12th one.
             get_latent = K.function([model.layers[0].input],
@@ -443,7 +443,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
             training_latent = get_latent([X_train, 0])[0]
             design_latent = get_latent([X_newMOF, 0])[0]
 
-            print(training_latent.shape,design_latent.shape)
+            # print(training_latent.shape,design_latent.shape)
 
     # Compute the pairwise distances between the test latent vectors and the train latent vectors to get latent distances
     d1 = pairwise_distances(design_latent,training_latent,n_jobs=30)
@@ -630,18 +630,18 @@ def descriptor_generator(name, structure, prediction_type):
     except ValueError:
         return 'FAILED'
 
-    try:
-        full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
-            # makes the linkers and sbus folders
-    except ValueError:
-        return 'FAILED'
-    except NotImplementedError:
-        return 'FAILED'
-    except AssertionError:
-        return 'FAILED'
+    # try:
+    #     full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
+    #         # makes the linkers and sbus folders
+    # except ValueError:
+    #     return 'FAILED'
+    # except NotImplementedError:
+    #     return 'FAILED'
+    # except AssertionError:
+    #     return 'FAILED'
 
-    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-        return 'FAILED'
+    # if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+    #     return 'FAILED'
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
@@ -656,13 +656,15 @@ def descriptor_generator(name, structure, prediction_type):
 
     cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
     cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
-    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -vol 1.86 1.86 10000 ' + zeo_folder + name + '_av.txt ' + cif_folder + name + '_primitive.cif'
-    cmd4 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
+    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
+    cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+
     # four parallelized Zeo++ commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
     process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
     process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
     output1 = process1.communicate()[0]
     output2 = process2.communicate()[0]
     output3 = process3.communicate()[0]
@@ -688,8 +690,7 @@ def descriptor_generator(name, structure, prediction_type):
     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
     if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
-        os.path.exists(zeo_folder + name + '_av.txt') & os.path.exists(zeo_folder + name + '_pov.txt')
-        ):
+        os.path.exists(zeo_folder + name + '_pov.txt')):
         with open(zeo_folder + name + '_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
@@ -718,9 +719,8 @@ def descriptor_generator(name, structure, prediction_type):
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
-        print('Not all 4 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
-              '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; av: ', os.path.exists(zeo_folder + name + '_av.txt'),
-              '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
+        print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
+              '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
         return 'FAILED'
     geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
                 'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
@@ -728,6 +728,12 @@ def descriptor_generator(name, structure, prediction_type):
     dict_list.append(geo_dict)
     geo_df = pd.DataFrame(dict_list)
     geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
+
+    # error handling for cmd4
+    with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
+        if f.readline() == 'FAILED':
+            print('RAC generation failed.')
+            return 'FAILED'
 
 
     timeDelta = time.time() - timeStarted # get execution time
@@ -865,21 +871,21 @@ def ss_predict():
     timeStarted = time.time() # save start time (debugging)
     prediction, neighbor_names, neighbor_distances = run_solvent_ANN(str(session['ID']), MOFSIMPLIFY_PATH, name, solvent_model)
 
-    print('check check')
-    print(neighbor_names) # debugging
-    print(neighbor_distances) # debugging
-    print(type(neighbor_names)) # debugging
-    print(type(neighbor_distances)) # debugging
-    print(prediction) # debugging
-    print(type(prediction))  # debugging  
+    # print('check check')
+    # print(neighbor_names) # debugging
+    # print(neighbor_distances) # debugging
+    # print(type(neighbor_names)) # debugging
+    # print(type(neighbor_distances)) # debugging
+    # print(prediction) # debugging
+    # print(type(prediction))  # debugging  
 
     results = {'prediction': prediction,
         'neighbor_names': neighbor_names,
         'neighbor_distances': neighbor_distances,
         'in_train': False} # a prediction was made. Requested MOF was not in the training data.
 
-    print(results) # debugging
-    print(type(results)) # debugging
+    # print(results) # debugging
+    # print(type(results)) # debugging
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds') 

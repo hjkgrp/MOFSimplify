@@ -35,7 +35,8 @@ from bokeh.models.markers import Circle
 from bokeh.palettes import Inferno256
 from flask import jsonify, render_template, redirect, request, url_for, session
 from functools import partial
-from keras.callbacks import EarlyStoppingimport flask_login
+from keras.callbacks import EarlyStopping
+import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
@@ -777,6 +778,7 @@ def descriptor_generator(name, structure, prediction_type):
     for index, row in train_df.iterrows(): # iterate through rows of the training data MOFs
 
         row_match = True # gets set to false if any values don't match 
+        matching_MOF = None # gets assigned a value if the current MOF is in the training data
 
         for col in merged_df.columns: # iterate through columns of the single new MOF we are predicting on (merged_df is just one row)
             if col == 'name' or col == 'cif_file' or col == 'Dif':
@@ -802,24 +804,24 @@ def descriptor_generator(name, structure, prediction_type):
 
                 break
         
-        if row_match and prediction_type == 'solvent': # all columns for row match! Training MOF is the same as new MOF
+        if row_match and prediction_type == 'solvent': # all columns for the row match! Some training MOF is the same as the new MOF
             in_train = True
             match_truth = row['flag'] # the flag for the MOF that matches the current MOF
+            matching_MOF = row['CoRE_name']
             print(row['CoRE_name'])
             break
-        if row_match and prediction_type =='thermal':
+        if row_match and prediction_type =='thermal': # all columns for the row match! Some training MOF is the same as the new MOF
             in_train = True
             match_truth = row['T'] # the flag for the MOF that matches the current MOF
-
             match_truth = np.round(match_truth,1) # round to 1 decimal
-
+            matching_MOF = row['CoRE_name']
             # adding units
             degree_sign= u'\N{DEGREE SIGN}'
             match_truth = str(match_truth) + degree_sign + 'C' # degrees Celsius
             break
 
     if in_train:
-        myDict = {'in_train': True, 'truth': match_truth}
+        myDict = {'in_train': True, 'truth': match_truth, 'match': matching_MOF}
         return myDict
 
     timeDelta = time.time() - timeStarted # get execution time

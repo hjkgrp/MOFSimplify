@@ -142,6 +142,21 @@ def serve_banner_dark():
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
 
+## Handle feedback
+@app.route('/process_feedback', methods=['POST'])
+def process_feedback():
+    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments']
+    # TODO: limit file size
+    print('printing out field values:')
+    for field in fields:
+        print(field)
+        print(request.form.get(field))
+    print(request.files['file'].content_length)
+    print(request.files['file'].content_type)
+    request.files['file'].save('uploaded_file.pdf')
+    return 'file uploaded successfully'
+
+
 ## Splash page management
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
@@ -1254,5 +1269,5 @@ def TGA_getter():
     return contents
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=8000, debug=True)
     #app.run(host='0.0.0.0', port=8000, threaded=False, processes=10)

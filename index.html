@@ -307,29 +307,34 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <div class='col-12' style='font-size:22px;' id='solvent_stability_prediction'>
         </div>
         <div class='col-12' id='solvent_form'>
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="feedback_form_name" value="solvent_stability" />
             <i>Rate this prediction:</i>
-            <input id="solvent_rating" type="text" class="rating" data-size="md">
+            <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                class="form-control">
+              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control" required>
             </div>
-            <select id="inputState" class="form-control mt-2 mb-0">
-              <option selected="">Reason for rating...</option>
-              <option>...</option>
+            <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+              <option value="">Reason for rating...</option>
+              <option>I've worked with this MOF before, the prediction is good</option>
+              <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
+              <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+              <option>The paper is incorrect (provide reasoning in comment field)</option>
+              <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
               </div>
-              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+              <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
                 class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
               <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
@@ -402,6 +407,38 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               id='comp_s_neighbor' type='button'>Get components</button>
           </div>
           <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
+          <!-- Feedback form for solvent neighbor -->
+          <div id="solvent_neighbor_form">
+            <form style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+              <i>Rate curated experimental stability data:</i>
+              <input id="solvent_rating" type="text" class="rating" data-size="md">
+              <div style="" class="input-group mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                </div>
+                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                  class="form-control">
+              </div>
+              <select id="inputState" class="form-control mt-2 mb-0">
+                <option selected="">Reason for rating...</option>
+                <option>...</option>
+              </select>
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                </div>
+                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                  class="form-control">
+              </div>
+              <div class="custom-file form-control mt-2">
+                <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+                <label class="custom-file-label" for="validatedCustomFile">Upload Supplementary File (optional; .pdf, .jpg, .png,
+                  .tiff)</label>
+                <div class="invalid-feedback">Example invalid custom file feedback</div>
+              </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
+            </form>
+          </div>
+
         </div>
 
         <div class='col-6 zebra' style='font-size:22px;' id='thermal_neighbor_section'>
@@ -422,6 +459,36 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               id='comp_t_neighbor' type='button'>Get components</button>
           </div>
           <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
+          <div id="thermal_neighbor_form">
+            <form style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+              <i>Rate curated experimental stability data:</i>
+              <input id="solvent_rating" type="text" class="rating" data-size="md">
+              <div style="" class="input-group mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                </div>
+                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                  class="form-control">
+              </div>
+              <select id="inputState" class="form-control mt-2 mb-0">
+                <option selected="">Reason for rating...</option>
+                <option>...</option>
+              </select>
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                </div>
+                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                  class="form-control">
+              </div>
+              <div class="custom-file form-control mt-2">
+                <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+                <label class="custom-file-label" for="validatedCustomFile">Upload Supplementary File (optional; .pdf, .jpg, .png,
+                  .tiff)</label>
+                <div class="invalid-feedback">Example invalid custom file feedback</div>
+              </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
+            </form>
+          </div>
           <div class='col-6' id='tga_plot'></div>
 
           <div id='tga_explanation' style='display: none; margin-top: 0.5cm;' class='zebra'>
@@ -1134,8 +1201,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#thermal_neighbor_section').hide()
       $('#status_section').hide()
       $('#descriptor_section').hide()
-      $('#solvent_form').hide()
-      $('#thermal_form').hide()
+      // $('#solvent_form').hide()
+      // $('#thermal_form').hide()
+      // $('#solvent_neighbor_form').hide()
+      // $('#thermal_neighbor_form').hide()
 
 
 
@@ -1232,6 +1301,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#status_section').show()
     });
 
+    // Code that updates the file upload text in any input form (i.e. change "Upload file..." to "file.pdf")
+    $('input[type="file"]').change(function(e){
+        var fileName = e.target.files[0].name;
+        $(e.target).siblings('.custom-file-label').html(fileName);
+    });
 
     // This function triggers when someone clicks the "Visualize selected (1) MOF" button.
     $("#visualize").on('click', function () {
@@ -2298,15 +2372,14 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           if (flag == 1) {
             document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: '
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-              + '<br />Experimentally observed to be stable upon solvent removal? Yes <br />Nearest neighbor DOI: '
-              + response['doi']; // <br /> for a new line in display
+              + '<br />Nearest neighbor DOI: ' + response['doi'] + '<br />Experimentally observed to be stable upon solvent removal? Yes' // <br /> for a new line in display
           }
           else {
             document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: '
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-              + '<br />Experimentally observed to be stable upon solvent removal? No <br />Nearest neighbor DOI: '
-              + response['doi']; // <br /> for a new line in display
+              + '<br />Nearest neighbor DOI: ' + response['doi'] + '<br />Experimentally observed to be stable upon solvent removal? No' // <br /> for a new line in display
           }
+          $('#solvent_neighbor_form').show()
         })
     })
 
@@ -2390,9 +2463,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         function (response) {
           document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: '
             + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+            + '<br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
+            + response['doi'] // <br /> for a new line in display. &#8451 is degrees celsius in decimal
             + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
-            + '&#8451 <br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
-            + response['doi']; // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+            + '&#8451';
+          $('#thermal_neighbor_form').show()
         })
 
       $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function (response) {

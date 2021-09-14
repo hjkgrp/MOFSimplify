@@ -1,8 +1,6 @@
 <!-- This code uses much of the code from molSimplify Lite. There are additional buttons for solvent removal and thermal stability predictions, and many MOF centered operations (visualization, component identification, etc). An example MOF is prepared by default, using fetch. 
-
 In a terminal, navigate to folder containing app.py.
 Then, to open the website, run python app.py in the terminal. Copy and paste http://0.0.0.0:8000/ into the Safari URL bar.
-
 -->
 
 
@@ -219,17 +217,21 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       <!--       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
       </li> -->
-      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom active" id="pills-main-tab"
           style='width:100%; height:100%; font-weight: bold; font-size:24px;'>Main</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-vis-tab"
           style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Visualization</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-comp-tab"
           style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Component Analysis</button>
+      </li>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
+        <button class="nav-link pill-custom" id="pills-data-tab"
+          style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Data Upload</button>
       </li>
       <!--       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-bb-tab" style='width:100%; height: 100%; font-weight: bold;'>Building Block Assembly</button>
@@ -309,6 +311,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <div class='col-12' id='solvent_form'>
           <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
             <input type="hidden" name="feedback_form_name" value="solvent_stability" />
+            <input type="hidden" name="cif_file_name" value="" />
+            <input type="hidden" name="structure" value="" />
             <i>Rate this prediction:</i>
             <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
@@ -345,29 +349,36 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <div class='col-12' style='font-size:22px;' id='thermal_stability_prediction'></div>
         <div class='col-12' style='font-size:22px;' id='thermal_stability_percentile'></div>
         <div class="col-12" id="thermal_form">
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='thermal_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="feedback_form_name" value="thermal_stability" />
+            <input type="hidden" name="cif_file_name" value="" />
+            <input type="hidden" name="structure" value="" />
             <i>Rate this prediction:</i>
-            <input id="solvent_rating" type="text" class="rating" data-size="md">
+            <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                class="form-control">
+              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control" required>
             </div>
-            <select id="inputState" class="form-control mt-2 mb-0">
-              <option selected="">Reason for rating...</option>
-              <option>...</option>
+            <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+              <option value="">Reason for rating...</option>
+              <option>I've worked with this MOF before, the prediction is good</option>
+              <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
+              <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+              <option>The paper is incorrect (provide reasoning in comment field)</option>
+              <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
               </div>
-              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+              <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
                 class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
               <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
@@ -417,7 +428,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
                 </div>
                 <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                  class="form-control">
+                  class="form-control" required>
               </div>
               <select id="inputState" class="form-control mt-2 mb-0">
                 <option selected="">Reason for rating...</option>
@@ -431,7 +442,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   class="form-control">
               </div>
               <div class="custom-file form-control mt-2">
-                <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+                <input type="file" class="custom-file-input" id="validatedCustomFile" required>
                 <label class="custom-file-label" for="validatedCustomFile">Upload Supplementary File (optional; .pdf, .jpg, .png,
                   .tiff)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
@@ -468,7 +479,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
                 </div>
                 <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                  class="form-control">
+                  class="form-control" required>
               </div>
               <select id="inputState" class="form-control mt-2 mb-0">
                 <option selected="">Reason for rating...</option>
@@ -482,7 +493,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   class="form-control">
               </div>
               <div class="custom-file form-control mt-2">
-                <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+                <input type="file" class="custom-file-input" id="validatedCustomFile" required>
                 <label class="custom-file-label" for="validatedCustomFile">Upload Supplementary File (optional; .pdf, .jpg, .png,
                   .tiff)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
@@ -660,8 +671,44 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     </div>
 
-    <!--       <div class="tab-pane fade" id="pills-stat" role="tabpanel" aria-labelledby="pills-stat-tab">
 
+    <div id="pills-data" class="container">
+
+        <div class="col-12" id="thermal_form">
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+            <i class='zebra'>Upload information on your MOF!</i>
+            <div style="" class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+              </div>
+              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control" required>
+            </div>
+            <div class="input-group mt-2" style="">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+              </div>
+              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control">
+            </div>
+            <div class="custom-file form-control mt-2">
+              <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+              <label class="custom-file-label" for="validatedCustomFile">Upload MOF (.cif)</label>
+              <div class="invalid-feedback">Example invalid custom file feedback</div>
+            </div>
+            <div class="custom-file form-control mt-2">
+              <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+              <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
+                .tiff)</label>
+              <div class="invalid-feedback">Example invalid custom file feedback</div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+          </form>
+        </div>
+    </div>
+
+
+    <!--       <div class="tab-pane fade" id="pills-stat" role="tabpanel" aria-labelledby="pills-stat-tab">
     </div> -->
 
 
@@ -1201,10 +1248,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#thermal_neighbor_section').hide()
       $('#status_section').hide()
       $('#descriptor_section').hide()
-      // $('#solvent_form').hide()
-      // $('#thermal_form').hide()
-      // $('#solvent_neighbor_form').hide()
-      // $('#thermal_neighbor_form').hide()
+      $('#solvent_form').hide()
+      $('#thermal_form').hide()
+      $('#solvent_neighbor_form').hide()
+      $('#thermal_neighbor_form').hide()
 
 
 
@@ -1491,6 +1538,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
             solvent_pred_color = success_green;
             $('#solvent_form').show() // Show the feedback form
+            $('#solvent_form input[name=cif_file_name]').val(myDict['name']);
+            $('#solvent_form input[name=structure]').val(myDict['structure']); // Populate the feedback form with metadata
             $('#predict_s').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
             $('#neighbor_blurb').show() // show nearest neighbors section
@@ -1646,6 +1695,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             }
 
             $('#thermal_form').show()
+            $('#thermal_form input[name=cif_file_name]').val(myDict['name']);
+            $('#thermal_form input[name=structure]').val(myDict['structure']); // Populate the feedback form with metadata
             thermal_pred_color = success_green;
             $('#predict_t').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
@@ -2692,6 +2743,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').show()
+      $('#pills-data').hide()
     })
 
 
@@ -2700,6 +2752,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
+      $('#pills-data').hide()
     })
 
     $('#pills-vis-tab').click(function () {
@@ -2708,6 +2761,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').show()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
+      $('#pills-data').hide()
     })
 
     $('#pills-comp-tab').click(function () {
@@ -2715,6 +2769,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').hide()
       $('#pills-comp').show()
       $('#pills-bb').hide()
+      $('#pills-data').hide()
+    })
+
+    $('#pills-data-tab').click(function () {
+      $('#pills-main').hide()
+      $('#pills-vis').hide()
+      $('#pills-comp').hide()
+      $('#pills-bb').hide()
+      $('#pills-data').show()
     })
 
     // $('#pills-bb-tab').click(function(){
@@ -2785,6 +2848,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // $('#pills-vis').hide()
     $('#pills-comp').hide()
     $('#pills-bb').hide()
+    $('#pills-data').hide()
     $('#predict_section').hide()
     $('#descriptor_section').hide()
     $('#neighbor_blurb').hide()

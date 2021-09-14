@@ -40,6 +40,8 @@ import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
+import bson
+from datetime import datetime
 
 
 cmap_bokeh = Inferno256
@@ -177,15 +179,22 @@ def serve_MOFSimplify_logo():
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
 def process_feedback():
-    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments']
-    # TODO: limit file size
-    print('printing out field values:')
+    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure']
+    #$meta_fields = ['IP', 'datetime', 'cif_file', 'MOF_name']
+    final_dict = {}
     for field in fields:
-        print(field)
-        print(request.form.get(field))
-    print(request.files['file'].content_length)
-    print(request.files['file'].content_type)
-    request.files['file'].save('uploaded_file.pdf')
+        final_dict[field] = request.form.get(field)
+
+    # Populate special fields
+    final_dict['filetype'] = request.files['file'].content_type
+    final_dict['file'] = request.files['file'].read()
+    final_dict['ip'] = request.remote_addr
+    final_dict['timestamp'] = datetime.now().isoformat()
+
+    print(final_dict)
+    with open('sample.bson', 'wb') as outfile:
+        outfile.write(bson.encode(final_dict))
+    # TODO: limit file size
     return 'file uploaded successfully'
 
 

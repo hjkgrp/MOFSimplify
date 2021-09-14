@@ -1,3 +1,0 @@
-@ /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1631568875.156499/solvent_zeo++/ABESUX_clean_pov.txt Unitcell_volume: 1393.08   Density: 3.74291   POAV_A^3: 565.87 POAV_Volume_fraction: 0.4062 POAV_cm^3/g: 0.108525 PONAV_A^3: 0 PONAV_Volume_fraction: 0 PONAV_cm^3/g: 0
-PROBE_OCCUPIABLE_VOL_CALC: filename| density(g/cm3)| probe rad| N points| probe ctr A fract| probe ctr NA fract| A fract| NA fract| narrow fract |ovlp fract.
-PROBE_OCCUPIABLE___RESULT: /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1631568875.156499/solvent_zeo++/ABESUX_clean_pov.txt	3.74291	1.86	10000	0.0453	0	0.4062	0	0.1479	0.4459

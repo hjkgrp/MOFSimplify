@@ -217,17 +217,21 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       <!--       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
       </li> -->
-      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom active" id="pills-main-tab"
           style='width:100%; height:100%; font-weight: bold; font-size:24px;'>Main</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-vis-tab"
           style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Visualization</button>
       </li>
-      <li class="nav-item" role="presentation" style='width:33%; min-width:150px;'>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-comp-tab"
           style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Component Analysis</button>
+      </li>
+      <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
+        <button class="nav-link pill-custom" id="pills-data-tab"
+          style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Data Upload</button>
       </li>
       <!--       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-bb-tab" style='width:100%; height: 100%; font-weight: bold;'>Building Block Assembly</button>
@@ -657,6 +661,43 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       </div>
 
     </div>
+
+
+    <div id="pills-data" class="container">
+
+        <div class="col-12" id="thermal_form">
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+            <i>Upload information on your MOF!</i>
+            <div style="" class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+              </div>
+              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control">
+            </div>
+            <div class="input-group mt-2" style="">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+              </div>
+              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control">
+            </div>
+            <div class="custom-file form-control mt-2">
+              <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+              <label class="custom-file-label" for="validatedCustomFile">Upload MOF (.cif)</label>
+              <div class="invalid-feedback">Example invalid custom file feedback</div>
+            </div>
+            <div class="custom-file form-control mt-2">
+              <input type="file" class="custom-file-input" id="validatedCustomFile" required="">
+              <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
+                .tiff)</label>
+              <div class="invalid-feedback">Example invalid custom file feedback</div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+          </form>
+        </div>
+    </div>
+
 
     <!--       <div class="tab-pane fade" id="pills-stat" role="tabpanel" aria-labelledby="pills-stat-tab">
     </div> -->
@@ -1198,10 +1239,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#thermal_neighbor_section').hide()
       $('#status_section').hide()
       $('#descriptor_section').hide()
-      // $('#solvent_form').hide()
-      // $('#thermal_form').hide()
-      // $('#solvent_neighbor_form').hide()
-      // $('#thermal_neighbor_form').hide()
+      $('#solvent_form').hide()
+      $('#thermal_form').hide()
+      $('#solvent_neighbor_form').hide()
+      $('#thermal_neighbor_form').hide()
 
 
 
@@ -2689,6 +2730,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').show()
+      $('#pills-data').hide()
     })
 
 
@@ -2697,6 +2739,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').hide()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
+      $('#pills-data').hide()
     })
 
     $('#pills-vis-tab').click(function () {
@@ -2705,6 +2748,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').show()
       $('#pills-comp').hide()
       $('#pills-bb').hide()
+      $('#pills-data').hide()
     })
 
     $('#pills-comp-tab').click(function () {
@@ -2712,6 +2756,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-vis').hide()
       $('#pills-comp').show()
       $('#pills-bb').hide()
+      $('#pills-data').hide()
+    })
+
+    $('#pills-data-tab').click(function () {
+      $('#pills-main').hide()
+      $('#pills-vis').hide()
+      $('#pills-comp').hide()
+      $('#pills-bb').hide()
+      $('#pills-data').show()
     })
 
     // $('#pills-bb-tab').click(function(){
@@ -2782,6 +2835,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // $('#pills-vis').hide()
     $('#pills-comp').hide()
     $('#pills-bb').hide()
+    $('#pills-data').hide()
     $('#predict_section').hide()
     $('#descriptor_section').hide()
     $('#neighbor_blurb').hide()

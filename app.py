@@ -42,7 +42,7 @@ from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_d
 from flask_cors import CORS
 import bson
 from datetime import datetime
-
+from pymongo import MongoClient
 
 cmap_bokeh = Inferno256
 
@@ -179,6 +179,9 @@ def serve_MOFSimplify_logo():
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
 def process_feedback():
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    db = client.feedback
+    collection = db.MOFSimplify
     fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure']
     #$meta_fields = ['IP', 'datetime', 'cif_file', 'MOF_name']
     final_dict = {}
@@ -190,8 +193,9 @@ def process_feedback():
     final_dict['file'] = request.files['file'].read()
     final_dict['ip'] = request.remote_addr
     final_dict['timestamp'] = datetime.now().isoformat()
-
+    
     print(final_dict)
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection
     with open('sample.bson', 'wb') as outfile:
         outfile.write(bson.encode(final_dict))
     # TODO: limit file size

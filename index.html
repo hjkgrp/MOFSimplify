@@ -420,29 +420,36 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
           <!-- Feedback form for solvent neighbor -->
           <div id="solvent_neighbor_form">
-            <form style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
-              <i>Rate curated experimental stability data:</i>
-              <input id="solvent_rating" type="text" class="rating" data-size="md">
+            <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_neighbor_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+              <input type="hidden" name="feedback_form_name" value="solvent_stability_neighbor" />
+              <input type="hidden" name="cif_file_name" value="" />
+              <input type="hidden" name="structure" value="" />
+              <i>Rate this prediction:</i>
+              <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
               <div style="" class="input-group mt-2">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
                 </div>
-                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
                   class="form-control" required>
               </div>
-              <select id="inputState" class="form-control mt-2 mb-0">
-                <option selected="">Reason for rating...</option>
-                <option>...</option>
+              <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+                <option value="">Reason for rating...</option>
+                <option>I've worked with this MOF before, the prediction is good</option>
+                <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
+                <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+                <option>The paper is incorrect (provide reasoning in comment field)</option>
+                <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
               </select>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
                 </div>
-                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
                   class="form-control">
               </div>
               <div class="custom-file form-control mt-2">
-                <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
                 <label class="custom-file-label" for="validatedCustomFile">Upload File (optional; .pdf, .jpg, .png, .tiff, .eps; 20 MB max)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
               </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
@@ -470,29 +477,36 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           </div>
           <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
           <div id="thermal_neighbor_form">
-            <form style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
-              <i>Rate curated experimental stability data:</i>
-              <input id="solvent_rating" type="text" class="rating" data-size="md">
+            <form class='col-10' style='font-size:22px;margin-left:15px' id='thermal_stability_neighbor_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+              <input type="hidden" name="feedback_form_name" value="thermal_stability_neighbor" />
+              <input type="hidden" name="cif_file_name" value="" />
+              <input type="hidden" name="structure" value="" />
+              <i>Rate this prediction:</i>
+              <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
               <div style="" class="input-group mt-2">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
                 </div>
-                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
                   class="form-control" required>
               </div>
-              <select id="inputState" class="form-control mt-2 mb-0">
-                <option selected="">Reason for rating...</option>
-                <option>...</option>
+              <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+                <option value="">Reason for rating...</option>
+                <option>I've worked with this MOF before, the prediction is good</option>
+                <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
+                <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+                <option>The paper is incorrect (provide reasoning in comment field)</option>
+                <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
               </select>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
                 </div>
-                <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
                   class="form-control">
               </div>
               <div class="custom-file form-control mt-2">
-                <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
                 <label class="custom-file-label" for="validatedCustomFile">Upload File (optional; .pdf, .jpg, .png, .tiff, .eps; 20 MB max)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
               </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
@@ -672,32 +686,37 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     <div id="pills-data" class="container">
 
-        <div class="col-12" id="thermal_form">
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback'>
+        <div class="col-12" id="upload_form">
+
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='upload_form_element' action='/process_feedback' method="POST" enctype="multipart/form-data">
             <i class='zebra'>Upload information on your MOF!</i>
+            <input type="hidden" name="feedback_form_name" value="upload_form" />
+            <input type="hidden" name="cif_file_name" value="" />
+            <input type="hidden" name="structure" value="" />
+            <input type="hidden" name="rating" value="" />
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
                 class="form-control" required>
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
               </div>
-              <input type="text" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+              <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
                 class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input type="file" class="custom-file-input" id="validatedCustomFile" required>
-              <label class="custom-file-label" for="validatedCustomFile">Upload MOF (.cif)</label>
+              <input name="cif_file" type="file" class="custom-file-input" id="validatedCustomFile" required>
+              <label class="custom-file-label" for="validatedCustomFile">Upload MOF (.cif; Required)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
             <div class="custom-file form-control mt-2">
-              <input type="file" class="custom-file-input" id="validatedCustomFile" required>
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile" required>
               <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
-                .tiff, .eps; 20 MB max)</label>
+                .tiff, .eps; 20 MB max; Required)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
             <button type="submit" class="btn btn-primary mt-2">Submit</button>
@@ -2429,6 +2448,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               + '<br />Nearest neighbor DOI: ' + response['doi'] + '<br />Experimentally observed to be stable upon solvent removal? No' // <br /> for a new line in display
           }
           $('#solvent_neighbor_form').show()
+          $('#solvent_neighbor_form input[name=cif_file_name]').val(my_neighbor);
+          $('#solvent_neighbor_form input[name=structure]').val('');
         })
     })
 
@@ -2517,6 +2538,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
             + '&#8451';
           $('#thermal_neighbor_form').show()
+          $('#thermal_neighbor_form input[name=cif_file_name]').val(my_neighbor);
+          $('#thermal_neighbor_form input[name=structure]').val(''); // Populate the feedback form with metadata
         })
 
       $.post("/TGA_plot", JSON.stringify(my_neighbor)).done(function (response) {

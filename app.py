@@ -207,6 +207,17 @@ def process_feedback():
     file_ext = os.path.splitext(filename)[1].lower()
     if file_ext not in app.config['UPLOAD_EXTENSIONS']:
         return flask.send_from_directory('./splash_page/', 'error.html')
+
+    # Special tasks if the form is upload_form
+    if request.form.get('feedback_form_name') == 'upload_form':
+        uploaded_cif = request.files['cif_file']
+        cif_filename = secure_filename(uploaded_cif.filename)
+        file_ext = os.path.splitext(cif_filename)[1].lower()
+        if file_ext != '.cif':
+            return flask.send_from_directory('./splash_page/', 'error.html')
+        final_dict['cif_file_name'] = cif_filename
+        final_dict['structure'] = uploaded_cif.read()
+
     final_dict['ip'] = request.remote_addr
     final_dict['timestamp'] = datetime.now().isoformat()
     

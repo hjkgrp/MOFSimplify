@@ -40,6 +40,7 @@ import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
+import json
 
 
 cmap_bokeh = Inferno256
@@ -49,7 +50,7 @@ MOFSIMPLIFY_PATH += '/'
 USE_SPLASH_PAGE = False
 
 app = flask.Flask(__name__)
-app.secret_key = 'hjk_secret_key_mofsimplify_2021' # secret key
+app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
 ### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask

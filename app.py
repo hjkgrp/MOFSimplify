@@ -44,6 +44,8 @@ import bson
 from datetime import datetime
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
+import json
+
 
 cmap_bokeh = Inferno256
 
@@ -52,9 +54,9 @@ MOFSIMPLIFY_PATH += '/'
 USE_SPLASH_PAGE = False
 
 app = flask.Flask(__name__)
-app.secret_key = 'hjk_secret_key_mofsimplify_2021' # secret key
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 20 # Upload max 20 megabytes
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg', '.png', '.pdf', '.tiff', '.tif', '.eps']
+app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
 ### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask

@@ -40,6 +40,11 @@ import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
+import bson
+from datetime import datetime
+from pymongo import MongoClient
+from werkzeug.utils import secure_filename
+import json
 
 
 cmap_bokeh = Inferno256
@@ -49,7 +54,9 @@ MOFSIMPLIFY_PATH += '/'
 USE_SPLASH_PAGE = False
 
 app = flask.Flask(__name__)
-app.secret_key = 'hjk_secret_key_mofsimplify_2021' # secret key
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 20 # Upload max 20 megabytes
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg', '.png', '.pdf', '.tiff', '.tif', '.eps']
+app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
 ### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask
@@ -174,19 +181,51 @@ def serve_banner_dark():
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
 
+@app.route('/images/bg.jpg')
+def serve_bg():
+    # Hack to show the background image on the success/failure screens.
+    return flask.send_from_directory('./splash_page/images', 'bg.jpg')
+
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
 def process_feedback():
-    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments']
-    # TODO: limit file size
-    print('printing out field values:')
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    db = client.feedback
+    collection = db.MOFSimplify
+    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure']
+    #$meta_fields = ['IP', 'datetime', 'cif_file', 'MOF_name']
+    final_dict = {}
     for field in fields:
-        print(field)
-        print(request.form.get(field))
-    print(request.files['file'].content_length)
-    print(request.files['file'].content_type)
-    request.files['file'].save('uploaded_file.pdf')
-    return 'file uploaded successfully'
+        final_dict[field] = request.form.get(field)
+
+    # Populate special fields
+    uploaded_file = request.files['file']
+    final_dict['filetype'] = uploaded_file.content_type
+    filename = secure_filename(uploaded_file.filename)
+    final_dict['filename'] = filename
+    final_dict['file'] = uploaded_file.read()
+    file_ext = os.path.splitext(filename)[1].lower()
+    if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+        return flask.send_from_directory('./splash_page/', 'error.html')
+
+    # Special tasks if the form is upload_form
+    if request.form.get('feedback_form_name') == 'upload_form':
+        uploaded_cif = request.files['cif_file']
+        cif_filename = secure_filename(uploaded_cif.filename)
+        file_ext = os.path.splitext(cif_filename)[1].lower()
+        if file_ext != '.cif':
+            return flask.send_from_directory('./splash_page/', 'error.html')
+        final_dict['cif_file_name'] = cif_filename
+        final_dict['structure'] = uploaded_cif.read()
+
+    final_dict['ip'] = request.remote_addr
+    final_dict['timestamp'] = datetime.now().isoformat()
+    
+    print(final_dict)
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    with open('sample.bson', 'wb') as outfile:
+        outfile.write(bson.encode(final_dict))
+    return flask.send_from_directory('./splash_page/', 'success.html')
 
 
 ## Splash page management

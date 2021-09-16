@@ -124,7 +124,19 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 <!-- Empty head section: place meta tags and favicon here -->
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition, debugging -->
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-L5DP2Y2607"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-L5DP2Y2607');
+  </script>
+  <!--   End of Google Analytics stuff -->
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition -->
 
   <title>MOFSimplify</title>
   <meta name="description"

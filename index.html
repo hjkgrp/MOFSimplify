@@ -2743,13 +2743,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     white = '#FFFFFF'
     $('#dark_mode').click(function () { // change background and button text depending on button state
       button_text = document.getElementById('dark_mode').textContent
-      if (button_text == 'Dark mode') {
+      if (button_text == 'Dark mode') { // make background dark and text white
         $('body').css("background-color", black);
         document.getElementById('dark_mode').textContent = 'Light mode';
         $('.zebra').css('color', white)
         $('#header_background').css('background-image', 'url(\'banner_dark\')')
       }
-      else {
+      else { // Button says Light mode; make background white and text black
         $('body').css("background-color", white);
         document.getElementById('dark_mode').textContent = 'Dark mode';
         $('.zebra').css('color', black)

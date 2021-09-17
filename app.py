@@ -60,9 +60,10 @@ app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
 ### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask
-login_manager = LoginManager()
-login_manager.init_app(app)
-users = {'user1':{'password':'MOFSimplify!Beta2021'}}
+# uncomment these lines and the login manager functions to get the splash up
+# login_manager = LoginManager()
+# login_manager.init_app(app)
+# users = {'user1':{'password':'MOFSimplify!Beta2021'}}
 
 def precision(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
@@ -93,25 +94,25 @@ thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_ep
 class User(UserMixin):
   pass
 
-@login_manager.user_loader
-def user_loader(username):
-  if username not in users:
-    return
-  user = User()
-  user.id = username
-  return user
+# @login_manager.user_loader
+# def user_loader(username):
+#   if username not in users:
+#     return
+#   user = User()
+#   user.id = username
+#   return user
 
-@login_manager.request_loader
-def request_loader(request):
-  username = request.form.get('username')
-  if username not in users:
-    return
-  user = User()
-  user.id = username
+# @login_manager.request_loader
+# def request_loader(request):
+#   username = request.form.get('username')
+#   if username not in users:
+#     return
+#   user = User()
+#   user.id = username
 
-  user.is_authenticated = request.form['password'] == users[username]['password']
+#   user.is_authenticated = request.form['password'] == users[username]['password']
 
-  return user
+#   return user
 
 ### End of splash page management
 
@@ -234,20 +235,25 @@ def process_feedback():
 def index(path='index.html'):
   if request.method == 'POST':
     username = 'user1'
-    if request.form.get('password') == users[username]['password']:
-      user = User()
-      user.id = 'user1'
-      flask_login.login_user(user)
+    # user = User()
+    # user.id = username
+    # flask_login.login_user(user)
+    # This is the section where the password is checked.
+    # if request.form.get('password') == users[username]['password']:
+    #   user = User()
+    #   user.id = 'user1'
+    #   flask_login.login_user(user)
   # print('is user authenticated?')
   # print(current_user.is_authenticated)
   # print('input check')
   # print(request.form.get('password'))
-  if current_user.is_authenticated:
-    return flask.send_from_directory('.', 'index.html')
-  elif request.form.get('password') == None:
-    return flask.send_from_directory('./splash_page/', path)
-  else:
-    return flask.send_from_directory('./splash_page/', 'index_wrong_password.html')
+  # if current_user.is_authenticated:
+  #   return flask.send_from_directory('.', 'index.html')
+  # elif request.form.get('password') == None:
+  #   return flask.send_from_directory('./splash_page/', path)
+  # else:
+  #   return flask.send_from_directory('./splash_page/', 'index_wrong_password.html')
+  return flask.send_from_directory('.', 'index.html')
 
 @app.route('/about.html')
 def serve_about():

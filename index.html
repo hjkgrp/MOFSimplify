@@ -273,6 +273,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'
             style='font-size:22px;'>Building block assembly</button>
 
+          <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be clean and solvent free</p>
+
         </div>
 
       </div>
@@ -1281,6 +1283,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#thermal_form').hide()
       $('#solvent_neighbor_form').hide()
       $('#thermal_neighbor_form').hide()
+      $('#cif_hint').hide()
 
 
 
@@ -1375,6 +1378,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#upload').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
       $('#predict_section').show()
       $('#status_section').show()
+      $('#cif_hint').show()
     });
 
     // Code that updates the file upload text in any input form (i.e. change "Upload file..." to "file.pdf")
@@ -2888,6 +2892,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     $('#thermal_neighbor_section').hide()
     $('#solvent_neighbor_section').hide()
     $('#status_section').hide()
+    $('#cif_hint').hide()
 
     function viewer_hider() {
       $('#pills-vis').hide()

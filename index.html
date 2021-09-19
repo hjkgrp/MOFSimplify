@@ -1,6 +1,6 @@
 <!-- This code uses much of the code from molSimplify Lite. There are additional buttons for solvent removal and thermal stability predictions, and many MOF centered operations (visualization, component identification, etc). An example MOF is prepared by default, using fetch. 
 In a terminal, navigate to folder containing app.py.
-Then, to open the website, run python app.py in the terminal. Copy and paste http://0.0.0.0:8000/ into the Safari URL bar.
+Then, to open the website, run python app.py in the terminal. Copy and paste http://0.0.0.0:8000/ into the search browser URL bar.
 -->
 
 
@@ -78,27 +78,17 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     content: "";
     background-image: url('banner_light');
     background-size: cover;
-    /*  position: absolute;
-*/
     top: 0px;
     right: 0px;
     bottom: 0px;
     left: 0px;
   }
 
-  /*background image in header of website*/
-  /*#header_background::before { 
-}*/
-
   body {
     /* The font to be used everywhere */
     font-family: Arial, Helvetica, sans-serif;
     color: black;
     font-size: 16px;
-
-    /*background color*/
-    /*  background-color: black;
-*/
   }
 
   .pill-custom {
@@ -136,7 +126,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   </script>
   <!--   End of Google Analytics stuff -->
 
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> <!-- Gianmarco addition -->
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
 
   <title>MOFSimplify</title>
   <meta name="description"
@@ -168,18 +158,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <a class="nav-link" href="about.html">About</a> TODO?
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="https://github.com/hjkgrp/molSimplify">Source Code</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://molsimplify.readthedocs.io/en/latest/Installation.html">Installation Instructions</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="http://hjkgrp.mit.edu/molSimplify-tutorials">Tutorials</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://molsimplify.readthedocs.io/en/latest/">Documentation</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="how_to_cite.html">How to Cite</a> TODO?
             </li> -->
           <li class="nav-item" style='padding-left: 30px;'>
@@ -200,21 +178,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   <div class="container">
     <div class="page-header" id="banner">
       <div class="row">
-        <!--         <img style='width: 100%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='mof_simplify_light.png' alt='MOFSimplify banner'>
- -->
         <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
           <!-- Title -->
           <span style='position:relative;'>
-            <!--             <img style='width: 40%; display:  block; margin-left:  auto; margin-right:  auto; margin-top: 0.5cm;' src='MOF_logo.png' alt='MOFSimplify logo'> 
- -->
+            <!-- The zebra class changes color depending if Dark mode is toggled on or not. -->
             <p style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50; margin-top: 6cm;"
               class='zebra'>The <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT <br> Powered by <a
                 class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a></p>
-
-            <!-- Subtitle -->
-            <!--             <p style="width:100%; text-align:center;">
-              <span style="font-size:26px;" class='zebra'>Analyze metal-organic frameworks (MOFs) below!</span><br>
-            </p> -->
           </span>
         </div>
       </div>
@@ -224,11 +194,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     <!-- The 4 tabs of the website -->
     <ul class="nav nav-pills mb-3" id="pills-tab"
       style="overflow-x: auto;text-align: center;margin-left:-15px;margin-right:-15px;margin-bottom: 10px;border-bottom-width: 1px;border-bottom-style: solid; border-bottom-color:#d6d9dc; flex-wrap:nowrap;">
-      <!--     <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
- -->
-      <!--       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-home-tab" data-toggle="pill" data-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
-      </li> -->
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom active" id="pills-main-tab"
           style='width:100%; height:100%; font-weight: bold; font-size:24px;'>Main</button>
@@ -245,57 +210,39 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <button class="nav-link pill-custom" id="pills-data-tab"
           style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Data Upload</button>
       </li>
-      <!--       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
-        <button class="nav-link pill-custom" id="pills-bb-tab" style='width:100%; height: 100%; font-weight: bold;'>Building Block Assembly</button>
-      </li> -->
-      <!--       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-stat-tab" data-toggle="pill" data-target="#pills-stat" type="button" role="tab" aria-controls="pills-stat" aria-selected="false">Status messages and MOF predictions</button>
-      </li> -->
     </ul>
 
-    <div id="pills-main" class="container">
-
+    <!-- The Main tab of the website -->
+    <div id="pills-main" class="container"> 
       <b style='font-size:22px;' class='zebra'> 1) Select a MOF (metal-organic framework) for analysis</b>
       <!-- Create a section containing buttons -->
       <div class='col-lg-12'>
-
         <div style='width:100%; text-align:center; margin-top:0.25cm;'>
-
           <!-- Button for queuing up the example MOF cif file -->
           <button class='btn btn-primary round_button selection_button' id='load' type='button'
             style='font-size:22px;'>Example MOF</button>
-
           <!-- Button for uploading MOF cif file -->
           <button class='btn btn-primary round_button selection_button' id='upload' type='button'
             style='font-size:22px;'>Custom (upload cif file)</button>
-
           <!-- Button for uploading MOF cif file -->
           <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'
             style='font-size:22px;'>Building block assembly</button>
-
           <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p>
-
         </div>
-
       </div>
 
       <div id='predict_section' style='margin-top: 1cm;'>
         <b style='font-size:22px;' class='zebra'> 2) Predict properties of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
-
           <div style='width:100%; text-align:center; margin-top:0.25cm;'>
-
             <!-- Button for predicting solvent removal stability of MOF -->
             <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
               id='predict_s' type='button'>Stability upon solvent removal</button>
-
             <!-- Button for predicting thermal stability of MOF -->
             <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
               id='predict_t' type='button'>Thermal stability</button>
-
           </div>
-
         </div>
       </div>
 
@@ -303,15 +250,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <b style='font-size:22px;' class='zebra'> 3) Download descriptors of the selected MOF </b>
         <!-- Create a section containing buttons -->
         <div class='col-lg-12'>
-
           <div style='width:100%; text-align:center; margin-top:0.25cm;'>
-
             <!-- Button for downloading descriptors of MOF -->
             <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
               id='download_descriptors' type='button'>Download descriptors</button>
-
           </div>
-
         </div>
       </div>
 
@@ -402,14 +345,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <div class='col-12' style='font-size:22px;' id='chart'></div>
       </div>
 
-
       <div class='row' id='neighbor_blurb'>
-
         <p class='col-12 zebra' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of
           training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used
           to
           train an ANN.</p>
-
       </div>
 
       <div class='row'>
@@ -469,7 +409,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
             </form>
           </div>
-
         </div>
 
         <div class='col-6 zebra' style='font-size:22px;' id='thermal_neighbor_section'>
@@ -534,13 +473,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they
               intersect, and the point of intersection is taken to be the breakdown temperature.</p>
           </div>
-
         </div>
-
       </div>
     </div>
 
 
+    <!-- The Visualization tab of the website -->
     <div id="pills-vis">
       <!-- MOF viewer and buttons -->
 
@@ -568,10 +506,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       <div style='width:100%; text-align:center;'>
         <div style='display:inline-block; font-size: 22px;' id='status_visualization'></div>
       </div>
-
-
     </div>
 
+    <!-- The Component Analysis tab of the website -->
     <div id="pills-comp">
       <div class='row'>
         <div class='col-lg-6' style='margin-top: 0.5cm;'>
@@ -600,16 +537,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <div class='col-lg-6' style='margin-top: 0.5cm;'>
           <!-- Button for getting MOF components for visualization  -->
           <div style='width:100%; text-align:center;'>
-
             <button style='display:inline-block; width:80%; font-size: 22px; margin-bottom: 0.5cm;'
               class='btn btn-primary round_button' id='get_components' type='button'>Get selected (1) MOF
               components</button>
           </div>
 
-          <!--           <p style='margin-top: 0.5cm; font-size: 22px;'> Can display MOF's linkers and SBUs after clicking the Get selected (1) MOF components button (or the other 'components' buttons). Select the desired linker or SBU, then click Linker or SBU.</p> -->
-
-          <div id='comp_MOF' style='font-size: 22px;' class='zebra'> </div>
-          <!-- Will display information on what MOF's components are currently visualized -->
+          <div id='comp_MOF' style='font-size: 22px;' class='zebra'> </div> <!-- Will display information on what MOF's components are currently visualized -->
 
           <div style='font-size: 22px; margin-top: 0.5cm' class='zebra'>
             Linkers
@@ -626,7 +559,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <button style='display:inline-block; width:80%; margin-bottom: 0.5cm; font-size: 22px;'
               class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Filter by
               connectivity</button>
-
           </div>
 
           <div class='col-12 zebra'>
@@ -640,6 +572,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       </div>
     </div>
 
+    <!-- The building block section of the website -->
     <div id="pills-bb" style='font-size: 20px;' class='zebra'>
       A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building
       blocks (bb). <br>
@@ -662,7 +595,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       <datalist id='linkers_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
-
 
       <!-- Selection box for metal SBU building block -->
       <div style='font-size: 22px;' class='zebra'>
@@ -698,6 +630,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     </div>
 
 
+      <!-- The Data Upload tab of the website -->  
     <div id="pills-data" class="container">
 
         <div class="col-12" id="upload_form">
@@ -737,13 +670,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           </form>
         </div>
     </div>
-
-
-    <!--       <div class="tab-pane fade" id="pills-stat" role="tabpanel" aria-labelledby="pills-stat-tab">
-    </div> -->
-
-
-
 
   </div>
 
@@ -792,7 +718,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   // Lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization.
 
   // ***** Beginning of section with a lot of copied code from the Snurr group's GitHub. *****
-  // With some modifications for our purposes, specifically in the handleInput function. Also, the OOM message
+  // With some modifications for our purposes, specifically in the handleInput function. Also, the OOM message. 
 
   var stage;
 
@@ -942,14 +868,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // if not, default to visualize the MOF that is queued up
 
     if (s_neighbor) { // In this case, want to visualize the solvent stability ANN neighbor
-      console.log('Check A')
-
       // grab the current solvent neighbor MOF cif file
 
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
-
-      console.log(my_neighbor)
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
         if (!response.ok) { // catching 404 and other issues
@@ -1004,7 +926,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 
   handleVisualization = function (ciffile) {
-    console.log('handle visualization check')
     //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
     var cifreader = new FileReader();
     cifreader.onload = function (event) {
@@ -1031,8 +952,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         document.getElementById("viewportwrapper").classList.add("inactive");
       }
     };
-    // console.log('Check check')
-    // console.log(ciffile instanceof Blob)
 
     // The below try-catch fixes a Chrome issue for visualizing neighbors (Uncaught TypeError: Failed to execute 'readAsText' on 'FileReader': parameter 1 is not of type 'Blob'.)
     try {
@@ -1096,9 +1015,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       /* See class documentation at http://nglviewer.org/ngl/api/class/src/stage/stage.js~Stage.html */
       /* See also the general documentation at http://nglviewer.org/ngl/api/manual/ */
     });
-    // console.log('PDB check') // debugging
-    // console.log(path_to_cif)
-    // console.log(ngl_stage)
     return component;
   }
 
@@ -1134,7 +1050,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         //text = text.replace(/</g, "&lt;");
         //text = text.replace(/>/g, "&gt;");
         //text = text.replace('\n', '<br>', 'g');
-        console.log(text);
         if (element) {
           element.value += text + "\n";
           element.scrollTop = element.scrollHeight; // focus on bottom
@@ -1187,16 +1102,14 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
   // If the user chooses to try to visualize a MOF (either the selected MOF or a neighbor MOF), visualization is attempted by the website three times
   // This is because OOM errors are sometimes thrown upon visualization, but upon retrying, visualization often succeeds
-  // A cap of three is used because some MOFs will always fail visualization (if they are too large, or this code just doesn't like them)
+  // A cap of three is used because some MOFs will always fail visualization (if their unit cell from the cif is too large, or this code just doesn't like them)
   // After three failed tries, an error alert is shown to the user
   window.onerror = function (event) {
     if (vis_error_counter == MAX_VIS_ERROR) {
       //Module.setStatus('Exception thrown in visualization; please retry the operation.');
       document.getElementById("viewportnote").innerHTML = "Visualization failed";
-      alert('Exception thrown in visualization; please retry the operation.')
-      // $('#status_visualization').text('Exception thrown in visualization; please retry the operation.'); // out of memory (OOM)
-
-      //spinnerElement.style.display = 'none';
+      alert('MOF cannot be visualized.') // out of memory (OOM). Exception thrown in visualization
+      // $('#status_visualization').text('Exception thrown in visualization; please retry the operation.'); 
 
       $('#currently_visualized').text(''); // clear the message about which MOF is visualized if OOM occurs
 
@@ -1213,9 +1126,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       // $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
       vis_error_counter += 1
       vis_failure = true
-      console.log('vis error')
-      console.log(vis_error_counter)
-      console.log(vis_failure)
 
       handleInput(solvent_neighbor_vis, thermal_neighbor_vis); // handles visualization, will display the MOF in the appropriate box (viewportwrapper) 
     }
@@ -1224,7 +1134,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   // ***** End of section with a lot of copied code. *****
 
 
-  // tags for changing the selection button colors
+  // tags for changing the selection button colors, depending on if an operation is successfully completed or not
   failure_red = '#A33B20';
   success_green = '#18bc9c';
   inprogress_yellow = '#F7B801'
@@ -1285,8 +1195,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#thermal_neighbor_form').hide()
       $('#cif_hint').hide()
 
-
-
       // clearing previous predictions
       $('#solvent_stability_prediction').text('');
       $('#thermal_stability_prediction').text('');
@@ -1308,7 +1216,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
       $('#tga_explanation').hide() // hide the explanatory TGA graphic on simplified TGA plots
 
-
       // Clearing visualizations and dropdowns.
       clearViewer(stage); // no MOF is displayed in the visualizer now
       component_viewer.clear(); // likewise, clear component visualizer
@@ -1321,7 +1228,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       document.getElementById('container-01-note').innerHTML = 'MOF linkers and SBUs are visualized here. <br> Left click to rotate, scroll with mouse to zoom.';
     }
 
-    function color_reset() { // resets the colors of the selection and prediction and visualize and component buttons
+    // Resets the colors of the selection and prediction and visualize and component buttons
+    function color_reset() { 
       load_color = original_blue;
       upload_color = original_blue;
       bb_redirect_color = original_blue;
@@ -1391,7 +1299,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     $("#visualize").on('click', function () {
       vis_error_counter = 0 // used to track how many failed visualizations in a row for one MOF
       vis_failure = false // used to track if OOM error is thrown for this MOF
-      // visualize_color = inprogress_yellow; // TODO fix
+      // visualize_color = inprogress_yellow; // could not get this to work
       // $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
 
       clearViewer(stage); // no MOF is displayed in the visualizer now
@@ -1466,7 +1374,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       message = message + my_neighbor
 
       $('#currently_visualized').text(message);
-      // $('status_visualization').text(''); // clear the OOM message
 
       visualize_color = original_blue;
       $('#visualize').css({ 'background-color': original_blue, 'border-color': original_blue }); // setting button color 
@@ -1507,7 +1414,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       message = message + my_neighbor
 
       $('#currently_visualized').text(message);
-      // $('status_visualization').text(''); // clear the OOM message
 
       visualize_color = original_blue;
       $('#visualize').css({ 'background-color': original_blue, 'border-color': original_blue }); // setting button color 
@@ -1557,6 +1463,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         myDict = { 'name': name, 'structure': result }
 
+        // The $ is jquery. The post stuff sends a command to the app.py code to execute the function that is routed to by /predict_solvent_stability
+        // It is a post request rather than a get request because information is sent to the backend (in a get request no information is sent)
         $.post("/predict_solvent_stability", JSON.stringify(myDict)).done(
           function (response) {
 
@@ -1579,6 +1487,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             $('#solvent_neighbor_section').show()
             $('#descriptor_section').show() // show section where can download descriptors
 
+            // There are two possibilities. Either a prediction is made, or the selected MOF is in the ANN's training data and so no prediction is made and instead the ground truth is returned.
             if (!response['in_train']) { // a prediction was made
               var prediction = response['prediction']
 
@@ -1697,7 +1606,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         }
       }
 
-      // alert('You are about to begin a thermal stability prediction. Ck=')
+      // alert('You are about to begin a thermal stability prediction.')
       thermal_pred_color = inprogress_yellow;
       $('#predict_t').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress 
       $('#thermal_stability_prediction').text('The thermal stability prediction is loading...'); // display prediction result
@@ -1737,6 +1646,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             $('#thermal_neighbor_section').show()
             $('#descriptor_section').show() // show section where can download descriptors
 
+            // There are two possibilities. Either a prediction is made, or the selected MOF is in the ANN's training data and so no prediction is made and instead the ground truth is returned.
             if (!response['in_train']) { // a prediction was made
               prediction = response['prediction'];
               $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
@@ -1766,8 +1676,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 setColor(prediction_field, response_color)
                 setColor(thermal_form, response_color)
               })
-
-
 
               myDict = { 'prediction': true, 'temperature': prediction }
               $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
@@ -1814,10 +1722,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
               $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function (response) {
                 $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-
-                console.log('check check')
-                console.log(response)
-                console.log(response >= 60)
 
                 percentile_field = document.getElementById('thermal_stability_percentile');
                 prediction_field = document.getElementById('thermal_stability_prediction');
@@ -1900,8 +1804,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           $.get("/get_ID").done(
             function (response) {
               my_ID = response
-              console.log('ID check')
-              console.log(response)
 
               fetch('bbcif/primitive_' + name + '~' + my_ID).then(response => { // grabbing the MOF from local host
                 if (!response.ok) { // catching 404 and other issues
@@ -1913,7 +1815,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 var myFile = new File([blob], "example.cif", { type: "", lastModified: Date.now() }) // making a cif file
                 document.getElementById('bbg_MOF_holder').value = myFile; //bbMOF
 
-                $('#upload_status').text('Selected MOF (assembled): ' + name); // TODO make possible for multiple linkers and sbus?
+                $('#upload_status').text('Selected MOF (assembled): ' + name);
                 bb_redirect_color = success_green;
                 $('#bb-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
                 $('#pills-main-tab').click() // redirecting to appropriate tab
@@ -1979,8 +1881,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // Get MOF linkers and sbus when the "Get selected (1) MOF components" button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function () {
-      console.log('print check A')
-
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
@@ -2008,7 +1908,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         }
       }
 
-      console.log('print check B')
       component_color = inprogress_yellow;
       $('#get_components').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress
 
@@ -2017,15 +1916,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       // myFile.text() is a promise
       myFile.text().then(function (result) {
 
-        console.log('print check B2')
-
         myDict = { 'name': name, 'structure': result }
 
         // result is the text of the loaded .cif file
         $.post("/get_components", JSON.stringify(myDict)).done(
           function (response) {
-
-            console.log('print check C')
 
             if (response == 'FAILED') {
               alert('Failed to featurize.')
@@ -2060,12 +1955,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               sbu_dropdown.add(option);
             }
 
-            console.log('print check D')
-
             // Storing the linker and sbu data.
             document.getElementById('components_holder').value = result;
-
-            console.log('print check E')
 
             $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 
@@ -2259,7 +2150,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     });
 
 
-    function clear_component_dropdowns() { // clear dropdowns when upload new file
+    // This function is used to clear dropdowns
+    function clear_component_dropdowns() { 
       // Clearing the linker dropdown.
       var linker_dropdown = document.getElementById('linker');
       var length = linker_dropdown.options.length;
@@ -2290,6 +2182,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       var linker_dropdown = document.getElementById('linker');
       var sbu_dropdown = document.getElementById('sbu');
 
+      // Two different cases, depending if we are toggling unique components on or off
       if (document.getElementById('toggle_unique_components').textContent == 'Filter by connectivity') { // Want only unique components.
         document.getElementById('toggle_unique_components').textContent = 'No filter'; // cycle the button text on click
 
@@ -2312,7 +2205,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           option.text = 'SBU ' + j.toString();
           sbu_dropdown.add(option);
         }
-
 
       }
       else if (document.getElementById('toggle_unique_components').textContent == 'No filter') { // Want No filter.
@@ -2438,8 +2330,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
-      console.log('check check')
-      console.log(my_neighbor)
 
       // Get the latent space distance from the information returned from the prediction.
       dictionary = document.getElementById('solvent_neighbors_holder').value;
@@ -2666,13 +2556,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       }
 
       var name = document.getElementById('comp_MOF').innerHTML; // getting the name of the MOF for which components are being visualized
-      console.log(name)
       name = name.split(': ');
       name = name.slice(-1)[0]; // getting the last element of the array
       if (name.substring(name.length - 4) == '.cif') { // getting rid of the .cif part
         name = name.substring(0, name.length - 4)
       }
-      console.log(name)
 
       // I do this instead of redirecting to the xyz file (which would be simpler) in order to specify the name of the downloaded xyz file, make it more informative
       if (component == 'Linker') {
@@ -2764,8 +2652,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     const matches = container.querySelectorAll('li.nav-item > button') // Getting the tab options
     var triggerTabList = [].slice.call(matches) // making the tab options into a list
     triggerTabList.forEach(function (triggerEl) { // going through each of the tab options
-      console.log('Check hit')
-      console.log(triggerEl)
       var tabTrigger = new bootstrap.Tab(triggerEl)
 
       triggerEl.addEventListener('click', function (event) {
@@ -2773,6 +2659,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         tabTrigger.show()
       })
     })
+
+    // The code below that has a lot of hide and show operations is the tab functionality that allows the user to switch tabs.
+    // For example, when the Visualization tab is clicked, all website displays that don't have to do with visualization are hidden, and visualization functionality is shown
 
     $('#bb-redirect').click(function () {
       // $('#pills-bb-tab').click()
@@ -2783,8 +2672,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-data').hide()
     })
 
-
-    $('#pills-main-tab').click(function () {
+    $('#pills-main-tab').click(function () { // Main tab
       $('#pills-main').show()
       $('#pills-vis').hide()
       $('#pills-comp').hide()
@@ -2792,8 +2680,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-data').hide()
     })
 
-    $('#pills-vis-tab').click(function () {
-      // console.log('vis tab clicked')
+    $('#pills-vis-tab').click(function () { // Visualization tab
       $('#pills-main').hide()
       $('#pills-vis').show()
       $('#pills-comp').hide()
@@ -2801,7 +2688,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-data').hide()
     })
 
-    $('#pills-comp-tab').click(function () {
+    $('#pills-comp-tab').click(function () { // Component Analysis tab
       $('#pills-main').hide()
       $('#pills-vis').hide()
       $('#pills-comp').show()
@@ -2809,7 +2696,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-data').hide()
     })
 
-    $('#pills-data-tab').click(function () {
+    $('#pills-data-tab').click(function () { // Data Upload tab
       $('#pills-main').hide()
       $('#pills-vis').hide()
       $('#pills-comp').hide()
@@ -2823,9 +2710,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     //   $('#pills-comp').hide()
     //   $('#pills-bb').show()
     // })
-
-    // // Start up page by virtually clicking the "Example MOF" button
-    // $('#load').click();
 
     // Below: populate the linkers, sbus, and net dropdowns in the building block section.
     // I run a script (tobacco_3.0/scrap_cifs.py) in the tobacco_3.0/edges_database folder, the tobacco_3.0/nodes_database folder, and the tobacco_3.0/template_database folder to get a nice array form of all of the available files. I then paste the array into the appropriate places below (for example, my_linkers = ARRAYOFOPTIONS)
@@ -2875,14 +2759,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         console.log(response)
       })
 
-    // // Let the new user know how many people are currently using MOFSimplify
-    // $.get("/curr_users").done(
-    //   function(response) {
-    //     alert('The current number of users on MOFSimplify: ' + response)
-    // })
-
     // On start up, hide certain sections
-    // $('#pills-vis').hide()
     $('#pills-comp').hide()
     $('#pills-bb').hide()
     $('#pills-data').hide()

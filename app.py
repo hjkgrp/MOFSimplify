@@ -121,19 +121,15 @@ def set_ID():
     # sets the session user ID. This is used to generate unique folders, so that multiple users can use the website at a time 
     # specifically, copies of the temp_file_creation folder
     session['ID'] = time.time() # a unique ID for this session
-    # print('MY ID CHECK 1')
-    # print(session['ID'])
 
     # make a version of the temp_file_creation folder for this user
     new_folder = MOFSIMPLIFY_PATH + '/temp_file_creation_' + str(session['ID'])
     shutil.copytree('temp_file_creation', new_folder)
     os.remove(new_folder + '/temp_cif.cif') # remove this, for sole purpose of updating time stamp on the new folder (copytree doesn't)
 
-    # print('walk check')
     # delete all temp_file_creation clone folders that haven't been used for a while, to prevent folder accumulation
     for root, dirs, files in os.walk(MOFSIMPLIFY_PATH):
         for dir in dirs:
-            # print(dir)
             target_str = 'temp_file_creation'
             if len(dir) > len(target_str) and target_str in dir and file_age_in_seconds(dir) > 7200: # 7200s is two hours
                 # target_str in dir since all copies start with temp_file_creation
@@ -147,7 +143,6 @@ def set_ID():
 def get_ID():
     # gets the session user ID. This is used for getting building block generated MOFs
     return str(session['ID']) # return a string
-
 
 @app.route('/demo')
 def serve_demo():
@@ -287,9 +282,6 @@ def serve_bbcif(path):
     path_parts = path.split('~')
     cif_name = path_parts[0]
     user_ID = path_parts[1]
-    # print('ID check')
-    # print(session)
-    # print(session['ID'])
     return flask.send_from_directory('temp_file_creation_' + user_ID + '/tobacco_3.0/output_cifs', cif_name);
 
 @app.route('/neighbor/<path:path>') # needed for fetch
@@ -492,7 +484,6 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
         with tf_session.graph.as_default():
             ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
             new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
-            # print('success!')
 
             # Define the function for the latent space. This will depend on the model. We want the layer before the last, in this case this was the 12th one.
             get_latent = K.function([model.layers[0].input],
@@ -501,8 +492,6 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
             # Get the latent vectors for the training data first, then the latent vectors for the test data.
             training_latent = get_latent([X_train, 0])[0]
             design_latent = get_latent([X_newMOF, 0])[0]
-
-            # print(training_latent.shape,design_latent.shape)
 
     # Compute the pairwise distances between the test latent vectors and the train latent vectors to get latent distances
     d1 = pairwise_distances(design_latent,training_latent,n_jobs=30)
@@ -930,14 +919,6 @@ def ss_predict():
 
     timeStarted = time.time() # save start time (debugging)
     prediction, neighbor_names, neighbor_distances = run_solvent_ANN(str(session['ID']), MOFSIMPLIFY_PATH, name, solvent_model)
-
-    # print('check check')
-    # print(neighbor_names) # debugging
-    # print(neighbor_distances) # debugging
-    # print(type(neighbor_names)) # debugging
-    # print(type(neighbor_distances)) # debugging
-    # print(prediction) # debugging
-    # print(type(prediction))  # debugging  
 
     results = {'prediction': prediction,
         'neighbor_names': neighbor_names,

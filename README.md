@@ -3,11 +3,11 @@
 The MOF website for property prediction and community engagement.
 Runs on Chrome Version 93.0.4577.82, Safari Version 14.1.2, Firefox 92.0, and Edge.
 
-### How to run MOFSimplify (tested on Python 3.8.5):
+### How to run MOFSimplify locally (tested on Python 3.8.5):
 - Install Flask, molSimplify, and any other necessary dependencies.
-- Run `app.py` to start a server instance.
+- Run `python app.py` to start a server instance.
 - Go to `http://localhost:8000/` in your browser (or whatever address `app.py` prints)
-- Quit and re-run `app.py` every time you make changes to the frontend or backend.
+- Quit and re-run `python app.py` every time you make changes to the frontend or backend.
 
 ### Structure of MOFSimplify:
 - Backend: `app.py`

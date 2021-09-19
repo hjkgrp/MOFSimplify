@@ -153,10 +153,6 @@ def serve_demo():
 def serve_logo():
     return flask.send_from_directory('images', 'logo.png')
 
-@app.route('/truncated_logo.png')
-def serve_truncated_logo():
-    return flask.send_from_directory('images', 'truncated_logo.png')
-
 @app.route('/TGA_graphic.png')
 def serve_TGA_graphic():
     return flask.send_from_directory('images', 'TGA_graphic.png')
@@ -177,10 +173,10 @@ def serve_banner_dark():
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
 
-@app.route('/images/bg.jpg')
-def serve_bg():
-    # Hack to show the background image on the success/failure screens.
-    return flask.send_from_directory('./splash_page/images', 'bg.jpg')
+# @app.route('/images/bg.jpg')
+# def serve_bg():
+#     # Hack to show the background image on the success/failure screens.
+#     return flask.send_from_directory('./splash_page/images', 'bg.jpg')
 
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
@@ -259,11 +255,6 @@ def serve_about():
 def serve_example(path):
     # Serves example
     return flask.send_from_directory('mof_examples', path)
-
-@app.route('/ris_files/<path:path>')
-def serve_ris(path):
-    # Serves homepage
-    return flask.send_from_directory('ris_files', path)
 
 @app.route('/how_to_cite.html')
 def serve_cite():

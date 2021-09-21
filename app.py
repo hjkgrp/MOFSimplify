@@ -55,7 +55,7 @@ USE_SPLASH_PAGE = False
 
 app = flask.Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 20 # Upload max 20 megabytes
-app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg', '.png', '.pdf', '.tiff', '.tif', '.eps']
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg', '.png', '.pdf', '.tiff', '.tif', '.eps'] # acceptable file types
 app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
@@ -65,6 +65,7 @@ cors = CORS(app)
 # login_manager.init_app(app)
 # users = {'user1':{'password':'MOFSimplify!Beta2021'}}
 
+# The following three functions are needed for the ANN models.
 def precision(y_true, y_pred):
     true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
     predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
@@ -116,10 +117,22 @@ class User(UserMixin):
 
 ### End of splash page management
 
+# app.route takes jquery ($) requests from index.html and executes the associated function in app.py.
+# Output can then be returned to index.html.
+
 @app.route('/new_user', methods=['GET'])
 def set_ID():
-    # sets the session user ID. This is used to generate unique folders, so that multiple users can use the website at a time 
-    # specifically, copies of the temp_file_creation folder
+    """
+    set_ID sets the session user ID. 
+    This is also used to generate unique folders, so that multiple users can use the website at a time. 
+        The user's folder is temp_file_creation_[ID]
+    Specifically, the function copies the temp_file_creation folder for the current user so that the rest of MOFSimplify functionality can be executed for the current user in their own folder.
+        This lets multiple operations be run for different users concurrently.
+    This function also deletes temp_file_creation copies from other users that have not been used for a while, in order to reduce clutter.
+
+    :return: The session ID for this user.
+    """ 
+
     session['ID'] = time.time() # a unique ID for this session
 
     # make a version of the temp_file_creation folder for this user
@@ -141,14 +154,15 @@ def set_ID():
 
 @app.route('/get_ID', methods=['GET'])
 def get_ID():
-    # gets the session user ID. This is used for getting building block generated MOFs
+    """
+    get_ID gets the session user ID. 
+    This is used for getting building block generated MOFs.
+
+    :return: The session ID for this user.
+    """ 
     return str(session['ID']) # return a string
 
-@app.route('/demo')
-def serve_demo():
-    # Go to localhost:8000/demo to see this.
-    return 'you are on the demo page'
-
+# The send_from_directory functions that follow provide images from the MOFSimplify server to the website. The images are in a folder called images.
 @app.route('/logo.png')
 def serve_logo():
     return flask.send_from_directory('images', 'logo.png')
@@ -163,11 +177,11 @@ def serve_MOF5():
 
 @app.route('/banner_light')
 def serve_banner_light():
-    return flask.send_from_directory('images', 'MOF_light.webp') # google's webp format. It is optimized for websites and loads fast
+    return flask.send_from_directory('images', 'MOF_light.webp') # Google's webp format. It is optimized for websites and loads quickly.
 
 @app.route('/banner_dark')
 def serve_banner_dark():
-    return flask.send_from_directory('images', 'MOF_dark.webp') # google's webp format. It is optimized for websites and loads fast
+    return flask.send_from_directory('images', 'MOF_dark.webp') # Google's webp format. It is optimized for websites and loads quickly.
 
 @app.route('/MOF_logo.png')
 def serve_MOFSimplify_logo():
@@ -181,9 +195,14 @@ def serve_MOFSimplify_logo():
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
 def process_feedback():
+    """
+    process_feedback inserts MOFSimplify form feedback into the MongoDB database. 
+    If an uploaded file has an incorrect extension (i.e. is a disallowed file format), the user is directed to an error page.
+    """ 
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
+        # The first argument is the IP address. The second argument is the port.
     db = client.feedback
-    collection = db.MOFSimplify
+    collection = db.MOFSimplify # The MOFSimplify collection in the feedback database.
     fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure']
     #$meta_fields = ['IP', 'datetime', 'cif_file', 'MOF_name']
     final_dict = {}
@@ -220,7 +239,7 @@ def process_feedback():
     return flask.send_from_directory('./splash_page/', 'success.html')
 
 
-## Splash page management
+## Splash page management. Splash page is currently disabled.
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def index(path='index.html'):
@@ -248,27 +267,57 @@ def index(path='index.html'):
 
 @app.route('/about.html')
 def serve_about():
-    # Serves homepage
+    """
+    serve_about serves the about page.
+    So the user is redirected to the about page.
+
+    :return: The about page.
+    """ 
     return flask.send_from_directory('.', 'about.html')
 
 @app.route('/mof_examples/<path:path>') # needed for fetch
 def serve_example(path):
-    # Serves example
+    """
+    serve_example returns a file to MOFSimplify.
+    The file is intended to be a cif file of an example MOF. 
+    So, this function serves the example MOF.
+
+    :param path: The path to the desired example MOF in the mof_examples folder. For example, HKUST1.cif.
+    :return: The MOF specified in the path input.
+    """ 
     return flask.send_from_directory('mof_examples', path)
 
 @app.route('/how_to_cite.html')
 def serve_cite():
-    # Serves homepage
+    """
+    serve_cite serves the how to cite page.
+    So the user is redirected to the how to cite page.
+
+    :return: The how to cite page.
+    """ 
     return flask.send_from_directory('.', 'how_to_cite.html')
 
 @app.route('/libraries/<path:path>')
 def serve_library_files(path):
-    # Serves libraries
+    """
+    serve_library_files returns a file to MOFSimplify.
+    The file is intended to be a library file, either .js or .css.
+
+    :param path: The path to the desired library in the libraries folder. For example, jquery-3.4.1.min.js.
+    :return: The library specified in the path input.
+    """ 
     return flask.send_from_directory('libraries', path)
 
 @app.route('/bbcif/<path:path>')
 def serve_bbcif(path):
-    # Serves the building block generated MOF
+    """
+    serve_bbcif returns a file to MOFSimplify.
+    The file is intended to be a cif file for a MOF that was constructed using MOFSimplify's building block functionality.
+    So, this function serves the building block generated MOF.
+
+    :param path: The path to the desired MOF in the user's building block folder.
+    :return: The cif file for the building block generated MOF.
+    """ 
 
     path_parts = path.split('~')
     cif_name = path_parts[0]
@@ -277,7 +326,14 @@ def serve_bbcif(path):
 
 @app.route('/neighbor/<path:path>') # needed for fetch
 def serve_neighbor(path):
-    # Serves the neighbor CoRE MOF
+    """
+    serve_neighbor returns a file to MOFSimplify.
+    The file is intended to be a cif file for a latent space nearest neighbor MOF selected in a dropdown, either solvent or thermal.
+    So, this function serves the neighbor CoRE MOF.
+
+    :param path: The path to the desired MOF in the CoRE2019 folder.
+    :return: The cif file for the neighbor MOF.
+    """ 
     return flask.send_from_directory('CoRE2019', path);
 
 # @app.route('/neighbor_info/<path:path>')
@@ -291,6 +347,13 @@ def serve_descriptors(path):
     return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/merged_descriptors', path);
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
+    """
+    listdir_nohidden returns files in the current directory that are not hidden. 
+    It is used as a helper function in the bb_generate function.
+
+    :param path: The path to be examined.
+    :return: The non hidden files in the current path.
+    """ 
     myList = os.listdir(path);
     for i in myList:
         if i.startswith('.'):

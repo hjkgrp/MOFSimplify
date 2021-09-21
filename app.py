@@ -449,11 +449,25 @@ def bb_generate():
 
 ### Next, the prediction functions ### 
 
-# This function takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
-# This function also takes in fnames (the feature names) and lname (the target property name).
-# This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
-# It also "normalizes" y_train, which are the solvent stability flags in the training data dataframe, and returns x_scaler (which scaled X_train).
-def normalize_data_solvent(df_train, df_newMOF, fnames, lname, unit_trans=1, debug=False):
+
+def normalize_data_solvent(df_train, df_newMOF, fnames, lname, debug=False):
+    """
+    normalize_data_solvent takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+    This function also takes in fnames (the feature names) and lname (the target property name).
+    This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
+    It also standardizes y_train, which are the solvent stability flags in the training data dataframe, and returns x_scaler (which scaled X_train).
+        By standardizes, I mean that it makes the values of y_train either 0 or 1
+
+    :param df_train: A pandas dataframe of the training data.
+    :param df_newMOF: A pandas dataframe of the new MOF being analyzed.
+    :param fnames: An array of column names of the descriptors.
+    :param lname: An array of the column name of the target.
+    :param debug: A boolean that determines whether extra information is printed.
+    :return: numpy.ndarray X_train, the descriptors of the training data. Its number of rows is the number of MOFs in the training data. Its number of columns is the number of descriptors.
+    :return: numpy.ndarray X_newMOF, the descriptors of the new MOF being analyzed by MOFSimplify. It contains only one row.
+    :return: numpy.ndarray y_train, the solvent removal stabilities of the training data. 
+    :return: sklearn.preprocessing._data.StandardScaler x_scaler, the scaler used to normalize the descriptor data to unit mean and a variance of 1.
+    """ 
     _df_train = df_train.copy().dropna(subset=fnames+lname)
     _df_newMOF = df_newMOF.copy().dropna(subset=fnames) 
     X_train, X_newMOF = _df_train[fnames].values, _df_newMOF[fnames].values # takes care of ensuring ordering is same for both X
@@ -468,11 +482,32 @@ def normalize_data_solvent(df_train, df_newMOF, fnames, lname, unit_trans=1, deb
     return X_train, X_newMOF, y_train, x_scaler
 
 def standard_labels(df, key="flag"):
-    flags = [1 if row[key] == 1 else 0 for _, row in df.iterrows()]
+    """
+    standard_labels makes the solvent removal stability either 1 (stable upon solvent removal) or 0 (unstable upon solvent removal)
+    "flag" is the column under which solvent removal stability is reported in the dataframe
+
+    :param df: A pandas dataframe to modify.
+    :param key: The column in the pandas dataframe to look at.
+    :return: The modified pandas dataframe.
+    """ 
+    flags = [1 if row[key] == 1 else 0 for _, row in df.iterrows()] # Look through all rows of the dataframe df.
     df[key] = flags
     return df
 
 def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
+    """
+    run_solvent_ANN runs the solvent removal stability ANN with the desired MOF as input.
+    It returns a prediction between zero and one. This prediction corresponds to an assessment of MOF stability upon solvent removal.
+    The further the prediction is from 0.5, the more sure the ANN is.
+
+    :param user_id: str, the session ID of the user
+    :param path: str, the server's path to the MOFSimplify folder on the server
+    :param MOF_name: str, the name of the MOF for which a prediction is being generated
+    :param solvent_ANN: keras.engine.training.Model, the ANN itself
+    :return: str str(new_MOF_pred[0][0]), the model solvent removal stability prediction 
+    :return: list neighbor_names, the latent space nearest neighbor MOFs in the solvent removal stability ANN
+    :return: list neighbor_distances, the latent space distances of the latent space nearest neighbor MOFs in neighbor_names 
+    """ 
 
     RACs = ['D_func-I-0-all','D_func-I-1-all','D_func-I-2-all','D_func-I-3-all',
      'D_func-S-0-all', 'D_func-S-1-all', 'D_func-S-2-all', 'D_func-S-3-all',
@@ -533,7 +568,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
 
     ### Utilize the function below to normalize the RACs + geos of the new MOF
     # newMOF refers to the MOF that has been uploaded to mofSimplify, for which a prediction will be generated
-    X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], unit_trans=1, debug=False)
+    X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], debug=False)
     # Order of values in X_newMOF matters, but this is taken care of in normalize_data_solvent.
     X_train.shape, y_train.reshape(-1, ).shape
     model = solvent_ANN
@@ -576,11 +611,25 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
 
     return str(new_MOF_pred[0][0]), neighbors_names, neighbors_distances
 
-# This function takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
-# This function also takes in fnames (the feature names) and lname (the target property name).
-# This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
-# It also normalizes y_train, which are the thermal breakdown temperatures in the training data dataframe, and returns x_scaler (which scaled X_train) and y_scaler (which scaled y_train).
-def normalize_data_thermal(df_train, df_newMOF, fnames, lname, unit_trans=1, debug=False): # assumes gets Pandas dataframes with MOFs as rows and features as columns
+
+def normalize_data_thermal(df_train, df_newMOF, fnames, lname, debug=False): # Function assumes it gets pandas dataframes with MOFs as rows and features as columns
+    """
+    normalize_data_thermal takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+    This function also takes in fnames (the feature names) and lname (the target property name).
+    This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
+    It also normalizes y_train, which are the thermal breakdown temperatures in the training data dataframe, and returns x_scaler (which scaled X_train) and y_scaler (which scaled y_train).
+
+    :param df_train: A pandas dataframe of the training data.
+    :param df_newMOF: A pandas dataframe of the new MOF being analyzed.
+    :param fnames: An array of column names of the descriptors.
+    :param lname: An array of the column name of the target.
+    :param debug: A boolean that determines whether extra information is printed.
+    :return: numpy.ndarray X_train, the descriptors of the training data. Its number of rows is the number of MOFs in the training data. Its number of columns is the number of descriptors.
+    :return: numpy.ndarray X_newMOF, the descriptors of the new MOF being analyzed by MOFSimplify. It contains only one row.
+    :return: numpy.ndarray y_train, the thermal stabilities of the training data. 
+    :return: sklearn.preprocessing._data.StandardScaler x_scaler, the scaler used to normalize the descriptor data to unit mean and a variance of 1. 
+    :return: sklearn.preprocessing._data.StandardScaler y_scaler, the scaler used to normalize the target data to unit mean and a variance of 1.
+    """ 
     _df_train = df_train.copy().dropna(subset=fnames+lname)
     _df_newMOF = df_newMOF.copy().dropna(subset=fnames) 
     X_train, X_newMOF = _df_train[fnames].values, _df_newMOF[fnames].values # takes care of ensuring ordering is same for both X
@@ -597,6 +646,18 @@ def normalize_data_thermal(df_train, df_newMOF, fnames, lname, unit_trans=1, deb
     return X_train, X_newMOF, y_train, x_scaler, y_scaler
 
 def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
+    """
+    run_thermal_ANN runs the thermal stability ANN with the desired MOF as input.
+    It returns a prediction for the thermal breakdown temperature of the chosen MOF.
+
+    :param user_id: str, the session ID of the user
+    :param path: str, the server's path to the MOFSimplify folder on the server
+    :param MOF_name: str, the name of the MOF for which a prediction is being generated
+    :param thermal_ANN: keras.engine.training.Model, the ANN itself
+    :return: str new_MOF_pred, the model thermal stability prediction 
+    :return: list neighbor_names, the latent space nearest neighbor MOFs in the solvent removal stability ANN
+    :return: list neighbor_distances, the latent space distances of the latent space nearest neighbor MOFs in neighbor_names 
+    """ 
 
     RACs = ['D_func-I-0-all','D_func-I-1-all','D_func-I-2-all','D_func-I-3-all',
      'D_func-S-0-all', 'D_func-S-1-all', 'D_func-S-2-all', 'D_func-S-3-all',
@@ -647,7 +708,7 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
     df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors.csv') # Assume temp_file_creation/ in parent directory
     features = [val for val in df_train.columns.values if val in RACs+geo]
 
-    X_train, X_newMOF, y_train, x_scaler, y_scaler = normalize_data_thermal(df_train, df_newMOF, features, ["T"], unit_trans=1, debug=False)
+    X_train, X_newMOF, y_train, x_scaler, y_scaler = normalize_data_thermal(df_train, df_newMOF, features, ["T"], debug=False)
     X_train.shape, y_train.reshape(-1, ).shape 
 
     model = thermal_ANN
@@ -700,11 +761,25 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
 
     return new_MOF_pred, neighbors_names, neighbors_distances
 
-# This function is used by both ss_predict() and ts_predict() to generate RACs and Zeo++ descriptors
-# These descriptors are subsequently used in ss_predict() and ts_predict() for the ANN models
-# Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated
-# The third input indicates the type of prediction (solvent removal or thermal)
+
 def descriptor_generator(name, structure, prediction_type):
+    """
+    # descriptor_generator is used by both ss_predict() and ts_predict() to generate RACs and Zeo++ descriptors.
+    # These descriptors are subsequently used in ss_predict() and ts_predict() for the ANN models.
+    # Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
+    # The third input indicates the type of prediction (solvent removal or thermal).
+
+    :param name: str, the name of the MOF being analyzed
+    :param structure: str, the text of the cif file of the MOF being analyzed
+    :param prediction_type: str, the type of prediction being run. Can either be 'solvent' or 'thermal'.
+    :return: Depends, either the string 'FAILED' if descriptor generation fails, a dictionary myDict (if the MOF being analyzed is in the training data), or an array myResult (if the MOF being analyzed is not in the training data) 
+    """ 
+
+    print('type check!')
+    print(type(name))
+    print(type(structure))
+    print(type(prediction_type))
+
     print('TIME CHECK 2')
     import time # debugging
     timeStarted = time.time() # save start time (debugging)
@@ -720,6 +795,7 @@ def descriptor_generator(name, structure, prediction_type):
     cif_file.write(structure)
     cif_file.close()
 
+    # There can be a RACs folder for solvent predictions and a RACs folder for thermal predictions. Same for Zeo++.
     RACs_folder = temp_file_folder +  prediction_type + '_RACs/'
     zeo_folder = temp_file_folder + prediction_type + '_zeo++/'
 
@@ -766,7 +842,7 @@ def descriptor_generator(name, structure, prediction_type):
     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
 
-    # four parallelized Zeo++ commands
+    # four parallelized Zeo++ and RAC commands
     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
     process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
@@ -875,11 +951,10 @@ def descriptor_generator(name, structure, prediction_type):
         ANN_folder = MOFSIMPLIFY_PATH + 'model/thermal/ANN/'
         train_df = pd.read_csv(ANN_folder + 'train.csv')
 
-    # Here, I do a check to see if the current MOF is in the training data.
+    ### Here, I do a check to see if the current MOF is in the training data. ###
     # If it is, then I return the known truth for the MOF, rather than make a prediction.
 
     # Will iterate through the rows of the train pandas dataframe
-
 
     in_train = False
 
@@ -932,14 +1007,16 @@ def descriptor_generator(name, structure, prediction_type):
         myDict = {'in_train': True, 'truth': match_truth, 'match': matching_MOF}
         return myDict
 
+    ### End of training data check. ###
+
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
     print('TIME CHECK 5')
 
-    return [temp_file_folder, ANN_folder]
+    myResult = [temp_file_folder, ANN_folder]
 
-
+    return myResult
     
 # Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14)
 # the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
@@ -960,7 +1037,7 @@ def ss_predict():
     if name == 'Example MOF':
         name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
-        name = name[:-4]
+        name = name[:-4] # remove the .cif part of the name
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
@@ -968,7 +1045,7 @@ def ss_predict():
     output = descriptor_generator(name, structure, 'solvent') # generate descriptors
     if output == 'FAILED': # model failure
         return 'FAILED'
-    elif isinstance(output, dict): # MOF was in the training data
+    elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
         return output
     else: # grabbing some variables. We will make a prediction
         temp_file_folder = output[0]
@@ -1008,12 +1085,12 @@ def ts_predict():
     if name == 'Example MOF':
         name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
-        name = name[:-4]
+        name = name[:-4] # remove the .cif part of the name
 
     output = descriptor_generator(name, structure, 'thermal') # generate descriptors
     if output == 'FAILED': # model failure
         return 'FAILED'
-    elif isinstance(output, dict): # MOF was in the training data
+    elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
         return output
     else: # grabbing some variables. We will make a prediction
         temp_file_folder = output[0]
@@ -1116,6 +1193,8 @@ def thermal_stability_percentile():
 
     return str(our_percentile)
 
+### Helper functions for TGA_plot. ###
+
 # I use https://stackoverflow.com/questions/3252194/numpy-and-line-intersections to get code for the intersection of the two TGA lines
 # for use in /TGA_plot call. perp and seg_intersect are from that stackoverflow page
 
@@ -1141,9 +1220,15 @@ def seg_intersect(a1,a2, b1,b2) :
     num = np.dot( dap, dp )
     return (num / denom.astype(float))*db + b1
 
-# Makes the TGA plot for the current thermal ANN nearest neighbor.
+### End of helper functions for TGA_plot. ###
+
 @app.route('/TGA_plot', methods=['POST'])
 def TGA_plot():
+    # Makes the TGA plot for the current thermal ANN nearest neighbor.
+    # The TGA plot contains the four points that constitute the simplified TGA data. These points are yellow stars.
+    # The two points representing the flatter part of the trace are connected with a line (line A), and the two points representing the steeper part of the trace are connected with a line (line B).
+    # The intersection of lines A and B is designated with a red dot.
+    # Lines A and B extend past the red dot for a bit. Lines A and B are blue dashed lines.
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
@@ -1213,7 +1298,7 @@ def get_components():
     if name == 'Example MOF':
         name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
-        name = name[:-4]
+        name = name[:-4] # remove the .cif part of the name
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
     cif_folder = temp_file_folder + 'cifs/'
@@ -1585,7 +1670,7 @@ def descriptor_getter():
     if name == 'Example MOF':
         name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
-        name = name[:-4]
+        name = name[:-4] # remove the .cif part of the name
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
     descriptors_folder = temp_file_folder + "merged_descriptors/"

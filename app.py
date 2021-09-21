@@ -775,11 +775,6 @@ def descriptor_generator(name, structure, prediction_type):
     :return: Depends, either the string 'FAILED' if descriptor generation fails, a dictionary myDict (if the MOF being analyzed is in the training data), or an array myResult (if the MOF being analyzed is not in the training data) 
     """ 
 
-    print('type check!')
-    print(type(name))
-    print(type(structure))
-    print(type(prediction_type))
-
     print('TIME CHECK 2')
     import time # debugging
     timeStarted = time.time() # save start time (debugging)
@@ -1286,9 +1281,9 @@ def TGA_plot():
 
 @app.route('/get_components', methods=['POST']) 
 def get_components():
-    # Uses Aditya's MOF code to get linkers and sbus
-    # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus
-    # Also in the dictionary: SMILES string for each of the linkers and sbus
+    # Uses Aditya's MOF code to get linkers and sbus.
+    # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus.
+    # Also in the dictionary: SMILES string for each of the linkers and sbus.
 
     # Grab data
     my_data = json.loads(flask.request.get_data());
@@ -1489,6 +1484,7 @@ def get_components():
 @app.route('/solvent_neighbor_flag', methods=['POST']) 
 def is_stable():
     # Returns the flag (whether or not stable upon solvent removal) and DOI of the neighbor sent over from the front end.
+    # The flag is returned to the front end (index.html).
 
     # Grab data.
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
@@ -1514,6 +1510,7 @@ def is_stable():
 @app.route('/thermal_neighbor_T', methods=['POST']) 
 def breakdown_T():
     # Returns the thermal breakdown temperature and DOI of the neighbor sent over from the front end.
+    # The information is returned to the front end (index.html).
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
@@ -1542,6 +1539,7 @@ def breakdown_T():
 @app.route('/neighbor_writer', methods=['POST']) 
 def neighbor_writer():
     # Writes information to a txt file about the selected latent space nearest neighbor.
+    # Returns the information in that txt file to the front end for downloading.
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is a dictionary with information about the neighbor and the MOF that was analyzed by an ANN
@@ -1665,6 +1663,13 @@ def neighbor_writer():
 
 @app.route('/get_descriptors', methods=['POST']) 
 def descriptor_getter():
+    """
+    descriptor_getter returns the contents of the csv with the descriptors of the desired MOF.
+    These descriptors are RACs and Zeo++ descriptors. There are 188 total.
+
+    :return: str contents, the contents of the csv with the descriptor data. To be written to a csv in the front end for download.
+    """ 
+
     # Grab data
     name = json.loads(flask.request.get_data()); # This is the selected MOF
     if name == 'Example MOF':
@@ -1682,6 +1687,12 @@ def descriptor_getter():
 
 @app.route('/get_TGA', methods=['POST']) 
 def TGA_getter():
+    """
+    TGA_getter returns the contents of the csv with the simplified TGA data of the desired MOF.
+
+    :return: str contents, the contents of the csv with the simplified TGA data. To be written to a csv in the front end for download.
+    """ 
+
     # Grab data
     name = json.loads(flask.request.get_data()); # This is the thermal ANN latent space nearest neighbor
     

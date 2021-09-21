@@ -334,17 +334,7 @@ def serve_neighbor(path):
     :param path: The path to the desired MOF in the CoRE2019 folder.
     :return: The cif file for the neighbor MOF.
     """ 
-    return flask.send_from_directory('CoRE2019', path);
-
-# @app.route('/neighbor_info/<path:path>')
-# def serve_neighbor_txt(path):
-#     # Serves the neighbor CoRE MOF information in txt file format
-#     return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/latent_neighbor', path);
-
-@app.route('/merged_descriptors/<path:path>')
-def serve_descriptors(path):
-    # Serves the csv of descriptors for the selected MOF
-    return flask.send_from_directory('temp_file_creation_' + str(session['ID']) + '/merged_descriptors', path);
+    return flask.send_from_directory('CoRE2019', path)
 
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     """
@@ -361,13 +351,23 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     return myList
 
 def file_age_in_seconds(pathname): 
-    # print('age_check')
-    # print(time.time() - os.stat(pathname)[stat.ST_MTIME]) # time since last modification
-    return time.time() - os.stat(pathname)[stat.ST_MTIME]
+    """
+    file_age_in_seconds returns the age of the file/folder specified in pathname since the last modification.
+    It is used as a helper function in the set_ID function.
+
+    :return: The age of the file/folder specified in pathname since the last modification, in seconds.
+    """ 
+
+    return time.time() - os.stat(pathname)[stat.ST_MTIME] # time since last modification
 
 @app.route('/curr_users', methods=['GET'])
 def curr_num_users():
-    # Returns the current number of users on MOFSimplify. 
+    """
+    curr_num_users returns the current number of users on MOFSimplify.
+    This is determined by looking at user specific folders. User specific folders that have not been used for a while are deleted (see the set_ID function). 
+
+    :return: The number of extant user-specific folders on MOFSimplify.
+    """ 
 
     sum = 0
 

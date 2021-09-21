@@ -2594,7 +2594,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // When the "Download descriptors" button is clicked, download the descriptors for the selected MOF
     $('#download_descriptors').click(function () {
       name = get_selected_MOF(false) // don't want the .cif extension
-      // window.location = '/merged_descriptors/' + name + '_descriptors.csv'; // get file from the temp_file_creation_USERID/merged_descriptors folder
 
       // Grab the contents of the descriptor csv
       $.post("/get_descriptors", JSON.stringify(name)).done(

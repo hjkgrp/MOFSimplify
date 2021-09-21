@@ -383,9 +383,14 @@ def curr_num_users():
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 
 def bb_generate():
-    # generates a MOF using the building blocks and net specified by the user
-    # uses ToBaCCo code, version 3.0
-    # returns the constructed MOF's name to the front end
+    """
+    bb_generated generates a MOF using the building blocks and net specified by the user. 
+    The function uses ToBaCCo code, version 3.0. 
+    It returns the constructed MOF's name to the front end
+
+    :return: The name of the building block MOF.
+    """
+
 
     tobacco_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + "/tobacco_3.0/"
 

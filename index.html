@@ -1177,9 +1177,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
       color_reset(); // resetting selection and prediction and visualize and component button colors 
 
+      s_stability_field = document.getElementById('solvent_stability_prediction');
+      setColor(s_stability_field, 'transparent') // color background, transparent                      
 
-      stability_field = document.getElementById('solvent_stability_prediction');
-      setColor(stability_field, 'transparent') // color background, transparent                      
+      t_stability_field = document.getElementById('thermal_stability_prediction');
+      setColor(t_stability_field, 'transparent') // color background, transparent                      
 
       // hiding sections
       // $('#predict_section').hide()

@@ -1013,19 +1013,27 @@ def descriptor_generator(name, structure, prediction_type):
 
     return myResult
     
-# Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14)
-# the two h5 models show up in solvent_ANN.py and thermal_ANN.py, respectively
+##### Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14). #####
+
 @app.route('/predict_solvent_stability', methods=['POST']) 
 def ss_predict():
-    # Generates solvent stability prediction.
-    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
-    # Then, apply Aditya's model to make prediction.
+    """
+    ss_predict generates the solvent removal stability prediction for the selected MOF.
+        Or it will return a ground truth if the MOF is in the thermal stability ANN training data.
+        Or it will return an signal that descriptor generation failed and thus a prediction cannot be made. 
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
+    Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
+
+    :return: dict results, contains the prediction and information on latent space nearest neighbors.
+        May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
+        May instead return a string 'FAILED' if descriptor generation fails.
+    """ 
 
     print('TIME CHECK 1')
     import time
     timeStarted = time.time() # save start time (debugging)
 
-    # Grab data
+    # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data())
     structure = my_data['structure']
     name = my_data['name']
@@ -1038,7 +1046,7 @@ def ss_predict():
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
     output = descriptor_generator(name, structure, 'solvent') # generate descriptors
-    if output == 'FAILED': # model failure
+    if output == 'FAILED': # Description generation failure
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
         return output
@@ -1052,12 +1060,9 @@ def ss_predict():
     prediction, neighbor_names, neighbor_distances = run_solvent_ANN(str(session['ID']), MOFSIMPLIFY_PATH, name, solvent_model)
 
     results = {'prediction': prediction,
-        'neighbor_names': neighbor_names,
-        'neighbor_distances': neighbor_distances,
-        'in_train': False} # a prediction was made. Requested MOF was not in the training data.
-
-    # print(results) # debugging
-    # print(type(results)) # debugging
+        'neighbor_names': neighbor_names, # The names of the five nearest latent space nearest neighbors in the ANN's training data. The ANNs used CoRE MOFs as training data.
+        'neighbor_distances': neighbor_distances, # The latent space distances of the five nearest latent space neighbors.
+        'in_train': False} # A prediction was made. The requested (selected) MOF was not in the training data.
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds') 
@@ -1068,13 +1073,20 @@ def ss_predict():
 
 @app.route('/predict_thermal_stability', methods=['POST']) 
 def ts_predict():
-    # Generates thermal stability prediction.
-    # To do this, need to generate RAC featurization and Zeo++ geometry information for the MOF.
-    # Then, apply Aditya's model to make prediction.
+    """
+    ts_predict generates the thermal stability prediction for the selected MOF.
+        Or it will return a ground truth if the MOF is in the thermal stability ANN training data.
+        Or it will return an signal that descriptor generation failed and thus a prediction cannot be made. 
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
+    Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
 
+    :return: dict results, contains the prediction and information on latent space nearest neighbors.
+        May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
+        May instead return a string 'FAILED' if descriptor generation fails.
+    """ 
 
-    # Grab data
-    my_data = json.loads(flask.request.get_data())
+    # Grab data and tweak the MOF name.
+    my_data = json.loads(flask.request.get_data()) # This is a dictionary.
     structure = my_data['structure']
     name = my_data['name']
     if name == 'Example MOF':
@@ -1083,7 +1095,7 @@ def ts_predict():
         name = name[:-4] # remove the .cif part of the name
 
     output = descriptor_generator(name, structure, 'thermal') # generate descriptors
-    if output == 'FAILED': # model failure
+    if output == 'FAILED': # Description generation failure
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
         return output
@@ -1100,16 +1112,10 @@ def ts_predict():
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    print('check check')
-    print(neighbor_names) # debugging
-    print(neighbor_distances) # debugging
-    print(type(neighbor_names)) # debugging
-    print(type(neighbor_distances)) # debugging    
-
     results = {'prediction': prediction,
-        'neighbor_names': neighbor_names,
-        'neighbor_distances': neighbor_distances,
-        'in_train': False} # a prediction was made. Requested MOF was not in the training data.
+        'neighbor_names': neighbor_names, # The names of the five nearest latent space nearest neighbors in the ANN's training data. The ANNs used CoRE MOFs as training data.
+        'neighbor_distances': neighbor_distances, # The latent space distances of the five nearest latent space neighbors.
+        'in_train': False} # A prediction was made. The requested (selected) MOF was not in the training data.
 
     print('TIME CHECK 6 ' + str(session['ID']))
 
@@ -1117,16 +1123,19 @@ def ts_predict():
 
 @app.route('/plot_thermal_stability', methods=['POST']) 
 def plot_thermal_stability():
-    # Returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on.
-    # Additionally, displays the position of the current MOF's thermal breakdown temperature.
+    """
+    plot_thermal_stability returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on.
+    Additionally, it displays the position of the current MOF's predicted or ground truth thermal breakdown temperature.
+
+    :return: HTML document, a plot of the kernel-density estimate of the breakdown temperatures in the training data 
+        with a red dot indicating the position of the current MOF's predicted or ground truth thermal breakdown temperature.
+    """ 
 
     # Grab data
     info = json.loads(flask.request.get_data()) 
     my_data = info['temperature'] # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
     my_data = float(my_data)
-    # print('checkerino')
-    # print(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv(MOFSIMPLIFY_PATH + "model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -1140,19 +1149,21 @@ def plot_thermal_stability():
 
     # In training data, smallest T breakdown is 35, and largest T breakdown is 654.
 
-    # use stats.gaussian_kde to estimate the probability density function from the histogram
+    # Use stats.gaussian_kde to estimate the probability density function from the histogram. This is a kernel-density estimate using Gaussian kernels.
     density = stats.gaussian_kde(temps_df['T'])
     x = np.arange(30,661,1) # in training data, smallest T breakdown is 35, and largest T breakdown is 654
     fig = plt.figure(figsize=(10, 6), dpi=80) # set figure size
     ax = fig.add_subplot(1,1,1)
     plt.plot(x, density(x))
-    plt.plot(my_data, density(my_data), "or") # the current MOF's predicted thermal breakdown temperature
+    plt.plot(my_data, density(my_data), "or") # The current MOF's predicted or ground truth thermal breakdown temperature.
 
     ax.set_xlabel('Breakdown temperature (°C)')
     ax.set_ylabel('Frequency in the training data')
-    if info['prediction']: # MOF wasn't in training data, and its ANN predicted breakdown temperature is used
+
+    # The title of the plot differs slightly depending on if the selected MOF is in the traiining data or not.
+    if info['prediction']: # MOF wasn't in training data, and its ANN predicted breakdown temperature is used.
         ax.set_title('Current MOF\'s predicted breakdown temperature relative to others')
-    else: # MOF was in the training data, and its reported breakdown temperature is used
+    else: # MOF was in the training data, and its reported breakdown temperature is used.
         ax.set_title('Current MOF\'s breakdown temperature relative to others')
 
     import mpld3
@@ -1161,14 +1172,18 @@ def plot_thermal_stability():
 
 @app.route('/thermal_stability_percentile', methods=['POST']) 
 def thermal_stability_percentile():
-    # Returns what percentile the thermal breakdown temperature of the selected MOF lies in
-    # with respect to the MOFs used to train the ANN for thermal stability predictions.
+    """
+    thermal_stability_percentile returns what percentile the thermal breakdown temperature (prediction or ground truth) of the selected MOF lies in
+        with respect to the MOFs used to train the ANN for thermal stability predictions.
+    For example, a 30th percentile breakdown temperature is higher than 30% of the breakdown temperatures in the CoRE training data for the thermal stability ANN.
+
+    :return: str our_percentile, the percentile of the thermal breakdown temperature.
+    """ 
 
     # Grab data.
     my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
     my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
     my_data = float(my_data)
-    print(my_data)
 
     # Getting the temperature data.
     temps_df = pd.read_csv(MOFSIMPLIFY_PATH + "model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -1185,8 +1200,9 @@ def thermal_stability_percentile():
             our_percentile = i
 
     our_percentile = int(our_percentile) # no decimal points
+    our_percentile = str(our_percentile)
 
-    return str(our_percentile)
+    return our_percentile
 
 ### Helper functions for TGA_plot. ###
 
@@ -1219,14 +1235,20 @@ def seg_intersect(a1,a2, b1,b2) :
 
 @app.route('/TGA_plot', methods=['POST'])
 def TGA_plot():
-    # Makes the TGA plot for the current thermal ANN nearest neighbor.
-    # The TGA plot contains the four points that constitute the simplified TGA data. These points are yellow stars.
-    # The two points representing the flatter part of the trace are connected with a line (line A), and the two points representing the steeper part of the trace are connected with a line (line B).
-    # The intersection of lines A and B is designated with a red dot.
-    # Lines A and B extend past the red dot for a bit. Lines A and B are blue dashed lines.
+    """
+    TGA_plot makes the TGA plot for the current thermal ANN nearest neighbor.
+    The TGA plot contains the four points that constitute the simplified TGA data. These points are yellow stars.
+    The two points representing the flatter part of the trace are connected with a line (line A), 
+        and the two points representing the steeper part of the trace are connected with a line (line B).
+    The intersection of lines A and B is designated with a red dot.
+    Lines A and B extend past the red dot for a bit. Lines A and B are blue dashed lines.
+    The simplified TGA plot is sent to the front end (index.html) for display.
+
+    :return: HTML document, the simplified TGA plot.
+    """ 
 
     # Grab data
-    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex's name.
 
     # cut off these endings, in order to access the TGA file correctly:
     # _clean, _ion_b, _neutral_b, _SL, _charged, _clean_h, _manual, _auto, _charged, etc
@@ -1251,10 +1273,10 @@ def TGA_plot():
 
     intersection_point = seg_intersect(p1, p2, p3, p4)
 
-    # Want lines to extend beyond intersection point. I will make it 20%
-    x_extension = [None] * 2 # will hold the x values of the two extension points
-    y_extension = [None] * 2 # will hold the y values of the two extension points
-    slope = [None] * 2 # will hold the slopes of the two lines
+    # Want lines to extend beyond intersection point. I will make it 20%.
+    x_extension = [None] * 2 # This variable will hold the x values of the two extension points.
+    y_extension = [None] * 2 # This variable will hold the y values of the two extension points.
+    slope = [None] * 2 # This variable will hold the slopes of the two lines.
 
     x_extension[0] = intersection_point[0] + (intersection_point[0] - x_values[0])*0.2 # x_values[0] is the smallest value, x_values[3] is the largest value
     x_extension[1] = intersection_point[0] - (x_values[3] - intersection_point[0])*0.2
@@ -1281,9 +1303,15 @@ def TGA_plot():
 
 @app.route('/get_components', methods=['POST']) 
 def get_components():
-    # Uses Aditya's MOF code to get linkers and sbus.
-    # Returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus.
-    # Also in the dictionary: SMILES string for each of the linkers and sbus.
+    """
+    get_components uses Aditya's MOF code to get components (linkers and sbus).
+    It returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus.
+    The dictionary also contains the SMILES string for each of the linkers and sbus.
+
+    :return: str json_object, encodes a dictionary. The dictionary contains the xyz file geometry information for each component, 
+        the number of each type of component, the unique linkers and sbus (kept track of by their index, see linker_num and sbu_num in the code),
+        and the SMILES string for each component.
+    """ 
 
     # Grab data
     my_data = json.loads(flask.request.get_data());
@@ -1483,11 +1511,15 @@ def get_components():
 
 @app.route('/solvent_neighbor_flag', methods=['POST']) 
 def is_stable():
-    # Returns the flag (whether or not stable upon solvent removal) and DOI of the neighbor sent over from the front end.
-    # The flag is returned to the front end (index.html).
+    """
+    is_stable returns the flag (i.e. the stability upon solvent removal, yes or no) and DOI of the neighbor sent over from the front end.
+    The flag is returned to the front end (index.html). 
+
+    :return: dict myDict, contains the solvent removal stability of the latent space nearest neighbor MOF, and its DOI.
+    """ 
 
     # Grab data.
-    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex's name.
 
     print(my_data)
     
@@ -1509,11 +1541,15 @@ def is_stable():
 
 @app.route('/thermal_neighbor_T', methods=['POST']) 
 def breakdown_T():
-    # Returns the thermal breakdown temperature and DOI of the neighbor sent over from the front end.
-    # The information is returned to the front end (index.html).
+    """
+    breakdown_T returns the thermal breakdown temperature and DOI of the neighbor sent over from the front end.
+    The information is returned to the front end (index.html).
+    
+    :return: dict myDict, contains the breakdown temperature of the latent space nearest neighbor MOF, and its DOI.
+    """ 
 
     # Grab data
-    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
+    my_data = json.loads(flask.request.get_data()); # This is the neighbor complex's name.
 
     print(my_data)
     
@@ -1538,14 +1574,15 @@ def breakdown_T():
 
 @app.route('/neighbor_writer', methods=['POST']) 
 def neighbor_writer():
-    # Writes information to a txt file about the selected latent space nearest neighbor.
-    # Returns the information in that txt file to the front end for downloading.
+    """
+    neighbor_writer writes information to a txt file about the selected latent space nearest neighbor.
+    It returns the information in that txt file to the front end for downloading.
+
+    :return: dict myDict, contains the content for the text file to be downloaded, and the name of the text file to be downloaded.
+    """ 
 
     # Grab data
     my_data = json.loads(flask.request.get_data()); # This is a dictionary with information about the neighbor and the MOF that was analyzed by an ANN
-
-    print('neighbor writer check')
-    print(my_data)
 
     prediction_type = my_data['prediction_type']
     current_MOF = my_data['current_MOF']
@@ -1608,9 +1645,9 @@ def neighbor_writer():
 
     print('neighbor writer check 2')
 
-    my_dict = {'contents': contents, 'file_name': prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt'}
+    myDict = {'contents': contents, 'file_name': prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt'}
 
-    return my_dict
+    return myDict
 
 
 # @app.route('/TGA_maker', methods=['POST']) 

@@ -1627,133 +1627,139 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         myDict = { 'name': name, 'structure': result }
 
-        $.post("/predict_thermal_stability", JSON.stringify(myDict)).done(
-          function (response) {
+        try {
+          $.post("/predict_thermal_stability", JSON.stringify(myDict)).done(
+            function (response) {
 
-            if (response == 'FAILED') {
-              alert('Failed to featurize')
-              thermal_pred_color = failure_red;
-              $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-              $('#thermal_stability_prediction').text('')
-              return; // Do not update solvent stability prediction if prediction failed.
-            }
-
-            $('#thermal_form').show()
-            $('#thermal_form input[name=cif_file_name]').val(myDict['name']);
-            $('#thermal_form input[name=structure]').val(myDict['structure']); // Populate the feedback form with metadata
-            thermal_pred_color = success_green;
-            $('#predict_t').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
-
-            $('#neighbor_blurb').show() // show nearest neighbors section
-            $('#thermal_neighbor_section').show()
-            $('#descriptor_section').show() // show section where can download descriptors
-
-            // There are two possibilities. Either a prediction is made, or the selected MOF is in the ANN's training data and so no prediction is made and instead the ground truth is returned.
-            if (!response['in_train']) { // a prediction was made
-              prediction = response['prediction'];
-              $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
-
-              $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function (response) {
-                $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-
-                percentile_field = document.getElementById('thermal_stability_percentile');
-                prediction_field = document.getElementById('thermal_stability_prediction');
-                thermal_form = document.getElementById('thermal_form');
-                if (response >= 80) {
-                  response_color = '#90ee90' // color background, light green
-                }
-                else if (response >= 60) {
-                  response_color = '#e7ff97' // light lime
-                }
-                else if (response >= 40) {
-                  response_color = '#fffa97' // light yellow
-                }
-                else if (response >= 20) {
-                  response_color = '#ffcd97' // light orange
-                }
-                else {
-                  response_color = '#ffad97' // light red
-                }
-                setColor(percentile_field, response_color)
-                setColor(prediction_field, response_color)
-                setColor(thermal_form, response_color)
-              })
-
-              myDict = { 'prediction': true, 'temperature': prediction }
-              $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
-                $('#chart').html(response);
-              })
-
-              // Now that the prediction has been displayed, can move on to the neighbors display.
-              var neighbor_names = response['neighbor_names']
-              var neighbor_distances = response['neighbor_distances']
-
-              // Converting these arrays into a dictionary called neighbors.
-              var neighbors = {}
-              for (i = 0; i < neighbor_names.length; i++) {
-                neighbors[neighbor_names[i]] = neighbor_distances[i]
+              if (response == 'FAILED') {
+                alert('Failed to featurize')
+                thermal_pred_color = failure_red;
+                $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                $('#thermal_stability_prediction').text('')
+                return; // Do not update solvent stability prediction if prediction failed.
               }
 
-              // Storing the information on the neighbors.
-              document.getElementById('thermal_neighbors_holder').value = neighbors;
+              $('#thermal_form').show()
+              $('#thermal_form input[name=cif_file_name]').val(myDict['name']);
+              $('#thermal_form input[name=structure]').val(myDict['structure']); // Populate the feedback form with metadata
+              thermal_pred_color = success_green;
+              $('#predict_t').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
-              // Populating the thermal neighbors dropdown.
-              var thermal_dropdown = document.getElementById("thermal_neighbors");
+              $('#neighbor_blurb').show() // show nearest neighbors section
+              $('#thermal_neighbor_section').show()
+              $('#descriptor_section').show() // show section where can download descriptors
 
-              // clear dropdown
-              var length = thermal_dropdown.options.length;
-              for (i = length - 1; i >= 0; i--) {
-                thermal_dropdown.options[i] = null;
+              // There are two possibilities. Either a prediction is made, or the selected MOF is in the ANN's training data and so no prediction is made and instead the ground truth is returned.
+              if (!response['in_train']) { // a prediction was made
+                prediction = response['prediction'];
+                $('#thermal_stability_prediction').text('The thermal stability prediction is: Thermal breakdown at ' + prediction); // display prediction result
+
+                $.post("/thermal_stability_percentile", JSON.stringify(prediction)).done(function (response) {
+                  $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+
+                  percentile_field = document.getElementById('thermal_stability_percentile');
+                  prediction_field = document.getElementById('thermal_stability_prediction');
+                  thermal_form = document.getElementById('thermal_form');
+                  if (response >= 80) {
+                    response_color = '#90ee90' // color background, light green
+                  }
+                  else if (response >= 60) {
+                    response_color = '#e7ff97' // light lime
+                  }
+                  else if (response >= 40) {
+                    response_color = '#fffa97' // light yellow
+                  }
+                  else if (response >= 20) {
+                    response_color = '#ffcd97' // light orange
+                  }
+                  else {
+                    response_color = '#ffad97' // light red
+                  }
+                  setColor(percentile_field, response_color)
+                  setColor(prediction_field, response_color)
+                  setColor(thermal_form, response_color)
+                })
+
+                myDict = { 'prediction': true, 'temperature': prediction }
+                $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
+                  $('#chart').html(response);
+                })
+
+                // Now that the prediction has been displayed, can move on to the neighbors display.
+                var neighbor_names = response['neighbor_names']
+                var neighbor_distances = response['neighbor_distances']
+
+                // Converting these arrays into a dictionary called neighbors.
+                var neighbors = {}
+                for (i = 0; i < neighbor_names.length; i++) {
+                  neighbors[neighbor_names[i]] = neighbor_distances[i]
+                }
+
+                // Storing the information on the neighbors.
+                document.getElementById('thermal_neighbors_holder').value = neighbors;
+
+                // Populating the thermal neighbors dropdown.
+                var thermal_dropdown = document.getElementById("thermal_neighbors");
+
+                // clear dropdown
+                var length = thermal_dropdown.options.length;
+                for (i = length - 1; i >= 0; i--) {
+                  thermal_dropdown.options[i] = null;
+                }
+
+                // Populating the thermal neighbors dropdown.
+                for (i = 0; i < neighbor_names.length; i++) {
+                  var option = document.createElement('option');
+                  var num = String(i + 1)
+                  num = num.concat('. ') // formatting to make it look like a list
+                  option.text = num.concat(neighbor_names[i]);
+                  thermal_dropdown.add(option);
+                }
               }
 
-              // Populating the thermal neighbors dropdown.
-              for (i = 0; i < neighbor_names.length; i++) {
-                var option = document.createElement('option');
-                var num = String(i + 1)
-                num = num.concat('. ') // formatting to make it look like a list
-                option.text = num.concat(neighbor_names[i]);
-                thermal_dropdown.add(option);
+              else { // requested MOF was in the training data
+                // Storing information indicating that a prediction was made, but no neighbors are avaialable
+                document.getElementById('thermal_neighbors_holder').value = 1
+
+                $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
+
+                $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function (response) {
+                  $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
+
+                  percentile_field = document.getElementById('thermal_stability_percentile');
+                  prediction_field = document.getElementById('thermal_stability_prediction');
+                  thermal_form = document.getElementById('thermal_form');
+                  if (response >= 80) {
+                    response_color = '#90ee90' // color background, light green
+                  }
+                  else if (response >= 60) {
+                    response_color = '#e7ff97' // light lime
+                  }
+                  else if (response >= 40) {
+                    response_color = '#fffa97' // light yellow
+                  }
+                  else if (response >= 20) {
+                    response_color = '#ffcd97' // light orange
+                  }
+                  else {
+                    response_color = '#ffad97' // light red
+                  }
+                  setColor(percentile_field, response_color)
+                  setColor(prediction_field, response_color)
+                  setColor(thermal_form, response_color)
+                })
+
+                myDict = { 'prediction': false, 'temperature': response['truth'] }
+                $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
+                  $('#chart').html(response);
+                })
               }
-            }
-
-            else { // requested MOF was in the training data
-              // Storing information indicating that a prediction was made, but no neighbors are avaialable
-              document.getElementById('thermal_neighbors_holder').value = 1
-
-              $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
-
-              $.post("/thermal_stability_percentile", JSON.stringify(response['truth'])).done(function (response) {
-                $('#thermal_stability_percentile').text('The percentile of thermal stability of the selected MOF with respect to the MOFs in the training data is: ' + response.toString());
-
-                percentile_field = document.getElementById('thermal_stability_percentile');
-                prediction_field = document.getElementById('thermal_stability_prediction');
-                thermal_form = document.getElementById('thermal_form');
-                if (response >= 80) {
-                  response_color = '#90ee90' // color background, light green
-                }
-                else if (response >= 60) {
-                  response_color = '#e7ff97' // light lime
-                }
-                else if (response >= 40) {
-                  response_color = '#fffa97' // light yellow
-                }
-                else if (response >= 20) {
-                  response_color = '#ffcd97' // light orange
-                }
-                else {
-                  response_color = '#ffad97' // light red
-                }
-                setColor(percentile_field, response_color)
-                setColor(prediction_field, response_color)
-                setColor(thermal_form, response_color)
-              })
-
-              myDict = { 'prediction': false, 'temperature': response['truth'] }
-              $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
-                $('#chart').html(response);
-              })
-            }
-          });
+            });
+        
+        }
+        catch(err) { // Error 500 or Error 504
+          alert('Server is experiencing high traffic, please try again later.')
+        }
       })
     });
 

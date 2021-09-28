@@ -35,6 +35,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 
   .mol-container {
+    /* For component visualization */
     height: 400px;
     position: relative;
   }
@@ -56,32 +57,25 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 
   .link {
-    color: #279AF1;
     /* hyperlinks are blue */
+    color: #279AF1;
   }
 
   #viewportwrapper {
+    /* For MOF visualization */
     grid-area: viz;
-  }
-
-  /* For MOF visualization */
+  }  
 
   #chart {
+    /* thermal breakdown plot is centered, when thermal stability prediction is made */
     width: 100%;
     text-align: center;
-    /* thermal breakdown plot is centered, when thermal stability prediction is made */
   }
 
   #header_background {
-    position: relative;
-    opacity: 1;
-    content: "";
     background-image: url('banner_light');
-    background-size: cover;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    left: 0px;
+    background-position: center; /* Keeps the banner centered even when window is shrunken */
+    background-size: cover; /* Makes the banner the appropriate size */
   }
 
   body {
@@ -110,8 +104,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 </style>
 
-
-<!-- Empty head section: place meta tags and favicon here -->
 
 <head>
 

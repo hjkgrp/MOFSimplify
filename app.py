@@ -59,6 +59,10 @@ app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg', '.png', '.pdf', '.tiff', '.t
 app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
+operation_counter = 0 # This variable keeps track of server traffic to alert the user if they should wait until later to make a request. 
+    # I only change operation_counter for the more time-consuming operations (the two predictions, and component analysis).
+MAX_OPERATIONS = 4 # This variable dictates the maximum number of concurrent operations, to prevent server overload.
+
 ### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask
 # uncomment these lines and the login manager functions to get the splash up
 # login_manager = LoginManager()
@@ -391,7 +395,6 @@ def bb_generate():
     :return: The name of the building block MOF.
     """
 
-
     tobacco_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + "/tobacco_3.0/"
 
     # Grab data
@@ -455,7 +458,7 @@ def normalize_data_solvent(df_train, df_newMOF, fnames, lname, debug=False):
     normalize_data_solvent takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
     This function also takes in fnames (the feature names) and lname (the target property name).
     This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
-    It also standardizes y_train, which are the solvent stability flags in the training data dataframe, and returns x_scaler (which scaled X_train).
+    It also standardizes y_train, which are the solvent removal stability flags in the training data dataframe, and returns x_scaler (which scaled X_train).
         By standardizes, I mean that it makes the values of y_train either 0 or 1
 
     :param df_train: A pandas dataframe of the training data.
@@ -1013,7 +1016,7 @@ def descriptor_generator(name, structure, prediction_type):
 
     return myResult
     
-##### Note: the h5 model for the solvent stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14). #####
+##### Note: the h5 model for the solvent removal stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14). #####
 
 @app.route('/predict_solvent_stability', methods=['POST']) 
 def ss_predict():
@@ -1027,7 +1030,15 @@ def ss_predict():
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
         May instead return a string 'FAILED' if descriptor generation fails.
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50x errors (like 504, aka Gateway Time-out).
     """ 
+
+    global operation_counter # global variable
+
+    if operation_counter >= MAX_OPERATIONS:
+        return 'OVERLOAD'
+
+    operation_counter += 1
 
     print('TIME CHECK 1')
     import time
@@ -1047,8 +1058,10 @@ def ss_predict():
 
     output = descriptor_generator(name, structure, 'solvent') # generate descriptors
     if output == 'FAILED': # Description generation failure
+        operation_counter -= 1
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
+        operation_counter -= 1
         return output
     else: # grabbing some variables. We will make a prediction
         temp_file_folder = output[0]
@@ -1069,6 +1082,7 @@ def ss_predict():
 
     print('TIME CHECK 6')
 
+    operation_counter -= 1
     return results
 
 @app.route('/predict_thermal_stability', methods=['POST']) 
@@ -1083,7 +1097,15 @@ def ts_predict():
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
         May instead return a string 'FAILED' if descriptor generation fails.
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50x errors (like 504, aka Gateway Time-out).
     """ 
+
+    global operation_counter # global variable
+
+    if operation_counter >= MAX_OPERATIONS:
+        return 'OVERLOAD'
+
+    operation_counter += 1
 
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data()) # This is a dictionary.
@@ -1096,8 +1118,10 @@ def ts_predict():
 
     output = descriptor_generator(name, structure, 'thermal') # generate descriptors
     if output == 'FAILED': # Description generation failure
+        operation_counter -= 1
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
+        operation_counter -= 1
         return output
     else: # grabbing some variables. We will make a prediction
         temp_file_folder = output[0]
@@ -1119,6 +1143,7 @@ def ts_predict():
 
     print('TIME CHECK 6 ' + str(session['ID']))
 
+    operation_counter -= 1
     return results
 
 @app.route('/plot_thermal_stability', methods=['POST']) 
@@ -1311,7 +1336,17 @@ def get_components():
     :return: str json_object, encodes a dictionary. The dictionary contains the xyz file geometry information for each component, 
         the number of each type of component, the unique linkers and sbus (kept track of by their index, see linker_num and sbu_num in the code),
         and the SMILES string for each component.
+
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50x errors (like 504, aka Gateway Time-out).
     """ 
+
+    global operation_counter # global variable
+
+    if operation_counter >= MAX_OPERATIONS:
+        print('HIT HIT HIT')
+        return 'OVERLOAD'
+
+    operation_counter += 1
 
     # Grab data
     my_data = json.loads(flask.request.get_data());
@@ -1330,6 +1365,7 @@ def get_components():
     try:
         cif_file = open(cif_folder + name + '.cif', 'w')
     except FileNotFoundError:
+        operation_counter -= 1
         return 'FAILED'
     cif_file.write(structure)
     cif_file.close()
@@ -1344,19 +1380,24 @@ def get_components():
     try:
         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
     except ValueError:
+        operation_counter -= 1
         return 'FAILED'
 
     try:
         full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
             # makes the linkers and sbus folders
     except ValueError:
+        operation_counter -= 1
         return 'FAILED'
     except NotImplementedError:
+        operation_counter -= 1
         return 'FAILED'
     except AssertionError:
+        operation_counter -= 1
         return 'FAILED'
 
     if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+        operation_counter -= 1
         return 'FAILED'
 
     # At this point, have the RAC featurization. 
@@ -1507,6 +1548,7 @@ def get_components():
 
     json_object = json.dumps(dictionary, indent = 4);
 
+    operation_counter -= 1
     return json_object
 
 @app.route('/solvent_neighbor_flag', methods=['POST']) 

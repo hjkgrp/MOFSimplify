@@ -867,10 +867,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // s_neighbor and t_neighbor are booleans, indicate if we are visualizing a neighbor
     // if not, default to visualize the MOF that is queued up
 
-    if (s_neighbor) { // In this case, want to visualize the solvent stability ANN neighbor
+    if (s_neighbor) { // In this case, want to visualize the solvent removal stability ANN neighbor
       // grab the current solvent neighbor MOF cif file
 
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
@@ -891,7 +891,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
       // grab the current solvent neighbor MOF cif file
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
@@ -1369,7 +1369,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       handleInput(solvent_neighbor_vis, thermal_neighbor_vis); // handles visualization, will display the MOF in the appropriate box (viewportwrapper)
 
 
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       message = 'Currently visualized MOF: '
@@ -1470,13 +1470,21 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         $.post("/predict_solvent_stability", JSON.stringify(myDict)).done(
           function (response) {
 
+            if (response == 'OVERLOAD') {
+              alert('Server is receiving high traffic, please try again later')
+              solvent_pred_color = failure_red;
+              $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+              $('#solvent_stability_prediction').text('');
+
+              return; // Do not update solvent removal stability prediction if server is too busy.              
+            }
             if (response == 'FAILED') {
               alert('Failed to featurize')
               solvent_pred_color = failure_red;
               $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
               $('#solvent_stability_prediction').text('');
 
-              return; // Do not update solvent stability prediction if prediction failed.
+              return; // Do not update solvent removal stability prediction if prediction failed.
             }
 
             solvent_pred_color = success_green;
@@ -1630,12 +1638,20 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         $.post("/predict_thermal_stability", JSON.stringify(myDict)).done(
           function (response) {
 
+            if (response == 'OVERLOAD') {
+              alert('Server is receiving high traffic, please try again later')
+              thermal_pred_color = failure_red;
+              $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+              $('#thermal_stability_prediction').text('')
+              return; // Do not update thermal stability prediction if server is too busy.              
+            }
+
             if (response == 'FAILED') {
               alert('Failed to featurize')
               thermal_pred_color = failure_red;
               $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
               $('#thermal_stability_prediction').text('')
-              return; // Do not update solvent stability prediction if prediction failed.
+              return; // Do not update solvent removal stability prediction if prediction failed.
             }
 
             $('#thermal_form').show()
@@ -1883,6 +1899,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // Get MOF linkers and sbus when the "Get selected (1) MOF components" button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function () {
+      console.log('First component check')
+
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
       $('#component_SMILES').text('') // clear the SMILES text
@@ -1923,6 +1941,18 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         // result is the text of the loaded .cif file
         $.post("/get_components", JSON.stringify(myDict)).done(
           function (response) {
+
+            console.log('component check')
+            console.log(typeof response)
+
+            if (response == 'OVERLOAD') {
+              console.log('HIT HIT HIT')
+              alert('Server is receiving high traffic, please try again later')
+              document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+              component_color = failure_red;
+              $('#get_components').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+              return;             
+            }
 
             if (response == 'FAILED') {
               alert('Failed to featurize.')
@@ -1995,7 +2025,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
       $('#pills-comp-tab').click() // redirecting to appropriate tab
 
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
@@ -2301,7 +2331,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     })
 
     function clear_neighbor_dropdowns() { // clear dropdowns when upload new file
-      // Clearing solvent stability ANN nearest neighbors dropdown.
+      // Clearing solvent removal stability ANN nearest neighbors dropdown.
       var solvent_dropdown = document.getElementById("solvent_neighbors");
       var length = solvent_dropdown.options.length;
       for (i = length - 1; i >= 0; i--) {
@@ -2330,7 +2360,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         return;
       }
 
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Get the latent space distance from the information returned from the prediction.
@@ -2341,7 +2371,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         latent_distance = '0' + latent_distance;
       }
 
-      // Grab the solvent stability flag and DOI from the appropriate Excel sheet with a POST request.
+      // Grab the solvent removal stability flag and DOI from the appropriate Excel sheet with a POST request.
       $.post("/solvent_neighbor_flag", JSON.stringify(my_neighbor)).done(
         function (response) {
           flag = response['flag']
@@ -2377,7 +2407,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         return;
       }
 
-      my_neighbor = $('#solvent_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Making the txt file with information about the neighbor
@@ -2425,7 +2455,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         return;
       }
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Get the latent space distance from the information returned from the prediction.
@@ -2476,7 +2506,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         return;
       }
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Making the txt file with information about the neighbor

@@ -262,7 +262,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="feedback_form_name" value="solvent_stability" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i>Rate this prediction:</i>
+            <i id='rate_solvent'>Rate this prediction:</i> <!-- TODO adjust text to say ground truth if MOF is in ground truth, do same with thermal form-->
             <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
@@ -302,7 +302,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="feedback_form_name" value="thermal_stability" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i>Rate this prediction:</i>
+            <i id='rate_thermal'>Rate this prediction:</i>
             <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
@@ -1556,6 +1556,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 option.text = num.concat(neighbor_names[i]);
                 solvent_dropdown.add(option);
               }
+
+              // Setting text in the feedback form.
+              $('#rate_solvent').text('Rate this prediction:')
             }
             else { // requested MOF was in the training data
 
@@ -1576,6 +1579,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 setColor(solvent_form, '#ffad97') // color background, light red
               }
 
+              // Setting text in the feedback form.
+              $('#rate_solvent').text('Rate this ground truth:')
             }
 
           });
@@ -1722,6 +1727,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 option.text = num.concat(neighbor_names[i]);
                 thermal_dropdown.add(option);
               }
+
+              // Setting text in the feedback form.
+              $('#rate_thermal').text('Rate this prediction:')
+
             }
 
             else { // requested MOF was in the training data
@@ -1754,12 +1763,16 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 setColor(percentile_field, response_color)
                 setColor(prediction_field, response_color)
                 setColor(thermal_form, response_color)
+
               })
 
               myDict = { 'prediction': false, 'temperature': response['truth'] }
               $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
                 $('#chart').html(response);
               })
+
+              // Setting text in the feedback form.
+              $('#rate_thermal').text('Rate this ground truth:')
             }
           })
       })

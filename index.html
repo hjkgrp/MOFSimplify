@@ -135,7 +135,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
 
 <body>
-
   <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
   <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
     <div class="container">
@@ -262,7 +261,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="feedback_form_name" value="solvent_stability" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i id='rate_solvent'>Rate this prediction:</i> 
+            <i id='rate_solvent'>Rate this prediction: *</i> 
             <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
@@ -272,13 +271,20 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 class="form-control" required>
             </div>
             <select name="reason" id="inputState_A" class="form-control mt-2 mb-0" required>
-              <option value="">Reason for rating...</option>
+              <option value="">Reason for rating... *</option>
               <option>I've worked with this MOF before, the prediction is good</option>
               <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
               <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
               <option>The paper is incorrect (provide reasoning in comment field)</option>
               <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
+            <div style="" class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
+              </div>
+              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control">
+            </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
@@ -291,7 +297,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <label class="custom-file-label" for="validatedCustomFile_A" id="TGA_A">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff; 20 MB max)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
-            </div><button type="submit" class="btn btn-primary mt-2" id="submit_A">Submit</button>
+            </div>
+            <div class="input-group mt-2" style="">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+              </div>
+              <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary mt-2" id="submit_A">Submit</button>
           </form>
         </div>
 
@@ -302,7 +316,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="feedback_form_name" value="thermal_stability" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i id='rate_thermal'>Rate this prediction:</i>
+            <i id='rate_thermal'>Rate this prediction: *</i>
             <input name="rating" id="thermal_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
@@ -312,13 +326,20 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 class="form-control" required>
             </div>
             <select name="reason" id="inputState_B" class="form-control mt-2 mb-0" required>
-              <option value="">Reason for rating...</option>
+              <option value="">Reason for rating... *</option>
               <option>I've worked with this MOF before, the prediction is good</option>
               <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
               <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
               <option>The paper is incorrect (provide reasoning in comment field)</option>
               <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
+            <div style="" class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
+              </div>
+              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                class="form-control">
+            </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="thermal_rating_comments_desc">Comments</span>
@@ -331,7 +352,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <label class="custom-file-label" for="validatedCustomFile_B" id="TGA_B">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff; 20 MB max)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
-            </div><button type="submit" class="btn btn-primary mt-2" id="submit_B">Submit</button>
+            </div>
+            <div class="input-group mt-2" style="">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+              </div>
+              <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary mt-2" id="submit_B">Submit</button>
           </form>
         </div>
         <div class='col-12' style='font-size:22px;' id='chart'></div>
@@ -370,7 +399,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <input type="hidden" name="feedback_form_name" value="solvent_stability_neighbor" />
               <input type="hidden" name="cif_file_name" value="" />
               <input type="hidden" name="structure" value="" />
-              <i>Rate this existing data:</i>
+              <i>Rate this existing data: *</i>
               <input name="rating" id="solvent_neighbor_rating" type="text" class="rating" data-size="md" required>
               <div style="" class="input-group mt-2">
                 <div class="input-group-prepend">
@@ -380,13 +409,20 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   class="form-control" required>
               </div>
               <select name="reason" id="inputState_C" class="form-control mt-2 mb-0" required>
-                <option value="">Reason for rating...</option>
+                <option value="">Reason for rating... * </option>
                 <option>I've worked with this MOF before, the deposited data is good</option>
                 <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
                 <option>The literature contains counter examples of this deposited data (provide DOI of papers with counterexamples in comment field)</option>
                 <option>The paper is incorrect (provide reasoning in comment field)</option>
                 <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
               </select>
+              <div style="" class="input-group mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
+                </div>
+                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                  class="form-control">
+              </div>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="solvent_neighbor_rating_comments_desc">Comments</span>
@@ -398,7 +434,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_C">
                 <label class="custom-file-label" for="validatedCustomFile_C" id="TGA_C">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
-              </div><button type="submit" class="btn btn-primary mt-2" id="submit_C">Submit</button>
+              </div>
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+                </div>
+                <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                  class="form-control">
+              </div>
+              <button type="submit" class="btn btn-primary mt-2" id="submit_C">Submit</button>
             </form>
           </div>
         </div>
@@ -426,7 +470,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <input type="hidden" name="feedback_form_name" value="thermal_stability_neighbor" />
               <input type="hidden" name="cif_file_name" value="" />
               <input type="hidden" name="structure" value="" />
-              <i>Rate this existing data:</i>
+              <i>Rate this existing data: *</i>
               <input name="rating" id="thermal_neighbor_rating" type="text" class="rating" data-size="md" required>
               <div style="" class="input-group mt-2">
                 <div class="input-group-prepend">
@@ -436,13 +480,20 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                   class="form-control" required>
               </div>
               <select name="reason" id="inputState_D" class="form-control mt-2 mb-0" required>
-                <option value="">Reason for rating...</option>
+                <option value="">Reason for rating... *</option>
                 <option>I've worked with this MOF before, the deposited data is good</option>
                 <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
                 <option>The literature contains counter examples of this deposited data (provide DOI of papers with counterexamples in comment field)</option>
                 <option>The paper is incorrect (provide reasoning in comment field)</option>
                 <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
               </select>
+              <div style="" class="input-group mt-2">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
+                </div>
+                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                  class="form-control">
+              </div>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="thermal_neighbor_rating_comments_desc">Comments</span>
@@ -454,7 +505,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_D">
                 <label class="custom-file-label" for="validatedCustomFile_D" id="TGA_D">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
-              </div><button type="submit" class="btn btn-primary mt-2" id="submit_D">Submit</button>
+              </div>
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+                </div>
+                <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                  class="form-control">
+              </div>
+              <button type="submit" class="btn btn-primary mt-2" id="submit_D">Submit</button>
             </form>
           </div>
           <div class='col-6' id='tga_plot'></div>
@@ -649,14 +708,21 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             </div>
             <div class="custom-file form-control mt-2">
               <input name="cif_file" type="file" class="custom-file-input" id="validatedCustomFile_E1" required>
-              <label class="custom-file-label" for="validatedCustomFile_E1" id="MOF_E">Upload MOF (.cif; Required)</label>
+              <label class="custom-file-label" for="validatedCustomFile_E1" id="MOF_E">Upload MOF (.cif) *</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
             <div class="custom-file form-control mt-2">
               <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_E2" required>
               <label class="custom-file-label" for="validatedCustomFile_E2" id="TGA_E">Upload TGA Trace (.pdf, .jpg, .png,
-                .tiff; 20 MB max; Required)</label>
+                .tiff; 20 MB max) *</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
+            </div>
+            <div class="input-group mt-2" style="">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used *</span>
+              </div>
+              <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
           </form>
@@ -1568,7 +1634,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               }
 
               // Setting text in the feedback form.
-              $('#rate_solvent').text('Rate this prediction:')
+              $('#rate_solvent').text('Rate this prediction *')
             }
             else { // requested MOF was in the training data
 
@@ -1590,7 +1656,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               }
 
               // Setting text in the feedback form.
-              $('#rate_solvent').text('Rate this ground truth:')
+              $('#rate_solvent').text('Rate this ground truth *')
             }
 
           });
@@ -1739,7 +1805,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               }
 
               // Setting text in the feedback form.
-              $('#rate_thermal').text('Rate this prediction:')
+              $('#rate_thermal').text('Rate this prediction *')
 
             }
 
@@ -1782,7 +1848,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               })
 
               // Setting text in the feedback form.
-              $('#rate_thermal').text('Rate this ground truth:')
+              $('#rate_thermal').text('Rate this ground truth *')
             }
           })
       })
@@ -2683,7 +2749,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           my_extension = getExtension(my_name);
           console.log('check 2')
           console.log(my_extension)
-          if (upload_extensions.includes(my_extension)) {
+          if (upload_extensions.includes(my_extension.toLowerCase())) {
             alert('Thank you for your feedback!')
           }
           else {
@@ -2714,7 +2780,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         if (file) { // The user did upload the optional TGA file.
           my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
           my_extension = getExtension(my_name);
-          if (upload_extensions.includes(my_extension)) {
+          if (upload_extensions.includes(my_extension.toLowerCase())) {
             alert('Thank you for your feedback!')
           }
           else {
@@ -2745,7 +2811,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         if (file) { // The user did upload the optional TGA file.
           my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
           my_extension = getExtension(my_name);
-          if (upload_extensions.includes(my_extension)) {
+          if (upload_extensions.includes(my_extension.toLowerCase())) {
             alert('Thank you for your feedback!')
           }
           else {
@@ -2776,7 +2842,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         if (file) { // The user did upload the optional TGA file.
           my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
           my_extension = getExtension(my_name);
-          if (upload_extensions.includes(my_extension)) {
+          if (upload_extensions.includes(my_extension.toLowerCase())) {
             alert('Thank you for your feedback!')
           }
           else {
@@ -2810,7 +2876,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         my_name_2 = TGA_file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
         my_extension_2 = getExtension(my_name_2);
 
-        if (upload_extensions.includes(my_extension_2) && my_extension_1 == "cif") {
+        if (upload_extensions.includes(my_extension_2.toLowerCase()) && my_extension_1 == "cif") {
           alert('Thank you for your feedback!')
         }
         else {

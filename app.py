@@ -192,10 +192,10 @@ def serve_banner_dark():
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
 
-# @app.route('/images/bg.jpg')
-# def serve_bg():
-#     # Hack to show the background image on the success/failure screens.
-#     return flask.send_from_directory('./splash_page/images', 'bg.jpg')
+@app.route('/images/bg.jpg')
+def serve_bg():
+    # Hack to show the background image on the success/failure screens.
+    return flask.send_from_directory('./splash_page/images', 'bg.jpg')
 
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
@@ -208,7 +208,7 @@ def process_feedback():
         # The first argument is the IP address. The second argument is the port.
     db = client.feedback
     collection = db.MOFSimplify # The MOFSimplify collection in the feedback database.
-    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure']
+    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure', 'solvent']
     #$meta_fields = ['IP', 'datetime', 'cif_file', 'MOF_name']
     final_dict = {}
     for field in fields:
@@ -219,6 +219,8 @@ def process_feedback():
     if uploaded_file.filename == '' and request.form.get('feedback_form_name') != 'upload_form':
         # User did not upload the optional TGA trace
         print('No TGA trace')
+    # if final_dict['file']==b'':
+    #     file_ext = ''
     else:
         final_dict['filetype'] = uploaded_file.content_type
         filename = secure_filename(uploaded_file.filename)

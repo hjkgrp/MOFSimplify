@@ -341,9 +341,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+                <span class="input-group-text" id="thermal_rating_solvname_desc">Solvent used for selected MOF</span>
               </div>
-              <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+              <input name="solvent" type="text" id="thermal_rating_solvname" aria-describedby="thermal_rating_solvname_desc"
                 class="form-control">
             </div>
             <button type="submit" class="btn btn-primary mt-2" id="submit_B">Submit</button>
@@ -416,9 +416,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               </div>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+                  <span class="input-group-text" id="solvent_neighbor_rating_solvname_desc">Solvent used for selected MOF</span>
                 </div>
-                <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                <input name="solvent" type="text" id="solvent_neighbor_rating_solvname" aria-describedby="solvent_neighbor_rating_solvname_desc"
                   class="form-control">
               </div>
               <button type="submit" class="btn btn-primary mt-2" id="submit_C">Submit</button>
@@ -480,9 +480,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               </div>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used for selected MOF</span>
+                  <span class="input-group-text" id="thermal_neighbor_rating_solvname_desc">Solvent used for selected MOF</span>
                 </div>
-                <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+                <input name="solvent" type="text" id="thermal_neighbor_rating_solvname" aria-describedby="thermal_neighbor_rating_solvname_desc"
                   class="form-control">
               </div>
               <button type="submit" class="btn btn-primary mt-2" id="submit_D">Submit</button>
@@ -691,9 +691,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent used *</span>
+                <span class="input-group-text" id="data_upload_solvname_desc">Solvent used *</span>
               </div>
-              <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+              <input name="solvent" type="text" id="data_upload_solvname" aria-describedby="data_upload_solvname_desc"
                 class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
@@ -2838,8 +2838,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       var email = document.getElementById('upload_form_email').value;
       var cif_file = document.getElementById('validatedCustomFile_E1').value;
       var TGA_file = document.getElementById('validatedCustomFile_E2').value;
+      var solvent = document.getElementById('data_upload_solvname').value;
 
-      if (email && cif_file && TGA_file) { // requisite fields have been filled out
+      if (email && cif_file && TGA_file && solvent) { // requisite fields have been filled out
         var cif_file = document.getElementById('validatedCustomFile_E1').value;
         var TGA_file = document.getElementById('validatedCustomFile_E2').value;
 

@@ -278,13 +278,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <option>The paper is incorrect (provide reasoning in comment field)</option>
               <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
-            <div style="" class="input-group mt-2">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
-              </div>
-              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                class="form-control">
-            </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
@@ -333,13 +326,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <option>The paper is incorrect (provide reasoning in comment field)</option>
               <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
-            <div style="" class="input-group mt-2">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
-              </div>
-              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                class="form-control">
-            </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
                 <span class="input-group-text" id="thermal_rating_comments_desc">Comments</span>
@@ -416,13 +402,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 <option>The paper is incorrect (provide reasoning in comment field)</option>
                 <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
               </select>
-              <div style="" class="input-group mt-2">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
-                </div>
-                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                  class="form-control">
-              </div>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="solvent_neighbor_rating_comments_desc">Comments</span>
@@ -487,13 +466,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 <option>The paper is incorrect (provide reasoning in comment field)</option>
                 <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
               </select>
-              <div style="" class="input-group mt-2">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred)</span>
-                </div>
-                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                  class="form-control">
-              </div>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
                   <span class="input-group-text" id="thermal_neighbor_rating_comments_desc">Comments</span>
@@ -2883,8 +2855,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           alert('Invalid file extension.')
         }  
         document.getElementById('upload_form_element').reset() // reset the form
-        $("#TGA_E").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
-        $("#MOF_E").text('Upload MOF (.cif; Required)')
+        $("#TGA_E").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max) *') // resetting input text
+        $("#MOF_E").text('Upload MOF (.cif) *')
       }
     })
 

@@ -56,6 +56,7 @@ USE_SPLASH_PAGE = False
 app = flask.Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 20 # Upload max 20 megabytes
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg', '.png', '.pdf', '.tiff', '.tif', '.eps'] # acceptable file types
+    # Note: these are a superset of the extensions indicated on the form and allowed on the front end, so some of these extensions don't actually apply
 app.secret_key = str(json.load(open('secret_key.json','r'))['key']) # secret key
 cors = CORS(app)
 
@@ -215,13 +216,18 @@ def process_feedback():
 
     # Populate special fields
     uploaded_file = request.files['file']
-    final_dict['filetype'] = uploaded_file.content_type
-    filename = secure_filename(uploaded_file.filename)
-    final_dict['filename'] = filename
-    final_dict['file'] = uploaded_file.read()
-    file_ext = os.path.splitext(filename)[1].lower()
-    if file_ext not in app.config['UPLOAD_EXTENSIONS']:
-        return flask.send_from_directory('./splash_page/', 'error.html')
+    if uploaded_file.filename == '' and request.form.get('feedback_form_name') != 'upload_form':
+        # User did not upload the optional TGA trace
+        print('No TGA trace')
+    else:
+        final_dict['filetype'] = uploaded_file.content_type
+        filename = secure_filename(uploaded_file.filename)
+        final_dict['filename'] = filename
+        final_dict['file'] = uploaded_file.read()
+        file_ext = os.path.splitext(filename)[1].lower()
+        if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+            return ('', 204) # 204 no content response
+            # return flask.send_from_directory('./splash_page/', 'error.html')
 
     # Special tasks if the form is upload_form
     if request.form.get('feedback_form_name') == 'upload_form':
@@ -229,7 +235,8 @@ def process_feedback():
         cif_filename = secure_filename(uploaded_cif.filename)
         file_ext = os.path.splitext(cif_filename)[1].lower()
         if file_ext != '.cif':
-            return flask.send_from_directory('./splash_page/', 'error.html')
+            return ('', 204) # 204 no content response
+            # return flask.send_from_directory('./splash_page/', 'error.html')
         final_dict['cif_file_name'] = cif_filename
         final_dict['structure'] = uploaded_cif.read()
 
@@ -240,7 +247,8 @@ def process_feedback():
     collection.insert(final_dict) # insert the dictionary into the mongodb collection
     with open('sample.bson', 'wb') as outfile:
         outfile.write(bson.encode(final_dict))
-    return flask.send_from_directory('./splash_page/', 'success.html')
+    return ('', 204) # 204 no content response
+    # return flask.send_from_directory('./splash_page/', 'success.html')
 
 
 ## Splash page management. Splash page is currently disabled.

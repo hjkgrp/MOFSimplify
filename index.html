@@ -262,7 +262,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="feedback_form_name" value="solvent_stability" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i id='rate_solvent'>Rate this prediction:</i> <!-- TODO adjust text to say ground truth if MOF is in ground truth, do same with thermal form-->
+            <i id='rate_solvent'>Rate this prediction:</i> 
             <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
@@ -271,7 +271,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
                 class="form-control" required>
             </div>
-            <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+            <select name="reason" id="inputState_A" class="form-control mt-2 mb-0" required>
               <option value="">Reason for rating...</option>
               <option>I've worked with this MOF before, the prediction is good</option>
               <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
@@ -287,11 +287,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
                 class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
-              <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_A">
+              <label class="custom-file-label" for="validatedCustomFile_A" id="TGA_A">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff; 20 MB max)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
-            </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
+            </div><button type="submit" class="btn btn-primary mt-2" id="submit_A">Submit</button>
           </form>
         </div>
 
@@ -303,15 +303,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
             <i id='rate_thermal'>Rate this prediction:</i>
-            <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
+            <input name="rating" id="thermal_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                <span class="input-group-text" id="thermal_rating_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+              <input name="email" type="email" id="thermal_rating_email" aria-describedby="thermal_rating_email_desc"
                 class="form-control" required>
             </div>
-            <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+            <select name="reason" id="inputState_B" class="form-control mt-2 mb-0" required>
               <option value="">Reason for rating...</option>
               <option>I've worked with this MOF before, the prediction is good</option>
               <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
@@ -321,17 +321,17 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             </select>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                <span class="input-group-text" id="thermal_rating_comments_desc">Comments</span>
               </div>
-              <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
+              <input name="comments" type="text" id="thermal_rating_comments" aria-describedby="thermal_rating_comments_desc"
                 class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
-              <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_B">
+              <label class="custom-file-label" for="validatedCustomFile_B" id="TGA_B">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff; 20 MB max)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
-            </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
+            </div><button type="submit" class="btn btn-primary mt-2" id="submit_B">Submit</button>
           </form>
         </div>
         <div class='col-12' style='font-size:22px;' id='chart'></div>
@@ -371,15 +371,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <input type="hidden" name="cif_file_name" value="" />
               <input type="hidden" name="structure" value="" />
               <i>Rate this existing data:</i>
-              <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
+              <input name="rating" id="solvent_neighbor_rating" type="text" class="rating" data-size="md" required>
               <div style="" class="input-group mt-2">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                  <span class="input-group-text" id="solvent_neighbor_rating_email_desc">Email (.edu preferred) *</span>
                 </div>
-                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                <input name="email" type="email" id="solvent_neighbor_rating_email" aria-describedby="solvent_neighbor_rating_email_desc"
                   class="form-control" required>
               </div>
-              <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+              <select name="reason" id="inputState_C" class="form-control mt-2 mb-0" required>
                 <option value="">Reason for rating...</option>
                 <option>I've worked with this MOF before, the deposited data is good</option>
                 <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
@@ -389,16 +389,16 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               </select>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                  <span class="input-group-text" id="solvent_neighbor_rating_comments_desc">Comments</span>
                 </div>
-                <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
+                <input name="comments" type="text" id="solvent_neighbor_rating_comments" aria-describedby="solvent_neighbor_rating_comments_desc"
                   class="form-control">
               </div>
               <div class="custom-file form-control mt-2">
-                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
-                <label class="custom-file-label" for="validatedCustomFile">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
+                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_C">
+                <label class="custom-file-label" for="validatedCustomFile_C" id="TGA_C">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
-              </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
+              </div><button type="submit" class="btn btn-primary mt-2" id="submit_C">Submit</button>
             </form>
           </div>
         </div>
@@ -427,15 +427,15 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               <input type="hidden" name="cif_file_name" value="" />
               <input type="hidden" name="structure" value="" />
               <i>Rate this existing data:</i>
-              <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
+              <input name="rating" id="thermal_neighbor_rating" type="text" class="rating" data-size="md" required>
               <div style="" class="input-group mt-2">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                  <span class="input-group-text" id="thermal_neighbor_rating_email_desc">Email (.edu preferred) *</span>
                 </div>
-                <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+                <input name="email" type="email" id="thermal_neighbor_rating_email" aria-describedby="thermal_neighbor_rating_email_desc"
                   class="form-control" required>
               </div>
-              <select name="reason" id="inputState" class="form-control mt-2 mb-0" required>
+              <select name="reason" id="inputState_D" class="form-control mt-2 mb-0" required>
                 <option value="">Reason for rating...</option>
                 <option>I've worked with this MOF before, the deposited data is good</option>
                 <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
@@ -445,16 +445,16 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               </select>
               <div class="input-group mt-2" style="">
                 <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                  <span class="input-group-text" id="thermal_neighbor_rating_comments_desc">Comments</span>
                 </div>
-                <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
+                <input name="comments" type="text" id="thermal_neighbor_rating_comments" aria-describedby="thermal_neighbor_rating_comments_desc"
                   class="form-control">
               </div>
               <div class="custom-file form-control mt-2">
-                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile">
-                <label class="custom-file-label" for="validatedCustomFile">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
+                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_D">
+                <label class="custom-file-label" for="validatedCustomFile_D" id="TGA_D">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
                 <div class="invalid-feedback">Example invalid custom file feedback</div>
-              </div><button type="submit" class="btn btn-primary mt-2">Submit</button>
+              </div><button type="submit" class="btn btn-primary mt-2" id="submit_D">Submit</button>
             </form>
           </div>
           <div class='col-6' id='tga_plot'></div>
@@ -518,7 +518,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
               id='visualize_sbu' type='button'>SBU</button>
             <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
-              id='reset' type='button'>Reset zoom</button>
+              id='reset_zoom' type='button'>Reset zoom</button>
             <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
               id='download_linker' type='button'>Download linker</button>
             <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
@@ -635,30 +635,30 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <input type="hidden" name="rating" value="" />
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                <span class="input-group-text" id="upload_form_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+              <input name="email" type="email" id="upload_form_email" aria-describedby="upload_form_email_desc"
                 class="form-control" required>
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                <span class="input-group-text" id="upload_form_comments_desc">Comments</span>
               </div>
-              <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
+              <input name="comments" type="text" id="upload_form_comments" aria-describedby="upload_form_comments_desc"
                 class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input name="cif_file" type="file" class="custom-file-input" id="validatedCustomFile" required>
-              <label class="custom-file-label" for="validatedCustomFile">Upload MOF (.cif; Required)</label>
+              <input name="cif_file" type="file" class="custom-file-input" id="validatedCustomFile_E1" required>
+              <label class="custom-file-label" for="validatedCustomFile_E1" id="MOF_E">Upload MOF (.cif; Required)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
             <div class="custom-file form-control mt-2">
-              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile" required>
-              <label class="custom-file-label" for="validatedCustomFile">Upload TGA Trace (.pdf, .jpg, .png,
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_E2" required>
+              <label class="custom-file-label" for="validatedCustomFile_E2" id="TGA_E">Upload TGA Trace (.pdf, .jpg, .png,
                 .tiff; 20 MB max; Required)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
-            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+            <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
           </form>
         </div>
     </div>
@@ -1150,7 +1150,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     data = {};
 
     // Reset zoom level.
-    $('#reset').click(function () {
+    $('#reset_zoom').click(function () {
       component_viewer.zoomTo();
     })
 
@@ -1220,6 +1220,16 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       document.getElementById('viewportnote').style.display = 'block';
       document.getElementById('viewportnote').innerHTML = 'MOF unit cells are visualized here. <br> Left click to rotate, right click with mouse to move, scroll with mouse to zoom.';
       document.getElementById('container-01-note').innerHTML = 'MOF linkers and SBUs are visualized here. <br> Left click to rotate, scroll with mouse to zoom.';
+
+      // Reset forms
+      document.getElementById('solvent_stability_feedback').reset()
+      document.getElementById('thermal_stability_feedback').reset()
+      document.getElementById('solvent_stability_neighbor_feedback').reset()
+      document.getElementById('thermal_stability_neighbor_feedback').reset()
+      $("#TGA_A").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text (solvent stability)
+      $("#TGA_B").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text (thermal stability)
+      $("#TGA_C").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text (solvent stability neighbor)
+      $("#TGA_D").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text (thermal stability neighbor)
     }
 
     // Resets the colors of the selection and prediction and visualize and component buttons
@@ -2557,7 +2567,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     })
 
 
-    // This function is for downlooding information on nearest neighbors and xyz's of components
+    // This function is used for downlooding information on nearest neighbors and xyz's of components
     function download(filename, text) {
       var element = document.createElement('a');
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -2640,6 +2650,176 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           download(name + '_descriptors.csv', response)
         })
 
+    })
+
+
+    // Form check for file extensions
+    upload_extensions = ['pdf', 'jpg', 'png', 'tiff'] // ['jpg', 'jpeg', 'png', 'pdf', 'tiff', 'tif', 'eps'] // acceptable file types
+
+    // The next few functions handle form submission. Specifically, the printing of messages to indicate if form submission went through.
+
+    // When the "Submit" button is clicked for the solvent removal stability prediction/ground truth feedback
+    $('#submit_A').click(function () {
+      // Returns an alert to the user indicating whether their feedback was accepted.
+
+      // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+      var rating = document.getElementById('solvent_rating').value;      
+      console.log('Rating check')
+      console.log(rating)
+      var email = document.getElementById('solvent_rating_email').value;
+      console.log('Email check')
+      console.log(email)
+      var reason = document.getElementById('inputState_A').value;
+      console.log('Reason check')
+      console.log(reason)
+
+      if (rating && email && reason) { // requisite fields have been filled out
+        var file = document.getElementById('validatedCustomFile_A').value;
+
+        if (file) { // The user did upload the optional TGA file.
+          console.log('check check check')
+          console.log(file)
+          my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
+          my_extension = getExtension(my_name);
+          console.log('check 2')
+          console.log(my_extension)
+          if (upload_extensions.includes(my_extension)) {
+            alert('Thank you for your feedback!')
+          }
+          else {
+            alert('Invalid file extension.')
+          }  
+        }
+        else { // The user did not upload the optional TGA file
+          alert('Thank you for your feedback!')
+        }
+
+        document.getElementById('solvent_stability_feedback').reset() // reset the form
+        $("#TGA_A").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
+      }
+    })
+
+    // When the "Submit" button is clicked for the thermal stability prediction/ground truth feedback
+    $('#submit_B').click(function () {
+      // Returns an alert to the user indicating whether their feedback was accepted.
+
+      // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+      var rating = document.getElementById('thermal_rating').value;      
+      var email = document.getElementById('thermal_rating_email').value;
+      var reason = document.getElementById('inputState_B').value;
+
+      if (rating && email && reason) { // requisite fields have been filled out
+        var file = document.getElementById('validatedCustomFile_B').value;
+
+        if (file) { // The user did upload the optional TGA file.
+          my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
+          my_extension = getExtension(my_name);
+          if (upload_extensions.includes(my_extension)) {
+            alert('Thank you for your feedback!')
+          }
+          else {
+            alert('Invalid file extension.')
+          }  
+        }
+        else { // The user did not upload the optional TGA file
+          alert('Thank you for your feedback!')
+        }
+
+        document.getElementById('thermal_stability_feedback').reset() // reset the form
+        $("#TGA_B").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
+      }
+    })
+
+    // When the "Submit" button is clicked for the solvent neighbor feedback
+    $('#submit_C').click(function () {
+      // Returns an alert to the user indicating whether their feedback was accepted.
+
+      // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+      var rating = document.getElementById('solvent_neighbor_rating').value;      
+      var email = document.getElementById('solvent_neighbor_rating_email').value;
+      var reason = document.getElementById('inputState_C').value;
+
+      if (rating && email && reason) { // requisite fields have been filled out
+        var file = document.getElementById('validatedCustomFile_C').value;
+
+        if (file) { // The user did upload the optional TGA file.
+          my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
+          my_extension = getExtension(my_name);
+          if (upload_extensions.includes(my_extension)) {
+            alert('Thank you for your feedback!')
+          }
+          else {
+            alert('Invalid file extension.')
+          }  
+        }
+        else { // The user did not upload the optional TGA file
+          alert('Thank you for your feedback!')
+        }
+
+        document.getElementById('solvent_stability_neighbor_feedback').reset() // reset the form
+        $("#TGA_C").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
+      }
+    })
+
+    // When the "Submit" button is clicked for the thermal neighbor feedback
+    $('#submit_D').click(function () {
+      // Returns an alert to the user indicating whether their feedback was accepted.
+
+      // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+      var rating = document.getElementById('thermal_neighbor_rating').value;      
+      var email = document.getElementById('thermal_neighbor_rating_email').value;
+      var reason = document.getElementById('inputState_D').value;
+
+      if (rating && email && reason) { // requisite fields have been filled out
+        var file = document.getElementById('validatedCustomFile_D').value;
+
+        if (file) { // The user did upload the optional TGA file.
+          my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
+          my_extension = getExtension(my_name);
+          if (upload_extensions.includes(my_extension)) {
+            alert('Thank you for your feedback!')
+          }
+          else {
+            alert('Invalid file extension.')
+          }  
+        }
+        else { // The user did not upload the optional TGA file
+          alert('Thank you for your feedback!')
+        }
+
+        document.getElementById('thermal_stability_neighbor_feedback').reset() // reset the form
+        $("#TGA_D").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
+      }
+    })
+
+    // When the "Submit" button is clicked for the data upload form
+    $('#submit_E').click(function () {
+      // Returns an alert to the user indicating whether their feedback was accepted.
+
+      // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+      var email = document.getElementById('upload_form_email').value;
+      var cif_file = document.getElementById('validatedCustomFile_E1').value;
+      var TGA_file = document.getElementById('validatedCustomFile_E2').value;
+
+      if (email && cif_file && TGA_file) { // requisite fields have been filled out
+        var cif_file = document.getElementById('validatedCustomFile_E1').value;
+        var TGA_file = document.getElementById('validatedCustomFile_E2').value;
+
+        my_name_1 = cif_file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
+        my_extension_1 = getExtension(my_name_1)
+        my_name_2 = TGA_file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
+        my_extension_2 = getExtension(my_name_2);
+
+        if (upload_extensions.includes(my_extension_2) && my_extension_1 == "cif") {
+          alert('Thank you for your feedback!')
+        }
+        else {
+          alert('Invalid file extension.')
+        }  
+        document.getElementById('upload_form_element').reset() // reset the form
+        $("#TGA_E").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
+        $("#MOF_E").text('Upload MOF (.cif; Required)')
+      }
     })
 
 

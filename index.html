@@ -2711,6 +2711,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       console.log('Reason check')
       console.log(reason)
 
+      success = true
+
       if (rating && email && reason) { // requisite fields have been filled out
         var file = document.getElementById('validatedCustomFile_A').value;
 
@@ -2726,13 +2728,22 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           }
           else {
             alert('Invalid file extension.')
+            success = false
           }  
         }
         else { // The user did not upload the optional TGA file
           alert('Thank you for your feedback!')
         }
 
+        var data = new FormData($('#solvent_stability_feedback')[0])
         document.getElementById('solvent_stability_feedback').reset() // reset the form
+        if (success) {
+          var request = new XMLHttpRequest();
+          request.onreadystatechange = function() { return; } // Override the response behavior of the request
+          request.open("POST", 'process_feedback', true)
+          request.send(data)
+        }
+        
         $("#TGA_A").text('Upload TGA Trace (.pdf, .jpg, .png, .tiff; 20 MB max)') // resetting input text
       }
     })
@@ -2746,6 +2757,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       var email = document.getElementById('thermal_rating_email').value;
       var reason = document.getElementById('inputState_B').value;
 
+      success = true
+
       if (rating && email && reason) { // requisite fields have been filled out
         var file = document.getElementById('validatedCustomFile_B').value;
 
@@ -2757,6 +2770,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           }
           else {
             alert('Invalid file extension.')
+            success = false;
           }  
         }
         else { // The user did not upload the optional TGA file

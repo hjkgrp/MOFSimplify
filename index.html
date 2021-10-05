@@ -2698,7 +2698,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // When the "Submit" button is clicked for the solvent removal stability prediction/ground truth feedback
     $('#submit_A').click(function () {
-      // Returns an alert to the user indicating whether their feedback was accepted.
+      // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
       var rating = document.getElementById('solvent_rating').value;      
@@ -2737,7 +2737,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         var data = new FormData($('#solvent_stability_feedback')[0])
         document.getElementById('solvent_stability_feedback').reset() // reset the form
-        if (success) {
+        if (success) { // send form data to backend
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() { return; } // Override the response behavior of the request
           request.open("POST", 'process_feedback', true)
@@ -2750,7 +2750,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // When the "Submit" button is clicked for the thermal stability prediction/ground truth feedback
     $('#submit_B').click(function () {
-      // Returns an alert to the user indicating whether their feedback was accepted.
+      // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
       var rating = document.getElementById('thermal_rating').value;      
@@ -2779,7 +2779,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         var data = new FormData($('#thermal_stability_feedback')[0])
         document.getElementById('thermal_stability_feedback').reset() // reset the form
-        if (success) {
+        if (success) { // send form data to backend
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() { return; } // Override the response behavior of the request
           request.open("POST", 'process_feedback', true)
@@ -2792,7 +2792,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // When the "Submit" button is clicked for the solvent neighbor feedback
     $('#submit_C').click(function () {
-      // Returns an alert to the user indicating whether their feedback was accepted.
+      // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
       var rating = document.getElementById('solvent_neighbor_rating').value;      
@@ -2821,7 +2821,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         var data = new FormData($('#solvent_stability_neighbor_feedback')[0])
         document.getElementById('solvent_stability_neighbor_feedback').reset() // reset the form
-        if (success) {
+        if (success) { // send form data to backend
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() { return; } // Override the response behavior of the request
           request.open("POST", 'process_feedback', true)
@@ -2834,7 +2834,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // When the "Submit" button is clicked for the thermal neighbor feedback
     $('#submit_D').click(function () {
-      // Returns an alert to the user indicating whether their feedback was accepted.
+      // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
       var rating = document.getElementById('thermal_neighbor_rating').value;      
@@ -2863,7 +2863,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         var data = new FormData($('#thermal_stability_neighbor_feedback')[0])
         document.getElementById('thermal_stability_neighbor_feedback').reset() // reset the form
-        if (success) {
+        if (success) { // send form data to backend
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() { return; } // Override the response behavior of the request
           request.open("POST", 'process_feedback', true)
@@ -2876,7 +2876,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // When the "Submit" button is clicked for the data upload form
     $('#submit_E').click(function () {
-      // Returns an alert to the user indicating whether their feedback was accepted.
+      // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
       var email = document.getElementById('upload_form_email').value;
@@ -2905,7 +2905,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         var data = new FormData($('#upload_form_element')[0])
         document.getElementById('upload_form_element').reset() // reset the form
-        if (success) {
+        if (success) { // send form data to backend
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() { return; } // Override the response behavior of the request
           request.open("POST", 'process_feedback', true)

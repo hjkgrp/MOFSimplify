@@ -1201,14 +1201,18 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
     function renew(action) { // something else was already called reset, so we're calling this renew
+      console.log('Renew hit')
+      console.log(action)
+
       // action will be either 'example', 'input', or 'bb'
       if (action != 'example') {
         document.getElementById('example_holder').value = null; // clears example cif
       }
-      else if (action != 'input') {
+      if (action != 'input') {
+        console.log('Not input hit')
         document.getElementById('file_input').value = null; // clearing any cifs loaded by the user
       }
-      else if (action != 'bb') {
+      if (action != 'bb') {
         document.getElementById('bbg_MOF_holder').value = null; // clearing bb-generated MOFs holder
       }
 

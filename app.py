@@ -139,6 +139,7 @@ def set_ID():
     """ 
 
     session['ID'] = time.time() # a unique ID for this session
+    session['permission'] = False # keeps track of if user gave us permission to store the MOFs they predict on
 
     # make a version of the temp_file_creation folder for this user
     new_folder = MOFSIMPLIFY_PATH + '/temp_file_creation_' + str(session['ID'])
@@ -163,9 +164,26 @@ def get_ID():
     get_ID gets the session user ID. 
     This is used for getting building block generated MOFs.
 
-    :return: The session ID for this user.
+    :return: string, The session ID for this user.
     """ 
     return str(session['ID']) # return a string
+
+@app.route('/permission', methods=['POST'])
+def change_permission():
+    """
+    change_permission adjusts whether or not MOFSimplify stores information on the MOFs the user predicts on.
+
+    :return: string, The boolean sent from the front end. We return this because we have to return something, but nothing is done with the returned value on the front end.
+    """
+
+    # Grab data
+    permission = json.loads(flask.request.get_data())
+    session['permission'] = permission
+    print('Permission check')
+    print(permission)
+    print(type(permission))
+    return str(permission)
+
 
 # The send_from_directory functions that follow provide images from the MOFSimplify server to the website. The images are in a folder called images.
 @app.route('/logo.png')
@@ -1050,6 +1068,10 @@ def ss_predict():
 
     operation_counter += 1
 
+    if session['permission']:
+        # TODO implement database push of MOF structure
+        print('TODO')
+
     print('TIME CHECK 1')
     import time
     timeStarted = time.time() # save start time (debugging)
@@ -1116,6 +1138,10 @@ def ts_predict():
         return 'OVERLOAD'
 
     operation_counter += 1
+
+    if session['permission']:
+        # TODO implement database push of MOF structure
+        print('TODO')
 
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data()) # This is a dictionary.

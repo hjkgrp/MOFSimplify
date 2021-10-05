@@ -85,6 +85,11 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     font-size: 16px;
   }
 
+  .perm {
+    background: none;
+    border: none;
+  }
+
   .pill-custom {
     border-radius: 0px 0px 0px 0px !important;
     border: 0px;
@@ -219,6 +224,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'
             style='font-size:22px;'>Building block assembly</button>
           <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p>
+          <p class='zebra' style='font-size:22px;' id='permission_line'>May MOFSimplify store information on your MOFs? &nbsp&nbsp<button style='color: green;' id='perm_yes' class='perm'>Yes.</button>&nbsp&nbsp&nbsp<button style='color: red;' id='perm_no' class='perm'>No.</button></p> <!-- &nbsp is a space gap -->
         </div>
       </div>
 
@@ -235,6 +241,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               id='predict_t' type='button'>Thermal stability</button>
           </div>
         </div>
+
       </div>
 
       <div id='descriptor_section' style='margin-top: 1cm;'>
@@ -3090,7 +3097,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // I just wait a bit, then hide it
     window.setTimeout(viewer_hider, 5)
 
-
     // functions to handle the selection and prediction and visualize and component button color change upon mouse hover
     // since we change the selection and prediction and visualize and component button colors and lose the default hover color change
     $("#load").hover(function () {
@@ -3162,6 +3168,34 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     }, function () {
       $(this).css("color", '#279AF1');
     });
+
+
+    // // TODO Ask the user if they are ok with us storing the MOFs they predict on.
+    // if (confirm('Can we store information on the MOFs you select?')) {
+    //   // User gave us permission to store their MOF information.
+    //   console.log('permission check')
+    //   $.post("/permission", JSON.stringify(true)).done(function (response) {
+    //   })
+    // } else {
+    //   // User did not give permission for us to store their MOF information.
+    //   $.post("/permission", JSON.stringify(false)).done(function (response) {
+    //   })
+    // }
+
+
+    // When the "Yes" button is clicked for storage permission line
+    $("#perm_yes").click(function () {
+      $('#permission_line').hide()
+      $.post("/permission", JSON.stringify(true)).done(function (response) {
+      })
+    })
+
+    // When the "No" button is clicked for storage permission line
+    $("#perm_no").click(function () {
+      $('#permission_line').hide()
+      $.post("/permission", JSON.stringify(false)).done(function (response) {
+      })
+    })
 
   });
 

@@ -1068,10 +1068,6 @@ def ss_predict():
 
     operation_counter += 1
 
-    if session['permission']:
-        # TODO implement database push of MOF structure
-        print('TODO')
-
     print('TIME CHECK 1')
     import time
     timeStarted = time.time() # save start time (debugging)
@@ -1113,6 +1109,10 @@ def ss_predict():
     print('Finished process in ' + str(timeDelta) + ' seconds') 
 
     print('TIME CHECK 6')
+
+    if session['permission']:
+        # database push of MOF structure
+        db_push(structure, 'solvent_stability_prediction')
 
     operation_counter -= 1
     return results
@@ -1179,8 +1179,43 @@ def ts_predict():
 
     print('TIME CHECK 6 ' + str(session['ID']))
 
+    if session['permission']:
+        # database push of MOF structure
+        db_push(structure, 'thermal_stability_prediction')
+
     operation_counter -= 1
     return results
+
+def db_push(structure, prediction_type):
+    """
+    # db_push sends the structure of the MOF being predicted on to the MOFSimplify database.
+    # Many of the form fields that are filled for other forms are left empty in this case.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed
+    :param prediction_type: str, the type of prediction being run. Can either be 'solvent_stability_prediction' or 'thermal_stability_prediction'.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """ 
+
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.feedback
+    collection = db.MOFSimplify # The MOFSimplify collection in the feedback database.
+    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure', 'solvent']
+    final_dict = {}
+    for field in fields:
+        final_dict[field] = '' # start with everything empty
+
+    # Populate certain fields
+    final_dict['feedback_form_name'] = prediction_type
+    final_dict['structure'] = structure
+    final_dict['ip'] = request.remote_addr
+    final_dict['timestamp'] = datetime.now().isoformat()
+    
+    print(final_dict)
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    with open('sample.bson', 'wb') as outfile:
+        outfile.write(bson.encode(final_dict))
+    return ('', 204) # 204 no content response
 
 @app.route('/plot_thermal_stability', methods=['POST']) 
 def plot_thermal_stability():

@@ -151,7 +151,7 @@ def set_ID():
         for dir in dirs:
             target_str = 'temp_file_creation'
             if len(dir) > len(target_str) and target_str in dir and file_age_in_seconds(dir) > 7200: # 7200s is two hours
-                # target_str in dir since all copies start with temp_file_creation
+                # target_str in dir since the names of all copies start with the sequence "temp_file_creation"
                 # len(dir) > len(target_str) to prevent deleting the original temp_file_creation folder
                 shutil.rmtree(dir)
 

@@ -1,3 +1,0 @@
-@ /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1637269397.8033001/solvent_zeo++/HKUST-1_sa.txt Unitcell_volume: 4546.4   Density: 0.8837   ASA_A^2: 801.81 ASA_m^2/cm^3: 1763.62 ASA_m^2/g: 1995.72 NASA_A^2: 43.3668 NASA_m^2/cm^3: 95.3872 NASA_m^2/g: 107.941
-Number_of_channels: 1 Channel_surface_area_A^2: 801.81  
-Number_of_pockets: 2 Pocket_surface_area_A^2: 21.3888  21.978  

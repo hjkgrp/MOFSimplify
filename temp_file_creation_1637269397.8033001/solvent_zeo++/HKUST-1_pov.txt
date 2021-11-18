@@ -1,3 +1,0 @@
-@ /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1637269397.8033001/solvent_zeo++/HKUST-1_pov.txt Unitcell_volume: 4546.4   Density: 0.8837   POAV_A^3: 2771.94 POAV_Volume_fraction: 0.6097 POAV_cm^3/g: 0.68994 PONAV_A^3: 183.674 PONAV_Volume_fraction: 0.0404 PONAV_cm^3/g: 0.0457168
-PROBE_OCCUPIABLE_VOL_CALC: filename| density(g/cm3)| probe rad| N points| probe ctr A fract| probe ctr NA fract| A fract| NA fract| narrow fract |ovlp fract.
-PROBE_OCCUPIABLE___RESULT: /Users/gianmarcoterrones/Research/MOFSimplify/temp_file_creation_1637269397.8033001/solvent_zeo++/HKUST-1_pov.txt	0.8837	1.86	10000	0.2571	0.0025	0.6097	0.0404	0.0725	0.2774

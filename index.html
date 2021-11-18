@@ -1647,7 +1647,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             solvent_pred_color = failure_red;
             $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#solvent_stability_prediction').text('');
-            alert('Server timed out after one minute')
+            alert(errorThrown)
           })
       })
     });
@@ -1844,7 +1844,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             thermal_pred_color = failure_red;
             $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#thermal_stability_prediction').text('')
-            alert('Server timed out after one minute')
+            alert(errorThrown)
           })
       })
     });
@@ -2073,7 +2073,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
             component_color = failure_red;
             $('#get_components').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-            alert('Server timed out after one minute')
+            alert(errorThrown)
           })
       })
     });

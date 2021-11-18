@@ -1063,6 +1063,8 @@ def ss_predict():
 
     global operation_counter # global variable
 
+    print(f'Current operation_counter: {operation_counter}')
+
     if operation_counter >= MAX_OPERATIONS:
         return 'OVERLOAD'
 
@@ -1133,6 +1135,8 @@ def ts_predict():
     """ 
 
     global operation_counter # global variable
+
+    print(f'Current operation_counter: {operation_counter}')
 
     if operation_counter >= MAX_OPERATIONS:
         return 'OVERLOAD'
@@ -1413,8 +1417,9 @@ def get_components():
 
     global operation_counter # global variable
 
+    print(f'Current operation_counter: {operation_counter}')
+
     if operation_counter >= MAX_OPERATIONS:
-        print('HIT HIT HIT')
         return 'OVERLOAD'
 
     operation_counter += 1

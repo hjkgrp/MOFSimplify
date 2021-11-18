@@ -1642,7 +1642,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               $('#rate_solvent').text('Rate this ground truth *')
             }
 
-          });
+          })
+          .fail(function(xhr, textStatus, errorThrown) {
+            solvent_pred_color = failure_red;
+            $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            $('#solvent_stability_prediction').text('');
+            alert(xhr.responseText)
+          })
       })
     });
 

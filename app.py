@@ -1176,10 +1176,6 @@ def ts_predict():
 
     operation_counter += 1
 
-    if session['permission']:
-        # TODO implement database push of MOF structure
-        print('TODO')
-
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data()) # This is a dictionary.
     structure = my_data['structure']

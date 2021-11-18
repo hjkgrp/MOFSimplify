@@ -1643,7 +1643,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             }
 
           })
-          .fail(function(xhr, textStatus, errorThrown) { // for timeout error
+          .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
             solvent_pred_color = failure_red;
             $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#solvent_stability_prediction').text('');
@@ -1840,7 +1840,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               $('#rate_thermal').text('Rate this ground truth *')
             }
           })
-          .fail(function(xhr, textStatus, errorThrown) { // for timeout error
+          .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
             thermal_pred_color = failure_red;
             $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#thermal_stability_prediction').text('')
@@ -2069,7 +2069,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 
           })
-          .fail(function(xhr, textStatus, errorThrown) { // for timeout error
+          .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
             document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
             component_color = failure_red;
             $('#get_components').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure

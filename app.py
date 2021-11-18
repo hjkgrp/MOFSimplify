@@ -4,6 +4,7 @@ import flask
 import tensorflow as tf
 import pandas as pd
 import numpy as np
+import sched
 import time
 import json
 import string
@@ -62,6 +63,9 @@ cors = CORS(app)
 
 operation_counter = 0 # This variable keeps track of server traffic to alert the user if they should wait until later to make a request. 
     # I only change operation_counter for the more time-consuming operations (the two predictions, and component analysis).
+    # operation_counter is periodically set back to zero, since if a user closes their browser in the middle of an operation operation_counter is not properly -=1'd
+last_operation_counter_clear = time.time() # the current time when server is started
+
 MAX_OPERATIONS = 4 # This variable dictates the maximum number of concurrent operations, to prevent server overload.
 
 ### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask
@@ -121,6 +125,21 @@ class User(UserMixin):
 #   return user
 
 ### End of splash page management
+
+
+def conditional_diminish(counter):
+    """
+    conditional_diminish decreases the input by one and returns it, unless the input is already zero.
+    The input is intended to be operation_counter.
+    operation_counter might be zero when conditional_diminish is called b/c of the periodic zero-ing of operation_counter. It is unlikely though.
+
+    :param counter: An int, which should be operation_counter.
+    :return: The new value of operation_counter.
+    """ 
+    if counter != 0:
+        counter -= 1
+
+    return counter
 
 # app.route takes jquery ($) requests from index.html and executes the associated function in app.py.
 # Output can then be returned to index.html.
@@ -1062,6 +1081,13 @@ def ss_predict():
     """ 
 
     global operation_counter # global variable
+    global last_operation_counter_clear
+
+    import time 
+    if last_operation_counter_clear - time.time() > 3600: # one hour or more since last time operation_counter was zero'd
+        print(f'operation_counter cleared at {time.time()}')
+        last_operation_counter_clear = time.time()
+        operation_counter = 0
 
     print(f'Current operation_counter: {operation_counter}')
 
@@ -1088,10 +1114,10 @@ def ss_predict():
 
     output = descriptor_generator(name, structure, 'solvent') # generate descriptors
     if output == 'FAILED': # Description generation failure
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return output
     else: # grabbing some variables. We will make a prediction
         temp_file_folder = output[0]
@@ -1116,7 +1142,7 @@ def ss_predict():
         # database push of MOF structure
         db_push(structure, 'solvent_stability_prediction')
 
-    operation_counter -= 1
+    operation_counter = conditional_diminish(operation_counter)
     return results
 
 @app.route('/predict_thermal_stability', methods=['POST']) 
@@ -1135,6 +1161,13 @@ def ts_predict():
     """ 
 
     global operation_counter # global variable
+    global last_operation_counter_clear
+
+    import time
+    if last_operation_counter_clear - time.time() > 3600: # one hour or more since last time operation_counter was zero'd
+        print(f'operation_counter cleared at {time.time()}')
+        last_operation_counter_clear = time.time()
+        operation_counter = 0
 
     print(f'Current operation_counter: {operation_counter}')
 
@@ -1158,10 +1191,10 @@ def ts_predict():
 
     output = descriptor_generator(name, structure, 'thermal') # generate descriptors
     if output == 'FAILED': # Description generation failure
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return output
     else: # grabbing some variables. We will make a prediction
         temp_file_folder = output[0]
@@ -1187,7 +1220,7 @@ def ts_predict():
         # database push of MOF structure
         db_push(structure, 'thermal_stability_prediction')
 
-    operation_counter -= 1
+    operation_counter = conditional_diminish(operation_counter)
     return results
 
 def db_push(structure, prediction_type):
@@ -1416,6 +1449,13 @@ def get_components():
     """ 
 
     global operation_counter # global variable
+    global last_operation_counter_clear
+
+    import time
+    if last_operation_counter_clear - time.time() > 3600: # one hour or more since last time operation_counter was zero'd
+        print(f'operation_counter cleared at {time.time()}')
+        last_operation_counter_clear = time.time()
+        operation_counter = 0
 
     print(f'Current operation_counter: {operation_counter}')
 
@@ -1441,7 +1481,7 @@ def get_components():
     try:
         cif_file = open(cif_folder + name + '.cif', 'w')
     except FileNotFoundError:
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
     cif_file.write(structure)
     cif_file.close()
@@ -1456,24 +1496,24 @@ def get_components():
     try:
         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
     except ValueError:
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
     try:
         full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
             # makes the linkers and sbus folders
     except ValueError:
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
     except NotImplementedError:
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
     except AssertionError:
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
     if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-        operation_counter -= 1
+        operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
     # At this point, have the RAC featurization. 
@@ -1624,7 +1664,7 @@ def get_components():
 
     json_object = json.dumps(dictionary, indent = 4);
 
-    operation_counter -= 1
+    operation_counter = conditional_diminish(operation_counter)
     return json_object
 
 @app.route('/solvent_neighbor_flag', methods=['POST']) 

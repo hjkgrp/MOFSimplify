@@ -1647,7 +1647,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             solvent_pred_color = failure_red;
             $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#solvent_stability_prediction').text('');
-            alert(xhr.responseText)
+            alert(textStatus)
           })
       })
     });
@@ -1839,6 +1839,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
               // Setting text in the feedback form.
               $('#rate_thermal').text('Rate this ground truth *')
             }
+          })
+          .fail(function(xhr, textStatus, errorThrown) {
+            thermal_pred_color = failure_red;
+            $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            $('#thermal_stability_prediction').text('')
+            alert(textStatus)
           })
       })
     });
@@ -2062,7 +2068,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
             $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 
-          });
+          })
+          .fail(function(xhr, textStatus, errorThrown) {
+            document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
+            component_color = failure_red;
+            $('#get_components').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            alert(textStatus)
+          })
       })
     });
 

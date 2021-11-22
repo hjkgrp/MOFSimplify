@@ -1372,7 +1372,7 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
         final_dict['t_neighbornames'] = my_document['t_neighbornames']
         final_dict['t_neighbordists'] = my_document['t_neighbordists']
 
-        if predict_type == 'solvent_stability_prediction':
+        if prediction_type == 'solvent_stability_prediction':
             final_dict['s_intrain'] = in_train
             final_dict['s_result'] = result
             final_dict['s_neighbornames'] = neighbor_names

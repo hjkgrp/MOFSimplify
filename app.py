@@ -1138,7 +1138,7 @@ def ss_predict():
         # Making the csv; can skip csv making in descriptor_generator with this
         csv_content = entry_data['csv_content']
         temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv') as f:
+        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
             f.write(csv_content)
 
 
@@ -1251,7 +1251,7 @@ def ts_predict():
         # Making the csv; can skip csv making in descriptor_generator with this
         csv_content = entry_data['csv_content']
         temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv') as f:
+        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
             f.write(csv_content)
 
     output = descriptor_generator(name, structure, 'thermal', is_entry) # generate descriptors

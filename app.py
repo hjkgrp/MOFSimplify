@@ -1188,7 +1188,7 @@ def ss_predict():
         with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
             csv_contents = f.read()
 
-        db_push(structure=structure, prediction_type='solvent_stability_prediction', in_train=False, result=prediction, neighbor_names=neighbor_names, neighbor_dists=neighbor_dists, failure=False, csv_content=csv_contents)
+        db_push(structure=structure, prediction_type='solvent_stability_prediction', in_train=False, result=prediction, neighbor_names=neighbor_names, neighbor_dists=neighbor_distances, failure=False, csv_content=csv_contents)
 
     operation_counter = conditional_diminish(operation_counter)
     return results
@@ -1301,7 +1301,7 @@ def ts_predict():
         with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
             csv_contents = f.read()
 
-        db_push(structure=structure, prediction_type='thermal_stability_prediction', in_train=False, result=prediction, neighbor_names=neighbor_names, neighbor_dists=neighbor_dists, failure=False, csv_content=csv_contents)
+        db_push(structure=structure, prediction_type='thermal_stability_prediction', in_train=False, result=prediction, neighbor_names=neighbor_names, neighbor_dists=neighbor_distances, failure=False, csv_content=csv_contents)
 
     operation_counter = conditional_diminish(operation_counter)
     return results

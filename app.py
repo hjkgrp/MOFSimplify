@@ -1127,6 +1127,8 @@ def ss_predict():
     print(f'is_entry is {is_entry}')
     if is_entry:
         entry_data = my_documents[0]
+        print(f'entry_data is {entry_data}')
+        print(f'entry_data["s_intrain"] is {entry_data['s_intrain']} and is of type {type(entry_data['s_intrain'])}')
         if entry_data['failure'] == True:
             print('entry_data["failure"] is True!')
             return 'FAILED'
@@ -1135,6 +1137,7 @@ def ss_predict():
             return my_dict
         elif entry_data['s_intrain'] == False:
             my_dict = {'prediction':entry_data['s_result'],'neighbor_names':entry_data['s_neighbornames'],'neighbor_distances':entry_data['s_neighbordists'],'in_train':False}
+            return my_dict
         # Making the csv; can skip csv making in descriptor_generator with this
         csv_content = entry_data['csv_content']
         temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
@@ -1248,6 +1251,7 @@ def ts_predict():
             return my_dict
         elif entry_data['s_intrain'] == False:
             my_dict = {'prediction':entry_data['t_result'],'neighbor_names':entry_data['t_neighbornames'],'neighbor_distances':entry_data['t_neighbordists'],'in_train':False}
+            return my_dict
         # Making the csv; can skip csv making in descriptor_generator with this
         csv_content = entry_data['csv_content']
         temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'

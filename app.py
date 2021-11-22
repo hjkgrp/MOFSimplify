@@ -238,7 +238,7 @@ def serve_bg():
 @app.route('/process_feedback', methods=['POST'])
 def process_feedback():
     """
-    process_feedback inserts MOFSimplify form feedback into the MongoDB database. 
+    process_feedback inserts MOFSimplify form feedback into the MongoDB feedback database. 
     If an uploaded file has an incorrect extension (i.e. is a disallowed file format), the user is directed to an error page.
     """ 
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
@@ -705,7 +705,7 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
     :param MOF_name: str, the name of the MOF for which a prediction is being generated
     :param thermal_ANN: keras.engine.training.Model, the ANN itself
     :return: str new_MOF_pred, the model thermal stability prediction 
-    :return: list neighbor_names, the latent space nearest neighbor MOFs in the solvent removal stability ANN
+    :return: list neighbor_names, the latent space nearest neighbor MOFs in the thermal stability ANN
     :return: list neighbor_distances, the latent space distances of the latent space nearest neighbor MOFs in neighbor_names 
     """ 
 
@@ -812,16 +812,17 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
     return new_MOF_pred, neighbors_names, neighbors_distances
 
 
-def descriptor_generator(name, structure, prediction_type):
+def descriptor_generator(name, structure, prediction_type, is_entry):
     """
     # descriptor_generator is used by both ss_predict() and ts_predict() to generate RACs and Zeo++ descriptors.
     # These descriptors are subsequently used in ss_predict() and ts_predict() for the ANN models.
     # Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
     # The third input indicates the type of prediction (solvent removal or thermal).
 
-    :param name: str, the name of the MOF being analyzed
-    :param structure: str, the text of the cif file of the MOF being analyzed
+    :param name: str, the name of the MOF being analyzed.
+    :param structure: str, the text of the cif file of the MOF being analyzed.
     :param prediction_type: str, the type of prediction being run. Can either be 'solvent' or 'thermal'.
+    :param is_entry: boolean, indicates whether the descriptor CSV has already been written.
     :return: Depends, either the string 'FAILED' if descriptor generation fails, a dictionary myDict (if the MOF being analyzed is in the training data), or an array myResult (if the MOF being analyzed is not in the training data) 
     """ 
 
@@ -852,140 +853,145 @@ def descriptor_generator(name, structure, prediction_type):
     shutil.rmtree(zeo_folder)
     os.mkdir(zeo_folder)
 
-    # Next, running MOF featurization
-    try:
-        get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
-    except ValueError:
-        return 'FAILED'
+    if not is_entry: # have to generate the CSV
 
-    # try:
-    #     full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
-    #         # makes the linkers and sbus folders
-    # except ValueError:
-    #     return 'FAILED'
-    # except NotImplementedError:
-    #     return 'FAILED'
-    # except AssertionError:
-    #     return 'FAILED'
-
-    # if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-    #     return 'FAILED'
-
-    timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds')
-
-    print('TIME CHECK 3')
-
-    # At this point, have the RAC featurization. Need geometry information next.
-
-    # Run Zeo++
-
-    timeStarted = time.time() # save start time (debugging)
-
-    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
-    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
-    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
-    cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
-
-    # four parallelized Zeo++ and RAC commands
-    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
-
-    output1 = process1.communicate()[0]
-    output2 = process2.communicate()[0]
-    output3 = process3.communicate()[0]
-    output4 = process4.communicate()[0]
-
-    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
-
-    ''' The geometric descriptors are largest included sphere (Di), 
-    largest free sphere (Df), largest included sphere along free path (Dif),
-    crystal density (rho), volumetric surface area (VSA), gravimetric surface (GSA), 
-    volumetric pore volume (VPOV) and gravimetric pore volume (GPOV). 
-    Also, we include cell volume as a descriptor.
-
-    All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
-    '''
-
-    dict_list = []
-    cif_file = name + '_primitive.cif' 
-    basename = cif_file.strip('.cif')
-    largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
-    unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
-    VPOV, GPOV = np.nan, np.nan
-    POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-
-    if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
-        os.path.exists(zeo_folder + name + '_pov.txt')):
-        with open(zeo_folder + name + '_pd.txt') as f:
-            pore_diameter_data = f.readlines()
-            for row in pore_diameter_data:
-                largest_included_sphere = float(row.split()[1]) # largest included sphere
-                largest_free_sphere = float(row.split()[2]) # largest free sphere
-                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-        with open(zeo_folder + name + '_sa.txt') as f:
-            surface_area_data = f.readlines()
-            for i, row in enumerate(surface_area_data):
-                if i == 0:
-                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                    crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
-                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
-                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-        with open(zeo_folder + name + '_pov.txt') as f:
-            pore_volume_data = f.readlines()
-            for i, row in enumerate(pore_volume_data):
-                if i == 0:
-                    density = float(row.split('Density:')[1].split()[0])
-                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
-                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
-                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
-                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
-                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
-                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
-                    VPOV = POAV_volume_fraction+PONAV_volume_fraction
-                    GPOV = VPOV/density
-    else:
-        print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
-              '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
-        return 'FAILED'
-    geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
-                'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
-                'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
-    dict_list.append(geo_dict)
-    geo_df = pd.DataFrame(dict_list)
-    geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
-
-    # error handling for cmd4
-    with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
-        if f.readline() == 'FAILED':
-            print('RAC generation failed.')
+        # Next, running MOF featurization
+        try:
+            get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
+        except ValueError:
             return 'FAILED'
 
+        # try:
+        #     full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
+        #         # makes the linkers and sbus folders
+        # except ValueError:
+        #     return 'FAILED'
+        # except NotImplementedError:
+        #     return 'FAILED'
+        # except AssertionError:
+        #     return 'FAILED'
 
-    timeDelta = time.time() - timeStarted # get execution time
-    print('Finished process in ' + str(timeDelta) + ' seconds')
+        # if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
+        #     return 'FAILED'
 
-    print('TIME CHECK 4')
+        timeDelta = time.time() - timeStarted # get execution time
+        print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    timeStarted = time.time() # save start time
+        print('TIME CHECK 3')
 
-    # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-    try:
-        lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
-        sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
-        linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
-    except Exception: # csv files have been deleted
-        return 'FAILED' 
+        # At this point, have the RAC featurization. Need geometry information next.
 
-    lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
-    sbu_df = sbu_df.mean().to_frame().transpose()
-    linker_df = linker_df.mean().to_frame().transpose()
+        # Run Zeo++
 
-    merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
+        timeStarted = time.time() # save start time (debugging)
 
-    merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
+        cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
+        cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
+        cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
+        cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+
+        # four parallelized Zeo++ and RAC commands
+        process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
+        output1 = process1.communicate()[0]
+        output2 = process2.communicate()[0]
+        output3 = process3.communicate()[0]
+        output4 = process4.communicate()[0]
+
+        # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
+
+        ''' The geometric descriptors are largest included sphere (Di), 
+        largest free sphere (Df), largest included sphere along free path (Dif),
+        crystal density (rho), volumetric surface area (VSA), gravimetric surface (GSA), 
+        volumetric pore volume (VPOV) and gravimetric pore volume (GPOV). 
+        Also, we include cell volume as a descriptor.
+
+        All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
+        '''
+
+        dict_list = []
+        cif_file = name + '_primitive.cif' 
+        basename = cif_file.strip('.cif')
+        largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
+        unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
+        VPOV, GPOV = np.nan, np.nan
+        POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+
+        if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
+            os.path.exists(zeo_folder + name + '_pov.txt')):
+            with open(zeo_folder + name + '_pd.txt') as f:
+                pore_diameter_data = f.readlines()
+                for row in pore_diameter_data:
+                    largest_included_sphere = float(row.split()[1]) # largest included sphere
+                    largest_free_sphere = float(row.split()[2]) # largest free sphere
+                    largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+            with open(zeo_folder + name + '_sa.txt') as f:
+                surface_area_data = f.readlines()
+                for i, row in enumerate(surface_area_data):
+                    if i == 0:
+                        unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
+                        crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
+                        VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
+                        GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+            with open(zeo_folder + name + '_pov.txt') as f:
+                pore_volume_data = f.readlines()
+                for i, row in enumerate(pore_volume_data):
+                    if i == 0:
+                        density = float(row.split('Density:')[1].split()[0])
+                        POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
+                        PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
+                        GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
+                        GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
+                        POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
+                        PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                        VPOV = POAV_volume_fraction+PONAV_volume_fraction
+                        GPOV = VPOV/density
+        else:
+            print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
+                  '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
+            return 'FAILED'
+        geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
+                    'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
+                    'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
+        dict_list.append(geo_dict)
+        geo_df = pd.DataFrame(dict_list)
+        geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
+
+        # error handling for cmd4
+        with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
+            if f.readline() == 'FAILED':
+                print('RAC generation failed.')
+                return 'FAILED'
+
+
+        timeDelta = time.time() - timeStarted # get execution time
+        print('Finished process in ' + str(timeDelta) + ' seconds')
+
+        print('TIME CHECK 4')
+
+        timeStarted = time.time() # save start time
+
+        # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+        try:
+            lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+            sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+            linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
+        except Exception: # csv files have been deleted
+            return 'FAILED' 
+
+        lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
+        sbu_df = sbu_df.mean().to_frame().transpose()
+        linker_df = linker_df.mean().to_frame().transpose()
+
+        merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
+
+        merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors.csv',index=False) # written in /temp_file_creation_SESSIONID
+
+    else: # CSV is already written
+        merged_df = pd.read_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors.csv')
 
     if prediction_type == 'solvent':
 
@@ -1061,7 +1067,7 @@ def descriptor_generator(name, structure, prediction_type):
 
     myResult = [temp_file_folder, ANN_folder]
 
-    return myResult
+    return myResult 
     
 ##### Note: the h5 model for the solvent removal stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14). #####
 
@@ -1084,7 +1090,7 @@ def ss_predict():
     global last_operation_counter_clear
 
     import time 
-    if last_operation_counter_clear - time.time() > 3600: # one hour or more since last time operation_counter was zero'd
+    if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()
         operation_counter = 0
@@ -1112,14 +1118,46 @@ def ss_predict():
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
-    output = descriptor_generator(name, structure, 'solvent') # generate descriptors
+    # Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    if is_entry:
+        entry_data = collection.find({structure.structure}) # returns a cursor to the document that has the structure
+        if entry_data['failure'] == True:
+            return 'FAILED'
+        elif entry_data['s_intrain'] == True:
+            my_dict = {'in_train':True, 'truth':entry_data['s_result'],'match':None} # don't care about the MOF that matches in CoRE here
+            return my_dict
+        elif entry_data['s_intrain'] == False:
+            my_dict = {'prediction':entry_data['s_result'],'neighbor_names':entry_data['s_neighbornames'],'neighbor_distances':entry_data['s_neighbordists'],'in_train':False}
+        # Making the csv; can skip csv making in descriptor_generator with this
+        csv_content = entry_data['csv_content']
+        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv') as f:
+            f.write(csv_content)
+
+
+    output = descriptor_generator(name, structure, 'solvent', is_entry) # generate descriptors
     if output == 'FAILED': # Description generation failure
         operation_counter = conditional_diminish(operation_counter)
+        if session['permission']:
+            db_push(structure=structure, prediction_type='solvent_stability_prediction', in_train='', result='', neighbor_names='', neighbor_dists='', failure=True, csv_content='')
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
         operation_counter = conditional_diminish(operation_counter)
+
+        if session['permission']:
+            # Getting the contents of the CSV containing features.
+            descriptors_folder = temp_file_folder + "merged_descriptors/"
+            with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
+                csv_contents = f.read()
+
+            db_push(structure=structure, prediction_type='solvent_stability_prediction', in_train=True, result=output['truth'], neighbor_names='', neighbor_dists='', failure=False, csv_content=csv_contents)
         return output
-    else: # grabbing some variables. We will make a prediction
+    else: # grabbing some variables (that aren't used lol). We will make a prediction
         temp_file_folder = output[0]
         ANN_folder = output[1]
 
@@ -1139,8 +1177,16 @@ def ss_predict():
     print('TIME CHECK 6')
 
     if session['permission']:
-        # database push of MOF structure
-        db_push(structure, 'solvent_stability_prediction')
+        # database push of MOF structure and ANN results
+
+        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
+        # Getting the contents of the CSV containing features.
+        descriptors_folder = temp_file_folder + "merged_descriptors/"
+        with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
+            csv_contents = f.read()
+
+        db_push(structure=structure, prediction_type='solvent_stability_prediction', in_train=False, result=prediction, neighbor_names=neighbor_names, neighbor_dists=neighbor_dists, failure=False, csv_content=csv_contents)
 
     operation_counter = conditional_diminish(operation_counter)
     return results
@@ -1164,7 +1210,7 @@ def ts_predict():
     global last_operation_counter_clear
 
     import time
-    if last_operation_counter_clear - time.time() > 3600: # one hour or more since last time operation_counter was zero'd
+    if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()
         operation_counter = 0
@@ -1185,14 +1231,45 @@ def ts_predict():
     if name[-4:] == '.cif':
         name = name[:-4] # remove the .cif part of the name
 
-    output = descriptor_generator(name, structure, 'thermal') # generate descriptors
+    # Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    if is_entry:
+        entry_data = collection.find({structure.structure}) # returns a cursor to the document that has the structure
+        if entry_data['failure'] == True:
+            return 'FAILED'
+        elif entry_data['s_intrain'] == True:
+            my_dict = {'in_train':True, 'truth':entry_data['t_result'],'match':None} # don't care about the MOF that matches in CoRE here
+            return my_dict
+        elif entry_data['s_intrain'] == False:
+            my_dict = {'prediction':entry_data['t_result'],'neighbor_names':entry_data['t_neighbornames'],'neighbor_distances':entry_data['t_neighbordists'],'in_train':False}
+        # Making the csv; can skip csv making in descriptor_generator with this
+        csv_content = entry_data['csv_content']
+        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv') as f:
+            f.write(csv_content)
+
+    output = descriptor_generator(name, structure, 'thermal', is_entry) # generate descriptors
     if output == 'FAILED': # Description generation failure
         operation_counter = conditional_diminish(operation_counter)
+        if session['permission']:
+            db_push(structure=structure, prediction_type='thermal_stability_prediction', in_train='', result='', neighbor_names='', neighbor_dists='', failure=True, csv_content='')
         return 'FAILED'
     elif isinstance(output, dict): # MOF was in the training data. Return the ground truth.
         operation_counter = conditional_diminish(operation_counter)
+
+        if session['permission']:
+            # Getting the contents of the CSV containing features.
+            descriptors_folder = temp_file_folder + "merged_descriptors/"
+            with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
+                csv_contents = f.read()
+
+            db_push(structure=structure, prediction_type='thermal_stability_prediction', in_train=True, result=output['truth'], neighbor_names='', neighbor_dists='', failure=False, csv_content=csv_contents)
         return output
-    else: # grabbing some variables. We will make a prediction
+    else: # grabbing some variables (that aren't used lol). We will make a prediction
         temp_file_folder = output[0]
         ANN_folder = output[1]
 
@@ -1213,41 +1290,93 @@ def ts_predict():
     print('TIME CHECK 6 ' + str(session['ID']))
 
     if session['permission']:
-        # database push of MOF structure
-        db_push(structure, 'thermal_stability_prediction')
+        # database push of MOF structure and ANN results
+
+        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
+        # Getting the contents of the CSV containing features.
+        descriptors_folder = temp_file_folder + "merged_descriptors/"
+        with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
+            csv_contents = f.read()
+
+        db_push(structure=structure, prediction_type='thermal_stability_prediction', in_train=False, result=prediction, neighbor_names=neighbor_names, neighbor_dists=neighbor_dists, failure=False, csv_content=csv_contents)
 
     operation_counter = conditional_diminish(operation_counter)
     return results
 
-def db_push(structure, prediction_type):
+def db_push(structure, prediction_type, in_train, result, neighbor_names, neighbor_dists, failure, csv_content):
     """
-    # db_push sends the structure of the MOF being predicted on to the MOFSimplify database.
-    # Many of the form fields that are filled for other forms are left empty in this case.
+    # db_push sends the structure of the MOF being predicted on, and other information, to the MOFSimplify collection in the MongoDB history database.
 
-    :param structure: str, the text of the cif file of the MOF being analyzed
+    :param structure: str, the text of the cif file of the MOF being analyzed.
     :param prediction_type: str, the type of prediction being run. Can either be 'solvent_stability_prediction' or 'thermal_stability_prediction'.
+    :param in_train: boolean, indicates whether the current structure is in the training data or not.
+    :param result: float, the ground truth or prediction for this structure.
+    :param neighbor_names: list, the latent space nearest neighbor MOFs in the thermal stability ANN.
+    :param neighbor_distances: list, the latent space distances of the latent space nearest neighbor MOFs in neighbor_names.
+    :param failure: boolean, whether the featurization failed.
+    :param csv_content: string, the content of the csv of features.
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """ 
 
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
-    db = client.feedback
-    collection = db.MOFSimplify # The MOFSimplify collection in the feedback database.
-    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure', 'solvent']
+    db = client.history # The history database
+    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
+    fields = ['structure', 's_intrain', 's_result', 's_neighbornames', 's_neighbordists', 't_intrain', 't_result', 't_neighbornames', 't_neighbordists', 'failure', 'csv_content'] 
     final_dict = {}
     for field in fields:
         final_dict[field] = '' # start with everything empty
 
-    # Populate certain fields
-    final_dict['feedback_form_name'] = prediction_type
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+
     final_dict['structure'] = structure
-    final_dict['ip'] = request.remote_addr
-    final_dict['timestamp'] = datetime.now().isoformat()
-    
-    print(final_dict)
-    collection.insert(final_dict) # insert the dictionary into the mongodb collection
-    with open('sample.bson', 'wb') as outfile:
-        outfile.write(bson.encode(final_dict))
+    final_dict['failure'] = failure
+    final_dict['csv_content'] = csv_content
+    if is_entry == 0: # structure has not been seen before. Make a new entry
+        # Populate certain fields
+        if prediction_type == 'solvent_stability_prediction':
+            final_dict['s_intrain'] = in_train
+            final_dict['s_result'] = result
+            final_dict['s_neighbornames'] = neighbor_names
+            final_dict['s_neighbordists'] = neighbor_dists
+        elif prediction_type == 'thermal_stability_prediction':
+            final_dict['t_intrain'] = in_train
+            final_dict['t_result'] = result
+            final_dict['t_neighbornames'] = neighbor_names
+            final_dict['t_neighbordists'] = neighbor_dists
+        
+        print(final_dict)
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+        my_document = my_documents[0]
+        final_dict['s_intrain'] = my_document['s_intrain']
+        final_dict['s_result'] = my_document['s_result']
+        final_dict['s_neighbornames'] = my_document['s_neighbornames']
+        final_dict['s_neighbordists'] = my_document['s_neighbordists']
+        final_dict['t_intrain'] = my_document['t_intrain']
+        final_dict['t_result'] = my_document['t_result']
+        final_dict['t_neighbornames'] = my_document['t_neighbornames']
+        final_dict['t_neighbordists'] = my_document['t_neighbordists']
+
+        if predict_type == 'solvent_stability_prediction':
+            final_dict['s_intrain'] = in_train
+            final_dict['s_result'] = result
+            final_dict['s_neighbornames'] = neighbor_names
+            final_dict['s_neighbordists'] = neighbor_dists
+        elif prediction_type == 'thermal_stability_prediction':
+            final_dict['t_intrain'] = in_train
+            final_dict['t_result'] = result
+            final_dict['t_neighbornames'] = neighbor_names
+            final_dict['t_neighbordists'] = neighbor_dists
+
+        collection.remove({'structure':structure}) # delete entry
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    # with open('sample.bson', 'wb') as outfile:
+    #     outfile.write(bson.encode(final_dict))
     return ('', 204) # 204 no content response
 
 @app.route('/plot_thermal_stability', methods=['POST']) 
@@ -1448,7 +1577,7 @@ def get_components():
     global last_operation_counter_clear
 
     import time
-    if last_operation_counter_clear - time.time() > 3600: # one hour or more since last time operation_counter was zero'd
+    if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()
         operation_counter = 0
@@ -1497,7 +1626,7 @@ def get_components():
 
     try:
         full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
-            # makes the linkers and sbus folders
+            # makes the linkers and sbus folders, complete with linkers and sbus. We don't care about full_names and full_descriptors in this function
     except ValueError:
         operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'

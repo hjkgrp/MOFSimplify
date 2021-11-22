@@ -1246,10 +1246,10 @@ def ts_predict():
         entry_data = my_documents[0]
         if entry_data['failure'] == True:
             return 'FAILED'
-        elif entry_data['s_intrain'] == True:
+        elif entry_data['t_intrain'] == True:
             my_dict = {'in_train':True, 'truth':entry_data['t_result'],'match':None} # don't care about the MOF that matches in CoRE here
             return my_dict
-        elif entry_data['s_intrain'] == False:
+        elif entry_data['t_intrain'] == False:
             my_dict = {'prediction':entry_data['t_result'],'neighbor_names':entry_data['t_neighbornames'],'neighbor_distances':entry_data['t_neighbordists'],'in_train':False}
             return my_dict
         # Making the csv; can skip csv making in descriptor_generator with this

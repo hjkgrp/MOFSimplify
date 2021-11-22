@@ -1129,22 +1129,27 @@ def ss_predict():
         entry_data = my_documents[0]
         print(f'entry_data is {entry_data}')
         print(f'entry_data["s_intrain"] is {entry_data["s_intrain"]} and is of type {type(entry_data["s_intrain"])}')
-        if entry_data['failure'] == True:
+        if entry_data['failure'] == True: # MOF was not featurizable
             print('entry_data["failure"] is True!')
+            operation_counter = conditional_diminish(operation_counter)
             return 'FAILED'
-        elif entry_data['s_intrain'] == True:
+        else: 
+            # Making the csv; can skip csv making in descriptor_generator with this
+            csv_content = entry_data['csv_content']
+            temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+            with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
+                f.write(csv_content)
+
+        if entry_data['s_intrain'] == True:
             my_dict = {'in_train':True, 'truth':entry_data['s_result'],'match':None} # don't care about the MOF that matches in CoRE here
+            operation_counter = conditional_diminish(operation_counter)
             return my_dict
         elif entry_data['s_intrain'] == False:
             my_dict = {'prediction':entry_data['s_result'],'neighbor_names':entry_data['s_neighbornames'],'neighbor_distances':entry_data['s_neighbordists'],'in_train':False}
+            operation_counter = conditional_diminish(operation_counter)
             return my_dict
 
         # if haven't returned anything by now, have a featurizable MOF for which a solvent prediction has not been run, but a thermal prediction has
-        # Making the csv; can skip csv making in descriptor_generator with this
-        csv_content = entry_data['csv_content']
-        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
-            f.write(csv_content)
 
 
     output = descriptor_generator(name, structure, 'solvent', is_entry) # generate descriptors
@@ -1246,19 +1251,23 @@ def ts_predict():
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
     if is_entry:
         entry_data = my_documents[0]
-        if entry_data['failure'] == True:
+        if entry_data['failure'] == True: # MOF was not featurizable
+            operation_counter = conditional_diminish(operation_counter)
             return 'FAILED'
-        elif entry_data['t_intrain'] == True:
+        else:
+            # Making the csv; can skip csv making in descriptor_generator with this
+            csv_content = entry_data['csv_content']
+            temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+            with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
+                f.write(csv_content)
+        if entry_data['t_intrain'] == True:
             my_dict = {'in_train':True, 'truth':entry_data['t_result'],'match':None} # don't care about the MOF that matches in CoRE here
+            operation_counter = conditional_diminish(operation_counter)
             return my_dict
         elif entry_data['t_intrain'] == False:
             my_dict = {'prediction':entry_data['t_result'],'neighbor_names':entry_data['t_neighbornames'],'neighbor_distances':entry_data['t_neighbordists'],'in_train':False}
+            operation_counter = conditional_diminish(operation_counter)
             return my_dict
-        # Making the csv; can skip csv making in descriptor_generator with this
-        csv_content = entry_data['csv_content']
-        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-        with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
-            f.write(csv_content)
 
     output = descriptor_generator(name, structure, 'thermal', is_entry) # generate descriptors
     if output == 'FAILED': # Description generation failure

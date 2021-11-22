@@ -1128,7 +1128,7 @@ def ss_predict():
     if is_entry:
         entry_data = my_documents[0]
         print(f'entry_data is {entry_data}')
-        print(f'entry_data["s_intrain"] is {entry_data['s_intrain']} and is of type {type(entry_data['s_intrain'])}')
+        print(f'entry_data["s_intrain"] is {entry_data["s_intrain"]} and is of type {type(entry_data["s_intrain"])}')
         if entry_data['failure'] == True:
             print('entry_data["failure"] is True!')
             return 'FAILED'

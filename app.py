@@ -1138,6 +1138,8 @@ def ss_predict():
         elif entry_data['s_intrain'] == False:
             my_dict = {'prediction':entry_data['s_result'],'neighbor_names':entry_data['s_neighbornames'],'neighbor_distances':entry_data['s_neighbordists'],'in_train':False}
             return my_dict
+
+        # if haven't returned anything by now, have a featurizable MOF for which a solvent prediction has not been run, but a thermal prediction has
         # Making the csv; can skip csv making in descriptor_generator with this
         csv_content = entry_data['csv_content']
         temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'

@@ -1124,9 +1124,11 @@ def ss_predict():
     collection = db.MOFSimplify # The MOFSimplify collection in the history database.
     my_documents = collection.find({'structure':structure})
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    print(f'is_entry is {is_entry}')
     if is_entry:
         entry_data = collection.find({structure.structure}) # returns a cursor to the document that has the structure
         if entry_data['failure'] == True:
+            print('entry_data["failure"] is True!')
             return 'FAILED'
         elif entry_data['s_intrain'] == True:
             my_dict = {'in_train':True, 'truth':entry_data['s_result'],'match':None} # don't care about the MOF that matches in CoRE here
@@ -1318,6 +1320,8 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
     :param csv_content: string, the content of the csv of features.
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """ 
+
+    print(f'Have entered the db_push function')
 
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.

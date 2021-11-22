@@ -1126,7 +1126,7 @@ def ss_predict():
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
     print(f'is_entry is {is_entry}')
     if is_entry:
-        entry_data = collection.find({structure.structure}) # returns a cursor to the document that has the structure
+        entry_data = my_documents[0]
         if entry_data['failure'] == True:
             print('entry_data["failure"] is True!')
             return 'FAILED'
@@ -1240,7 +1240,7 @@ def ts_predict():
     my_documents = collection.find({'structure':structure})
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
     if is_entry:
-        entry_data = collection.find({structure.structure}) # returns a cursor to the document that has the structure
+        entry_data = my_documents[0]
         if entry_data['failure'] == True:
             return 'FAILED'
         elif entry_data['s_intrain'] == True:
@@ -1353,7 +1353,7 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
             final_dict['t_neighbornames'] = neighbor_names
             final_dict['t_neighbordists'] = neighbor_dists
         
-        print(final_dict)
+        # print(final_dict)
         collection.insert(final_dict) # insert the dictionary into the mongodb collection
     else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
         my_document = my_documents[0]

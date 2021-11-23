@@ -1430,6 +1430,9 @@ def db_push_lite(structure, prediction_type):
     :param prediction_type: str, the type of prediction being run. Can either be 'solvent_stability_prediction' or 'thermal_stability_prediction'.
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """ 
+
+    print('Entering db_push_lite!')
+
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
@@ -1457,9 +1460,11 @@ def db_push_lite(structure, prediction_type):
     final_dict['t_times'] = my_document['t_times']
 
     if prediction_type == 'solvent_stability_prediction': 
-        final_dict['s_times'] = final_dict['s_times'] + 1
+        print('db_push_lite solvent hit')
+        final_dict['s_times'] += 1
     elif prediction_type == 'thermal_stability_prediction': 
-        final_dict['t_times'] = final_dict['t_times'] + 1
+        print('db_push_lite solvent hit')
+        final_dict['t_times'] += 1
 
     collection.remove({'structure':structure}) # delete entry
     collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)

@@ -1448,6 +1448,7 @@ def db_push_lite(structure, prediction_type):
     # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
     # s_times and t_times indicate the number of times this structure has had its solvent removal stability or thermal stability predicted
     my_document = my_documents[0]
+    final_dict['structure'] = structure
     final_dict['s_intrain'] = my_document['s_intrain']
     final_dict['s_result'] = my_document['s_result']
     final_dict['s_neighbornames'] = my_document['s_neighbornames']

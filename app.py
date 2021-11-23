@@ -1459,6 +1459,8 @@ def db_push_lite(structure, prediction_type):
     final_dict['t_neighbordists'] = my_document['t_neighbordists']
     final_dict['s_times'] = my_document['s_times']
     final_dict['t_times'] = my_document['t_times']
+    final_dict['failure'] = my_document['failure']
+    final_dict['csv_content'] = my_document['csv_content']
 
     if prediction_type == 'solvent_stability_prediction': 
         print('db_push_lite solvent hit')

@@ -1120,6 +1120,8 @@ def ss_predict():
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
     # Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
@@ -1140,7 +1142,6 @@ def ss_predict():
         else: 
             # Making the csv; can skip csv making in descriptor_generator with this
             csv_content = entry_data['csv_content']
-            temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
             with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
                 f.write(csv_content)
 
@@ -1199,8 +1200,6 @@ def ss_predict():
     if session['permission']:
         # database push of MOF structure and ANN results
 
-        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-
         # Getting the contents of the CSV containing features.
         descriptors_folder = temp_file_folder + "merged_descriptors/"
         with open(descriptors_folder + name + '_descriptors.csv', 'r') as f:
@@ -1253,6 +1252,8 @@ def ts_predict():
     if name[-4:] == '.cif':
         name = name[:-4] # remove the .cif part of the name
 
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
     # Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
@@ -1269,7 +1270,6 @@ def ts_predict():
         else:
             # Making the csv; can skip csv making in descriptor_generator with this
             csv_content = entry_data['csv_content']
-            temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
             with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors.csv', 'w') as f:
                 f.write(csv_content)
         if entry_data['t_intrain'] == True:
@@ -1324,8 +1324,6 @@ def ts_predict():
 
     if session['permission']:
         # database push of MOF structure and ANN results
-
-        temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
         # Getting the contents of the CSV containing features.
         descriptors_folder = temp_file_folder + "merged_descriptors/"

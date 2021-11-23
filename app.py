@@ -1092,6 +1092,11 @@ def ss_predict():
     global last_operation_counter_clear
 
     import time 
+    print('quick time check')
+    print(time.time())
+    print(last_operation_counter_clear)
+    print(time.time() - last_operation_counter_clear)
+    print('end of quick time check')
     if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()

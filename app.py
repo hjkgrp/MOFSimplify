@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import sched
 import time
-import json
+import d
 import string
 import os
 import shutil
@@ -158,7 +158,7 @@ def set_ID():
     """ 
 
     session['ID'] = time.time() # a unique ID for this session
-    session['permission'] = False # keeps track of if user gave us permission to store the MOFs they predict on
+    session['permission'] = True # keeps track of if user gave us permission to store the MOFs they predict on; defaults to Yes
 
     # make a version of the temp_file_creation folder for this user
     new_folder = MOFSIMPLIFY_PATH + '/temp_file_creation_' + str(session['ID'])
@@ -1080,6 +1080,8 @@ def ss_predict():
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
     Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
 
+    If the structure is already in our history.MOFSimplify collection, we use information from the database to speed things up.
+
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
         May instead return a string 'FAILED' if descriptor generation fails.
@@ -1125,12 +1127,14 @@ def ss_predict():
     my_documents = collection.find({'structure':structure})
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
     print(f'is_entry is {is_entry}')
-    if is_entry:
+    if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
         entry_data = my_documents[0]
-        print(f'entry_data is {entry_data}')
-        print(f'entry_data["s_intrain"] is {entry_data["s_intrain"]} and is of type {type(entry_data["s_intrain"])}')
+        # print(f'entry_data is {entry_data}')
+        # print(f'entry_data["s_intrain"] is {entry_data["s_intrain"]} and is of type {type(entry_data["s_intrain"])}')
         if entry_data['failure'] == True: # MOF was not featurizable
             print('entry_data["failure"] is True!')
+            if session['permission']:
+                db_push_lite(structure=structure, prediction_type='solvent_stability_prediction') # add 1 to the s_times in the database
             operation_counter = conditional_diminish(operation_counter)
             return 'FAILED'
         else: 
@@ -1142,14 +1146,18 @@ def ss_predict():
 
         if entry_data['s_intrain'] == True:
             my_dict = {'in_train':True, 'truth':entry_data['s_result'],'match':None} # don't care about the MOF that matches in CoRE here
+            if session['permission']:
+                db_push_lite(structure=structure, prediction_type='solvent_stability_prediction') # add 1 to the s_times in the database
             operation_counter = conditional_diminish(operation_counter)
             return my_dict
         elif entry_data['s_intrain'] == False:
             my_dict = {'prediction':entry_data['s_result'],'neighbor_names':entry_data['s_neighbornames'],'neighbor_distances':entry_data['s_neighbordists'],'in_train':False}
+            if session['permission']:
+                db_push_lite(structure=structure, prediction_type='solvent_stability_prediction') # add 1 to the s_times in the database
             operation_counter = conditional_diminish(operation_counter)
             return my_dict
 
-        # if haven't returned anything by now, have a featurizable MOF for which a solvent prediction has not been run, but a thermal prediction has
+        # if haven't returned anything by now and entered the if is_entry statement, have a featurizable MOF for which a solvent prediction has not been run, but a thermal prediction has
 
 
     output = descriptor_generator(name, structure, 'solvent', is_entry) # generate descriptors
@@ -1212,6 +1220,8 @@ def ts_predict():
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
     Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
 
+    If the structure is already in our history.MOFSimplify collection, we use information from the database to speed things up.
+
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
         May instead return a string 'FAILED' if descriptor generation fails.
@@ -1252,6 +1262,8 @@ def ts_predict():
     if is_entry:
         entry_data = my_documents[0]
         if entry_data['failure'] == True: # MOF was not featurizable
+            if session['permission']:
+                db_push_lite(structure=structure, prediction_type='thermal_stability_prediction') # add 1 to the t_times in the database
             operation_counter = conditional_diminish(operation_counter)
             return 'FAILED'
         else:
@@ -1262,10 +1274,14 @@ def ts_predict():
                 f.write(csv_content)
         if entry_data['t_intrain'] == True:
             my_dict = {'in_train':True, 'truth':entry_data['t_result'],'match':None} # don't care about the MOF that matches in CoRE here
+            if session['permission']:
+                db_push_lite(structure=structure, prediction_type='thermal_stability_prediction') # add 1 to the t_times in the database
             operation_counter = conditional_diminish(operation_counter)
             return my_dict
         elif entry_data['t_intrain'] == False:
             my_dict = {'prediction':entry_data['t_result'],'neighbor_names':entry_data['t_neighbornames'],'neighbor_distances':entry_data['t_neighbordists'],'in_train':False}
+            if session['permission']:
+                db_push_lite(structure=structure, prediction_type='thermal_stability_prediction') # add 1 to the t_times in the database
             operation_counter = conditional_diminish(operation_counter)
             return my_dict
 
@@ -1343,7 +1359,8 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
     db = client.history # The history database
     collection = db.MOFSimplify # The MOFSimplify collection in the history database.
     # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
-    fields = ['structure', 's_intrain', 's_result', 's_neighbornames', 's_neighbordists', 't_intrain', 't_result', 't_neighbornames', 't_neighbordists', 'failure', 'csv_content'] 
+    fields = ['structure', 's_intrain', 's_result', 's_neighbornames', 's_neighbordists', 't_intrain', 't_result', 't_neighbornames', 't_neighbordists', 'failure', 'csv_content', 's_times', 't_times'] 
+        # s_times and t_times indicate the number of times this structure has had its solvent removal stability or thermal stability predicted
     final_dict = {}
     for field in fields:
         final_dict[field] = '' # start with everything empty
@@ -1362,12 +1379,16 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
             final_dict['s_result'] = result
             final_dict['s_neighbornames'] = neighbor_names
             final_dict['s_neighbordists'] = neighbor_dists
+            final_dict['s_times'] = 1
+            final_dict['t_times'] = 0
         elif prediction_type == 'thermal_stability_prediction':
             final_dict['t_intrain'] = in_train
             final_dict['t_result'] = result
             final_dict['t_neighbornames'] = neighbor_names
             final_dict['t_neighbordists'] = neighbor_dists
-        
+            final_dict['s_times'] = 0
+            final_dict['t_times'] = 1
+
         # print(final_dict)
         collection.insert(final_dict) # insert the dictionary into the mongodb collection
     else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
@@ -1380,22 +1401,70 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
         final_dict['t_result'] = my_document['t_result']
         final_dict['t_neighbornames'] = my_document['t_neighbornames']
         final_dict['t_neighbordists'] = my_document['t_neighbordists']
+        final_dict['s_times'] = my_document['s_times']
+        final_dict['t_times'] = my_document['t_times']
 
-        if prediction_type == 'solvent_stability_prediction':
+        if prediction_type == 'solvent_stability_prediction': # structure has had a thermal prediction but not a solvent prediction
             final_dict['s_intrain'] = in_train
             final_dict['s_result'] = result
             final_dict['s_neighbornames'] = neighbor_names
             final_dict['s_neighbordists'] = neighbor_dists
-        elif prediction_type == 'thermal_stability_prediction':
+            final_dict['s_times'] = final_dict['s_times'] + 1
+        elif prediction_type == 'thermal_stability_prediction': # structure has had a solvent prediction but not a thermal prediction
             final_dict['t_intrain'] = in_train
             final_dict['t_result'] = result
             final_dict['t_neighbornames'] = neighbor_names
             final_dict['t_neighbordists'] = neighbor_dists
+            final_dict['t_times'] = final_dict['t_times'] + 1
 
         collection.remove({'structure':structure}) # delete entry
         collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
     # with open('sample.bson', 'wb') as outfile:
     #     outfile.write(bson.encode(final_dict))
+    return ('', 204) # 204 no content response
+
+def db_push_lite(structure, prediction_type):
+    """
+    # db_push_lite increases either s_times or t_times in the document corresponding to structure, in the MOFSimplify collection in the MongoDB history database.
+    # The prediction_type determines whether s_times or t_times is increased by one.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param prediction_type: str, the type of prediction being run. Can either be 'solvent_stability_prediction' or 'thermal_stability_prediction'.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """ 
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    final_dict = {}
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure})
+
+    # if db_push_lite is called, structure passed to it will already have a document in the history.MOFSimplify collection
+
+    #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+    # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
+    # s_times and t_times indicate the number of times this structure has had its solvent removal stability or thermal stability predicted
+    my_document = my_documents[0]
+    final_dict['s_intrain'] = my_document['s_intrain']
+    final_dict['s_result'] = my_document['s_result']
+    final_dict['s_neighbornames'] = my_document['s_neighbornames']
+    final_dict['s_neighbordists'] = my_document['s_neighbordists']
+    final_dict['t_intrain'] = my_document['t_intrain']
+    final_dict['t_result'] = my_document['t_result']
+    final_dict['t_neighbornames'] = my_document['t_neighbornames']
+    final_dict['t_neighbordists'] = my_document['t_neighbordists']
+    final_dict['s_times'] = my_document['s_times']
+    final_dict['t_times'] = my_document['t_times']
+
+    if prediction_type == 'solvent_stability_prediction': 
+        final_dict['s_times'] = final_dict['s_times'] + 1
+    elif prediction_type == 'thermal_stability_prediction': 
+        final_dict['t_times'] = final_dict['t_times'] + 1
+
+    collection.remove({'structure':structure}) # delete entry
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
     return ('', 204) # 204 no content response
 
 @app.route('/plot_thermal_stability', methods=['POST']) 

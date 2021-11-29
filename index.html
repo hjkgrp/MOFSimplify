@@ -951,29 +951,19 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 
   handleVisualization = function (ciffile) {
-    //document.getElementById("obresults").innerHTML = "<code>Processing " + ciffile.name + "</code>";
     var cifreader = new FileReader();
     cifreader.onload = function (event) {
       var mofid_results = analyzeMOF(event.target.result, ciffile.name);
       if (mofid_results.fragments.parsed) {
         const mofid_html = "<div>MOFid:<br /><code>" + mofid_results.mofid + "</code></div>";
         const mofkey_html = "<div>MOFkey:<br /><code>" + mofid_results.mofkey + "</code></div>";
-        //document.getElementById("obresults").innerHTML = mofid_html + mofkey_html;
-
-        //clearDropdown("cifdownload");
         updateFileLists();  // populate the initial list of files
-        //document.getElementById("folderdownload").selectedIndex = "0";  // back to the orig_mol
-
-        //document.getElementById("resultsdownload").classList.remove("inactive");
         document.getElementById("viewportnote").style.display = "none";
         document.getElementById("viewportwrapper").classList.remove("inactive");
-
 
         clearViewer(stage);
         drawEmPDB(stage, "/Output/orig_mol.pdb");
       } else {
-        //document.getElementById("obresults").innerHTML = "<pre>Failed to calculate MOFid components</pre>";
-        //document.getElementById("resultsdownload").classList.add("inactive");
         document.getElementById("viewportwrapper").classList.add("inactive");
       }
     };
@@ -1043,14 +1033,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     var cif_string = FS.readFile(emscripten_path, { 'encoding': 'utf8' });
     var temp_file = new Blob([cif_string], { type: 'chemical/x-cif' });
     return addPDBtoViewer(ngl_stage, temp_file, color_scheme);
-  }
-
-  UniformColor = function (hex_color = 0x000000) {
-    return NGL.ColormakerRegistry.addScheme(function (params) {
-      this.atomColor = function (atom) {
-        return hex_color;
-      }
-    });
   }
 
 

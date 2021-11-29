@@ -13,15 +13,14 @@ import stat
 import keras
 import keras.backend as K
 import sklearn
-import sklearn.preprocessing
 from sklearn.metrics import pairwise_distances
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 from bokeh.embed import file_html
 from bokeh.palettes import Inferno256
-from flask import jsonify, render_template, redirect, request, url_for, session
-import flask_login
-from flask_login import LoginManager, UserMixin, login_required, current_user
+from flask import request, session
+# import flask_login
+# from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
 from datetime import datetime

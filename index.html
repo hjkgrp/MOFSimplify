@@ -126,15 +126,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
 
   <title>MOFSimplify</title>
-  <meta name="description"
-    content="MOFSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik Group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." />
-  <meta property="og:type" content="website" />
-  <meta property="og:description"
-    content="MOFSimplify is an online interface to molSimplify, an open source, Python-based utility created by the Kulik Group at MIT for the Machine-Learning accelerated generation, prediction, and design of transition metal (coordination) complexes and MOFs." />
-  <meta property="og:title" content="MOFSimplify" />
-  <meta property="og:image" content="https://molsimplify.mit.edu/logo.png" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:image" content="https://molsimplify.mit.edu/logo.png" />
 
 </head>
 
@@ -150,12 +141,9 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
         <ul class="navbar-nav">
-          <!-- <li class="nav-item">
-              <a class="nav-link" href="about.html">About</a> TODO?
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="how_to_cite.html">How to Cite</a> TODO?
-            </li> -->
+<!--             <li class="nav-item">
+              <a class="nav-link" href="how_to_cite.html">How to Cite</a> TODO once Scientific Data paper is published
+            </li> --> -->
           <li class="nav-item" style='padding-left: 30px;'>
             <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
           </li>
@@ -1009,8 +997,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     }
   }
 
-
-
   updateFileLists = function () {
     //clearDropdown("cifdownload");
     var folder_name = "";//getInputValue("folderdownload");
@@ -1035,9 +1021,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       // Separate linkers into branches + branch points for the AllNode algorithm
       view_value_list[0] = "nodes_and_branches";
     }
-
   }
-
 
   clearViewer = function (ngl_stage) {
     ngl_stage.removeAllComponents();
@@ -1070,10 +1054,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   }
 
 
-  // var statusElement = document.getElementById('status_visualization');
-  //var progressElement = document.getElementById('progress');
-  //var spinnerElement = document.getElementById('spinner');
-
   var Module = {
     preRun: [],
     postRun: [],
@@ -1082,11 +1062,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       if (element) element.value = ''; // clear browser cache
       return function (text) {
         if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-        // These replacements are necessary if you render to raw HTML
-        //text = text.replace(/&/g, "&amp;");
-        //text = text.replace(/</g, "&lt;");
-        //text = text.replace(/>/g, "&gt;");
-        //text = text.replace('\n', '<br>', 'g');
         if (element) {
           element.value += text + "\n";
           element.scrollTop = element.scrollHeight; // focus on bottom
@@ -1117,17 +1092,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       if (m && now - Date.now() < 30) return; // if this is a progress update, skip it if too soon
       if (m) {
         text = m[1];
-        //progressElement.value = parseInt(m[2])*100;
-        //progressElement.max = parseInt(m[4])*100;
-        //progressElement.hidden = false;
-        //spinnerElement.hidden = false;
-      } //else {
-      //progressElement.value = null;
-      //progressElement.max = null;
-      //progressElement.hidden = true;
-      //if (!text) spinnerElement.style.display = 'none';
-      //}
-      // statusElement.innerHTML = text;
+      } 
     },
     totalDependencies: 0,
     monitorRunDependencies: function (left) {
@@ -1159,8 +1124,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     }
     else {
-      // visualize_color = inprogress_yellow;
-      // $('#visualize').css({'background-color': inprogress_yellow, 'border-color': inprogress_yellow}); // setting button color to indicate in progress
       vis_error_counter += 1
       vis_failure = true
 
@@ -2574,7 +2537,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // Download the cif file of the nearest neighbor in thermal stability ANN latent space when the "Download" button in the thermal section is clicked. 
     // Also download a .txt file that contains information on the nearest neighbor.
-    // Also download a .csv file with the TGA data for the MOF
+    // Also download a .csv file with the TGA data for the MOF.
     $('#download_t_neighbor').click(function () {
 
       // Ensure there are neighbors to display information on
@@ -2634,7 +2597,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     })
 
 
-    // This function is used for downlooding information on nearest neighbors and xyz's of components
+    // This function is used for downloading information on nearest neighbors and xyz's of components
     function download(filename, text) {
       var element = document.createElement('a');
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -3044,12 +3007,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $('#pills-data').show()
     })
 
-    // $('#pills-bb-tab').click(function(){
-    //   $('#pills-main').hide() 
-    //   $('#pills-vis').hide()
-    //   $('#pills-comp').hide()
-    //   $('#pills-bb').show()
-    // })
 
     // Below: populate the linkers, sbus, and net dropdowns in the building block section.
     // I run a script (tobacco_3.0/scrap_cifs.py) in the tobacco_3.0/edges_database folder, the tobacco_3.0/nodes_database folder, and the tobacco_3.0/template_database folder to get a nice array form of all of the available files. I then paste the array into the appropriate places below (for example, my_linkers = ARRAYOFOPTIONS)
@@ -3190,20 +3147,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     }, function () {
       $(this).css("color", '#279AF1');
     });
-
-
-    // // TODO Ask the user if they are ok with us storing the MOFs they predict on.
-    // if (confirm('Can we store information on the MOFs you select?')) {
-    //   // User gave us permission to store their MOF information.
-    //   console.log('permission check')
-    //   $.post("/permission", JSON.stringify(true)).done(function (response) {
-    //   })
-    // } else {
-    //   // User did not give permission for us to store their MOF information.
-    //   $.post("/permission", JSON.stringify(false)).done(function (response) {
-    //   })
-    // }
-
 
     // When the "Yes" button is clicked for storage permission line
     $("#perm_yes").click(function () {

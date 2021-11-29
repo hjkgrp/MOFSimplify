@@ -41,7 +41,6 @@ import flask_login
 from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
 from flask_cors import CORS
-import bson
 from datetime import datetime
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
@@ -67,12 +66,6 @@ operation_counter = 0 # This variable keeps track of server traffic to alert the
 last_operation_counter_clear = time.time() # the current time when server is started
 
 MAX_OPERATIONS = 4 # This variable dictates the maximum number of concurrent operations, to prevent server overload.
-
-### splash page management: https://stackoverflow.com/questions/37275262/anonym-password-protect-pages-without-username-with-flask
-# uncomment these lines and the login manager functions to get the splash up
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-# users = {'user1':{'password':'MOFSimplify!Beta2021'}}
 
 # The following three functions are needed for the ANN models.
 def precision(y_true, y_pred):
@@ -100,31 +93,6 @@ from tensorflow import keras as tf_keras
 tf_keras.backend.set_session(tf_session)
 solvent_model = keras.models.load_model(solvent_ANN_path + 'final_model_flag_few_epochs.h5',custom_objects=dependencies)
 thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
-
-class User(UserMixin):
-  pass
-
-# @login_manager.user_loader
-# def user_loader(username):
-#   if username not in users:
-#     return
-#   user = User()
-#   user.id = username
-#   return user
-
-# @login_manager.request_loader
-# def request_loader(request):
-#   username = request.form.get('username')
-#   if username not in users:
-#     return
-#   user = User()
-#   user.id = username
-
-#   user.is_authenticated = request.form['password'] == users[username]['password']
-
-#   return user
-
-### End of splash page management
 
 
 def conditional_diminish(counter):
@@ -205,17 +173,9 @@ def change_permission():
 
 
 # The send_from_directory functions that follow provide images from the MOFSimplify server to the website. The images are in a folder called images.
-@app.route('/logo.png')
-def serve_logo():
-    return flask.send_from_directory('images', 'logo.png')
-
 @app.route('/TGA_graphic.png')
 def serve_TGA_graphic():
     return flask.send_from_directory('images', 'TGA_graphic.png')
-
-@app.route('/MOF5_background.png')
-def serve_MOF5():
-    return flask.send_from_directory('images', 'MOF5_background.png')
 
 @app.route('/banner_light')
 def serve_banner_light():
@@ -228,11 +188,6 @@ def serve_banner_dark():
 @app.route('/MOF_logo.png')
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
-
-@app.route('/images/bg.jpg')
-def serve_bg():
-    # Hack to show the background image on the success/failure screens.
-    return flask.send_from_directory('./splash_page/images', 'bg.jpg')
 
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
@@ -284,8 +239,6 @@ def process_feedback():
     
     print(final_dict)
     collection.insert(final_dict) # insert the dictionary into the mongodb collection
-    with open('sample.bson', 'wb') as outfile:
-        outfile.write(bson.encode(final_dict))
     return ('', 204) # 204 no content response
     # return flask.send_from_directory('./splash_page/', 'success.html')
 
@@ -315,16 +268,6 @@ def index(path='index.html'):
   # else:
   #   return flask.send_from_directory('./splash_page/', 'index_wrong_password.html')
   return flask.send_from_directory('.', 'index.html')
-
-@app.route('/about.html')
-def serve_about():
-    """
-    serve_about serves the about page.
-    So the user is redirected to the about page.
-
-    :return: The about page.
-    """ 
-    return flask.send_from_directory('.', 'about.html')
 
 @app.route('/mof_examples/<path:path>') # needed for fetch
 def serve_example(path):
@@ -861,19 +804,6 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
         except ValueError:
             return 'FAILED'
 
-        # try:
-        #     full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
-        #         # makes the linkers and sbus folders
-        # except ValueError:
-        #     return 'FAILED'
-        # except NotImplementedError:
-        #     return 'FAILED'
-        # except AssertionError:
-        #     return 'FAILED'
-
-        # if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-        #     return 'FAILED'
-
         timeDelta = time.time() - timeStarted # get execution time
         print('Finished process in ' + str(timeDelta) + ' seconds')
 
@@ -1018,24 +948,11 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
             if col == 'name' or col == 'cif_file' or col == 'Dif':
                 continue # skip these
                 # Dif was sometimes differing between new Zeo++ call and training data value, for the same MOF
-            # print('Column: ')
-            # print(col)
-            # print(row[col])
-            # print(merged_df.iloc[0][col])
 
             # If for any property a training MOF and the new MOF we are predicting on differ too much, we know they are not the same MOF
             # So row_match is set to false for this training MOF
             if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some same values being idenfitied as different b/c of some floating 10^-15 values 
                 row_match = False
-
-                # print(row['CoRE_name'])
-                # # debugging
-                # if row['CoRE_name'] == 'HISJAW_clean': (check with AFUKIX for thermal)
-                #     print('HISJAW check')
-                #     print(col)
-                #     print(row[col])
-                #     print(merged_df.iloc[0][col])
-
                 break
         
         if row_match and prediction_type == 'solvent': # all columns for the row match! Some training MOF is the same as the new MOF
@@ -1136,8 +1053,6 @@ def ss_predict():
     print(f'is_entry is {is_entry}')
     if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
         entry_data = my_documents[0]
-        # print(f'entry_data is {entry_data}')
-        # print(f'entry_data["s_intrain"] is {entry_data["s_intrain"]} and is of type {type(entry_data["s_intrain"])}')
         if entry_data['failure'] == True: # MOF was not featurizable
             print('entry_data["failure"] is True!')
             if session['permission']:
@@ -1265,7 +1180,7 @@ def ts_predict():
     collection = db.MOFSimplify # The MOFSimplify collection in the history database.
     my_documents = collection.find({'structure':structure})
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
-    if is_entry:
+    if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
         entry_data = my_documents[0]
         if entry_data['failure'] == True: # MOF was not featurizable
             if session['permission']:
@@ -1422,8 +1337,6 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
 
         collection.remove({'structure':structure}) # delete entry
         collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
-    # with open('sample.bson', 'wb') as outfile:
-    #     outfile.write(bson.encode(final_dict))
     return ('', 204) # 204 no content response
 
 def db_push_lite(structure, prediction_type):
@@ -2030,55 +1943,6 @@ def neighbor_writer():
     myDict = {'contents': contents, 'file_name': prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt'}
 
     return myDict
-
-
-# @app.route('/TGA_maker', methods=['POST']) 
-# def TGA_maker():
-#     # Making the TGA plot and saving it, for it to be downloaded
-#     from bokeh.io import export_png
-
-#     # Grab data
-#     my_data = json.loads(flask.request.get_data()); # This is the neighbor complex
-#     my_data = my_data[:6] # only want the first six letters
-
-#     print('neighbor writer check 3')
-
-#     # Grab data 
-#     slopes_df = pd.read_csv(MOFSIMPLIFY_PATH + "TGA/raw_TGA_digitization_data/digitized_csv/" + my_data + ".csv")
-
-#     x_values = []
-#     y_values = []
-#     for i in range(4): # 0, 1, 2, 3
-#         x_values.append(slopes_df.iloc[[i]]['T (degrees C)'][i])
-#         y_values.append(slopes_df.iloc[[i]]['mass (arbitrary units)'][i])
-
-#     # Making the four points.
-#     p1 = np.array( [x_values[0], y_values[0]] )
-#     p2 = np.array( [x_values[1], y_values[1]] )
-
-#     p3 = np.array( [x_values[2], y_values[2]] )
-#     p4 = np.array( [x_values[3], y_values[3]] )
-
-#     intersection_point = seg_intersect(p1, p2, p3, p4)
-
-#     # Instantiating the figure object. 
-#     graph = figure(title = "Simplified literature TGA plot of selected thermal ANN neighbor")  
-         
-#     # The points to be plotted.
-#     xs = [[x_values[0], x_values[1],intersection_point[0]], [x_values[2], x_values[3],intersection_point[0]]] 
-#     ys = [[y_values[0], y_values[1],intersection_point[1]], [y_values[2], y_values[3],intersection_point[1]]] 
-        
-#     # Plotting the graph.
-#     graph.multi_line(xs, ys) 
-#     graph.circle([intersection_point[0]], [intersection_point[1]], size=20, color="navy", alpha=0.5)
-#     graph.xaxis.axis_label = 'Temperature (°C)'
-#     graph.yaxis.axis_label = 'Percentage mass remaining or Mass' 
-
-#     print('neighbor writer check 4')
-
-#     export_png(graph, filename='temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + my_data + "_simplified_TGA.png")
-    
-#     return 'Success!'
 
 @app.route('/get_descriptors', methods=['POST']) 
 def descriptor_getter():

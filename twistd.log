@@ -1,9 +1,0 @@
-2021-06-22T14:57:51-0400 [twisted.scripts._twistd_unix.UnixAppLogger#info] twistd 20.3.0 (/Users/gianmarcoterrones/opt/anaconda3/envs/mofSimplify/bin/python 3.6.13) starting up.
-2021-06-22T14:57:51-0400 [twisted.scripts._twistd_unix.UnixAppLogger#info] reactor class: twisted.internet.selectreactor.SelectReactor.
-2021-06-22T14:57:51-0400 [-] Site starting on 8080
-2021-06-22T14:57:51-0400 [twisted.web.server.Site#info] Starting factory <twisted.web.server.Site object at 0x7fdc1105cc50>
-2021-06-22T15:12:22-0400 [-] Received SIGTERM, shutting down.
-2021-06-22T15:12:22-0400 [-] (TCP Port 8080 Closed)
-2021-06-22T15:12:22-0400 [twisted.web.server.Site#info] Stopping factory <twisted.web.server.Site object at 0x7fdc1105cc50>
-2021-06-22T15:12:22-0400 [-] Main loop terminated.
-2021-06-22T15:12:22-0400 [twisted.scripts._twistd_unix.UnixAppLogger#info] Server Shut Down.

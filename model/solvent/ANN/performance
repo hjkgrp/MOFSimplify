@@ -1,2 +1,0 @@
- - 0s - loss: 0.1926 - accuracy: 0.9964 - precision: 0.9970 - recall: 0.9960 - f1: 0.9965 - val_loss: 0.5493 - val_accuracy: 0.7880 - val_precision: 0.7730 - val_recall: 0.8549 - val_f1: 0.8119
-0: roc-auc: 1.0 - roc-auc_val: 0.8288

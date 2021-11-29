@@ -1906,8 +1906,6 @@ def neighbor_writer():
 
     # next, getting DOI
     if prediction_type == 'solvent':
-        # os.chdir('model/solvent/ANN/dropped_connectivity_dupes')
-        # solvent_flags_df = pd.read_csv('train.csv')
         this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == selected_neighbor] # getting the row with the MOF of interest
         this_neighbor_doi = this_neighbor['doi'] # getting the doi
         this_neighbor_doi = this_neighbor_doi.iloc[0]

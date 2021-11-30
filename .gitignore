@@ -1,4 +1,5 @@
 .DS_Store
+**/.DS_Store
 zeo++-0.3/
 __pycache__/
 secret_key.json

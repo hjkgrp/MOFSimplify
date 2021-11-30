@@ -1,0 +1,1 @@
+This folder is used for displaying TGA plots. Called in app.py.

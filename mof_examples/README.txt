@@ -1,0 +1,1 @@
+The default MOF loaded when the Example MOF button is clicked. Currently, HKUST-1 from CoRE is the default MOF (HKUST1.cif, from https://github.com/WMD-group/Crystal_structures/blob/master/MOFs/HKUST-1/HKUST1.cif).

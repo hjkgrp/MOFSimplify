@@ -226,11 +226,11 @@ def process_feedback():
     return ('', 204) # 204 no content response
     # return flask.send_from_directory('./splash_page/', 'success.html')
 
-## Handle retraction request
-@app.route('/process_retraction', methods=['POST'])
-def process_retraction():
+## Handle removal request
+@app.route('/process_removal', methods=['POST'])
+def process_removal():
     """
-    process_retraction emails mofsimplify@mit.edu when the retraction form is filled out.
+    process_removal emails mofsimplify@mit.edu when the removal form is filled out.
     """ 
 
     email = request.form.get('email')
@@ -251,7 +251,7 @@ def process_retraction():
         # logging in to mail server
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
-        subject = 'MOFSimplify retraction request'
+        subject = 'MOFSimplify removal request'
         body = f'email: {email}\ncomments: {comments}\nip: {ip}\ntimestamp: {timestamp}'
 
         msg = f'Subject: {subject}\n\n{body}'

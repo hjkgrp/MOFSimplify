@@ -694,20 +694,20 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
           </form>
 
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='retraction_form_element' action='/process_retraction' method="POST" enctype="multipart/form-data">
-            <i class='zebra'>Request information retraction from our databases</i>
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='removal_form_element' action='/process_removal' method="POST" enctype="multipart/form-data">
+            <i class='zebra'>Request information removal from our databases</i>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="retraction_form_email_desc">Email (.edu preferred) *</span>
+                <span class="input-group-text" id="removal_form_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input name="email" type="email" id="retraction_form_email" aria-describedby="retraction_form_email_desc"
+              <input name="email" type="email" id="removal_form_email" aria-describedby="removal_form_email_desc"
                 class="form-control" required>
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="retraction_form_comments_desc">Describe entry to remove (date uploaded, type of MOF, etc) *</span>
+                <span class="input-group-text" id="removal_form_comments_desc">Describe entry to remove (date uploaded, type of MOF, etc) *</span>
               </div>
-              <input name="comments" type="text" id="retraction_form_comments" aria-describedby="retraction_form_comments_desc"
+              <input name="comments" type="text" id="removal_form_comments" aria-describedby="removal_form_comments_desc"
                 class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary mt-2" id="submit_F">Submit</button>
@@ -2909,13 +2909,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       }
     })
 
-    // When the "Submit" button is clicked for the data retraction form
+    // When the "Submit" button is clicked for the data removal form
     $('#submit_F').click(function () {
       // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
-      var email = document.getElementById('retraction_form_email').value;
-      var description = document.getElementById('retraction_form_comments').value;
+      var email = document.getElementById('removal_form_email').value;
+      var description = document.getElementById('removal_form_comments').value;
 
       success = true // Tracks whether the form should be sent to the backend
 
@@ -2923,12 +2923,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
         alert('Thank you, your request is being processed.')
 
-        var data = new FormData($('#retraction_form_element')[0])
-        document.getElementById('retraction_form_element').reset() // reset the form
+        var data = new FormData($('#removal_form_element')[0])
+        document.getElementById('removal_form_element').reset() // reset the form
         if (success) { // send form data to backend
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() { return; } // Override the response behavior of the request
-          request.open("POST", 'process_retraction', true)
+          request.open("POST", 'process_removal', true)
           request.send(data)
         }
       }

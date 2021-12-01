@@ -238,7 +238,7 @@ def process_retraction():
     ip = request.remote_addr
     timestamp = datetime.now().isoformat()
 
-    # grabbing environment variables (should be in .bash_profile or .bash_rc or .zshrc)
+    # grabbing environment variables (should be in .bashrc_conda or .zshrc)
     EMAIL_ADDRESS = os.environ.get('EMAIL_USER')
     EMAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 

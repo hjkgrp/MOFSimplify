@@ -143,7 +143,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         <ul class="navbar-nav">
 <!--             <li class="nav-item">
               <a class="nav-link" href="how_to_cite.html">How to Cite</a> TODO once Scientific Data paper is published
-            </li> --> -->
+            </li> -->
           <li class="nav-item" style='padding-left: 30px;'>
             <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
           </li>
@@ -693,6 +693,26 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             </div>
             <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
           </form>
+
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='retraction_form_element' action='/process_retraction' method="POST" enctype="multipart/form-data">
+            <i class='zebra'>Request information retraction from our databases</i>
+            <div style="" class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="retraction_form_email_desc">Email (.edu preferred) *</span>
+              </div>
+              <input name="email" type="email" id="retraction_form_email" aria-describedby="retraction_form_email_desc"
+                class="form-control" required>
+            </div>
+            <div class="input-group mt-2" style="">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="retraction_form_comments_desc">Describe entry to remove (date uploaded, type of MOF, etc) *</span>
+              </div>
+              <input name="comments" type="text" id="retraction_form_comments" aria-describedby="retraction_form_comments_desc"
+                class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2" id="submit_F">Submit</button>
+          </form>
+
         </div>
     </div>
 
@@ -2861,8 +2881,6 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       success = true // Tracks whether the form should be sent to the backend
 
       if (email && cif_file && TGA_file && solvent) { // requisite fields have been filled out
-        var cif_file = document.getElementById('validatedCustomFile_E1').value;
-        var TGA_file = document.getElementById('validatedCustomFile_E2').value;
 
         my_name_1 = cif_file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
         my_extension_1 = getExtension(my_name_1)
@@ -2891,6 +2909,30 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       }
     })
 
+    // When the "Submit" button is clicked for the data retraction form
+    $('#submit_F').click(function () {
+      // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
+
+      // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+      var email = document.getElementById('retraction_form_email').value;
+      var description = document.getElementById('retraction_form_comments').value;
+
+      success = true // Tracks whether the form should be sent to the backend
+
+      if (email && description) { // requisite fields have been filled out
+
+        alert('Thank you, your request is being processed.')
+
+        var data = new FormData($('#retraction_form_element')[0])
+        document.getElementById('retraction_form_element').reset() // reset the form
+        if (success) { // send form data to backend
+          var request = new XMLHttpRequest();
+          request.onreadystatechange = function() { return; } // Override the response behavior of the request
+          request.open("POST", 'process_retraction', true)
+          request.send(data)
+        }
+      }
+    })
 
     // This function returns the name of the selected MOF
     // If extension is true, keep the .cif at the end; else don't

@@ -1,5 +1,5 @@
-.DS_Store
+temp_file_creation_*/
 **/.DS_Store
 zeo++-0.3/
-__pycache__/
+**/__pycache__/
 secret_key.json

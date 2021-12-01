@@ -13,6 +13,8 @@ import stat
 import keras
 import keras.backend as K
 import sklearn
+import json
+import smtplib
 from sklearn.metrics import pairwise_distances
 from bokeh.plotting import figure
 from bokeh.resources import CDN
@@ -26,7 +28,7 @@ from flask_cors import CORS
 from datetime import datetime
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-import json
+
 
 
 cmap_bokeh = Inferno256
@@ -224,6 +226,39 @@ def process_feedback():
     return ('', 204) # 204 no content response
     # return flask.send_from_directory('./splash_page/', 'success.html')
 
+## Handle retraction request
+@app.route('/process_retraction', methods=['POST'])
+def process_retraction():
+    """
+    process_retraction emails mofsimplify@mit.edu when the retraction form is filled out.
+    """ 
+
+    email = request.form.get('email')
+    comments = request.form.get('comments')
+    ip = request.remote_addr
+    timestamp = datetime.now().isoformat()
+
+    # grabbing environment variables (should be in .bash_profile or .zshrc)
+    EMAIL_ADDRESS = os.environ.get('EMAIL_USER')
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+
+    # https://www.youtube.com/watch?v=JRCJ6RtE3xU
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+
+        # logging in to mail server
+        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+
+        subject = 'MOFSimplify retraction request'
+        body = f'email: {email}\ncomments: {comments}\nip: {ip}\ntimestamp: {timestamp}'
+
+        msg = f'Subject: {subject}\n\n{body}'
+
+        smtp.sendmail(EMAIL_ADDRESS, 'mofsimplify@mit.edu', msg) # sending to mofsimplify@mit.edu
+
+    return ('', 204) # 204 no content response
 
 ## Splash page management. Splash page is currently disabled.
 @app.route('/', methods=['GET', 'POST'])

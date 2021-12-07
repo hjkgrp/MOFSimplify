@@ -1493,9 +1493,6 @@ rel="stylesheet" type="text/css" />
       var name = document.getElementById('upload_status').innerHTML;
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'HKUST-1'
-      }
 
       // myFile.text() is a promise
       myFile.text().then(function (result) {
@@ -1674,9 +1671,6 @@ function setColor(element, color) {
       var name = document.getElementById('upload_status').innerHTML;
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'HKUST-1'
-      }
 
       // myFile.text() is a promise
       myFile.text().then(function (result) {

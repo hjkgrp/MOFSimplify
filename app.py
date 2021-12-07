@@ -15,6 +15,7 @@ import keras.backend as K
 import sklearn
 import json
 import smtplib
+import glob
 from sklearn.metrics import pairwise_distances
 from bokeh.plotting import figure
 from bokeh.resources import CDN
@@ -28,7 +29,7 @@ from flask_cors import CORS
 from datetime import datetime
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
-
+from list_content.list_content import my_linkers, my_sbus, my_nets, my_MOFs
 
 
 cmap_bokeh = Inferno256
@@ -152,9 +153,16 @@ def change_permission():
     session['permission'] = permission
     print('Permission check')
     print(permission)
-    print(type(permission))
     return str(permission)
 
+@app.route('/list_getter', methods=['GET'])
+def get_lists():
+    """
+    get_lists gets the dropdown lists. 
+
+    :return: dictionary. The dropdown lists
+    """ 
+    return {'my_linkers':my_linkers, 'my_sbus':my_sbus, 'my_nets':my_nets, 'my_MOFs':my_MOFs}
 
 # The send_from_directory functions that follow provide images from the MOFSimplify server to the website. The images are in a folder called images.
 @app.route('/TGA_graphic.png')
@@ -319,6 +327,17 @@ def serve_library_files(path):
     """ 
     return flask.send_from_directory('libraries', path)
 
+@app.route('/list_content/<path:path>')
+def serve_list_files(path):
+    """
+    serve_list_files returns a file to MOFSimplify.
+    The file is intended to be a list file, which contains information for dropdowns.
+
+    :param path: The path to the desired library in the libraries folder.
+    :return: The list file specified in the path input.
+    """ 
+    return flask.send_from_directory('list_content', path)
+
 @app.route('/bbcif/<path:path>')
 def serve_bbcif(path):
     """
@@ -335,12 +354,11 @@ def serve_bbcif(path):
     user_ID = path_parts[1]
     return flask.send_from_directory('temp_file_creation_' + user_ID + '/tobacco_3.0/output_cifs', cif_name);
 
-@app.route('/neighbor/<path:path>') # needed for fetch
-def serve_neighbor(path):
+@app.route('/CoRE2019/<path:path>') # needed for fetch
+def serve_CoRE_MOF(path):
     """
-    serve_neighbor returns a file to MOFSimplify.
-    The file is intended to be a cif file for a latent space nearest neighbor MOF selected in a dropdown, either solvent or thermal.
-    So, this function serves the neighbor CoRE MOF.
+    serve_CoRE_MOF returns a file to MOFSimplify.
+    The file is intended to be a cif file. It should be a CoRE MOF.
 
     :param path: The path to the desired MOF in the CoRE2019 folder.
     :return: The cif file for the neighbor MOF.
@@ -1588,6 +1606,26 @@ def TGA_plot():
 
     return file_html(graph,CDN,'my plot')
 
+@app.route('/get_fullname', methods=['POST']) 
+def get_fullname():
+    """
+    get_fullname gets the full name of the cif file associated with the refcode passed from the front end.
+    If there are multiple cif files with that refcode in their name, we just take the first one in the glob list. They should all be the same anyway.
+
+    :return: string, the full name of the cif file.
+    """ 
+
+    # Grab data
+    my_MOF = json.loads(flask.request.get_data());
+
+    # the list of all cif files that have this refcode in them
+    matching_list = glob.glob(f'{MOFSIMPLIFY_PATH}CoRE2019/{my_MOF}*')
+    fullname = matching_list[0] # just grabbing the first instance
+    fullname = fullname.split('/')
+    fullname = fullname[-1] # the split and [-1] maneuver gets just the cif file name 
+
+    return fullname
+
 @app.route('/get_components', methods=['POST']) 
 def get_components():
     """
@@ -1719,7 +1757,6 @@ def get_components():
     # If those numbers are the same, the linker is the same, if not, the linkers are different, etc.
 
     from molSimplify.Classes.mol3D import mol3D
-    import glob
     MOF_of_interest = name + '_primitive'
     XYZs = sorted(glob.glob(RACs_folder + 'linkers/*'+MOF_of_interest+'*xyz'))
     det_list = []
@@ -1952,8 +1989,6 @@ def neighbor_writer():
 
     with open(MOFSIMPLIFY_PATH + 'temp_file_creation_' + str(session['ID']) + '/latent_neighbor/' + prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt','r') as f:
         contents = f.read()
-
-    print('neighbor writer check 2')
 
     myDict = {'contents': contents, 'file_name': prediction_type + '-' + current_MOF + '-' + selected_neighbor + '.txt'}
 

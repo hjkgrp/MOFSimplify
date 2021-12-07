@@ -20,122 +20,122 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
 <!-- Imports related to star rating -->
 <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/css/star-rating.min.css" media="all"
-  rel="stylesheet" type="text/css" />
+rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/js/star-rating.min.js"
-  type="text/javascript"></script>
+type="text/javascript"></script>
 <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/themes/krajee-svg/theme.css" media="all"
-  rel="stylesheet" type="text/css" />
+rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/themes/krajee-svg/theme.js"></script>
 
-
 <!-- Custom CSS code is placed within the <style> tag: -->
-<style>
-  .btn {
-    margin-top: 3px;
-  }
+  <style>
+    .btn {
+      margin-top: 3px;
+    }
 
-  .mol-container {
-    /* For component visualization */
-    height: 400px;
-    position: relative;
-  }
+    .mol-container {
+      /* For component visualization */
+      height: 400px;
+      position: relative;
+    }
 
-  .form-control {
-    margin-bottom: 0.1cm;
-  }
+    .form-control {
+      margin-bottom: 0.1cm;
+    }
 
-  .round_button {
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: bold;
-    min-width: 130px;
-  }
+    .round_button {
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: bold;
+      min-width: 130px;
+    }
 
-  .selection_button {
-    display: inline-block;
-    width: 33%;
-  }
+    .selection_button {
+      display: inline-block;
+      width: 33%;
+    }
 
-  .link {
-    /* hyperlinks are blue */
-    color: #279AF1;
-  }
+    .link {
+      /* hyperlinks are blue */
+      color: #279AF1;
+    }
 
-  #viewportwrapper {
-    /* For MOF visualization */
-    grid-area: viz;
-  }  
+    #viewportwrapper {
+      /* For MOF visualization */
+      grid-area: viz;
+    }  
 
-  #chart {
-    /* thermal breakdown plot is centered, when thermal stability prediction is made */
-    width: 100%;
-    text-align: center;
-  }
+    #chart {
+      /* thermal breakdown plot is centered, when thermal stability prediction is made */
+      width: 100%;
+      text-align: center;
+    }
 
-  #header_background {
-    background-image: url('banner_light');
-    background-position: center; /* Keeps the banner centered even when window is shrunken */
-    background-size: cover; /* Makes the banner the appropriate size */
-  }
+    #header_background {
+      background-image: url('banner_light');
+      background-position: center; /* Keeps the banner centered even when window is shrunken */
+      background-size: cover; /* Makes the banner the appropriate size */
+    }
 
-  body {
-    /* The font to be used everywhere */
-    font-family: Arial, Helvetica, sans-serif;
-    color: black;
-    font-size: 16px;
-  }
+    body {
+      /* The font to be used everywhere */
+      font-family: Arial, Helvetica, sans-serif;
+      color: black;
+      font-size: 16px;
+    }
 
-  .perm {
-    background: none;
-    border: none;
-  }
+    .perm {
+      background: none;
+      border: none;
+    }
 
-  .pill-custom {
-    border-radius: 0px 0px 0px 0px !important;
-    border: 0px;
-    color: black !important;
-    background-color: white !important;
-    padding-left: 0px;
-    padding-right: 0px;
-  }
+    .pill-custom {
+      border-radius: 0px 0px 0px 0px !important;
+      border: 0px;
+      color: black !important;
+      background-color: white !important;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
 
-  .pill-custom.active {
-    background-color: #f7f7f7 !important;
-    border-bottom: 5px solid black !important;
-  }
+    .pill-custom.active {
+      background-color: #f7f7f7 !important;
+      border-bottom: 5px solid black !important;
+    }
 
-  .pill-custom:hover {
-    color: #18bc9c !important;
-  }
-</style>
-
-
-<head>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7B1L0P0FXV"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-7B1L0P0FXV');
-  </script>
-  <!--   End of Google Analytics stuff -->
-
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
-
-  <title>MOFSimplify</title>
-
-</head>
+    .pill-custom:hover {
+      color: #18bc9c !important;
+    }
+  </style>
 
 
-<body>
-  <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
-  <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-    <div class="container">
-      <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
-      <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
+  <head>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7B1L0P0FXV"></script>
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-7B1L0P0FXV');
+    </script>
+    <!--   End of Google Analytics stuff -->
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+
+    <title>MOFSimplify</title>
+
+  </head>
+
+
+  <body>
+    <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+      <div class="container">
+        <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
+        <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
         aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"><!-- Toggle navbar --></span>
       </button>
@@ -144,55 +144,55 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 <!--             <li class="nav-item">
               <a class="nav-link" href="how_to_cite.html">How to Cite</a> TODO once Scientific Data paper is published
             </li> -->
-          <li class="nav-item" style='padding-left: 30px;'>
-            <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
-          </li>
-          <li class="nav-item" style='padding-left: 30px;'>
-            <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF
+            <li class="nav-item" style='padding-left: 30px;'>
+              <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
+            </li>
+            <li class="nav-item" style='padding-left: 30px;'>
+              <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF
               Code</a>
-          </li>
-        </ul>
+            </li>
+          </ul>
 
-      </div>
-      <button class='btn btn-primary round_button selection_button' id='dark_mode' type='button'
+        </div>
+        <button class='btn btn-primary round_button selection_button' id='dark_mode' type='button'
         style='font-size:22px;'>Dark mode</button>
+      </div>
     </div>
-  </div>
 
-  <div class="container">
-    <div class="page-header" id="banner">
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
-          <!-- Title -->
-          <span style='position:relative;'>
-            <!-- The zebra class changes color depending if Dark mode is toggled on or not. -->
-            <p style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50; margin-top: 6cm;"
+    <div class="container">
+      <div class="page-header" id="banner">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
+            <!-- Title -->
+            <span style='position:relative;'>
+              <!-- The zebra class changes color depending if Dark mode is toggled on or not. -->
+              <p style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50; margin-top: 6cm;"
               class='zebra'>The <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT <br> Powered by <a
-                class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a></p>
-          </span>
+              class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a></p>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
 
 
-    <!-- The 4 tabs of the website -->
-    <ul class="nav nav-pills mb-3" id="pills-tab"
+      <!-- The 4 tabs of the website -->
+      <ul class="nav nav-pills mb-3" id="pills-tab"
       style="overflow-x: auto;text-align: center;margin-left:-15px;margin-right:-15px;margin-bottom: 10px;border-bottom-width: 1px;border-bottom-style: solid; border-bottom-color:#d6d9dc; flex-wrap:nowrap;">
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom active" id="pills-main-tab"
-          style='width:100%; height:100%; font-weight: bold; font-size:24px;'>Main</button>
+        style='width:100%; height:100%; font-weight: bold; font-size:24px;'>Main</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-vis-tab"
-          style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Visualization</button>
+        style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Visualization</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-comp-tab"
-          style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Component Analysis</button>
+        style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Component Analysis</button>
       </li>
       <li class="nav-item" role="presentation" style='width:25%; min-width:150px;'>
         <button class="nav-link pill-custom" id="pills-data-tab"
-          style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Data Upload</button>
+        style='width:100%; height: 100%; font-weight: bold; font-size:24px;'>Data Upload</button>
       </li>
     </ul>
 
@@ -203,14 +203,14 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       <div class='col-lg-12'>
         <div style='width:100%; text-align:center; margin-top:0.25cm;'>
           <!-- Button for queuing up the example MOF cif file -->
-          <button class='btn btn-primary round_button selection_button' id='load' type='button'
-            style='font-size:22px;'>Example MOF</button>
+          <button class='btn btn-primary round_button selection_button' id='example-redirect' type='button'
+          style='font-size:22px;'>Example MOF</button>
           <!-- Button for uploading MOF cif file -->
           <button class='btn btn-primary round_button selection_button' id='upload' type='button'
-            style='font-size:22px;'>Custom (upload cif file)</button>
+          style='font-size:22px;'>Custom (upload cif file)</button>
           <!-- Button for uploading MOF cif file -->
           <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'
-            style='font-size:22px;'>Building block assembly</button>
+          style='font-size:22px;'>Building block assembly</button>
           <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p>
           <p class='zebra' style='font-size:22px;' id='permission_line'>May MOFSimplify store information on your MOFs? &nbsp&nbsp<button style='color: green;' id='perm_yes' class='perm'>Yes.</button>&nbsp&nbsp&nbsp<button style='color: red;' id='perm_no' class='perm'>No.</button></p> <!-- &nbsp is a space gap -->
         </div>
@@ -223,10 +223,10 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           <div style='width:100%; text-align:center; margin-top:0.25cm;'>
             <!-- Button for predicting solvent removal stability of MOF -->
             <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='predict_s' type='button'>Stability upon solvent removal</button>
+            id='predict_s' type='button'>Stability upon solvent removal</button>
             <!-- Button for predicting thermal stability of MOF -->
             <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='predict_t' type='button'>Thermal stability</button>
+            id='predict_t' type='button'>Thermal stability</button>
           </div>
         </div>
 
@@ -239,520 +239,544 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           <div style='width:100%; text-align:center; margin-top:0.25cm;'>
             <!-- Button for downloading descriptors of MOF -->
             <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='download_descriptors' type='button'>Download descriptors</button>
+            id='download_descriptors' type='button'>Download descriptors</button>
           </div>
         </div>
       </div>
 
       <!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
       <div id='status_section' class='row'
-        style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
-        <b style='font-size:22px;'> Status messages and MOF predictions </b>
-        <div class='col-12' style='font-size:22px;' id='upload_status'></div>
-        <div class='col-12' style='font-size:22px;' id='solvent_stability_prediction'>
+      style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
+      <b style='font-size:22px;'> Status messages and MOF predictions </b>
+      <div class='col-12' style='font-size:22px;' id='upload_status'></div>
+      <div class='col-12' style='font-size:22px;' id='solvent_stability_prediction'>
+      </div>
+      <div class='col-12' id='solvent_form'>
+        <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="feedback_form_name" value="solvent_stability" />
+          <input type="hidden" name="cif_file_name" value="" />
+          <input type="hidden" name="structure" value="" />
+          <i id='rate_solvent'>Rate this prediction: *</i> 
+          <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
+          <div style="" class="input-group mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+            </div>
+            <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
+            class="form-control" required>
+          </div>
+          <select name="reason" id="inputState_A" class="form-control mt-2 mb-0" required>
+            <option value="">Reason for rating... *</option>
+            <option>I've worked with this MOF before, the prediction is good</option>
+            <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
+            <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+            <option>The paper is incorrect (provide reasoning in comment field)</option>
+            <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
+          </select>
+          <div class="input-group mt-2" style="">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+            </div>
+            <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
+            class="form-control">
+          </div>
+          <div class="custom-file form-control mt-2">
+            <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_A">
+            <label class="custom-file-label" for="validatedCustomFile_A" id="TGA_A">Upload TGA Trace (.pdf, .jpg, .png,
+            .tiff; 20 MB max)</label>
+            <div class="invalid-feedback">Example invalid custom file feedback</div>
+          </div>
+          <div class="input-group mt-2" style="">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent evacuated for selected MOF</span>
+            </div>
+            <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
+            class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary mt-2" id="submit_A">Submit</button>
+        </form>
+      </div>
+
+      <div class='col-12' style='font-size:22px;' id='thermal_stability_prediction'></div>
+      <div class='col-12' style='font-size:22px;' id='thermal_stability_percentile'></div>
+      <div class="col-12" id="thermal_form">
+        <form class='col-10' style='font-size:22px;margin-left:15px' id='thermal_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="feedback_form_name" value="thermal_stability" />
+          <input type="hidden" name="cif_file_name" value="" />
+          <input type="hidden" name="structure" value="" />
+          <i id='rate_thermal'>Rate this prediction: *</i>
+          <input name="rating" id="thermal_rating" type="text" class="rating" data-size="md" required>
+          <div style="" class="input-group mt-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="thermal_rating_email_desc">Email (.edu preferred) *</span>
+            </div>
+            <input name="email" type="email" id="thermal_rating_email" aria-describedby="thermal_rating_email_desc"
+            class="form-control" required>
+          </div>
+          <select name="reason" id="inputState_B" class="form-control mt-2 mb-0" required>
+            <option value="">Reason for rating... *</option>
+            <option>I've worked with this MOF before, the prediction is good</option>
+            <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
+            <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+            <option>The paper is incorrect (provide reasoning in comment field)</option>
+            <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
+          </select>
+          <div class="input-group mt-2" style="">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="thermal_rating_comments_desc">Comments</span>
+            </div>
+            <input name="comments" type="text" id="thermal_rating_comments" aria-describedby="thermal_rating_comments_desc"
+            class="form-control">
+          </div>
+          <div class="custom-file form-control mt-2">
+            <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_B">
+            <label class="custom-file-label" for="validatedCustomFile_B" id="TGA_B">Upload TGA Trace (.pdf, .jpg, .png,
+            .tiff; 20 MB max)</label>
+            <div class="invalid-feedback">Example invalid custom file feedback</div>
+          </div>
+          <div class="input-group mt-2" style="">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="thermal_rating_solvname_desc">Solvent evacuated for selected MOF</span>
+            </div>
+            <input name="solvent" type="text" id="thermal_rating_solvname" aria-describedby="thermal_rating_solvname_desc"
+            class="form-control">
+          </div>
+          <button type="submit" class="btn btn-primary mt-2" id="submit_B">Submit</button>
+        </form>
+      </div>
+      <div class='col-12' style='font-size:22px;' id='chart'></div>
+    </div>
+
+    <div class='row' id='neighbor_blurb'>
+      <p class='col-12 zebra' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of
+        training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used
+        to
+      train an ANN.</p>
+    </div>
+
+    <div class='row'>
+
+      <div class='col-6 zebra' style='font-size:22px;' id='solvent_neighbor_section'>
+        Solvent removal stability ANN nearest neighbors <br> in latent space
+        <select class='form-control' id='solvent_neighbors' style='font-size:22px;'>
+        </select>
+
+        <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='s_neighbor' type='button'>Show</button>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='download_s_neighbor' type='button'>Download</button>
         </div>
-        <div class='col-12' id='solvent_form'>
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="feedback_form_name" value="solvent_stability" />
+        <div style='width:100%; text-align:center;'>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='visualize_s_neighbor' type='button'>Visualize</button>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='comp_s_neighbor' type='button'>Get components</button>
+        </div>
+        <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
+        <!-- Feedback form for solvent neighbor -->
+        <div id="solvent_neighbor_form">
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_neighbor_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="feedback_form_name" value="solvent_stability_neighbor" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i id='rate_solvent'>Rate this prediction: *</i> 
-            <input name="rating" id="solvent_rating" type="text" class="rating" data-size="md" required>
+            <i>Rate this existing data: *</i>
+            <input name="rating" id="solvent_neighbor_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_email_desc">Email (.edu preferred) *</span>
+                <span class="input-group-text" id="solvent_neighbor_rating_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input name="email" type="email" id="solvent_rating_email" aria-describedby="solvent_rating_email_desc"
-                class="form-control" required>
+              <input name="email" type="email" id="solvent_neighbor_rating_email" aria-describedby="solvent_neighbor_rating_email_desc"
+              class="form-control" required>
             </div>
-            <select name="reason" id="inputState_A" class="form-control mt-2 mb-0" required>
-              <option value="">Reason for rating... *</option>
-              <option>I've worked with this MOF before, the prediction is good</option>
-              <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
-              <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+            <select name="reason" id="inputState_C" class="form-control mt-2 mb-0" required>
+              <option value="">Reason for rating... * </option>
+              <option>I've worked with this MOF before, the deposited data is good</option>
+              <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
+              <option>The literature contains counter examples of this deposited data (provide DOI of papers with counterexamples in comment field)</option>
               <option>The paper is incorrect (provide reasoning in comment field)</option>
               <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_comments_desc">Comments</span>
+                <span class="input-group-text" id="solvent_neighbor_rating_comments_desc">Comments</span>
               </div>
-              <input name="comments" type="text" id="solvent_rating_comments" aria-describedby="solvent_rating_comments_desc"
-                class="form-control">
+              <input name="comments" type="text" id="solvent_neighbor_rating_comments" aria-describedby="solvent_neighbor_rating_comments_desc"
+              class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_A">
-              <label class="custom-file-label" for="validatedCustomFile_A" id="TGA_A">Upload TGA Trace (.pdf, .jpg, .png,
-                .tiff; 20 MB max)</label>
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_C">
+              <label class="custom-file-label" for="validatedCustomFile_C" id="TGA_C">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="solvent_rating_solvname_desc">Solvent evacuated for selected MOF</span>
+                <span class="input-group-text" id="solvent_neighbor_rating_solvname_desc">Solvent evacuated for selected MOF</span>
               </div>
-              <input name="solvent" type="text" id="solvent_rating_solvname" aria-describedby="solvent_rating_solvname_desc"
-                class="form-control">
+              <input name="solvent" type="text" id="solvent_neighbor_rating_solvname" aria-describedby="solvent_neighbor_rating_solvname_desc"
+              class="form-control">
             </div>
-            <button type="submit" class="btn btn-primary mt-2" id="submit_A">Submit</button>
+            <button type="submit" class="btn btn-primary mt-2" id="submit_C">Submit</button>
           </form>
         </div>
+      </div>
 
-        <div class='col-12' style='font-size:22px;' id='thermal_stability_prediction'></div>
-        <div class='col-12' style='font-size:22px;' id='thermal_stability_percentile'></div>
-        <div class="col-12" id="thermal_form">
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='thermal_stability_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="feedback_form_name" value="thermal_stability" />
+      <div class='col-6 zebra' style='font-size:22px;' id='thermal_neighbor_section'>
+        Thermal stability ANN nearest neighbors <br> in latent space
+        <select class='form-control' id='thermal_neighbors' style='font-size:22px;'>
+        </select>
+
+        <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='t_neighbor' type='button'>Show</button>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='download_t_neighbor' type='button'>Download</button>
+        </div>
+        <div style='width:100%; text-align:center;'>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='visualize_t_neighbor' type='button'>Visualize</button>
+          <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
+          id='comp_t_neighbor' type='button'>Get components</button>
+        </div>
+        <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
+        <div id="thermal_neighbor_form">
+          <form class='col-10' style='font-size:22px;margin-left:15px' id='thermal_stability_neighbor_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="feedback_form_name" value="thermal_stability_neighbor" />
             <input type="hidden" name="cif_file_name" value="" />
             <input type="hidden" name="structure" value="" />
-            <i id='rate_thermal'>Rate this prediction: *</i>
-            <input name="rating" id="thermal_rating" type="text" class="rating" data-size="md" required>
+            <i>Rate this existing data: *</i>
+            <input name="rating" id="thermal_neighbor_rating" type="text" class="rating" data-size="md" required>
             <div style="" class="input-group mt-2">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="thermal_rating_email_desc">Email (.edu preferred) *</span>
+                <span class="input-group-text" id="thermal_neighbor_rating_email_desc">Email (.edu preferred) *</span>
               </div>
-              <input name="email" type="email" id="thermal_rating_email" aria-describedby="thermal_rating_email_desc"
-                class="form-control" required>
+              <input name="email" type="email" id="thermal_neighbor_rating_email" aria-describedby="thermal_neighbor_rating_email_desc"
+              class="form-control" required>
             </div>
-            <select name="reason" id="inputState_B" class="form-control mt-2 mb-0" required>
+            <select name="reason" id="inputState_D" class="form-control mt-2 mb-0" required>
               <option value="">Reason for rating... *</option>
-              <option>I've worked with this MOF before, the prediction is good</option>
-              <option>I've worked with this MOF before, the prediction is bad (please upload data)</option>
-              <option>The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in comment field)</option>
+              <option>I've worked with this MOF before, the deposited data is good</option>
+              <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
+              <option>The literature contains counter examples of this deposited data (provide DOI of papers with counterexamples in comment field)</option>
               <option>The paper is incorrect (provide reasoning in comment field)</option>
               <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
             </select>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="thermal_rating_comments_desc">Comments</span>
+                <span class="input-group-text" id="thermal_neighbor_rating_comments_desc">Comments</span>
               </div>
-              <input name="comments" type="text" id="thermal_rating_comments" aria-describedby="thermal_rating_comments_desc"
-                class="form-control">
+              <input name="comments" type="text" id="thermal_neighbor_rating_comments" aria-describedby="thermal_neighbor_rating_comments_desc"
+              class="form-control">
             </div>
             <div class="custom-file form-control mt-2">
-              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_B">
-              <label class="custom-file-label" for="validatedCustomFile_B" id="TGA_B">Upload TGA Trace (.pdf, .jpg, .png,
-                .tiff; 20 MB max)</label>
+              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_D">
+              <label class="custom-file-label" for="validatedCustomFile_D" id="TGA_D">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
               <div class="invalid-feedback">Example invalid custom file feedback</div>
             </div>
             <div class="input-group mt-2" style="">
               <div class="input-group-prepend">
-                <span class="input-group-text" id="thermal_rating_solvname_desc">Solvent evacuated for selected MOF</span>
+                <span class="input-group-text" id="thermal_neighbor_rating_solvname_desc">Solvent evacuated for selected MOF</span>
               </div>
-              <input name="solvent" type="text" id="thermal_rating_solvname" aria-describedby="thermal_rating_solvname_desc"
-                class="form-control">
+              <input name="solvent" type="text" id="thermal_neighbor_rating_solvname" aria-describedby="thermal_neighbor_rating_solvname_desc"
+              class="form-control">
             </div>
-            <button type="submit" class="btn btn-primary mt-2" id="submit_B">Submit</button>
+            <button type="submit" class="btn btn-primary mt-2" id="submit_D">Submit</button>
           </form>
         </div>
-        <div class='col-12' style='font-size:22px;' id='chart'></div>
-      </div>
+        <div class='col-6' id='tga_plot'></div>
 
-      <div class='row' id='neighbor_blurb'>
-        <p class='col-12 zebra' style='margin-top: 0.5cm; font-size:22px;'> Nearest neighbors come from the pool of
-          training data (i.e. <a class='link' href='https://zenodo.org/record/3370144#.YQBeCC1h2L2'>CoRE MOFs</a>) used
-          to
-          train an ANN.</p>
-      </div>
-
-      <div class='row'>
-
-        <div class='col-6 zebra' style='font-size:22px;' id='solvent_neighbor_section'>
-          Solvent removal stability ANN nearest neighbors <br> in latent space
-          <select class='form-control' id='solvent_neighbors' style='font-size:22px;'>
-          </select>
-
-          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='s_neighbor' type='button'>Show</button>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='download_s_neighbor' type='button'>Download</button>
-          </div>
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='visualize_s_neighbor' type='button'>Visualize</button>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='comp_s_neighbor' type='button'>Get components</button>
-          </div>
-          <p id='s_neighbor_info' style='font-size:20px;' class='zebra'></p>
-          <!-- Feedback form for solvent neighbor -->
-          <div id="solvent_neighbor_form">
-            <form class='col-10' style='font-size:22px;margin-left:15px' id='solvent_stability_neighbor_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
-              <input type="hidden" name="feedback_form_name" value="solvent_stability_neighbor" />
-              <input type="hidden" name="cif_file_name" value="" />
-              <input type="hidden" name="structure" value="" />
-              <i>Rate this existing data: *</i>
-              <input name="rating" id="solvent_neighbor_rating" type="text" class="rating" data-size="md" required>
-              <div style="" class="input-group mt-2">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_neighbor_rating_email_desc">Email (.edu preferred) *</span>
-                </div>
-                <input name="email" type="email" id="solvent_neighbor_rating_email" aria-describedby="solvent_neighbor_rating_email_desc"
-                  class="form-control" required>
-              </div>
-              <select name="reason" id="inputState_C" class="form-control mt-2 mb-0" required>
-                <option value="">Reason for rating... * </option>
-                <option>I've worked with this MOF before, the deposited data is good</option>
-                <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
-                <option>The literature contains counter examples of this deposited data (provide DOI of papers with counterexamples in comment field)</option>
-                <option>The paper is incorrect (provide reasoning in comment field)</option>
-                <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
-              </select>
-              <div class="input-group mt-2" style="">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_neighbor_rating_comments_desc">Comments</span>
-                </div>
-                <input name="comments" type="text" id="solvent_neighbor_rating_comments" aria-describedby="solvent_neighbor_rating_comments_desc"
-                  class="form-control">
-              </div>
-              <div class="custom-file form-control mt-2">
-                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_C">
-                <label class="custom-file-label" for="validatedCustomFile_C" id="TGA_C">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
-                <div class="invalid-feedback">Example invalid custom file feedback</div>
-              </div>
-              <div class="input-group mt-2" style="">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="solvent_neighbor_rating_solvname_desc">Solvent evacuated for selected MOF</span>
-                </div>
-                <input name="solvent" type="text" id="solvent_neighbor_rating_solvname" aria-describedby="solvent_neighbor_rating_solvname_desc"
-                  class="form-control">
-              </div>
-              <button type="submit" class="btn btn-primary mt-2" id="submit_C">Submit</button>
-            </form>
-          </div>
-        </div>
-
-        <div class='col-6 zebra' style='font-size:22px;' id='thermal_neighbor_section'>
-          Thermal stability ANN nearest neighbors <br> in latent space
-          <select class='form-control' id='thermal_neighbors' style='font-size:22px;'>
-          </select>
-
-          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='t_neighbor' type='button'>Show</button>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='download_t_neighbor' type='button'>Download</button>
-          </div>
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='visualize_t_neighbor' type='button'>Visualize</button>
-            <button style='display:inline-block; width:49%; font-size:22px;' class='btn btn-primary round_button'
-              id='comp_t_neighbor' type='button'>Get components</button>
-          </div>
-          <p id='t_neighbor_info' style='font-size:20px;' class='zebra'></p>
-          <div id="thermal_neighbor_form">
-            <form class='col-10' style='font-size:22px;margin-left:15px' id='thermal_stability_neighbor_feedback' action='/process_feedback' method="POST" enctype="multipart/form-data">
-              <input type="hidden" name="feedback_form_name" value="thermal_stability_neighbor" />
-              <input type="hidden" name="cif_file_name" value="" />
-              <input type="hidden" name="structure" value="" />
-              <i>Rate this existing data: *</i>
-              <input name="rating" id="thermal_neighbor_rating" type="text" class="rating" data-size="md" required>
-              <div style="" class="input-group mt-2">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="thermal_neighbor_rating_email_desc">Email (.edu preferred) *</span>
-                </div>
-                <input name="email" type="email" id="thermal_neighbor_rating_email" aria-describedby="thermal_neighbor_rating_email_desc"
-                  class="form-control" required>
-              </div>
-              <select name="reason" id="inputState_D" class="form-control mt-2 mb-0" required>
-                <option value="">Reason for rating... *</option>
-                <option>I've worked with this MOF before, the deposited data is good</option>
-                <option>I've worked with this MOF before, the deposited data is bad (please upload data)</option>
-                <option>The literature contains counter examples of this deposited data (provide DOI of papers with counterexamples in comment field)</option>
-                <option>The paper is incorrect (provide reasoning in comment field)</option>
-                <option>The label obtained from the paper is incorrect (provide reasoning in comment field)</option>
-              </select>
-              <div class="input-group mt-2" style="">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="thermal_neighbor_rating_comments_desc">Comments</span>
-                </div>
-                <input name="comments" type="text" id="thermal_neighbor_rating_comments" aria-describedby="thermal_neighbor_rating_comments_desc"
-                  class="form-control">
-              </div>
-              <div class="custom-file form-control mt-2">
-                <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_D">
-                <label class="custom-file-label" for="validatedCustomFile_D" id="TGA_D">Upload File (optional; .pdf, .jpg, .png, .tiff; 20 MB max)</label>
-                <div class="invalid-feedback">Example invalid custom file feedback</div>
-              </div>
-              <div class="input-group mt-2" style="">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="thermal_neighbor_rating_solvname_desc">Solvent evacuated for selected MOF</span>
-                </div>
-                <input name="solvent" type="text" id="thermal_neighbor_rating_solvname" aria-describedby="thermal_neighbor_rating_solvname_desc"
-                  class="form-control">
-              </div>
-              <button type="submit" class="btn btn-primary mt-2" id="submit_D">Submit</button>
-            </form>
-          </div>
-          <div class='col-6' id='tga_plot'></div>
-
-          <div id='tga_explanation' style='display: none; margin-top: 0.5cm;' class='zebra'>
-            <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
-            <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These
-              points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they
-              intersect, and the point of intersection is taken to be the breakdown temperature.</p>
-          </div>
+        <div id='tga_explanation' style='display: none; margin-top: 0.5cm;' class='zebra'>
+          <img src='TGA_graphic.png' alt='Explanatory graphic for simplified TGA plots' style='max-width: 120%;'>
+          <p> In order to generate the simplified TGA plot, four points on the experimental TGA plot are chosen. These
+            points represent two lines of different slope on the TGA plot. The two lines are extrapolated until they
+          intersect, and the point of intersection is taken to be the breakdown temperature.</p>
         </div>
       </div>
     </div>
+  </div>
 
 
-    <!-- The Visualization tab of the website -->
-    <div id="pills-vis">
-      <!-- MOF viewer and buttons -->
+  <!-- The Visualization tab of the website -->
+  <div id="pills-vis">
+    <!-- MOF viewer and buttons -->
 
-      <div id="viewportwrapper" style="border-style: solid;border-width:2px;" class="content inactive">
-        <!-- MOF visualization -->
-        <div id="viewportnote" style="position: relative; top: 9em; text-align: center; z-index: 2; font-size: 28px;">
-          MOF
-          unit cells are visualized here. <br> Left click to rotate, right click with mouse to move, scroll with mouse
-          to
-          zoom.</div>
-        <div id="cifviewport" style="width=100%; height:500px;">
-        </div>
+    <div id="viewportwrapper" style="border-style: solid;border-width:2px;" class="content inactive">
+      <!-- MOF visualization -->
+      <div id="viewportnote" style="position: relative; top: 9em; text-align: center; z-index: 2; font-size: 28px;">
+        MOF
+        unit cells are visualized here. <br> Left click to rotate, right click with mouse to move, scroll with mouse
+        to
+      zoom.</div>
+      <div id="cifviewport" style="width=100%; height:500px;">
+      </div>
+    </div>
+    <div style="margin-bottom:0.5cm;"></div>
+    <div style='width:100%; text-align:center;'>
+      <button class='btn btn-primary round_button' style='display:inline-block; width:50%; font-size: 22px'
+      id='visualize' type='button'>Visualize selected (1) MOF</button>
+      <p class='zebra' style='display:inline-block; width:100%; font-size: 22px'> Special thanks to the Koes and Snurr
+      groups for developing visualization code. </p>
+    </div>
+
+    <div style='width:100%; text-align:center;'>
+      <div style='display:inline-block; font-size: 22px;' id='currently_visualized' class='zebra'></div>
+    </div>
+    <div style='width:100%; text-align:center;'>
+      <div style='display:inline-block; font-size: 22px;' id='status_visualization'></div>
+    </div>
+  </div>
+
+  <!-- The Component Analysis tab of the website -->
+  <div id="pills-comp">
+    <div class='row'>
+      <div class='col-lg-6' style='margin-top: 0.5cm;'>
+        <div id='container-01' class='mol-container'
+        style='border-style:solid;border-width:2px;background-color: white;'>
+        <div id='container-01-note'
+        style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px;'>MOF linkers and
+        SBUs
+        are visualized here. <br> Left click to rotate, scroll with mouse to zoom.</div>
       </div>
       <div style="margin-bottom:0.5cm;"></div>
       <div style='width:100%; text-align:center;'>
-        <button class='btn btn-primary round_button' style='display:inline-block; width:50%; font-size: 22px'
-          id='visualize' type='button'>Visualize selected (1) MOF</button>
-        <p class='zebra' style='display:inline-block; width:100%; font-size: 22px'> Special thanks to the Koes and Snurr
-          groups for developing visualization code. </p>
-      </div>
-
-      <div style='width:100%; text-align:center;'>
-        <div style='display:inline-block; font-size: 22px;' id='currently_visualized' class='zebra'></div>
-      </div>
-      <div style='width:100%; text-align:center;'>
-        <div style='display:inline-block; font-size: 22px;' id='status_visualization'></div>
-      </div>
-    </div>
-
-    <!-- The Component Analysis tab of the website -->
-    <div id="pills-comp">
-      <div class='row'>
-        <div class='col-lg-6' style='margin-top: 0.5cm;'>
-          <div id='container-01' class='mol-container'
-            style='border-style:solid;border-width:2px;background-color: white;'>
-            <div id='container-01-note'
-              style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px;'>MOF linkers and
-              SBUs
-              are visualized here. <br> Left click to rotate, scroll with mouse to zoom.</div>
-          </div>
-          <div style="margin-bottom:0.5cm;"></div>
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
-              id='visualize_linker' type='button'>Linker</button>
-            <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
-              id='visualize_sbu' type='button'>SBU</button>
-            <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
-              id='reset_zoom' type='button'>Reset zoom</button>
-            <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
-              id='download_linker' type='button'>Download linker</button>
-            <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
-              id='download_sbu' type='button'>Download SBU</button>
-          </div>
-        </div>
-
-        <div class='col-lg-6' style='margin-top: 0.5cm;'>
-          <!-- Button for getting MOF components for visualization  -->
-          <div style='width:100%; text-align:center;'>
-            <button style='display:inline-block; width:80%; font-size: 22px; margin-bottom: 0.5cm;'
-              class='btn btn-primary round_button' id='get_components' type='button'>Get selected (1) MOF
-              components</button>
-          </div>
-
-          <div id='comp_MOF' style='font-size: 22px;' class='zebra'> </div> <!-- Will display information on what MOF's components are currently visualized -->
-
-          <div style='font-size: 22px; margin-top: 0.5cm' class='zebra'>
-            Linkers
-            <select style='font-size: 22px;' class='form-control' id='linker'>
-            </select>
-          </div>
-
-          <div style='font-size: 22px;' class='zebra'>
-            SBUs
-            <select style='font-size: 22px;' class='form-control' id='sbu'> </select>
-          </div>
-
-          <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-            <button style='display:inline-block; width:80%; margin-bottom: 0.5cm; font-size: 22px;'
-              class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Filter by
-              connectivity</button>
-          </div>
-
-          <div class='col-12 zebra'>
-            <p id='component_SMILES'
-              style='margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-size: 22px;'> </p>
-            <p id='resize_hint'
-              style='display: none; margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-style:italic; font-size: 20px;'>
-              Component not visualizing? Try resizing the browser window.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- The building block section of the website -->
-    <div id="pills-bb" style='font-size: 20px;' class='zebra'>
-      A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building
-      blocks (bb). <br>
-
-      Not every combination of linker, SBU, and net is compatible. <br>
-
-      Special thanks to the G&oacutemez-Gualdr&oacuten and Snurr groups for developing MOF building block assembly code.
-      <br>
-
-      For information on net (topology) abbreviations, refer to 10.1021/acs.cgd.7b00848 and 10.1039/c8ce01637b.
-
-      <!-- Selection box for the linker building block -->
-      <div style="padding-top: 30px; font-size: 22px;" class='zebra'>
-        Linker, the connecting building block
-        <input style='font-size: 22px;' id="linker_option" class='form-control locksMetrics' list='linkers_list'
-          onmousedown="value = '';" />
-      </div>
-
-      <!-- Default linkers -->
-      <datalist id='linkers_list' style='font-size: 22px;'>
-        <!-- Defined near the end of the Javascript section below -->
-      </datalist>
-
-      <!-- Selection box for metal SBU building block -->
-      <div style='font-size: 22px;' class='zebra'>
-        SBU, the metal-centered nodular building block
-        <input style='font-size: 22px;' id="sbu_option" class='form-control locksMetrics' list='sbus_list'
-          onmousedown="value = '';" />
-      </div>
-
-      <!-- Default sbus -->
-      <datalist id='sbus_list'>
-        <!-- Defined near the end of the Javascript section below -->
-      </datalist>
-
-      <div style='font-size: 22px;'>
-        MOF Net
-        <input style='font-size: 22px;' id="nets_option" class='form-control locksMetrics' list='nets_list'
-          onmousedown="value = '';" />
-      </div>
-
-      <!-- Default nets -->
-      <datalist id='nets_list'>
-        <!-- Defined near the end of the Javascript section below -->
-      </datalist>
-
-      <div style='width:100%; text-align:center; margin-top:0.5cm;'>
-
+        <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
+        id='visualize_linker' type='button'>Linker</button>
+        <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
+        id='visualize_sbu' type='button'>SBU</button>
+        <button style='display:inline-block; width:32%; font-size: 22px;' class='btn btn-primary round_button'
+        id='reset_zoom' type='button'>Reset zoom</button>
         <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
-          id='generate' type='button'>Make bb-generated MOF</button>
+        id='download_linker' type='button'>Download linker</button>
         <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
-          id='download_generated' type='button'>Download bb-generated MOF</button>
+        id='download_sbu' type='button'>Download SBU</button>
       </div>
-
     </div>
 
-
-      <!-- The Data Upload tab of the website -->  
-    <div id="pills-data" class="container">
-
-        <div class="col-12" id="upload_form">
-
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='upload_form_element' action='/process_feedback' method="POST" enctype="multipart/form-data">
-            <i class='zebra'>Upload information on your MOF!</i>
-            <input type="hidden" name="feedback_form_name" value="upload_form" />
-            <input type="hidden" name="cif_file_name" value="" />
-            <input type="hidden" name="structure" value="" />
-            <input type="hidden" name="rating" value="" />
-            <div style="" class="input-group mt-2">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="upload_form_email_desc">Email (.edu preferred) *</span>
-              </div>
-              <input name="email" type="email" id="upload_form_email" aria-describedby="upload_form_email_desc"
-                class="form-control" required>
-            </div>
-            <div class="input-group mt-2" style="">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="upload_form_comments_desc">Comments</span>
-              </div>
-              <input name="comments" type="text" id="upload_form_comments" aria-describedby="upload_form_comments_desc"
-                class="form-control">
-            </div>
-            <div class="custom-file form-control mt-2">
-              <input name="cif_file" type="file" class="custom-file-input" id="validatedCustomFile_E1" required>
-              <label class="custom-file-label" for="validatedCustomFile_E1" id="MOF_E">Upload MOF (.cif) *</label>
-              <div class="invalid-feedback">Example invalid custom file feedback</div>
-            </div>
-            <div class="custom-file form-control mt-2">
-              <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_E2" required>
-              <label class="custom-file-label" for="validatedCustomFile_E2" id="TGA_E">Upload TGA Trace (.pdf, .jpg, .png,
-                .tiff; 20 MB max) *</label>
-              <div class="invalid-feedback">Example invalid custom file feedback</div>
-            </div>
-            <div class="input-group mt-2" style="">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="data_upload_solvname_desc">Solvent evacuated from MOF *</span>
-              </div>
-              <input name="solvent" type="text" id="data_upload_solvname" aria-describedby="data_upload_solvname_desc"
-                class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
-          </form>
-
-          <form class='col-10' style='font-size:22px;margin-left:15px' id='removal_form_element' action='/process_removal' method="POST" enctype="multipart/form-data">
-            <i class='zebra'>Request information removal from our databases</i>
-            <div style="" class="input-group mt-2">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="removal_form_email_desc">Email (.edu preferred) *</span>
-              </div>
-              <input name="email" type="email" id="removal_form_email" aria-describedby="removal_form_email_desc"
-                class="form-control" required>
-            </div>
-            <div class="input-group mt-2" style="">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="removal_form_comments_desc">Describe entry to remove (date uploaded, type of MOF, etc) *</span>
-              </div>
-              <input name="comments" type="text" id="removal_form_comments" aria-describedby="removal_form_comments_desc"
-                class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary mt-2" id="submit_F">Submit</button>
-          </form>
-
-        </div>
+    <div class='col-lg-6' style='margin-top: 0.5cm;'>
+      <!-- Button for getting MOF components for visualization  -->
+      <div style='width:100%; text-align:center;'>
+        <button style='display:inline-block; width:80%; font-size: 22px; margin-bottom: 0.5cm;'
+        class='btn btn-primary round_button' id='get_components' type='button'>Get selected (1) MOF
+      components</button>
     </div>
 
+    <div id='comp_MOF' style='font-size: 22px;' class='zebra'> </div> <!-- Will display information on what MOF's components are currently visualized -->
+
+    <div style='font-size: 22px; margin-top: 0.5cm' class='zebra'>
+      Linkers
+      <select style='font-size: 22px;' class='form-control' id='linker'>
+      </select>
+    </div>
+
+    <div style='font-size: 22px;' class='zebra'>
+      SBUs
+      <select style='font-size: 22px;' class='form-control' id='sbu'> </select>
+    </div>
+
+    <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+      <button style='display:inline-block; width:80%; margin-bottom: 0.5cm; font-size: 22px;'
+      class='btn btn-primary round_button' id='toggle_unique_components' type='button'>Filter by
+    connectivity</button>
   </div>
 
+  <div class='col-12 zebra'>
+    <p id='component_SMILES'
+    style='margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-size: 22px;'> </p>
+    <p id='resize_hint'
+    style='display: none; margin-top:0.5cm; margin: auto; width:100%; text-align: center; font-style:italic; font-size: 20px;'>
+  Component not visualizing? Try resizing the browser window.</p>
+</div>
+</div>
+</div>
+</div>
 
+<!-- The example MOF selection section of the website -->
+<div id="pills-example" style='font-size: 20px;' class='zebra'>
+  Choose the default MOF HKUST-1 or any CoRE MOF.
 
-  <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
-    <div class="container">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
-        </li>
-      </ul>
-    </div>
+  <!-- Selection box for the linker building block -->
+  <div style="padding-top: 30px; font-size: 22px;" class='zebra'>
+    Example MOF options
+    <input style='font-size: 22px;' id="MOF_option" class='form-control locksMetrics' list='MOFs_list'
+    onmousedown="value = '';" />
   </div>
 
-  <!-- For cif file upload -->
-  <input id="file_input" type="file" name="file_input" style="display:none" />
-  <!-- This will never display anything. Just used to store a MOF cif file if the button "Custom (upload cif file)" is used. -->
+  <!-- Default linkers -->
+  <datalist id='MOFs_list' style='font-size: 22px;'>
+    <!-- Defined near the end of the Javascript section below -->
+  </datalist>
 
-  <!-- For example MOF file -->
-  <p id="example_holder"> </p>
-  <!-- This will never display anything. Just used to store a MOF cif file if the button "Example MOF" is used. -->
+  <div style='width:100%; text-align:center; margin-top:0.5cm;'>
 
-  <!-- For building block-generated MOF file -->
-  <p id="bbg_MOF_holder"> </p>
-  <!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used. -->
+    <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
+    id='select_example' type='button'>Select example MOF</button>
+  </div>
 
-  <!-- For MOF components (xyz file text) -->
-  <p id="components_holder"> </p>
-  <!-- This will never display anything. Just used to store components if the button "Get selected (1) MOF components" is used. -->
+</div>
 
-  <!-- For solvent removal stability ANN nearest neighbors -->
-  <p id="solvent_neighbors_holder"> </p>
-  <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Stability upon solvent removal" is used. -->
+<!-- The building block section of the website -->
+<div id="pills-bb" style='font-size: 20px;' class='zebra'>
+  A way for the user to generate MOFs for analysis, using a topological MOF net and nodular and connecting building
+  blocks (bb). <br>
 
-  <!-- For thermal stability ANN nearest neighbors -->
-  <p id="thermal_neighbors_holder"> </p>
-  <!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Thermal stability" is used. -->
+  Not every combination of linker, SBU, and net is compatible. <br>
+
+  Special thanks to the G&oacutemez-Gualdr&oacuten and Snurr groups for developing MOF building block assembly code.
+  <br>
+
+  For information on net (topology) abbreviations, refer to 10.1021/acs.cgd.7b00848 and 10.1039/c8ce01637b.
+
+  <!-- Selection box for the linker building block -->
+  <div style="padding-top: 30px; font-size: 22px;" class='zebra'>
+    Linker, the connecting building block
+    <input style='font-size: 22px;' id="linker_option" class='form-control locksMetrics' list='linkers_list'
+    onmousedown="value = '';" />
+  </div>
+
+  <!-- Default linkers -->
+  <datalist id='linkers_list' style='font-size: 22px;'>
+    <!-- Defined near the end of the Javascript section below -->
+  </datalist>
+
+  <!-- Selection box for metal SBU building block -->
+  <div style='font-size: 22px;' class='zebra'>
+    SBU, the metal-centered nodular building block
+    <input style='font-size: 22px;' id="sbu_option" class='form-control locksMetrics' list='sbus_list'
+    onmousedown="value = '';" />
+  </div>
+
+  <!-- Default sbus -->
+  <datalist id='sbus_list'>
+    <!-- Defined near the end of the Javascript section below -->
+  </datalist>
+
+  <div style='font-size: 22px;'>
+    MOF Net
+    <input style='font-size: 22px;' id="nets_option" class='form-control locksMetrics' list='nets_list'
+    onmousedown="value = '';" />
+  </div>
+
+  <!-- Default nets -->
+  <datalist id='nets_list'>
+    <!-- Defined near the end of the Javascript section below -->
+  </datalist>
+
+  <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+
+    <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
+    id='generate' type='button'>Make bb-generated MOF</button>
+    <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button'
+    id='download_generated' type='button'>Download bb-generated MOF</button>
+  </div>
+
+</div>
+
+
+<!-- The Data Upload tab of the website -->  
+<div id="pills-data" class="container">
+
+  <div class="col-12" id="upload_form">
+
+    <form class='col-10' style='font-size:22px;margin-left:15px' id='upload_form_element' action='/process_feedback' method="POST" enctype="multipart/form-data">
+      <i class='zebra'>Upload information on your MOF!</i>
+      <input type="hidden" name="feedback_form_name" value="upload_form" />
+      <input type="hidden" name="cif_file_name" value="" />
+      <input type="hidden" name="structure" value="" />
+      <input type="hidden" name="rating" value="" />
+      <div style="" class="input-group mt-2">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="upload_form_email_desc">Email (.edu preferred) *</span>
+        </div>
+        <input name="email" type="email" id="upload_form_email" aria-describedby="upload_form_email_desc"
+        class="form-control" required>
+      </div>
+      <div class="input-group mt-2" style="">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="upload_form_comments_desc">Comments</span>
+        </div>
+        <input name="comments" type="text" id="upload_form_comments" aria-describedby="upload_form_comments_desc"
+        class="form-control">
+      </div>
+      <div class="custom-file form-control mt-2">
+        <input name="cif_file" type="file" class="custom-file-input" id="validatedCustomFile_E1" required>
+        <label class="custom-file-label" for="validatedCustomFile_E1" id="MOF_E">Upload MOF (.cif) *</label>
+        <div class="invalid-feedback">Example invalid custom file feedback</div>
+      </div>
+      <div class="custom-file form-control mt-2">
+        <input name="file" type="file" class="custom-file-input" id="validatedCustomFile_E2" required>
+        <label class="custom-file-label" for="validatedCustomFile_E2" id="TGA_E">Upload TGA Trace (.pdf, .jpg, .png,
+        .tiff; 20 MB max) *</label>
+        <div class="invalid-feedback">Example invalid custom file feedback</div>
+      </div>
+      <div class="input-group mt-2" style="">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="data_upload_solvname_desc">Solvent evacuated from MOF *</span>
+        </div>
+        <input name="solvent" type="text" id="data_upload_solvname" aria-describedby="data_upload_solvname_desc"
+        class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary mt-2" id="submit_E">Submit</button>
+    </form>
+
+    <form class='col-10' style='font-size:22px;margin-left:15px' id='removal_form_element' action='/process_removal' method="POST" enctype="multipart/form-data">
+      <i class='zebra'>Request information removal from our databases</i>
+      <div style="" class="input-group mt-2">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="removal_form_email_desc">Email (.edu preferred) *</span>
+        </div>
+        <input name="email" type="email" id="removal_form_email" aria-describedby="removal_form_email_desc"
+        class="form-control" required>
+      </div>
+      <div class="input-group mt-2" style="">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="removal_form_comments_desc">Describe entry to remove (date uploaded, type of MOF, etc) *</span>
+        </div>
+        <input name="comments" type="text" id="removal_form_comments" aria-describedby="removal_form_comments_desc"
+        class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary mt-2" id="submit_F">Submit</button>
+    </form>
+
+  </div>
+</div>
+
+</div>
+
+
+
+<div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
+  <div class="container">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- For cif file upload -->
+<input id="file_input" type="file" name="file_input" style="display:none" />
+<!-- This will never display anything. Just used to store a MOF cif file if the button "Custom (upload cif file)" is used. -->
+
+<!-- For example MOF file -->
+<p id="example_holder"> </p>
+<!-- This will never display anything. Just used to store a MOF cif file if the button "Example MOF" is used. -->
+
+<!-- For building block-generated MOF file -->
+<p id="bbg_MOF_holder"> </p>
+<!-- This will never display anything. Just used to store a MOF if the button "Make bb-generated MOF" is used. -->
+
+<!-- For MOF components (xyz file text) -->
+<p id="components_holder"> </p>
+<!-- This will never display anything. Just used to store components if the button "Get selected (1) MOF components" is used. -->
+
+<!-- For solvent removal stability ANN nearest neighbors -->
+<p id="solvent_neighbors_holder"> </p>
+<!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Stability upon solvent removal" is used. -->
+
+<!-- For thermal stability ANN nearest neighbors -->
+<p id="thermal_neighbors_holder"> </p>
+<!-- This will never display anything. Just used to store ANN nearest neighbors if the button "Thermal stability" is used. -->
 
 </body>
 
@@ -760,6 +784,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
 <!-- Begin JavaScript section -->
 <script>
+
   // Lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization.
 
   // ***** Beginning of section with a lot of copied code from the Snurr group's GitHub. *****
@@ -791,7 +816,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
   var runMOFidCode = function (cifdata) {
     C_obcode = Module.cwrap(
       'analyzeMOFc', 'null', ['string', 'number', 'number']
-    );
+      );
 
     if (!FS.analyzePath('/Output').exists) {
       FS.mkdir('/Output');  // See also docs on filesystem API: https://kripken.github.io/emscripten-site/docs/api_reference/Filesystem-API.html
@@ -1166,15 +1191,12 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
     function renew(action) { // something else was already called reset, so we're calling this renew
-      console.log('Renew hit')
-      console.log(action)
 
       // action will be either 'example', 'input', or 'bb'
       if (action != 'example') {
         document.getElementById('example_holder').value = null; // clears example cif
       }
       if (action != 'input') {
-        console.log('Not input hit')
         document.getElementById('file_input').value = null; // clearing any cifs loaded by the user
       }
       if (action != 'bb') {
@@ -1257,7 +1279,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       component_color = original_blue
       descriptor_color = original_blue;
 
-      $('#load').css({ 'background-color': original_blue, 'border-color': original_blue })
+      $('#example-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
       $('#upload').css({ 'background-color': original_blue, 'border-color': original_blue })
       $('#bb-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
       $('#predict_s').css({ 'background-color': original_blue, 'border-color': original_blue })
@@ -1309,8 +1331,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // Code that updates the file upload text in any input form (i.e. change "Upload file..." to "file.pdf")
     $('input[type="file"]').change(function(e){
-        var fileName = e.target.files[0].name;
-        $(e.target).siblings('.custom-file-label').html(fileName);
+      var fileName = e.target.files[0].name;
+      $(e.target).siblings('.custom-file-label').html(fileName);
     });
 
     // This function triggers when someone clicks the "Visualize selected (1) MOF" button.
@@ -1614,13 +1636,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             $('#solvent_stability_prediction').text('');
             alert(errorThrown)
           })
-      })
-    });
+        })
+});
 
 
-    function setColor(element, color) {
-      element.style.backgroundColor = color;
-    }
+function setColor(element, color) {
+  element.style.backgroundColor = color;
+}
 
     // Generate thermal stability prediction when the "Thermal stability" button is clicked.
     $('#predict_t').click(function () {
@@ -1811,8 +1833,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             $('#thermal_stability_prediction').text('')
             alert(errorThrown)
           })
-      })
-    });
+        })
+});
 
 
     // Generate MOF from building blocks when the "Make bb-generated MOF" button is clicked.
@@ -1907,13 +1929,30 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         })
     })
 
-    // Load example MOF when the "Example MOF" button is clicked.
-    $('#load').click(function () {
 
+    // Load an example MOF when the "Select example MOF "
+    $('#select_example').click(function () {
+      my_MOF = $('#MOF_option').val() // Check which MOF is selected in the Example MOF options dropdown.
+
+      if (my_MOF === '') {
+        alert("Must choose a MOF first.");
+        return;
+      }
+
+      if (my_MOF === 'HKUST-1 (default)') {
+        default_loader()
+      }
+      else { // have a CSD MOF
+        csd_loader(my_MOF)
+      }
+      $('#pills-main-tab').click() // redirecting to appropriate tab
+    })
+
+    function default_loader() {
       fetch('mof_examples/HKUST1.cif').then(response => { // grabbing the example MOF from local host
         if (!response.ok) { // catching 404 and other issues
           load_color = failure_red;
-          $('#load').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
           throw Error(response.statusText);
         }
         return response.blob();
@@ -1923,24 +1962,64 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         document.getElementById('example_holder').value = myFile; // setting the value of example_holder
         $('#upload_status').text('Selected MOF: HKUST-1'); // indicating that the example MOF has been uploaded
         load_color = success_green;
-        $('#load').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+        $('#example-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
         $('#predict_section').show() // show the prediction button section
         $('#status_section').show() // show the status section
 
         alert('Example MOF loaded!')
       }).catch(error => {
         load_color = failure_red;
-        $('#load').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+        $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
         $('#upload_status').text('Failed to upload example MOF');
         console.error('There has been a problem with your fetch operation:', error);
       })
-    });
+    };
+
+    function csd_loader(my_MOF) {
+
+      $.post("/get_fullname", JSON.stringify(my_MOF)).done(
+        function (response) { 
+          my_MOF_fullname = response
+
+          // my_MOF is the six letter refcode
+          // my_MOF_fullname will include stuff like "_clean" and "_SL" needed to fetch the cif file correctly. Also includes the .cif ending
+
+          fetch('CoRE2019/' + my_MOF_fullname).then(response => { // grabbing the example MOF from local host
+            if (!response.ok) { // catching 404 and other issues
+              load_color = failure_red;
+              $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+              throw Error(response.statusText);
+            }
+            return response.blob();
+          }).then(function (blob) {
+            renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
+            var myFile = new File([blob], "example.cif", { type: "", lastModified: Date.now() }) // making a cif file
+            document.getElementById('example_holder').value = myFile; // setting the value of example_holder
+            $('#upload_status').text('Selected MOF: ' + my_MOF); // indicating that the example MOF has been uploaded
+            load_color = success_green;
+            $('#example-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+            $('#predict_section').show() // show the prediction button section
+            $('#status_section').show() // show the status section
+
+            alert('Example MOF loaded!')
+          }).catch(error => {
+            load_color = failure_red;
+            $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            $('#upload_status').text('Failed to upload example MOF');
+            console.error('There has been a problem with your fetch operation:', error);
+          })
+        })
+        .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
+          load_color = failure_red;
+          $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          alert(errorThrown)
+        });
+    }
 
 
     // Get MOF linkers and sbus when the "Get selected (1) MOF components" button is clicked.
     // Returns a dictionary of linkers and sbus, also includes information about number of linkers and sbus
     $('#get_components').click(function () {
-      console.log('First component check')
 
       // Clearing things
       document.getElementById('toggle_unique_components').textContent = 'Filter by connectivity'; // reset the uniqueness-filter button
@@ -1983,11 +2062,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         $.post("/get_components", JSON.stringify(myDict)).done(
           function (response) {
 
-            console.log('component check')
-            console.log(typeof response)
-
             if (response == 'OVERLOAD') {
-              console.log('HIT HIT HIT')
               alert('Server is receiving high traffic, please try again later')
               document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
               component_color = failure_red;
@@ -2040,7 +2115,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
             $('#get_components').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             alert(errorThrown)
           })
-      })
+        })
     });
 
 
@@ -2424,18 +2499,18 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
           flag = response['flag']
           if (flag == 1) {
             document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: '
-              + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+            + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
               + '<br />Nearest neighbor DOI: ' + response['doi'] + '<br />Experimentally observed to be stable upon solvent removal? Yes' // <br /> for a new line in display
-          }
-          else {
-            document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: '
+            }
+            else {
+              document.getElementById('s_neighbor_info').innerHTML = 'Current nearest neighbor: '
               + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
               + '<br />Nearest neighbor DOI: ' + response['doi'] + '<br />Experimentally observed to be stable upon solvent removal? No' // <br /> for a new line in display
-          }
-          $('#solvent_neighbor_form').show()
-          $('#solvent_neighbor_form input[name=cif_file_name]').val(my_neighbor);
-          $('#solvent_neighbor_form input[name=structure]').val('');
-        })
+            }
+            $('#solvent_neighbor_form').show()
+            $('#solvent_neighbor_form input[name=cif_file_name]').val(my_neighbor);
+            $('#solvent_neighbor_form input[name=structure]').val('');
+          })
     })
 
 
@@ -2483,7 +2558,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         })
 
       setTimeout(function () {
-        window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
+        window.location = '/CoRE2019/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
       }, 1000); // the delay is to make it possible to download multiple files in the same function
 
     })
@@ -2517,13 +2592,13 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
       $.post("/thermal_neighbor_T", JSON.stringify(my_neighbor)).done(
         function (response) {
           document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: '
-            + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
-            + '<br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
+          + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
+          + '<br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
             + response['doi'] // <br /> for a new line in display. &#8451 is degrees celsius in decimal
             + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
             + '&#8451';
-          $('#thermal_neighbor_form').show()
-          $('#thermal_neighbor_form input[name=cif_file_name]').val(my_neighbor);
+            $('#thermal_neighbor_form').show()
+            $('#thermal_neighbor_form input[name=cif_file_name]').val(my_neighbor);
           $('#thermal_neighbor_form input[name=structure]').val(''); // Populate the feedback form with metadata
         })
 
@@ -2582,7 +2657,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         })
 
       setTimeout(function () {
-        window.location = '/neighbor/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
+        window.location = '/CoRE2019/' + my_neighbor + '.cif'; // download cif file from the CoRE2019 folder
       }, 1000); // the delay is to make it possible to download multiple files in the same function
 
       setTimeout(function () {
@@ -2696,14 +2771,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
       // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
       var rating = document.getElementById('solvent_rating').value;      
-      console.log('Rating check')
-      console.log(rating)
       var email = document.getElementById('solvent_rating_email').value;
-      console.log('Email check')
-      console.log(email)
       var reason = document.getElementById('inputState_A').value;
-      console.log('Reason check')
-      console.log(reason)
 
       success = true // Tracks whether the form should be sent to the backend
 
@@ -2711,12 +2780,8 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
         var file = document.getElementById('validatedCustomFile_A').value;
 
         if (file) { // The user did upload the optional TGA file.
-          console.log('check check check')
-          console.log(file)
           my_name = file.split(/(\\|\/)/g).pop() // split the string ({filepath}/{filename}) and get the file name
           my_extension = getExtension(my_name);
-          console.log('check 2')
-          console.log(my_extension)
           if (upload_extensions.includes(my_extension.toLowerCase())) {
             alert('Thank you for your feedback!')
           }
@@ -2990,89 +3055,77 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
     // The code below that has a lot of hide and show operations is the tab functionality that allows the user to switch tabs.
     // For example, when the Visualization tab is clicked, all website displays that don't have to do with visualization are hidden, and visualization functionality is shown
 
+    // Helper function for the code below. Hides the appropriate sections when a button is clicked.
+    function section_hider(current_section) {
+      // hide everything but current_section
+      sections = ['#pills-main', '#pills-vis', '#pills-comp', '#pills-bb', '#pills-example', '#pills-data']
+      $(current_section).show()
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i] != current_section) {
+          $(sections[i]).hide()
+        }
+      }
+    }
+
+    $('#example-redirect').click(function () {
+      section_hider('#pills-example')
+      $('#MOF_option').val('HKUST-1 (default)') // setting the default value
+    })
+
     $('#bb-redirect').click(function () {
-      // $('#pills-bb-tab').click()
-      $('#pills-main').hide()
-      $('#pills-vis').hide()
-      $('#pills-comp').hide()
-      $('#pills-bb').show()
-      $('#pills-data').hide()
+      section_hider('#pills-bb')
     })
 
     $('#pills-main-tab').click(function () { // Main tab
-      $('#pills-main').show()
-      $('#pills-vis').hide()
-      $('#pills-comp').hide()
-      $('#pills-bb').hide()
-      $('#pills-data').hide()
+      section_hider('#pills-main')
     })
 
     $('#pills-vis-tab').click(function () { // Visualization tab
-      $('#pills-main').hide()
-      $('#pills-vis').show()
-      $('#pills-comp').hide()
-      $('#pills-bb').hide()
-      $('#pills-data').hide()
+      section_hider('#pills-vis')
     })
 
     $('#pills-comp-tab').click(function () { // Component Analysis tab
-      $('#pills-main').hide()
-      $('#pills-vis').hide()
-      $('#pills-comp').show()
-      $('#pills-bb').hide()
-      $('#pills-data').hide()
+      section_hider('#pills-comp')
     })
 
     $('#pills-data-tab').click(function () { // Data Upload tab
-      $('#pills-main').hide()
-      $('#pills-vis').hide()
-      $('#pills-comp').hide()
-      $('#pills-bb').hide()
-      $('#pills-data').show()
+      section_hider('#pills-data')
     })
 
 
     // Below: populate the linkers, sbus, and net dropdowns in the building block section.
     // I run a script (tobacco_3.0/scrap_cifs.py) in the tobacco_3.0/edges_database folder, the tobacco_3.0/nodes_database folder, and the tobacco_3.0/template_database folder to get a nice array form of all of the available files. I then paste the array into the appropriate places below (for example, my_linkers = ARRAYOFOPTIONS)
 
-    // Populating the linkers in the building block section
 
-    var my_linkers = new Array();
-    my_linkers = ['1B_1TrU', '1B_2Br_Ch', '1B_2CF3_Ch', '1B_2CH3_Ch', '1B_2CN_Ch', '1B_2DoU_Ch', '1B_2F_Ch', '1B_2NH2_Ch', '1B_2NO2_Ch', '1B_2OH_Ch', '1B_2SH_Ch', '1B_2TrU', '1B_2TrU_4H_Ch', '1B_2furan_Ch', '1B_2indole_Ch', '1B_2thiophene_Ch', '1B_4Br_Ch', '1B_4CN_Ch', '1B_4F_Ch,cif', '1B_4H_Ch', '1DoU_Ch', '1TrU_Ch', '2B_1DoU_4H_Ch', '2B_1TrU_2', '2B_1TrU_3', '2B_1TrU_4H_Ch', '2B_2Br_Ch', '2B_2CF3_Ch', '2B_2CH3_Ch', '2B_2CN_Ch', '2B_2F_Ch', '2B_2NH2_Ch', '2B_2NO2_Ch', '2B_2OH_Ch', '2B_2SH_Ch', '2B_2TrU_1_Ch', '2B_2TrU_2_Ch', '2B_4Br_Ch', '2B_4CN_Ch', '2B_4F_Ch', '2B_4H_Ch', '2B_fused_Ch', '2TrU_Ch', '3B_4H_Ch', '3B_fused_8H_Ch', '4B_fused_8H_Ch', 'ntn_edge'];
-
-    var options = '';
-
-    for (var i = 0; i < my_linkers.length; i++) {
-      options += '<option value="' + my_linkers[i] + '" />';
+    // option_generator is a helper function for populating dropdowns on the website
+    var option_generator = function(my_list) {
+      var options = ''
+      for (var i = 0; i < my_list.length; i++) {
+        options += '<option value="' + my_list[i] + '" />';
+      }
+      return options
     }
 
-    document.getElementById('linkers_list').innerHTML = options; // populating the linkers dropdown
+    $.get("/list_getter").done(
+      function (response) {
+        // Purpose of this is to get lists for the code below
+        my_linkers = response['my_linkers']
+        my_sbus = response['my_sbus']
+        my_nets = response['my_nets']
+        my_MOFs = response['my_MOFs']
 
-    // Next, populating the nodes in the building block section.
+        // Populating the linkers in the building block section
+        document.getElementById('linkers_list').innerHTML = option_generator(my_linkers); // populating the linkers dropdown
 
-    var my_sbus = new Array();
-    my_sbus = ['12c_Ce_1_Ch', '12c_Eu_1_Ch', '12c_Mn_1_Ch', '12c_Tb_1_Ch', '12c_Ti_1_Ch', '12c_Zr_1_Ch', '3c_B_Ch', '3c_Cu_imadazoline_Ch', '3c_pyrrole_Ch', '3c_triazine_Ch', '3c_uranyl', '4c_1anC_Ch', '4c_4B_fused_Ch', '4c_B_Ch', '4c_Cd_1_Ch', '4c_Cu_1_Ch', '4c_In_1_Ch', '4c_Ni_1_Ch', '4c_V_1_Ch', '4c_bicyclooctane_Ch', '4c_ethene_Ch', '4c_porphyrin_Ch', '4c_pyrene_Ch', '4c_pyrene_NU_Ch', '4c_tetrathiafulvalene_Ch', '5c_bicyclooctane_Ch', '5c_pyrrole_Ch', '6c_3B_bicylcooctane_Ch', '6c_Al_1', '6c_Al_1_Ch', '6c_B_Ch', '6c_CdZn_1_Ch', '6c_Cr_1_Ch', '6c_Cu_1_Ch', '6c_Fe_1_Ch', '6c_Mg_1_Ch', '6c_Ni_1_Ch', '6c_Zn_1_Ch', '6c_Zr_1_Ch', '6c_bicyclooctane_Ch', '8c_Co_1_Ch', '8c_Co_2_Ch', '8c_Mn_1_Ch', '8c_Tb_1_Ch', '8c_Zr_1_Ch'];
+        // Next, populating the nodes in the building block section.
+        document.getElementById('sbus_list').innerHTML = option_generator(my_sbus); // populating the sbus dropdown
 
-    var options = '';
+        // Populating the nets in the building block section
+        document.getElementById('nets_list').innerHTML = option_generator(my_nets); // populating the nets dropdown
 
-    for (var i = 0; i < my_sbus.length; i++) {
-      options += '<option value="' + my_sbus[i] + '" />';
-    }
-
-    document.getElementById('sbus_list').innerHTML = options; // populating the sbus dropdown
-
-    // Last, populating the nets in the building block section
-
-    var my_nets = new Array();
-    my_nets = ['aab', 'abb', 'abf', 'abr', 'aca', 'acaa', 'acs', 'acsa', 'acsf', 'acsg', 'acsh', 'acsi', 'act', 'acta', 'aea', 'aeaa', 'afi', 'afie', 'afw', 'afwa', 'afx', 'afy', 'agw', 'agwa', 'ahq', 'ahqa', 'ahr', 'ahra', 'aht', 'ala', 'alaa', 'alb', 'alba', 'albd', 'albx', 'albxd', 'alc', 'alca', 'alm', 'alw', 'amn', 'amu', 'amua', 'ana', 'anaa', 'anae', 'anaf', 'anh', 'ant', 'anta', 'apc', 'apd', 'apo', 'apoa', 'asc', 'asca', 'asd', 'asda', 'ase', 'asea', 'asf', 'asfa', 'asn', 'asp', 'ast', 'aste', 'asv', 'atn', 'atne', 'ato', 'atoe', 'ats', 'atsa', 'att', 'atv', 'awd', 'aww', 'baa', 'baae', 'bab', 'bac', 'baf', 'bag', 'bah', 'baj', 'bak', 'bal', 'bam', 'ban', 'bao', 'bap', 'baq', 'bar', 'bas', 'bat', 'bau', 'bav', 'baw', 'bax', 'bay', 'baz', 'baza', 'bba', 'bbb', 'bbc', 'bbd', 'bbe', 'bbf', 'bbg', 'bbh', 'bbi', 'bbj', 'bbk', 'bbl', 'bbm', 'bbn', 'bbo', 'bbp', 'bbq', 'bbr', 'bbs', 'bbv', 'bbw', 'bbx', 'bby', 'bbz', 'bca', 'bcb', 'bcd', 'bce', 'bcf', 'bcg', 'bch', 'bcha', 'bcj', 'bcl', 'bcm', 'bcn', 'bco', 'bcp', 'bcq', 'bcs', 'bcsa', 'bct', 'bcu', 'bcuf', 'bcug', 'bcuh', 'bcuhe', 'bcui', 'bcuj', 'bcuk', 'bcul', 'bcut', 'bcux', 'bcuxa', 'bcv', 'bcw', 'bcx', 'bcy', 'bcz', 'bda', 'beb', 'bel', 'bele', 'bem', 'ben', 'bet', 'bik', 'bix', 'bkt', 'bmn', 'bne', 'bnl', 'bnn', 'bnna', 'bnnt', 'bod', 'boe', 'bon', 'bor', 'bora', 'bore', 'bow', 'bpa', 'bpb', 'bpc', 'bpd', 'bpe', 'bpf', 'bpg', 'bpi', 'bpj', 'bpk', 'bpl', 'bpm', 'bpn', 'bpo', 'bpp', 'bpq', 'bpr', 'bps', 'bpt', 'bpu', 'bpv', 'bpw', 'brk', 'brl', 'brla', 'bsn', 'bsv', 'bto', 'btoe', 'btu', 'btv', 'buh', 'buha', 'bva', 'bvh', 'bwt', 'byl', 'bzd', 'cab', 'caba', 'cag', 'cage', 'cai', 'cal', 'cald', 'can', 'cane', 'cao', 'cap', 'cas', 'cat', 'cbd', 'cbn', 'cbo', 'cboe', 'cbs', 'cbt', 'ccg', 'cco', 'cda', 'cdj', 'cdja', 'cdk', 'cdl', 'cdla', 'cdle', 'cdm', 'cdme', 'cdn', 'cdp', 'cdq', 'cds', 'cdsa', 'cdsf', 'cdst', 'cdt', 'cdz', 'cdze', 'cea', 'ceb', 'cec', 'ceca', 'ced', 'ceda', 'cee', 'ceea', 'cef', 'cefa', 'ceg', 'cega', 'ceh', 'ceha', 'cei', 'ceia', 'cej', 'ceja', 'cek', 'ceka', 'cel', 'cela', 'cen', 'cena', 'ceo', 'ceoa', 'cep', 'cepa', 'ceq', 'ceqa', 'cer', 'cera', 'ces', 'cesa', 'cet', 'ceta', 'ceu', 'ceua', 'cev', 'ceva', 'cew', 'cewa', 'cex', 'cexa', 'cez', 'ceza', 'cfc', 'cfcea', 'cfd', 'cfe', 'cgc', 'cgs', 'cha', 'chb', 'che', 'ckp', 'ckq', 'cla', 'clad', 'clh', 'cli', 'clj', 'cmc', 'cmd', 'cml', 'cnd', 'cnw', 'coe', 'coee', 'coi', 'cor', 'cora', 'core', 'cot', 'cota', 'crb', 'crba', 'crbe', 'crd', 'crr', 'crs', 'crsa', 'crsd', 'crt', 'csi', 'csj', 'csk', 'csp', 'csq', 'csqa', 'cssa', 'ctn', 'ctna', 'ctnd', 'ctne', 'ctnx', 'ctt', 'ctta', 'cua', 'cus', 'cut', 'cysa', 'czz', 'czza', 'dag', 'daga', 'dda', 'ddb', 'ddc', 'ddi', 'ddy', 'ddya', 'dea', 'deh', 'dehd', 'dei', 'dft', 'dfte', 'dgn', 'dgp', 'dgq', 'dia', 'diaa', 'diaaa', 'diaf', 'diag', 'diaj', 'diax', 'dma', 'dmb', 'dmc', 'dmd', 'dmda', 'dme', 'dmf', 'dmg', 'dmga', 'dmh', 'dmha', 'dmj', 'dmp', 'dna', 'dnaa', 'dnb', 'dnba', 'dnc', 'dnca', 'dnd', 'dnda', 'dne', 'dnea', 'dnf', 'dnfa', 'dng', 'dnga', 'dni', 'dnia', 'dnid', 'dnj', 'dnja', 'dnk', 'dnka', 'dnl', 'dnla', 'dnm', 'dnma', 'dnn', 'dnna', 'dno', 'dnoa', 'dnp', 'dnpa', 'dnq', 'dnqa', 'dnr', 'dnra', 'dns', 'dnsa', 'dnt', 'dnta', 'dnu', 'dnua', 'dnv', 'dnva', 'dnw', 'dnwa', 'dnx', 'dnxa', 'dny', 'dnya', 'dnz', 'dnza', 'doh', 'dpa', 'dpaa', 'dpb', 'dpba', 'dpc', 'dpca', 'dpd', 'dpda', 'dpe', 'dpea', 'dtc', 'dtd', 'dum', 'eab', 'eca', 'ecb', 'ecc', 'ecd', 'ece', 'ecf', 'ecg', 'ech', 'eci', 'ecj', 'eck', 'ecl', 'ecm', 'ecn', 'eco', 'ecp', 'ecq', 'ecr', 'ecs', 'ect', 'ecu', 'ecv', 'edc', 'edca', 'edi', 'edie', 'edp', 'edq', 'edqa', 'eea', 'eeaa', 'eed', 'eeda', 'eee', 'eft', 'efta', 'ela', 'elb', 'elc', 'eld', 'ele', 'elf', 'epa', 'epaa', 'epb', 'epba', 'epc', 'epd', 'epe', 'epf', 'epfa', 'epm', 'epma', 'epn', 'epna', 'epo', 'epp', 'eppa', 'epq', 'epqa', 'epr', 'epra', 'eps', 'epsa', 'ept', 'epta', 'epu', 'epua', 'epv', 'epva', 'epw', 'epwa', 'epx', 'epxa', 'epy', 'epya', 'epz', 'epza', 'eri', 'esg', 'esga', 'est', 'eta', 'etb', 'etbe', 'etc', 'etd', 'ete', 'etf', 'etg', 'eth', 'eti', 'etj', 'etk', 'etl', 'etm', 'etn', 'etna', 'eto', 'etp', 'etq', 'ets', 'eye', 'eyea', 'fab', 'fau', 'faue', 'fav', 'fca', 'fcb', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fct', 'fcu', 'fcv', 'fcx', 'fcy', 'fcz', 'fda', 'fdb', 'fdc', 'fdu', 'fdua', 'feb', 'fee', 'fel', 'fele', 'fet', 'ffa', 'ffc', 'ffca', 'ffd', 'ffda', 'fff', 'ffg', 'ffi', 'ffia', 'ffj', 'ffja', 'fga', 'fgl', 'fgla', 'fiq', 'fit', 'fita', 'fite', 'fiv', 'fjh', 'fjha', 'fla', 'flg', 'flga', 'flt', 'flta', 'flu', 'flua', 'flue', 'fly', 'fmj', 'fmja', 'fmz', 'fmza', 'fna', 'fnb', 'fnd', 'fnf', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fnn', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fnx', 'fny', 'fnz', 'foa', 'fob', 'fof', 'fofa', 'fog', 'foga', 'fon', 'fona', 'fqr', 'frf', 'frfa', 'frl', 'frx', 'fry', 'frz', 'fsa', 'fsb', 'fsc', 'fsd', 'fse', 'fsf', 'fsg', 'fsh', 'fsi', 'fsia', 'fsk', 'fsl', 'fsm', 'fsn', 'fsna', 'fso', 'fst', 'fsx', 'fsy', 'fsya', 'fta', 'ftb', 'ftc', 'ftd', 'fte', 'ftf', 'ftg', 'fth', 'fti', 'ftj', 'ftk', 'ftl', 'ftm', 'ftn', 'fto', 'ftp', 'ftq', 'ftr', 'fts', 'ftt', 'ftu', 'ftv', 'ftw', 'ftwa', 'ftwt', 'ftx', 'fty', 'ftz', 'fua', 'fub', 'fud', 'fue', 'fuf', 'fug', 'fuh', 'fui', 'fuj', 'ful', 'fum', 'fun', 'fuo', 'fup', 'fur', 'fus', 'fut', 'fuu', 'fuv', 'fuw', 'fuy', 'fuz', 'fva', 'fvb', 'fvc', 'fvd', 'fve', 'fvf', 'fvg', 'fvh', 'fvi', 'fvj', 'fvk', 'fvl', 'fvm', 'fvn', 'fvo', 'fvp', 'fvq', 'fvr', 'fvs', 'fvt', 'fvu', 'fvv', 'fvw', 'fvx', 'fwz', 'gaf', 'gah', 'gal', 'gala', 'gan', 'gao', 'gaoa', 'gar', 'gara', 'gare', 'gat', 'gata', 'gcc', 'gcd', 'gdla', 'gdm', 'gdma', 'gea', 'geaa', 'gee', 'geea', 'geo', 'geoa', 'gez', 'geza', 'gfy', 'gfya', 'ggl', 'ghw', 'gie', 'gis', 'gise', 'gme', 'gmee', 'gng', 'gpu', 'gpux', 'gra', 'gsi', 'gui', 'gwe', 'gwea', 'gwg', 'gwga', 'hal', 'hbk', 'hbka', 'hbl', 'hbm', 'hbo', 'hboe', 'hbr', 'hcd', 'hch', 'hci', 'hcj', 'hck', 'hcp', 'hcpd', 'hcz', 'hcza', 'hea', 'heaa', 'hec', 'hed', 'hee', 'hef', 'het', 'heta', 'hex', 'hey', 'heya', 'hfp', 'hha', 'hhb', 'hjm', 'hlz', 'hmc', 'hmca', 'hms', 'hmsa', 'hmse', 'hmst', 'hof', 'hqx', 'hqy', 'hst', 'htp', 'htpa', 'hua', 'hww', 'hwx', 'hwxa', 'hxg', 'hxgd', 'hxs', 'hyb', 'hyc', 'hyd', 'hyk', 'hyka', 'hyl', 'hyla', 'hyp', 'hyw', 'hyx', 'hyxa', 'iab', 'iaba', 'iac', 'iaca', 'iacd', 'iacda', 'iace', 'ibd', 'ibda', 'ibe', 'ibea', 'icc', 'icca', 'icd', 'icda', 'icm', 'icme', 'ict', 'icv', 'idp', 'idpa', 'ifi', 'ilc', 'ild', 'ins', 'iph', 'irl', 'isa', 'isc', 'isd', 'ise', 'isf', 'isg', 'ish', 'isi', 'isj', 'isk', 'isl', 'ism', 'isn', 'iso', 'isp', 'isq', 'isr', 'iss', 'isu', 'isw', 'isx', 'isy', 'ith', 'itha', 'ithd', 'ithda', 'ithe', 'itv', 'jag', 'jah', 'jai', 'jaj', 'jaja', 'jak', 'jan', 'jbw', 'jcy', 'jea', 'jeaa', 'jeb', 'jec', 'jjt', 'jjta', 'jkza', 'jmt', 'jph', 'jsa', 'jsb', 'jsc', 'jsd', 'jse', 'jst', 'jus', 'jusa', 'jwj', 'jxj', 'kag', 'kagd', 'kce', 'kcea', 'kcza', 'kdd', 'kea', 'keae', 'keb', 'keba', 'kem', 'kema', 'ken', 'kena', 'ket', 'kew', 'kewa', 'kex', 'kexa', 'key', 'keya', 'kez', 'keza', 'kfi', 'kfie', 'kfo', 'kga', 'kgh', 'kgi', 'kgj', 'kgk', 'kgl', 'kgn', 'kgo', 'kgp', 'kgq', 'kgr', 'kgs', 'kgt', 'kgu', 'kgz', 'khn', 'kkm', 'kkma', 'kle', 'klea', 'kms', 'kmsa', 'kna', 'knaa', 'knb', 'knba', 'knc', 'knca', 'koh', 'koha', 'kpc', 'kpl', 'ksx', 'kto', 'kts', 'kty', 'ktya', 'kwh', 'kwo', 'kxe', 'kxea', 'law', 'lbt', 'lcs', 'lcsa', 'lcse', 'lcsf', 'lcv', 'lcva', 'lcve', 'lcvf', 'lcwx', 'lcx', 'lcy', 'lcya', 'lcyax', 'lcye', 'lcz', 'lev', 'lfm', 'lhb', 'lhh', 'lib', 'lig', 'lil', 'lim', 'llj', 'llja', 'llk', 'llka', 'lll', 'llz', 'llza', 'lng', 'lnga', 'lni', 'lnj', 'loh', 'lom', 'lon', 'lona', 'lone', 'lonea', 'los', 'lqm', 'lrj', 'lrk', 'lrl', 'lsz', 'lta', 'ltae', 'ltj', 'ltl', 'ltw', 'lul', 'lum', 'lun', 'luo', 'lvt', 'lvta', 'lwa', 'lwad', 'lwg', 'lwga', 'lwh', 'lwha', 'lxx', 'maw', 'maz', 'mbc', 'mcd', 'mcf', 'mcfd', 'mcn', 'mco', 'mcoa', 'mcs', 'mcsa', 'mct', 'mcx', 'mdf', 'mdh', 'mds', 'med', 'mef', 'mep', 'mepe', 'mer', 'mere', 'met', 'meta', 'mfj', 'mft', 'mgc', 'mgca', 'mgcx', 'mgd', 'mgda', 'mgg', 'mgz', 'mgzx', 'mgzxd', 'mgzxde', 'mhg', 'mjb', 'mjd', 'mjha', 'mjt', 'mjy', 'mjz', 'mmg', 'mml', 'mmla', 'mmm', 'mmma', 'mmn', 'mmna', 'mmt', 'moa', 'mob', 'moc', 'mod', 'mof', 'mog', 'moge', 'mok', 'mon', 'mone', 'moo', 'mot', 'mota', 'mote', 'motea', 'mou', 'moue', 'mov', 'moz', 'mrc', 'msd', 'msf', 'msg', 'msh', 'msi', 'msp', 'msq', 'mss', 'mst', 'msw', 'msx', 'mtn', 'mtne', 'mtnea', 'muh', 'muo', 'mur', 'mvy', 'myc', 'myca', 'myd', 'myda', 'mzz', 'nab', 'nas', 'nasd', 'nat', 'naz', 'nazx', 'nba', 'nbd', 'nbo', 'nboa', 'nboae', 'nboh', 'nboxd', 'nca', 'ncb', 'ncba', 'ncc', 'ncd', 'nce', 'ncf', 'nch', 'nci', 'ncj', 'nck', 'ncl', 'ncm', 'neb', 'nebe', 'nfa', 'nfb', 'nfc', 'ngc', 'nha', 'nht', 'nhta', 'nia', 'niaa', 'niad', 'niada', 'niae', 'nin', 'nind', 'nip', 'niq', 'nir', 'nju', 'njua', 'nka', 'nkb', 'nkc', 'nkd', 'nke', 'nkf', 'nkn', 'nko', 'nkp', 'nkq', 'nku', 'nkua', 'nlr', 'nnd', 'nob', 'noc', 'nod', 'noe', 'nof', 'nog', 'noh', 'noi', 'noj', 'nok', 'nol', 'noo', 'noq', 'nor', 'nos', 'not', 'nou', 'noua', 'nov', 'nox', 'noy', 'noz', 'npo', 'npoa', 'npoe', 'nsp', 'nta', 'ntb', 'nth', 'nti', 'ntn', 'ntsa', 'ntt', 'ntta', 'ntu', 'ntua', 'ntv', 'ntva', 'ntw', 'ntwa', 'ntxa', 'ntya', 'nul0', 'num', 'nun', 'nva', 'nvb', 'nyn', 'nyna', 'nzn', 'oab', 'ocu', 'ocua', 'ocue', 'odf', 'odfd', 'odg', 'odh', 'odi', 'odj', 'odk', 'odl', 'odm', 'off', 'ofo', 'ofp', 'ofpa', 'oft', 'oge', 'ogea', 'omy', 'ooa', 'oob', 'ooc', 'ood', 'ooda', 'ooe', 'osa', 'osb', 'osc', 'osd', 'ose', 'osf', 'oso', 'ott', 'otta', 'pbg', 'pbge', 'pbgl', 'pbp', 'pbpe', 'pbpl', 'pbz', 'pbze', 'pbzl', 'pbzll', 'pbzm', 'pcb', 'pcbe', 'pcl', 'pcle', 'pcn', 'pcu', 'pcug', 'pcuge', 'pcuh', 'pcuhe', 'pcui', 'pcum', 'pda', 'pdb', 'pdm', 'pdp', 'pdpa', 'pds', 'pek', 'peka', 'pem', 'pfm', 'pfma', 'pha', 'phi', 'phl', 'phw', 'phwa', 'phx', 'phxa', 'pmc', 'pop', 'popa', 'poz', 'pse', 'psp', 'pspa', 'ptd', 'pte', 'pth', 'ptha', 'pti', 'ptia', 'pto', 'ptoa', 'ptod', 'ptr', 'ptra', 'pts', 'ptsa', 'ptse', 'ptsf', 'ptsg', 'ptsx', 'ptt', 'ptta', 'pyb', 'pyc', 'pyd', 'pyf', 'pyo', 'pyoa', 'pyr', 'pyra', 'pyre', 'pzh', 'pzha', 'qdl', 'qdle', 'qdlea', 'qms', 'qna', 'qnaa', 'qnb', 'qnba', 'qnc', 'qnca', 'qnd', 'qnda', 'qne', 'qnea', 'qnf', 'qnfa', 'qom', 'qoma', 'qrf', 'qsl', 'qsm', 'qtz', 'qtza', 'qtze', 'qtzf', 'qtzg', 'qtzh', 'qtzt', 'qza', 'qzd', 'qzda', 'qzh', 'qzj', 'raa', 'rab', 'rac', 'rad', 'rae', 'reo', 'reod', 'reoda', 'reoe', 'reot', 'rgd', 'rho', 'rhoe', 'rhp', 'rhr', 'rhra', 'rht', 'rhta', 'rhtxa', 'rin', 'rkf', 'rna', 'rnaa', 'rnb', 'rnc', 'rob', 'rra', 'rtl', 'rtla', 'rtw', 'rug', 'sab', 'saba', 'sas', 'sat', 'sbq', 'sbr', 'sbra', 'sca', 'scg', 'scp', 'scpa', 'sct', 'scu', 'scua', 'scuf', 'scug', 'scuh', 'sda', 'sdt', 'sdte', 'sea', 'seb', 'seh', 'sep', 'sepa', 'ses', 'sesa', 'sev', 'sgn', 'sgt', 'shb', 'shba', 'she', 'shea', 'shf', 'sho', 'shoa', 'shp', 'shpa', 'shy', 'sie', 'sig', 'sin', 'sit', 'sita', 'six', 'siy', 'siz', 'sjt', 'sjta', 'ska', 'skb', 'skc', 'skd', 'ske', 'skf', 'skg', 'skh', 'skl', 'skla', 'sku', 'sky', 'skya', 'sln', 'smb', 'smc', 'sme', 'smg', 'smh', 'smi', 'smk', 'sml', 'smm', 'smn', 'smo', 'smp', 'smq', 'smr', 'sms', 'smt', 'smu', 'smv', 'smw', 'snb', 'sne', 'snf', 'sng', 'snh', 'sni', 'snk', 'snl', 'snm', 'sno', 'snp', 'snq', 'snr', 'snv', 'snvx', 'snvx_star', 'snw', 'snx', 'sny', 'soa', 'soc', 'soca', 'sod', 'soda', 'sodaa', 'sodaaa', 'sode', 'sodf', 'sodg', 'sodh', 'sodt', 'soe', 'sof', 'sog', 'soh', 'soi', 'soj', 'sok', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sos', 'sot', 'sou', 'sow', 'sph', 'spha', 'spl', 'spla', 'spn', 'spna', 'spp', 'sppa', 'sqc', 'sqca', 'sqp', 'sqpa', 'sqs', 'sqsa', 'sra', 'srae', 'srb', 'src', 'srd', 'srdl', 'srr', 'srra', 'srs', 'srsa', 'srsae', 'srsf', 'srsg', 'srst', 'ssa', 'ssaa', 'ssb', 'ssba', 'ssc', 'ssca', 'ssd', 'ssde', 'sse', 'ssee', 'ssf', 'ssfe', 'ssm', 'sspa', 'sss', 'sssa', 'sst', 'ssta', 'sste', 'sta', 'stb', 'stc', 'std', 'stda', 'ste', 'stea', 'sth', 'stj', 'stja', 'stp', 'stpa', 'str', 'stu', 'stua', 'stw', 'stwa', 'stx', 'stxa', 'sty', 'stya', 'sum', 'sur', 'sura', 'sva', 'svb', 'svc', 'svd', 'sve', 'svf', 'svg', 'svh', 'svi', 'svix', 'svj', 'svk', 'svl', 'svm', 'svn', 'svna', 'svnd', 'svo', 'svp', 'svq', 'svr', 'svs', 'svt', 'svu', 'svv', 'svw', 'svx', 'svy', 'svz', 'swa', 'swb', 'swc', 'swd', 'swe', 'swf', 'swg', 'swh', 'swi', 'swj', 'swk', 'swl', 'swm', 'swn', 'swp', 'swq', 'sxa', 'sxb', 'sxc', 'sxcd', 'sxd', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxj', 'sxk', 'sxl', 'sxm', 'sxn', 'sxo', 'sxp', 'sxq', 'sxt', 'tap', 'tav', 'tava', 'tbd', 'tbo', 'tboa', 'tbr', 'tca', 'tcd', 'tce', 'tcf', 'tcfx', 'tcg', 'tcgx', 'tch', 'tci', 'tcj', 'tck', 'tcl', 'tcm', 'tco', 'tcs', 'tdc', 'tdd', 'tee', 'teea', 'tei', 'tej', 'ten', 'teo', 'tes', 'tfa', 'tfaa', 'tfb', 'tfba', 'tfc', 'tfce', 'tfd', 'tfe', 'tfea', 'tff', 'tfg', 'tfga', 'tfh', 'tfi', 'tfia', 'tfj', 'tfja', 'tfk', 'tfka', 'tfl', 'tfm', 'tfn', 'tfo', 'tfp', 'tfpa', 'tfq', 'tfqa', 'tfs', 'tfu', 'tfua', 'tfv', 'tfva', 'tfy', 'tfya', 'tfzd', 'the', 'thea', 'thf', 'thh', 'thj', 'thl', 'thp', 'thpa', 'thpx', 'ths', 'thse', 'tie', 'tim', 'tima', 'tmd', 'tna', 'tnn', 'toc', 'toca', 'toce', 'tof', 'ton', 'tona', 'tot', 'tota', 'toz', 'tpd', 'tph', 'tpha', 'tpr', 'tps', 'tpsa', 'tpt', 'tpta', 'tpy', 'tpz', 'tpza', 'tru', 'trua', 'tsa', 'tsaa', 'tsb', 'tsba', 'tsc', 'tsd', 'tse', 'tsf', 'tsg', 'tsga', 'tsh', 'tsha', 'tsi', 'tsj', 'tsja', 'tsl', 'tsn', 'tsna', 'tsq', 'tsqa', 'tst', 'tsta', 'tsx', 'tsxa', 'tsy', 'tta', 'ttc', 'ttd', 'ttf', 'ttg', 'tto', 'ttp', 'ttr', 'ttra', 'ttt', 'ttta', 'ttu', 'ttua', 'ttv', 'ttva', 'ttw', 'ttx', 'ttxa', 'tty', 'ttz', 'tub', 'tuba', 'twf', 'twfa', 'twfd', 'twfda', 'twfe', 'twt', 'twte', 'txt', 'txta', 'tzs', 'ubo', 'uboa', 'ubt', 'ubta', 'uca', 'ucb', 'ucn', 'ucp', 'ucpa', 'ucw', 'ucx', 'ucy', 'ucz', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umi', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umt', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unid', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'urf', 'urfa', 'urg', 'urga', 'urh', 'urha', 'uri', 'uria', 'urj', 'urja', 'urk', 'urka', 'url', 'urla', 'urm', 'urma', 'urn', 'urna', 'uro', 'uroa', 'urp', 'urpa', 'urq', 'urqa', 'urr', 'urra', 'urs', 'ursa', 'urt', 'urta', 'uru', 'urua', 'urv', 'urva', 'urw', 'urwa', 'urx', 'urxa', 'ury', 'urya', 'urz', 'urza', 'usf', 'uta', 'utae', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'uty', 'utz', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbo', 'vbp', 'vbq', 'vbr', 'vbs', 'vbt', 'vbu', 'vbv', 'vbw', 'vbx', 'vby', 'vca', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vcg', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vco', 'vcp', 'vcq', 'vcr', 'vcs', 'vct', 'vcu', 'vcv', 'vcw', 'vcx', 'vcy', 'vcz', 'vda', 'vdb', 'vfi', 'viv', 'viva', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmj', 'vmk', 'vml', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vms', 'vmt', 'vmu', 'vmv', 'vmw', 'vmx', 'vmy', 'vmz', 'vna', 'vnb', 'vnc', 'vnd', 'vne', 'vnf', 'vng', 'vnh', 'vni', 'vtx', 'vvi', 'vvia', 'wal', 'walx', 'wbl', 'wei', 'wfa', 'wfb', 'wfc', 'wfd', 'wfe', 'wff', 'wfg', 'wfh', 'wfi', 'wfj', 'wfk', 'wfl', 'wfm', 'wfn', 'wfo', 'wfp', 'wfq', 'wfr', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgk', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgv', 'wgw', 'wgx', 'wgy', 'wgz', 'wha', 'whb', 'whc', 'whd', 'whe', 'whf', 'whg', 'whh', 'whi', 'whj', 'whk', 'whl', 'whm', 'whn', 'who', 'whp', 'whq', 'whr', 'whs', 'wht', 'whu', 'whv', 'whw', 'whx', 'why', 'whz', 'wia', 'wib', 'wid', 'wie', 'wif', 'wig', 'wih', 'wii', 'wij', 'wik', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wis', 'wit', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wja', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkg', 'wkh', 'wki', 'wkj', 'wkk', 'wkl', 'wkm', 'wkn', 'wko', 'wkp', 'wkq', 'wkr', 'wks', 'wkt', 'wku', 'wkv', 'wkw', 'wkx', 'wky', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wma', 'wmb', 'wmc', 'wmd', 'wme', 'wmf', 'wmg', 'wmh', 'wmi', 'wmj', 'wmk', 'wml', 'wmm', 'wmn', 'wmo', 'wmp', 'wmq', 'wmr', 'wms', 'wmt', 'wmu', 'wmv', 'wmw', 'wmx', 'wmy', 'wmz', 'wna', 'wnb', 'wnc', 'wnd', 'wne', 'wnf', 'wng', 'wnh', 'wni', 'wnj', 'wnk', 'wnl', 'wnm', 'wnn', 'wno', 'wnp', 'wnq', 'wnr', 'wns', 'wnt', 'wnu', 'wnv', 'wnw', 'wnx', 'wny', 'wnz', 'wpa', 'wse', 'wsx', 'wut', 'wuy', 'wxs', 'wxsa', 'wys', 'wysa', 'wyt', 'wyta', 'wzz', 'wzza', 'xaa', 'xab', 'xaba', 'xac', 'xad', 'xada', 'xae', 'xaf', 'xag', 'xaga', 'xah', 'xai', 'xaia', 'xaj', 'xaja', 'xak', 'xal', 'xam', 'xan', 'xao', 'xap', 'xaq', 'xar', 'xas', 'xat', 'xata', 'xau', 'xav', 'xaw', 'xax', 'xay', 'xaz', 'xba', 'xbaa', 'xbb', 'xbc', 'xbd', 'xbe', 'xbf', 'xbfa', 'xbg', 'xbh', 'xbi', 'xbj', 'xbk', 'xbka', 'xbl', 'xbm', 'xbna', 'xbo', 'xboa', 'xbp', 'xbpa', 'xbq', 'xbqa', 'xbr', 'xbs', 'xbt', 'xbu', 'xbua', 'xbv', 'xbva', 'xby', 'xbya', 'xbz', 'xbza', 'xca', 'xcb', 'xci', 'xda', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfj', 'xfk', 'xfl', 'xfm', 'xfn', 'xfo', 'xfp', 'xfq', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'xhh', 'xii', 'xij', 'xik', 'xll', 'xlla', 'xly', 'xlya', 'xlz', 'xlza', 'xmz', 'xmza', 'xux', 'xww', 'xxv', 'yac', 'yan', 'yao', 'yaoa', 'yav', 'yava', 'yavd', 'yavda', 'ybh', 'ycq', 'ycr', 'ycs', 'yct', 'ydq', 'ydqa', 'yfa', 'yfb', 'yfc', 'yfd', 'yfe', 'yff', 'yfg', 'yfh', 'yfi', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfp', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfv', 'yfw', 'yfx', 'yfy', 'yfz', 'ykh', 'ylf', 'ytw', 'ytwa', 'yug', 'yyz', 'yzh', 'zaz', 'zba', 'zbb', 'zbc', 'zbd', 'zbe', 'zbf', 'zbg', 'zbh', 'zbi', 'zbj', 'zbk', 'zbl', 'zbm', 'zbn', 'zbo', 'zbp', 'zbq', 'zbr', 'zbs', 'zbt', 'zbu', 'zbv', 'zbw', 'zbx', 'zby', 'zbz', 'zca', 'zcb', 'zcc', 'zcd', 'zce', 'zea', 'zeb', 'zec', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zfz', 'zga', 'zhc', 'zhl', 'zim', 'zjz', 'zjza', 'zkf', 'zll', 'zlla', 'zma', 'zmb', 'zmc', 'zmd', 'zme', 'zmj', 'zni', 'znp', 'znz', 'zra', 'zrad', 'zrade', 'zrc', 'zrca', 'zsn', 'zul', 'zxc', 'zxca', 'zxd', 'zyg', 'zyga', 'zyl', 'zyla', 'zzz'];
-
-    var options = '';
-
-    for (var i = 0; i < my_nets.length; i++) {
-      options += '<option value="' + my_nets[i] + '" />';
-    }
-
-    document.getElementById('nets_list').innerHTML = options; // populating the nets dropdown
+        // In addition, populating the CSD MOF options for the Example MOF loading
+        document.getElementById('MOFs_list').innerHTML = option_generator(my_MOFs); // populating the MOFs dropdown
+      })
 
     $.get("/new_user").done(
       function (response) {
@@ -3082,6 +3135,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // On start up, hide certain sections
     $('#pills-comp').hide()
+    $('#pills-example').hide()
     $('#pills-bb').hide()
     $('#pills-data').hide()
     $('#predict_section').hide()
@@ -3102,7 +3156,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 
     // functions to handle the selection and prediction and visualize and component button color change upon mouse hover
     // since we change the selection and prediction and visualize and component button colors and lose the default hover color change
-    $("#load").hover(function () {
+    $("#example-redirect").hover(function () {
       $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
       $(this).css("border-color", "#1D2B37");
     }, function () {

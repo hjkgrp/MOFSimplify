@@ -943,7 +943,7 @@ rel="stylesheet" type="text/css" />
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
-      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('CoRE2019/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
         if (!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         }
@@ -964,7 +964,7 @@ rel="stylesheet" type="text/css" />
       my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
-      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('CoRE2019/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
         if (!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         }
@@ -2144,7 +2144,7 @@ function setColor(element, color) {
       my_neighbor = $('#solvent_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
-      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('CoRE2019/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
         if (!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         }
@@ -2236,7 +2236,7 @@ function setColor(element, color) {
       my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
-      fetch('neighbor/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
+      fetch('CoRE2019/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
         if (!response.ok) { // catching 404 and other issues
           throw Error(response.statusText);
         }

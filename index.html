@@ -3005,9 +3005,6 @@ function setColor(element, color) {
       var name = document.getElementById('upload_status').innerHTML; // getting the name of the selected MOF
       name = name.split(' ');
       name = name.slice(-1)[0]; // getting the last element of the array
-      if (name.substring(name.length - 3) != 'cif') { // check the last three characters // if the example MOF is loaded
-        name = 'HKUST-1'
-      }
       if (!extension) {
         if (name.substring(name.length - 4) == '.cif') { // getting rid of the .cif part
           name = name.substring(0, name.length - 4)

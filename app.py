@@ -1069,8 +1069,6 @@ def ss_predict():
     my_data = json.loads(flask.request.get_data())
     structure = my_data['structure']
     name = my_data['name']
-    if name == 'Example MOF':
-        name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
         name = name[:-4] # remove the .cif part of the name
 
@@ -1202,8 +1200,6 @@ def ts_predict():
     my_data = json.loads(flask.request.get_data()) # This is a dictionary.
     structure = my_data['structure']
     name = my_data['name']
-    if name == 'Example MOF':
-        name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
         name = name[:-4] # remove the .cif part of the name
 
@@ -1661,8 +1657,6 @@ def get_components():
 
     structure = my_data['structure']
     name = my_data['name']
-    if name == 'Example MOF':
-        name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
         name = name[:-4] # remove the .cif part of the name
 
@@ -2005,8 +1999,6 @@ def descriptor_getter():
 
     # Grab data
     name = json.loads(flask.request.get_data()); # This is the selected MOF
-    if name == 'Example MOF':
-        name = 'HKUST-1' # spacing in name was causing issues down the line
     if name[-4:] == '.cif':
         name = name[:-4] # remove the .cif part of the name
 

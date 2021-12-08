@@ -597,7 +597,7 @@ rel="stylesheet" type="text/css" />
   <!-- Selection box for the linker building block -->
   <div style="padding-top: 30px; font-size: 22px;" class='zebra'>
     Example MOF options
-    <input style='font-size: 22px;' id="MOF_option" class='form-control locksMetrics' list='MOFs_list'
+    <input autocomplete="off" style='font-size: 22px;' id="MOF_option" class='form-control locksMetrics' list='MOFs_list'
     onmousedown="value = '';" />
   </div>
 
@@ -1962,6 +1962,7 @@ function setColor(element, color) {
 
         alert('Example MOF loaded!')
       }).catch(error => {
+        renew('example'); 
         load_color = failure_red;
         $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
         $('#upload_status').text('Failed to upload example MOF');
@@ -1991,6 +1992,7 @@ function setColor(element, color) {
 
         alert('Example MOF loaded!')
       }).catch(error => {
+        renew('example');
         load_color = failure_red;
         $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
         $('#upload_status').text('Failed to upload example MOF');

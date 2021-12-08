@@ -1602,26 +1602,6 @@ def TGA_plot():
 
     return file_html(graph,CDN,'my plot')
 
-@app.route('/get_fullname', methods=['POST']) 
-def get_fullname():
-    """
-    get_fullname gets the full name of the cif file associated with the refcode passed from the front end.
-    If there are multiple cif files with that refcode in their name, we just take the first one in the glob list. They should all be the same anyway.
-
-    :return: string, the full name of the cif file.
-    """ 
-
-    # Grab data
-    my_MOF = json.loads(flask.request.get_data());
-
-    # the list of all cif files that have this refcode in them
-    matching_list = glob.glob(f'{MOFSIMPLIFY_PATH}CoRE2019/{my_MOF}*')
-    fullname = matching_list[0] # just grabbing the first instance
-    fullname = fullname.split('/')
-    fullname = fullname[-1] # the split and [-1] maneuver gets just the cif file name 
-
-    return fullname
-
 @app.route('/get_components', methods=['POST']) 
 def get_components():
     """

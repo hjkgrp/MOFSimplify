@@ -1970,44 +1970,33 @@ function setColor(element, color) {
     };
 
     function csd_loader(my_MOF) {
+      // my_MOF is the six letter refcode, plus stuff like _clean
 
-      $.post("/get_fullname", JSON.stringify(my_MOF)).done(
-        function (response) { 
-          my_MOF_fullname = response
-
-          // my_MOF is the six letter refcode
-          // my_MOF_fullname will include stuff like "_clean" and "_SL" needed to fetch the cif file correctly. Also includes the .cif ending
-
-          fetch('CoRE2019/' + my_MOF_fullname).then(response => { // grabbing the example MOF from local host
-            if (!response.ok) { // catching 404 and other issues
-              load_color = failure_red;
-              $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-              throw Error(response.statusText);
-            }
-            return response.blob();
-          }).then(function (blob) {
-            renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
-            var myFile = new File([blob], "example.cif", { type: "", lastModified: Date.now() }) // making a cif file
-            document.getElementById('example_holder').value = myFile; // setting the value of example_holder
-            $('#upload_status').text('Selected MOF: ' + my_MOF); // indicating that the example MOF has been uploaded
-            load_color = success_green;
-            $('#example-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
-            $('#predict_section').show() // show the prediction button section
-            $('#status_section').show() // show the status section
-
-            alert('Example MOF loaded!')
-          }).catch(error => {
-            load_color = failure_red;
-            $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-            $('#upload_status').text('Failed to upload example MOF');
-            console.error('There has been a problem with your fetch operation:', error);
-          })
-        })
-        .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
+      fetch('CoRE2019/' + my_MOF + '.cif').then(response => { // grabbing the example MOF from local host
+        if (!response.ok) { // catching 404 and other issues
           load_color = failure_red;
           $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-          alert(errorThrown)
-        });
+          throw Error(response.statusText);
+        }
+        return response.blob();
+      }).then(function (blob) {
+        renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
+        var myFile = new File([blob], "example.cif", { type: "", lastModified: Date.now() }) // making a cif file
+        document.getElementById('example_holder').value = myFile; // setting the value of example_holder
+        $('#upload_status').text('Selected MOF: ' + my_MOF); // indicating that the example MOF has been uploaded
+        load_color = success_green;
+        $('#example-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+        $('#predict_section').show() // show the prediction button section
+        $('#status_section').show() // show the status section
+
+        alert('Example MOF loaded!')
+      }).catch(error => {
+        load_color = failure_red;
+        $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+        $('#upload_status').text('Failed to upload example MOF');
+        console.error('There has been a problem with your fetch operation:', error);
+      })
+
     }
 
 

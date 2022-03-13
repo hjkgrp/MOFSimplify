@@ -141,9 +141,9 @@ rel="stylesheet" type="text/css" />
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
         <ul class="navbar-nav">
-<!--             <li class="nav-item">
-              <a class="nav-link" href="how_to_cite.html">How to Cite</a> TODO once Scientific Data paper is published
-            </li> -->
+            <li class="nav-item" style='padding-left: 30px;'>
+              <a class="nav-link" href="how_to_cite.html">How to Cite</a>
+            </li>
             <li class="nav-item" style='padding-left: 30px;'>
               <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
             </li>
@@ -782,7 +782,7 @@ rel="stylesheet" type="text/css" />
 
 
 
-<!-- Begin JavaScript section -->
+<!-- Beginning of JavaScript section -->
 <script>
 
   // Lots of this code is from sbu.html at https://github.com/snurr-group/web-mofid, for MOF visualization.
@@ -2660,6 +2660,7 @@ function setColor(element, color) {
 
 
     // This function is used for downloading information on nearest neighbors and xyz's of components
+    // filename is the name of the file to be downloaded. text is the contents of the file.
     function download(filename, text) {
       var element = document.createElement('a');
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
@@ -3226,6 +3227,7 @@ function setColor(element, color) {
 
 
 </script>
+<!-- End of Javascript section -->
 
 <!-- sbu.js is pulled from https://github.com/snurr-group/web-mofid, for visualization purposes. Not all of the code in it is used by our website. -->
 <script async type="text/javascript" src="libraries/sbu.js"></script>

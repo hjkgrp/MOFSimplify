@@ -1,0 +1,145 @@
+<!-- Import 3Dmol, jQuery, and Bootstrap libaries --> 
+<script src="libraries/3Dmol-min.js"></script>
+<script src="libraries/jquery-3.4.1.min.js"></script>
+<script src="libraries/bootstrap.min.js"></script>
+
+
+<!-- Import CSS -->
+<link rel="stylesheet" href="libraries/bootstrap.min.css">
+<link rel="stylesheet" href="libraries/bootstrap_custom.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<!-- Set up the size of the 3D viewer (.mol-container) and other styles -->
+<!-- Custom CSS code is placed within the <style> tag: -->
+<style>
+.mol-container {
+  width: 100%;
+  height: 400px;
+  position: relative;
+}
+
+.form-control {
+  margin-bottom:0.1cm;
+}
+
+.my-pre{
+  font-size: 16px;
+  border: 2px solid grey;
+  width: 100%;
+  border-left: 12px solid green;
+  border-radius: 5px;
+  padding: 14px;
+  
+  /* Fixed line height */
+  line-height: 24px;
+  
+  /* Use linear-gradient for background image */
+  background-image: linear-gradient(180deg, #eee 50%, #fff 50%);
+  
+  /* Size background so that the height is 2x line-height */
+  background-size: 100% 48px;
+  
+  /* Offset the background along the y-axis by top padding */
+  background-position: 0 14px;
+}
+</style>
+
+
+<!-- Empty head section: place meta tags and favicon here -->
+<head>
+
+<title>MOFSimplify</title>
+
+</head>
+
+
+<body>
+    <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
+    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+      <div class="container">
+        <a href="index.html" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
+        <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"><!-- Toggle navbar --></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
+        <ul class="navbar-nav">
+            <li class="nav-item" style='padding-left: 30px;'>
+              <a class="nav-link" href="how_to_cite.html">How to Cite</a>
+            </li>
+            <li class="nav-item" style='padding-left: 30px;'>
+              <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
+            </li>
+            <li class="nav-item" style='padding-left: 30px;'>
+              <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF
+              Code</a>
+            </li>
+          </ul>
+
+        </div>
+        <button class='btn btn-primary round_button selection_button' id='dark_mode' type='button'
+        style='font-size:22px;'>Dark mode</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="page-header" id="banner">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <!-- We need to place the logo here -->
+            <h1 class='zebra'>Thank you for using MOFSimplify.</h1>
+            <h4 class='zebra'> If you used MOFSimplify for MOF stability predictions, please cite the following manuscript: <a href="ris_files/MOFSimplify_citation.ris"><button class="btn zebra" ><i class="fa fa-download zebra"></i> Download RIS</button></a></h4>
+            <pre class='my-pre'><code>@Article {MOFSimplify,
+author = {Nandy, Aditya and Terrones, Gianmarco and Arunachalam, Naveen and Duan, Chenru and Kastner, David W. and Kulik, Heather J.},
+title = {MOFSimplify, machine learning models with extracted stability data of three thousand metal-organic frameworks},
+journal = {Scientific Data},
+volume = {9},
+number = {74},
+url = {https://doi.org/10.1038/s41597-022-01181-0},
+doi = {10.1038/s41597-022-01181-0},
+year = {2022},
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
+  <div class="container">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+</body>
+
+<!-- Begin JavaScript section -->
+<script>
+
+  // When the "Dark mode" button is clicked:
+  black = '#000000'
+  white = '#FFFFFF'
+  $('#dark_mode').click(function () { // change background and button text depending on button state
+    button_text = document.getElementById('dark_mode').textContent
+    if (button_text == 'Dark mode') { // make background dark and text white
+      $('body').css("background-color", black);
+      document.getElementById('dark_mode').textContent = 'Light mode';
+      $('.zebra').css('color', white)
+      $('#header_background').css('background-image', 'url(\'banner_dark\')')
+    }
+    else { // Button says Light mode; make background white and text black
+      $('body').css("background-color", white);
+      document.getElementById('dark_mode').textContent = 'Dark mode';
+      $('.zebra').css('color', black)
+      $('#header_background').css('background-image', 'url(\'banner_light\')')
+    }
+  })
+
+
+
+</script>

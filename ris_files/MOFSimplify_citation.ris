@@ -1,0 +1,20 @@
+TY  - JOUR
+AU  - Nandy, Aditya
+AU  - Terrones, Gianmarco
+AU  - Arunachalam, Naveen
+AU  - Duan, Chenru
+AU  - Kastner, David W.
+AU  - Kulik, Heather J.
+PY  - 2022
+DA  - 2022/03/11
+TI  - MOFSimplify, machine learning models with extracted stability data of three thousand metal–organic frameworks
+JO  - Scientific Data
+SP  - 74
+VL  - 9
+IS  - 1
+AB  - We report a workflow and the output of a natural language processing (NLP)-based procedure to mine the extant metal–organic framework (MOF) literature describing structurally characterized MOFs and their solvent removal and thermal stabilities. We obtain over 2,000 solvent removal stability measures from text mining and 3,000 thermal decomposition temperatures from thermogravimetric analysis data. We assess the validity of our NLP methods and the accuracy of our extracted data by comparing to a hand-labeled subset. Machine learning (ML, i.e. artificial neural network) models trained on this data using graph- and pore-geometry-based representations enable prediction of stability on new MOFs with quantified uncertainty. Our web interface, MOFSimplify, provides users access to our curated data and enables them to harness that data for predictions on new MOFs. MOFSimplify also encourages community feedback on existing data and on ML model predictions for community-based active learning for improved MOF stability models.
+SN  - 2052-4463
+UR  - https://doi.org/10.1038/s41597-022-01181-0
+DO  - 10.1038/s41597-022-01181-0
+ID  - Nandy2022
+ER  - 

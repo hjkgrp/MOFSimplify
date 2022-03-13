@@ -365,6 +365,17 @@ def serve_CoRE_MOF(path):
     """ 
     return flask.send_from_directory('CoRE2019', path)
 
+@app.route('/ris_files/MOFSimplify_citation.ris')
+def serve_ris():
+    """
+    serve_bbcif returns a file to MOFSimplify.
+    The file is intended the citation file for the MOFSimplify paper.
+
+    :return: The rif citation file.
+    """ 
+
+    return flask.send_from_directory('ris_files', 'MOFSimplify_citation.ris')
+
 def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     """
     listdir_nohidden returns files in the current directory that are not hidden. 

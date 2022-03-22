@@ -1060,7 +1060,7 @@ def ss_predict():
     print(last_operation_counter_clear)
     print(time.time() - last_operation_counter_clear)
     print('end of quick time check')
-    if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
+    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()
         operation_counter = 0
@@ -1194,8 +1194,13 @@ def ts_predict():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time
-    if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
+    import time 
+    print('quick time check')
+    print(time.time())
+    print(last_operation_counter_clear)
+    print(time.time() - last_operation_counter_clear)
+    print('end of quick time check')
+    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()
         operation_counter = 0
@@ -1630,8 +1635,13 @@ def get_components():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time
-    if time.time() - last_operation_counter_clear > 3600: # one hour or more since last time operation_counter was zero'd
+    import time 
+    print('quick time check')
+    print(time.time())
+    print(last_operation_counter_clear)
+    print(time.time() - last_operation_counter_clear)
+    print('end of quick time check')
+    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
         print(f'operation_counter cleared at {time.time()}')
         last_operation_counter_clear = time.time()
         operation_counter = 0

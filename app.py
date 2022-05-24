@@ -16,6 +16,7 @@ import sklearn
 import json
 import smtplib
 import glob
+import uuid
 from sklearn.metrics import pairwise_distances
 from bokeh.plotting import figure
 from bokeh.resources import CDN
@@ -110,7 +111,7 @@ def set_ID():
     :return: The session ID for this user.
     """ 
 
-    session['ID'] = time.time() # a unique ID for this session
+    session['ID'] = uuid.uuid4() # a unique ID for this session
     session['permission'] = True # keeps track of if user gave us permission to store the MOFs they predict on; defaults to Yes
 
     # make a version of the temp_file_creation folder for this user

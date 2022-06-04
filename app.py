@@ -412,6 +412,17 @@ def serve_CoRE_MOF(path):
     """ 
     return flask.send_from_directory('CoRE2019', path)
 
+@app.route('/stable_MOFs/<path:path>')
+def serve_stable_MOF(path):
+    """
+    serve_stable_MOF returns a file to MOFSimplify.
+    The file is intended to be a cif file. It should be a stable MOF.
+
+    :param path: The path to the desired MOF in the stable_MOFs folder.
+    :return: The cif file for the stable MOF.
+    """ 
+    return flask.send_from_directory(f'stable_MOFs/{path}', path + '.cif')
+
 @app.route('/ris_files/MOFSimplify_citation.ris')
 def serve_ris():
     """

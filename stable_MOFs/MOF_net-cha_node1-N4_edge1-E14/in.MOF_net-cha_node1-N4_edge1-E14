@@ -1,0 +1,21 @@
+log             log.MOF_net-cha_node1-N4_edge1-E14 append
+units           real
+atom_style      full
+boundary        p p p
+
+pair_style      lj/cut 12.500
+bond_style      harmonic
+angle_style     cosine/periodic
+dihedral_style  harmonic
+improper_style  fourier
+
+dielectric      1.0
+special_bonds   lj/coul 0.0 0.0 1.0
+pair_modify     tail yes mix arithmetic
+box tilt        large
+read_data       data.MOF_net-cha_node1-N4_edge1-E14
+
+#### Atom Groupings ####
+group           fram     id   1:3420
+#### END Atom Groupings ####
+

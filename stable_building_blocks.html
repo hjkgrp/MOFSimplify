@@ -483,8 +483,6 @@
   // Downloads an xyz file
   $('#download_bb').click(function () {
 
-    // TODO fix this up
-
     // Check which building block is selected, if any
     if (inorg_node_color === success_green) {
       bb_name = $('#inorg_node_option').val()
@@ -519,6 +517,19 @@
   // Resets the zoom level of the 3Dmol viewer.
   $('#reset_zoom').click(function () {
     component_viewer.zoomTo();
+  })
+
+  // This function is called when the "Download selected MOF" button is clicked.
+  // Downloads the selected MOF.
+  $('#download_MOF').click(function () {
+    if ($('#stable_MOF_option').val() === '') {
+      alert('Must select a stable MOF to be downloaded')
+    }
+    else {
+      selected_MOF = $('#stable_MOF_option').val()
+
+      window.location = '/stable_MOFs/' + selected_MOF; // download cif file from the stable_MOFs folder
+    }
   })
 
   // When the "Dark mode" button is clicked:

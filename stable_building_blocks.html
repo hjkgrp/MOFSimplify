@@ -1,0 +1,599 @@
+<!-- Import 3Dmol, jQuery, and Bootstrap libaries --> 
+<script src="libraries/3Dmol-min.js"></script>
+<script src="libraries/jquery-3.4.1.min.js"></script>
+<script src="libraries/bootstrap.min.js"></script>
+<script src="libraries/3Dmol-min.js"></script>
+
+<!-- Import CSS -->
+<link rel="stylesheet" href="libraries/bootstrap.min.css">
+<link rel="stylesheet" href="libraries/bootstrap_custom.min.css">
+
+<!-- Set up styles -->
+<!-- Custom CSS code is placed within the <style> tag: -->
+<style>
+  body {
+    /* The font to be used everywhere */
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    font-size: 22px;
+  }
+
+  .btn {
+    margin-top: 3px;
+  }  
+
+  .mol-container {
+    /* For building block visualization */
+    height: 400px;
+    position: relative;
+    margin:auto; 
+    width:50%
+  }
+
+  .round_button {
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 130px;
+  }
+
+  .toggle_button {
+    display:inline-block; 
+    width:32%; 
+    font-size: 22px;
+  }
+
+</style>
+
+
+<!-- Empty head section: place meta tags and favicon here -->
+<head>
+
+<title>MOFSimplify</title>
+
+</head>
+
+
+<body>
+  <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
+  <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+    <div class="container">
+      <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
+      <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
+      aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"><!-- Toggle navbar --></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
+      <ul class="navbar-nav">
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="building_blocks.html">Stable SBUs</a>
+          </li>            
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="how_to_cite.html">How to Cite</a>
+          </li>
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
+          </li>
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF Code</a>
+          </li>
+        </ul>
+
+      </div>
+      <button class='btn btn-primary round_button' id='dark_mode' type='button' style='font-size:22px; width:20%;'>Dark mode</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <h3> Select building blocks from our hypothetical MOF database here! </h3>
+
+    Naming for the building blocks (inorganic node, organic node, edge) reflects the CoRE MOF from which the building block was taken.
+
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Apply filters</h4>
+
+    <!-- Option to filter MOFs by category -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Filter by category (number of inorganic nodes, number of organic nodes, number of edges)
+      </div>
+      <div class='col-lg-8'>
+        <select style='font-size: 22px;' class='form-control filter_option' id='category_filter'>
+          <option value="All">All</option>
+          <option value="1, 0, 1">1, 0, 1</option>
+          <option value="1, 1, 1">1, 1, 1</option>
+          <option value="2, 0, 1">2, 0, 1</option>          
+        </select>
+      </div>
+    </div>
+
+    <!-- Option to filter building blocks by metal -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Filter by metal
+      </div>
+      <div class='col-lg-8'>
+        <input autocomplete="off" id='metal_filter' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="All" list='metal_list' onmousedown="value = '';" />
+        <datalist id='metal_list'>
+          <option value="All">
+          <option value="Fe">
+          <option value="Co">
+        </datalist>   
+      </div>
+    </div>
+
+    <!-- Selection box for the inorganic node -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Filter by inorganic node
+      </div>
+      <div class='col-lg-8'>
+        <input autocomplete="off" style='font-size: 22px;' id="inorg_node_option" class='form-control locksMetrics filter_option' placeholder="All" list='inorg_node_list'
+        onmousedown="value = '';" />
+      </div>
+
+      <datalist id='inorg_node_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+
+    </div>
+
+    <!-- Selection box for the organic node -->
+    <div class = 'row organic' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Filter by organic node
+      </div>
+      <div class='col-lg-8'>
+        <input autocomplete="off" style='font-size: 22px;' id="org_node_option" class='form-control locksMetrics filter_option' placeholder="All" list='org_node_list'
+        onmousedown="value = '';" />
+      </div>
+
+      <datalist id='org_node_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+
+    </div>
+
+    <!-- Selection box for the edge -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Filter by edge
+      </div>
+      <div class='col-lg-8'>
+        <input autocomplete="off" style='font-size: 22px;' id="edge_option" class='form-control locksMetrics filter_option' placeholder="All" list='edge_list'
+        onmousedown="value = '';" />
+      </div>
+
+      <datalist id='edge_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+
+    </div>
+
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Download and visualize your selected filter criteria building blocks</h4>
+
+    <div style='text-align:center; margin-top: 0.5cm;'>
+      <button class='btn btn-primary round_button toggle_button' id='toggle_inorg_node' type='button'>Inorganic node</button>
+      <button class='btn btn-primary round_button toggle_button organic' id='toggle_org_node' type='button'>Organic node</button>
+      <button class='btn btn-primary round_button toggle_button' id='toggle_edge' type='button'>Edge</button>
+    </div>
+
+    <div style='text-align:center; margin-top: 0.5cm;'>
+      <button class='btn btn-primary round_button toggle_button' id='download_bb' type='button'>Download</button>
+      <button class='btn btn-primary round_button toggle_button' id='visualize_bb' type='button'>Visualize</button>
+    </div>
+
+    <div class='row' style='margin-top: 1cm;'>
+        <div id='container-01' class='mol-container'
+        style='border-style:solid;border-width:2px;background-color: white;'>
+        <div id='container-01-note'
+        style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px;'> MOF building blocks are visualized here. <br> Left click to rotate, scroll with mouse to zoom. </div>
+        </div>
+        <div style="margin-bottom:0.5cm;"></div>
+        <div style='width:100%; text-align:center;'>
+        <button style='display:inline-block; width:50%; font-size: 22px;' class='btn btn-primary round_button'
+        id='reset_zoom' type='button'>Reset zoom</button>
+        </div>
+
+    </div>    
+
+
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Select stable MOF (filtered by the category, metal, nodes, and edge selected above)</h4>
+    <!-- Selection box for the stable MOF -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Select a stable MOF
+      </div>
+      <div class='col-lg-8'>
+        <input autocomplete="off" style='font-size: 22px;' id="stable_MOF_option" class='form-control locksMetrics' list='stable_MOF_list'
+        onmousedown="value = '';" />
+      </div>
+
+      <datalist id='stable_MOF_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+
+    </div>
+
+    <div style='text-align:center; margin-top: 0.5cm;'>
+      <button style='display:inline-block; width:50%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF' type='button'>Download selected MOF</button>
+    </div>
+
+    TODO display stats on selected MOF here
+
+  </div>
+
+
+  <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
+    <div class="container">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- For any selected building blocks -->
+  <p id="bb_holder"> </p>
+  <!-- This will never display anything. Just used to store a building block XYZ file content if the button "Inorganic node", "Organic node", or "Edge" is used -->
+
+</body>
+
+<!-- Begin JavaScript section -->
+<script>
+
+  // Set up 3Dmol viewer 
+  let element = $('#container-01');
+  let config = { backgroundColor: 'white' };
+  let component_viewer = $3Dmol.createViewer(element, config);
+  data = {};  
+
+  // Hardcoding this in, based on the CSV Aditya gave me
+  inorg_nodes = ['All', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BELTOD_clean_sbu_0', 'BEQFEK_clean_sbu_0',
+  'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0',
+  'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'BOTCEU_clean_sbu_0', 'CEKHIL_clean_sbu_0',
+  'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0',
+  'ENOWUB_clean_sbu_0', 'EQERAU_clean_sbu_0', 'ESEHIV_clean_sbu_0', 'EYACOX_clean_sbu_0',
+  'EYACOX_clean_sbu_1', 'EZIPEK_clean_sbu_0', 'FANWIC_clean_sbu_0', 'FUNLAD_clean_sbu_0',
+  'GALJAG_clean_sbu_0', 'GEDQOX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'HICVOG_clean_sbu_0',
+  'HISSIN_clean_sbu_0', 'HISSIN_clean_sbu_1', 'ICAMEG_clean_sbu_1', 'ICIZOL_clean_sbu_0',
+  'INOVEN_clean_sbu_0', 'IYUCEM_clean_sbu_0', 'IZENUY_clean_sbu_0', 'JUFBIX_clean_sbu_0',
+  'KAKCAD_clean_sbu_0', 'KOZSID_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'KUMBOL_clean_sbu_0',
+  'KUMBOL_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'KUMJIN_clean_sbu_0',
+  'KUMJIN_clean_sbu_1', 'LEVNOQ01_clean_sbu_1', 'LIZSOE_clean_sbu_0', 'MAKGOX_clean_sbu_0',
+  'MAKGUD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'MIFKUJ_clean_sbu_0', 'MUDLON_clean_sbu_0',
+  'NAHDIM_clean_sbu_0', 'NAHDIM_clean_sbu_2', 'NAWXER_clean_sbu_0', 'NUHQIS_clean_sbu_0',
+  'NUHQUE_clean_sbu_2', 'NUHRAL_clean_sbu_3', 'OJICUG_clean_sbu_0', 'OLANAS_clean_sbu_1',
+  'OLANAS_clean_sbu_2', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_1', 'OLANEW_clean_sbu_2',
+  'OLANEW_clean_sbu_3', 'OLANEW_clean_sbu_4', 'PAMTOO_clean_sbu_0', 'PAMTUU_clean_sbu_0',
+  'PORLAL_clean_sbu_0', 'QEWDON_clean_sbu_0', 'QUQFOY_clean_sbu_1', 'QUQFOY_clean_sbu_3',
+  'SARMOO_clean_sbu_0', 'TAGTUT_clean_sbu_1', 'TAGTUT_clean_sbu_3', 'TATPOV_clean_sbu_0',
+  'UKALOJ_clean_sbu_0', 'UKIBUN_clean_sbu_0', 'UXUYUI_clean_sbu_0', 'VETTIZ_charged_sbu_0',
+  'VOLQOD_clean_sbu_1', 'WAQDOJ_charged_sbu_0', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3',
+  'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'XUDNAN_clean_sbu_1', 'ZALLEG_clean_sbu_0']
+
+  // Hardcoding this in, based on the CSV Aditya gave me
+  org_nodes = ['All', 'APAZEY_clean_linker_0', 'AZAVOO_clean_linker_0',
+  'BELTOD_clean_linker_0', 'BEQFEK_clean_linker_11', 'BETDAH_clean_linker_0', 'BETDEL_clean_linker_0',
+  'BETDIP_clean_linker_0', 'CEKHIL_clean_linker_0', 'CUKXOW_clean_linker_0', 'CUQRIR_clean_linker_1',
+  'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IYUCEM_clean_linker_1',
+  'IZENUY_clean_linker_0', 'KAKCAD_clean_linker_0', 'KUFVIS_clean_linker_0', 'LEJCEK_clean_linker_0',
+  'MAKGUD_clean_linker_0', 'MIDCAF_clean_linker_0', 'MIFKUJ_clean_linker_1', 'MUDLON_clean_linker_0',
+  'NAHDIM_clean_linker_0', 'NAWXER_clean_linker_0', 'PAMTOO_clean_linker_0', 'QEWDON_clean_linker_0',
+  'QUQFOY_clean_linker_2', 'TATPOV_clean_linker_0', 'UFIREI_clean_linker_0', 'UWAGAB01_clean_linker_0',
+  'VETTIZ_charged_linker_0', 'WOSHET_clean_linker_1']
+
+  // Hardcoding this in, based on the CSV Aditya gave me
+  edges = ['All', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
+ 'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1',
+ 'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10',
+ 'UKIBIB_clean_linker_0', 'UKIBUN_clean_linker_0', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0',
+ 'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
+
+ // Hardcoding this in; TODO expand later
+ stable_MOFs = ['MOF_net-ech_node1-N77_edge1-E11', 
+ 'MOF_net-uod_node1-N18_edge1-E6',
+ 'MOF_net-snz_node1-N46_edge1-E7',
+ 'MOF_net-snz_node1-N46_edge1-E8',
+ 'MOF_net-cha_node1-N4_edge1-E14', 
+ 'MOF_net-snz_node1-N46_edge1-E9', 
+ 'MOF_net-uod_node1-N18_edge1-E7']
+
+  success_green = '#18bc9c';
+  original_blue = '#2c3e50';
+
+  inorg_node_color = original_blue;
+  org_node_color = original_blue;
+  edge_color = original_blue;
+
+  // When the Filter by category selection is changed
+  $('#category_filter').change(function() {
+    category = $('#category_filter').val()
+    if (category === 'All') { // Organic nodes permitted, since no restriction of category.
+      $('.organic').show()
+    }
+    else if (category === '1, 1, 1') { // This category has an organic node
+      $('.organic').show()
+    }
+    else { // The other two categories do not have an organic node.
+      $('.organic').hide()
+    }
+  });
+
+  // When the "Filter by inorganic node" field is clicked
+  $('#inorg_node_option').click(function () {
+    $('#inorg_node_option').change() // Trigger a change event
+      // I force trigger a change event in case the user clicks off the input element without selecting anything, in which case 'All' will be selected
+    // document.getElementById("inorg_node_option").value = 'All' // Default to 'All'
+  })
+
+  // $('#inorg_node_option').change(function () {
+  //   console.log('inorg node change!')
+  // })
+
+  // When the "Filter by organic node" field is clicked
+  $('#org_node_option').click(function () {
+    $('#org_node_option').change() // Trigger a change event
+    // $('#org_node_option').val('All') // Default to 'All'
+  })
+
+  // When the "Filter by edge" field is clicked
+  $('#edge_option').click(function () {
+    $('#edge_option').change() // Trigger a change event
+    // $('#edge_option').val('All') // Default to 'All'
+  })
+
+  // When any filter is changed
+  $('.filter_option').click(function () {
+    component_viewer.clear(); // clear any building block visualization
+    recolor("Reset")
+  })
+
+  // When the "Filter by inorganic node" field is changed
+  $('#inorg_node_option').change(function () {
+
+    filter_dictionary = { 'inorg_node': $('#inorg_node_option').val(), 
+    'org_node': $('#org_node_option').val(), 
+    'edge': $('#edge_option').val(), 
+    'stable_MOFs': stable_MOFs} // TODO expand this later to include net? metal?
+
+    $.post("/filter_MOFs", JSON.stringify(filter_dictionary)).done(
+      function (response) {
+        filtered_stable_MOFs = response['filtered_stable_MOFs']
+        document.getElementById('stable_MOF_list').innerHTML = option_generator(filtered_stable_MOFs)
+      })
+
+  })
+
+
+  // Recolors the building block selection buttons based on the string `bb_type`
+  function recolor(bb_type) {
+    switch(bb_type) {
+      case 'Inorganic node':
+        inorg_node_color = success_green
+        org_node_color = original_blue
+        edge_color = original_blue
+        break;
+      case 'Organic node':
+        inorg_node_color = original_blue
+        org_node_color = success_green
+        edge_color = original_blue
+        break;
+      case 'Edge':
+        inorg_node_color = original_blue
+        org_node_color = original_blue
+        edge_color = success_green
+        break;
+      case 'Reset':
+        inorg_node_color = original_blue
+        org_node_color = original_blue
+        edge_color = original_blue
+        break;      
+    }
+
+    // Recoloring buttons
+    $('#toggle_inorg_node').css({ 'background-color': inorg_node_color, 'border-color': inorg_node_color });
+    $('#toggle_org_node').css({ 'background-color': org_node_color, 'border-color': org_node_color });
+    $('#toggle_edge').css({ 'background-color': edge_color, 'border-color': edge_color });
+
+  }
+
+  // When the "Inorganic node" button is clicked
+  $('#toggle_inorg_node').click(function () {
+    console.log($('#inorg_node_option').val())
+    if ($('#inorg_node_option').val() === 'All' || $('#inorg_node_option').val() === '') {
+      // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+      alert('Must select a specific inorganic node for filtering, if you want to download and visualize an inorganic node')
+    }
+    else if (! inorg_nodes.includes($('#inorg_node_option').val())) {
+      alert('Invalid inorganic node selection')
+    }
+    else {
+      // Getting the XYZ information for the selected inorganic node
+      selected_bb = $('#inorg_node_option').val()
+      $.post("/bb", JSON.stringify(selected_bb)).done(
+        function (response) {
+          document.getElementById('bb_holder').value = response
+        })
+
+      recolor("Inorganic node")
+    }
+  })
+
+  // When the "Organic node" button is clicked
+  $('#toggle_org_node').click(function () {
+    if ($('#org_node_option').val() === 'All' || $('#org_node_option').val() === '') {
+      // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+      alert('Must select a specific organic node for filtering, if you want to download and visualize an organic node')
+    }
+    else if (! org_nodes.includes($('#org_node_option').val())) {
+      alert('Invalid inorganic node selection')
+    }
+    else {
+      // Getting the XYZ information for the selected organic node
+      selected_bb = $('#org_node_option').val()
+      $.post("/bb", JSON.stringify(selected_bb)).done(
+        function (response) {
+          document.getElementById('bb_holder').value = response
+        })
+
+      recolor("Organic node")
+    }
+  })
+
+  // When the "Edge" button is clicked
+  $('#toggle_edge').click(function () {
+    if ($('#edge_option').val() === 'All' || $('#edge_option').val() === '') {
+      // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+      alert('Must select a specific edge for filtering, if you want to download and visualize an edge')
+    }
+    else if (! edges.includes($('#edge_option').val())) {
+      alert('Invalid edge selection')
+    }    
+    else {
+      // Getting the XYZ information for the selected edge
+      selected_bb = $('#edge_option').val()
+      $.post("/bb", JSON.stringify(selected_bb)).done(
+        function (response) {
+          document.getElementById('bb_holder').value = response
+        })
+
+      recolor("Edge")
+    }
+  })
+
+  // This function is used for downloading xyz's of components
+  // filename is the name of the file to be downloaded. text is the contents of the file.
+  function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+
+  // This function is called when the "Download" button is clicked
+  // Downloads an xyz file
+  $('#download_bb').click(function () {
+
+    // TODO fix this up
+
+    // Check which building block is selected, if any
+    if (inorg_node_color === success_green) {
+      bb_name = $('#inorg_node_option').val()
+      download(bb_name + '.xyz', $('#bb_holder').val())
+    }
+    else if (org_node_color === success_green) {
+      bb_name = $('#org_node_option').val()
+      download(bb_name + '.xyz', $('#bb_holder').val())
+    }
+    else if (edge_color === success_green) {
+      bb_name = $('#edge_option').val()
+      download(bb_name + '.xyz', $('#bb_holder').val())
+    }
+    else {
+      alert('You must select a building block in order to download')
+      return // Leave the function
+    }
+  })
+
+  // This function is called when the "Visualize" button is clicked
+  // Visualizes the building block structure
+  $('#visualize_bb').click(function () {
+    $('#container-01-note').text('');
+    component_viewer.clear();
+    component_viewer.addModel($('#bb_holder').val(), "xyz"); // $('#bb_holder').val() contains the geometry
+    component_viewer.setStyle({}, { stick: { radius: 0.25 } });
+    component_viewer.zoomTo();
+    component_viewer.render();    
+  })  
+
+  // This function is called when the "Reset zoom" button is clicked
+  // Resets the zoom level of the 3Dmol viewer.
+  $('#reset_zoom').click(function () {
+    component_viewer.zoomTo();
+  })
+
+  // When the "Dark mode" button is clicked:
+  black = '#000000'
+  white = '#FFFFFF'
+  $('#dark_mode').click(function () { // change background and button text depending on button state
+    button_text = document.getElementById('dark_mode').textContent
+    if (button_text === 'Dark mode') { // make background dark and text white
+      $('body').css("background-color", black);
+      document.getElementById('dark_mode').textContent = 'Light mode';
+      $('.zebra').css('color', white)
+      $('#header_background').css('background-image', 'url(\'banner_dark\')')
+    }
+    else { // Button says Light mode; make background white and text black
+      $('body').css("background-color", white);
+      document.getElementById('dark_mode').textContent = 'Dark mode';
+      $('.zebra').css('color', black)
+      $('#header_background').css('background-image', 'url(\'banner_light\')')
+    }
+  })
+
+  // option_generator is a helper function for populating dropdowns on the website
+  var option_generator = function(my_list) {
+    var options = ''
+    for (var i = 0; i < my_list.length; i++) {
+      options += '<option value="' + my_list[i] + '" />';
+    }
+    return options
+  }
+
+  // functions to handle the button color change of certain buttons upon mouse hover
+  // since we change the colors of certain buttons and lose the default hover color change
+  $("#toggle_inorg_node").hover(function () {
+    $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+    $(this).css("border-color", "#1D2B37");
+  }, function () {
+    $(this).css("background-color", inorg_node_color);
+    $(this).css("border-color", inorg_node_color);
+  });
+
+  $("#toggle_org_node").hover(function () {
+    $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+    $(this).css("border-color", "#1D2B37");
+  }, function () {
+    $(this).css("background-color", org_node_color);
+    $(this).css("border-color", org_node_color);
+  });
+
+  $("#toggle_edge").hover(function () {
+    $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+    $(this).css("border-color", "#1D2B37");
+  }, function () {
+    $(this).css("background-color", edge_color);
+    $(this).css("border-color", edge_color);
+  });
+
+
+  // Populating dropdowns in this next section
+
+  // Populating the inorganic node dropdown
+  document.getElementById('inorg_node_list').innerHTML = option_generator(inorg_nodes);
+
+  // Populating the organic node dropdown
+  document.getElementById('org_node_list').innerHTML = option_generator(org_nodes)
+
+  // Populating the edge dropdown
+  document.getElementById('edge_list').innerHTML = option_generator(edges)
+
+  // Populating the MOF dropdown
+  document.getElementById('stable_MOF_list').innerHTML = option_generator(stable_MOFs)
+
+  // The code below runs when this webpage is opened.
+  $('#category_filter').val("All") // Setting the default value
+  $('#inorg_node_option').val("All") // Setting the default value
+  $('#org_node_option').val("All") // Setting the default value
+  $('#edge_option').val("All") // Setting the default value
+
+</script>

@@ -7,7 +7,7 @@
 <!-- Import CSS -->
 <link rel="stylesheet" href="libraries/bootstrap.min.css">
 <link rel="stylesheet" href="libraries/bootstrap_custom.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- This last css file gives the download button for the citation (the one with the arrow). -->
 
 <!-- Set up styles -->
 <!-- Custom CSS code is placed within the <style> tag: -->
@@ -32,6 +32,13 @@
     /* Offset the background along the y-axis by top padding */
     background-position: 0 14px;
   }
+
+  body {
+    /* The font to be used everywhere */
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    font-size: 16px;
+  }
 </style>
 
 
@@ -44,42 +51,42 @@
 
 
 <body>
-    <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
-    <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
-      <div class="container">
-        <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
-        <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
-        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"><!-- Toggle navbar --></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
-        <ul class="navbar-nav">
-            <li class="nav-item" style='padding-left: 30px;'>
-              <a class="nav-link" href="how_to_cite.html">How to Cite</a>
-            </li>
-            <li class="nav-item" style='padding-left: 30px;'>
-              <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
-            </li>
-            <li class="nav-item" style='padding-left: 30px;'>
-              <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF
-              Code</a>
-            </li>
-          </ul>
-
-        </div>
-        <button class='btn btn-primary round_button selection_button' id='dark_mode' type='button'
-        style='font-size:22px;'>Dark mode</button>
-      </div>
-    </div>
-
+  <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
+  <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
     <div class="container">
-      <div class="page-header" id="banner">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <!-- We need to place the logo here -->
-            <h1 class='zebra'>Thank you for using MOFSimplify.</h1>
-            <h4 class='zebra'> If you used MOFSimplify for MOF stability predictions, please cite the following manuscript: <a href='ris_files/MOFSimplify_citation.ris'><button class="btn zebra" ><i class="fa fa-download"></i> Download RIS</button></a></h4>
-            <pre class='my-pre'><code>@Article {MOFSimplify,
+      <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
+      <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
+      aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"><!-- Toggle navbar --></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
+      <ul class="navbar-nav">
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="building_blocks.html">Stable SBUs</a>
+          </li>            
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="how_to_cite.html">How to Cite</a>
+          </li>
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
+          </li>
+          <li class="nav-item" style='padding-left: 30px;'>
+            <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF Code</a>
+          </li>
+        </ul>
+
+      </div>
+      <button class='btn btn-primary round_button' id='dark_mode' type='button' style='font-size:22px; width:20%;'>Dark mode</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-header" id="banner">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <h1 class='zebra'>Thank you for using MOFSimplify.</h1>
+          <h4 class='zebra'> If you used MOFSimplify for MOF stability predictions, please cite the following manuscript: <a href='ris_files/MOFSimplify_citation.ris'><button class="btn zebra" ><i class="fa fa-download"></i> Download RIS</button></a></h4>
+          <pre class='my-pre'><code>@Article {MOFSimplify,
 author = {Nandy, Aditya and Terrones, Gianmarco and Arunachalam, Naveen and Duan, Chenru and Kastner, David W. and Kulik, Heather J.},
 title = {MOFSimplify, machine learning models with extracted stability data of three thousand metal-organic frameworks},
 journal = {Scientific Data},
@@ -89,20 +96,20 @@ url = {https://doi.org/10.1038/s41597-022-01181-0},
 doi = {10.1038/s41597-022-01181-0},
 year = {2022},
 }</code></pre>
-          </div>
         </div>
       </div>
     </div>
-
-<div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
-  <div class="container">
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
-      </li>
-    </ul>
   </div>
-</div>
+
+  <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
+    <div class="container">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
 
 </body>

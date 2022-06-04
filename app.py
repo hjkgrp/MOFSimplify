@@ -81,6 +81,42 @@ solvent_model = keras.models.load_model(solvent_ANN_path + 'final_model_flag_few
 thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
 
 
+# global variable dictionary for stable building block aliases
+bb_mapping = {'XUDNAN_clean_linker_2': 'E0', 'MIFKUJ_clean_linker_0': 'E1', 'AJUNOK_clean_linker_0': 'E2', 'OJICUG_clean_linker_0': 'E3',
+ 'FUNLAD_clean_linker_1': 'E4', 'CIFDUS_clean_linker_0': 'E5', 'EYOCIG_clean_linker_4': 'E6', 'TEMPAE_clean_linker_10': 'E7',
+ 'KIFKEQ_clean_linker_1': 'E8', 'FUNLAD_clean_linker_0': 'E9', 'EZIPEK_clean_linker_0': 'E10', 'UKIBIB_clean_linker_0': 'E11',
+ 'UKIBUN_clean_linker_0': 'E12', 'UVAHIK_clean_linker_0': 'E13', 'XIVTED_clean_linker_0': 'E14', 'ZUJKAS_clean_linker_0': 'E15',
+ 'APAZEY_clean_linker_0': 'orgN0', 'AZAVOO_clean_linker_0': 'orgN1', 'BELTOD_clean_linker_0': 'orgN2', 'BETDAH_clean_linker_0': 'orgN3',
+ 'BETDEL_clean_linker_0': 'orgN4', 'BETDIP_clean_linker_0': 'orgN5', 'CEKHIL_clean_linker_0': 'orgN6', 'CUKXOW_clean_linker_0': 'orgN7',
+ 'CUQRIR_clean_linker_1': 'orgN8', 'ESEHIV_clean_linker_0': 'orgN9', 'GIZVER_clean_linker_0': 'orgN10', 'INOVEN_clean_linker_0': 'orgN11',
+ 'IYUCEM_clean_linker_1': 'orgN12', 'IZENUY_clean_linker_0': 'orgN13', 'KAKCAD_clean_linker_0': 'orgN14', 'KUFVIS_clean_linker_0': 'orgN15',
+ 'MAKGUD_clean_linker_0': 'orgN16', 'MIDCAF_clean_linker_0': 'orgN17', 'MIFKUJ_clean_linker_1': 'orgN18', 'MUDLON_clean_linker_0': 'orgN19',
+ 'NAHDIM_clean_linker_0': 'orgN20', 'NAWXER_clean_linker_0': 'orgN21', 'PAMTOO_clean_linker_0': 'orgN22', 'QEWDON_clean_linker_0': 'orgN23',
+ 'QUQFOY_clean_linker_2': 'orgN24', 'TATPOV_clean_linker_0': 'orgN25', 'VETTIZ_charged_linker_0': 'orgN26', 'WOSHET_clean_linker_1': 'orgN27',
+ 'BEQFEK_clean_linker_11': 'orgN28', 'LEJCEK_clean_linker_0': 'orgN29', 'UFIREI_clean_linker_0': 'orgN30', 'UWAGAB01_clean_linker_0': 'orgN31',
+ 'BEQFEK_clean_sbu_0': 'N0', 'BOTCEU_clean_sbu_0': 'N1', 'ENOWUB_clean_sbu_0': 'N2', 'FANWIC_clean_sbu_0': 'N3',
+ 'ICAMEG_clean_sbu_1': 'N4', 'LIZSOE_clean_sbu_0': 'N5', 'UKALOJ_clean_sbu_0': 'N6', 'UKIBUN_clean_sbu_0': 'N7',
+ 'ZALLEG_clean_sbu_0': 'N8', 'AJUNOK_clean_sbu_0': 'N9', 'AZAVOO_clean_sbu_0': 'N10', 'BELTOD_clean_sbu_0': 'N11',
+ 'BETDAH_clean_sbu_0': 'N12', 'BETDEL_clean_sbu_0': 'N13', 'BETDIP_clean_sbu_0': 'N14', 'BETFAJ_clean_sbu_0': 'N15',
+ 'BETFEN_clean_sbu_0': 'N16', 'BETGAK_clean_sbu_0': 'N17', 'CEKHIL_clean_sbu_0': 'N18', 'CIFDUS_clean_sbu_1': 'N19',
+ 'CUKXOW_clean_sbu_0': 'N20', 'CUWYAW_clean_sbu_0': 'N21', 'EBIMEJ_clean_sbu_0': 'N22', 'EQERAU_clean_sbu_0': 'N23',
+ 'ESEHIV_clean_sbu_0': 'N24', 'EYACOX_clean_sbu_0': 'N25', 'EYACOX_clean_sbu_1': 'N26', 'EZIPEK_clean_sbu_0': 'N27',
+ 'FUNLAD_clean_sbu_0': 'N28', 'GALJAG_clean_sbu_0': 'N29', 'GEDQOX_clean_sbu_0': 'N30', 'GIZVER_clean_sbu_0': 'N31',
+ 'HICVOG_clean_sbu_0': 'N32', 'HISSIN_clean_sbu_0': 'N33', 'HISSIN_clean_sbu_1': 'N34', 'ICIZOL_clean_sbu_0': 'N35',
+ 'INOVEN_clean_sbu_0': 'N36', 'IYUCEM_clean_sbu_0': 'N37', 'IZENUY_clean_sbu_0': 'N38', 'JUFBIX_clean_sbu_0': 'N39',
+ 'KAKCAD_clean_sbu_0': 'N40', 'KOZSID_clean_sbu_0': 'N41', 'KUFVIS_clean_sbu_0': 'N42', 'KUMBOL_clean_sbu_0': 'N43',
+ 'KUMBOL_clean_sbu_1': 'N44', 'KUMBUR_clean_sbu_0': 'N45', 'KUMBUR_clean_sbu_1': 'N46', 'KUMJIN_clean_sbu_0': 'N47',
+ 'KUMJIN_clean_sbu_1': 'N48', 'LEVNOQ01_clean_sbu_1': 'N49', 'MAKGOX_clean_sbu_0': 'N50', 'MAKGUD_clean_sbu_1': 'N51',
+ 'MIDCAF_clean_sbu_0': 'N52', 'MIFKUJ_clean_sbu_0': 'N53', 'MUDLON_clean_sbu_0': 'N54', 'NAHDIM_clean_sbu_0': 'N55',
+ 'NAHDIM_clean_sbu_2': 'N56', 'NAWXER_clean_sbu_0': 'N57', 'NUHQIS_clean_sbu_0': 'N58', 'NUHQUE_clean_sbu_2': 'N59',
+ 'NUHRAL_clean_sbu_3': 'N60', 'OJICUG_clean_sbu_0': 'N61', 'OLANAS_clean_sbu_1': 'N62', 'OLANAS_clean_sbu_2': 'N63',
+ 'OLANEW_clean_sbu_0': 'N64', 'OLANEW_clean_sbu_1': 'N65', 'OLANEW_clean_sbu_2': 'N66', 'OLANEW_clean_sbu_3': 'N67',
+ 'OLANEW_clean_sbu_4': 'N68', 'PAMTOO_clean_sbu_0': 'N69', 'PAMTUU_clean_sbu_0': 'N70', 'PORLAL_clean_sbu_0': 'N71',
+ 'QEWDON_clean_sbu_0': 'N72', 'QUQFOY_clean_sbu_1': 'N73', 'QUQFOY_clean_sbu_3': 'N74', 'SARMOO_clean_sbu_0': 'N75',
+ 'TAGTUT_clean_sbu_1': 'N76', 'TAGTUT_clean_sbu_3': 'N77', 'TATPOV_clean_sbu_0': 'N78', 'UXUYUI_clean_sbu_0': 'N79',
+ 'VETTIZ_charged_sbu_0': 'N80', 'VOLQOD_clean_sbu_1': 'N81', 'WAQDOJ_charged_sbu_0': 'N82', 'WUSLED_clean_sbu_0': 'N83',
+ 'XADDAJ01_clean_sbu_3': 'N84', 'XOMCOT_clean_sbu_0': 'N85', 'XOMCOT_clean_sbu_1': 'N86', 'XUDNAN_clean_sbu_1': 'N87'}
+
 def conditional_diminish(counter):
     """
     conditional_diminish decreases the input by one and returns it, unless the input is already zero.
@@ -316,6 +352,16 @@ def serve_cite():
     :return: The how to cite page.
     """ 
     return flask.send_from_directory('.', 'how_to_cite.html')
+
+@app.route('/stable_building_blocks.html')
+def serve_stable_bb_page():
+    """
+    serve_cite serves the stable building blocks page.
+    So the user is redirected to the stable building blocks page.
+
+    :return: The stable building blocks page.
+    """ 
+    return flask.send_from_directory('.', 'stable_building_blocks.html')
 
 @app.route('/libraries/<path:path>')
 def serve_library_files(path):
@@ -1049,7 +1095,7 @@ def ss_predict():
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
         May instead return a string 'FAILED' if descriptor generation fails.
-        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50x errors (like 504, aka Gateway Time-out).
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
     """ 
 
     global operation_counter # global variable
@@ -1189,7 +1235,7 @@ def ts_predict():
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
         May instead return a string 'FAILED' if descriptor generation fails.
-        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50x errors (like 504, aka Gateway Time-out).
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
     """ 
 
     global operation_counter # global variable
@@ -1630,7 +1676,7 @@ def get_components():
         the number of each type of component, the unique linkers and sbus (kept track of by their index, see linker_num and sbu_num in the code),
         and the SMILES string for each component.
 
-        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50x errors (like 504, aka Gateway Time-out).
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
     """ 
 
     global operation_counter # global variable
@@ -2034,6 +2080,55 @@ def TGA_getter():
         contents = f.read()
 
     return contents
+
+@app.route('/bb', methods=['POST'])
+def stable_bb_getter():
+    """
+    stable_bb_getter returns the contents of the XYZ of the building block specified by the front end.
+
+    :return: str contents, the contents of the XYZ file of the requested building block.
+    """
+
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is the building block to get.
+
+    bb_file = open(MOFSIMPLIFY_PATH + 'stable_building_blocks/bbs/' + name + '.xyz', 'r');
+    bb_info = bb_file.read();
+    bb_file.close();
+
+    return bb_info
+
+@app.route('/filter_MOFs', methods=['POST'])
+def filter_MOFs():
+    """
+    filter_MOFs returns the list of stable MOFs after applying the filter criteria passed from the front end.
+
+    :return: list contents, the stable MOFs that survive all of the filters (e.g. inorganic node filter).
+    """
+
+    # Grab data
+    filter_dictionary = json.loads(flask.request.get_data()); # This dictionary contains the filters to apply.
+
+    print(f'filter_dictionary is {filter_dictionary}')
+
+    stable_MOFs = filter_dictionary['stable_MOFs']
+    filtered_stable_MOFs = stable_MOFs.copy()
+
+    inorg_node_filter = filter_dictionary['inorg_node']
+    org_node_filter = filter_dictionary['org_node']
+    edge_filter = filter_dictionary['edge']
+
+    # Applying the filters
+    if inorg_node_filter != 'All' and len(inorg_node_filter) != 0: # No filter applied in the 'All' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything   
+        filtered_stable_MOFs = [i for i in filtered_stable_MOFs if (bb_mapping[inorg_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
+    if org_node_filter != 'All' and len(org_node_filter) != 0:
+        filtered_stable_MOFs = [i for i in filtered_stable_MOFs if (bb_mapping[org_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
+    if edge_filter != 'All' and len(edge_filter) != 0:
+        filtered_stable_MOFs = [i for i in filtered_stable_MOFs if i.endswith(bb_mapping[edge_filter])]
+
+    response_dict = {'filtered_stable_MOFs': filtered_stable_MOFs} # List is not a valid return type, but dictionary is.
+
+    return response_dict
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

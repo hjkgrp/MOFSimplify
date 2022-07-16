@@ -383,7 +383,7 @@ def listdir_nohidden(path): # used for bb_generate. Ignores hidden files
     It is used as a helper function in the bb_generate function.
 
     :param path: The path to be examined.
-    :return: The non hidden files in the current path.
+    :return: The non-hidden files in the current path.
     """ 
     myList = os.listdir(path);
     for i in myList:
@@ -492,14 +492,14 @@ def bb_generate():
 
 def normalize_data_solvent(df_train, df_newMOF, fnames, lname, debug=False):
     """
-    normalize_data_solvent takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+    normalize_data_solvent takes in two DataFrames df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
     This function also takes in fnames (the feature names) and lname (the target property name).
-    This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
-    It also standardizes y_train, which are the solvent removal stability flags in the training data dataframe, and returns x_scaler (which scaled X_train).
+    This function normalizes the X values from the pandas DataFrames and returns them as X_train and X_newMOF.
+    It also standardizes y_train, which are the solvent removal stability flags in the training data DataFrame, and returns x_scaler (which scaled X_train).
         By standardizes, I mean that it makes the values of y_train either 0 or 1
 
-    :param df_train: A pandas dataframe of the training data.
-    :param df_newMOF: A pandas dataframe of the new MOF being analyzed.
+    :param df_train: A pandas DataFrame of the training data.
+    :param df_newMOF: A pandas DataFrame of the new MOF being analyzed.
     :param fnames: An array of column names of the descriptors.
     :param lname: An array of the column name of the target.
     :param debug: A boolean that determines whether extra information is printed.
@@ -524,13 +524,13 @@ def normalize_data_solvent(df_train, df_newMOF, fnames, lname, debug=False):
 def standard_labels(df, key="flag"):
     """
     standard_labels makes the solvent removal stability either 1 (stable upon solvent removal) or 0 (unstable upon solvent removal)
-    "flag" is the column under which solvent removal stability is reported in the dataframe
+    "flag" is the column under which solvent removal stability is reported in the DataFrame
 
-    :param df: A pandas dataframe to modify.
-    :param key: The column in the pandas dataframe to look at.
-    :return: The modified pandas dataframe.
+    :param df: A pandas DataFrame to modify.
+    :param key: The column in the pandas DataFrame to look at.
+    :return: The modified pandas DataFrame.
     """ 
-    flags = [1 if row[key] == 1 else 0 for _, row in df.iterrows()] # Look through all rows of the dataframe df.
+    flags = [1 if row[key] == 1 else 0 for _, row in df.iterrows()] # Look through all rows of the DataFrame df.
     df[key] = flags
     return df
 
@@ -599,7 +599,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
 
     df_train = standard_labels(df_train, key="flag")
 
-    ### The normalize_data_solvent function is expecting a dataframe with each MOF in a separate row, and features in columns
+    ### The normalize_data_solvent function is expecting a DataFrame with each MOF in a separate row, and features in columns
     ### At this location, use get_MOF_descriptors to get features
         # Look at the files that are generated: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
     ### Then store those features in a usable form (df)
@@ -607,7 +607,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
         # done in app.py
 
     ### Utilize the function below to normalize the RACs + geos of the new MOF
-    # newMOF refers to the MOF that has been uploaded to mofSimplify, for which a prediction will be generated
+    # newMOF refers to the MOF that has been uploaded to MOFSimplify, for which a prediction will be generated
     X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], debug=False)
     # Order of values in X_newMOF matters, but this is taken care of in normalize_data_solvent.
     X_train.shape, y_train.reshape(-1, ).shape
@@ -642,7 +642,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
     df_reformat = df1.min(axis='index')
 
     for i in range(neighbors):
-        name = df_reformat.idxmin() # name of next closest complex in the traiing data
+        name = df_reformat.idxmin() # name of next closest complex in the training data
         distance = df_reformat.min() # distance of the next closest complex in the training data to the new MOF
         df_reformat = df_reformat.drop(name) # dropping the next closest complex, in order to find the next-next closest complex
 
@@ -652,15 +652,15 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
     return str(new_MOF_pred[0][0]), neighbors_names, neighbors_distances
 
 
-def normalize_data_thermal(df_train, df_newMOF, fnames, lname, debug=False): # Function assumes it gets pandas dataframes with MOFs as rows and features as columns
+def normalize_data_thermal(df_train, df_newMOF, fnames, lname, debug=False): # Function assumes it gets pandas DataFrames with MOFs as rows and features as columns
     """
-    normalize_data_thermal takes in two dataframes df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+    normalize_data_thermal takes in two DataFrames df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
     This function also takes in fnames (the feature names) and lname (the target property name).
-    This function normalizes the X values from the pandas dataframes and returns them as X_train and X_newMOF.
-    It also normalizes y_train, which are the thermal breakdown temperatures in the training data dataframe, and returns x_scaler (which scaled X_train) and y_scaler (which scaled y_train).
+    This function normalizes the X values from the pandas DataFrames and returns them as X_train and X_newMOF.
+    It also normalizes y_train, which are the thermal breakdown temperatures in the training data DataFrame, and returns x_scaler (which scaled X_train) and y_scaler (which scaled y_train).
 
-    :param df_train: A pandas dataframe of the training data.
-    :param df_newMOF: A pandas dataframe of the new MOF being analyzed.
+    :param df_train: A pandas DataFrame of the training data.
+    :param df_newMOF: A pandas DataFrame of the new MOF being analyzed.
     :param fnames: An array of column names of the descriptors.
     :param lname: An array of the column name of the target.
     :param debug: A boolean that determines whether extra information is printed.
@@ -792,7 +792,7 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
     df_reformat = df1.min(axis='index')
 
     for i in range(neighbors):
-        name = df_reformat.idxmin() # name of next closest complex in the traiing data
+        name = df_reformat.idxmin() # name of next closest complex in the training data
         distance = df_reformat.min() # distance of the next closest complex in the training data to the new MOF
         df_reformat = df_reformat.drop(name) # dropping the next closest complex, in order to find the next-next closest complex
 
@@ -959,7 +959,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
         except Exception: # csv files have been deleted
             return 'FAILED' 
 
-        lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a Dataframe, then transpose
+        lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a DataFrame, then transpose
         sbu_df = sbu_df.mean().to_frame().transpose()
         linker_df = linker_df.mean().to_frame().transpose()
 
@@ -982,7 +982,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
     ### Here, I do a check to see if the current MOF is in the training data. ###
     # If it is, then I return the known truth for the MOF, rather than make a prediction.
 
-    # Will iterate through the rows of the train pandas dataframe
+    # Will iterate through the rows of the train pandas DataFrame
 
     in_train = False
 
@@ -998,7 +998,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 
             # If for any property a training MOF and the new MOF we are predicting on differ too much, we know they are not the same MOF
             # So row_match is set to false for this training MOF
-            if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some same values being idenfitied as different b/c of some floating 10^-15 values 
+            if np.absolute(row[col] - merged_df.iloc[0][col]) > 0.05 * np.absolute(merged_df.iloc[0][col]): # row[col] != merged_df.iloc[0][col] was leading to some same values being identified as different b/c of some floating 10^-15 values 
                 row_match = False
                 break
         
@@ -1040,7 +1040,7 @@ def ss_predict():
     """
     ss_predict generates the solvent removal stability prediction for the selected MOF.
         Or it will return a ground truth if the MOF is in the thermal stability ANN training data.
-        Or it will return an signal that descriptor generation failed and thus a prediction cannot be made. 
+        Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
     Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
 
@@ -1180,7 +1180,7 @@ def ts_predict():
     """
     ts_predict generates the thermal stability prediction for the selected MOF.
         Or it will return a ground truth if the MOF is in the thermal stability ANN training data.
-        Or it will return an signal that descriptor generation failed and thus a prediction cannot be made. 
+        Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
     Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
 
@@ -1452,7 +1452,7 @@ def plot_thermal_stability():
     # Grab data
     info = json.loads(flask.request.get_data()) 
     my_data = info['temperature'] # this is the current MOF's predicted thermal breakdown temperature
-    my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
+    my_data = my_data[:-3] # getting rid of the Celsius symbol, left with just the number
     my_data = float(my_data)
 
     # Getting the temperature data
@@ -1478,7 +1478,7 @@ def plot_thermal_stability():
     ax.set_xlabel('Breakdown temperature (°C)')
     ax.set_ylabel('Frequency in the training data')
 
-    # The title of the plot differs slightly depending on if the selected MOF is in the traiining data or not.
+    # The title of the plot differs slightly depending on if the selected MOF is in the training data or not.
     if info['prediction']: # MOF wasn't in training data, and its ANN predicted breakdown temperature is used.
         ax.set_title('Current MOF\'s predicted breakdown temperature relative to others')
     else: # MOF was in the training data, and its reported breakdown temperature is used.
@@ -1500,7 +1500,7 @@ def thermal_stability_percentile():
 
     # Grab data.
     my_data = json.loads(flask.request.get_data()) # this is the current MOF's predicted thermal breakdown temperature
-    my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
+    my_data = my_data[:-3] # getting rid of the Celsius symbol, left with just the number
     my_data = float(my_data)
 
     # Getting the temperature data.
@@ -1623,7 +1623,7 @@ def TGA_plot():
 def get_components():
     """
     get_components uses Aditya's MOF code to get components (linkers and sbus).
-    It returns a dictionary with the linker and sbu xyz files's text, along with information about the number of linkers and sbus.
+    It returns a dictionary with the linker and sbu xyz files' text, along with information about the number of linkers and sbus.
     The dictionary also contains the SMILES string for each of the linkers and sbus.
 
     :return: str json_object, encodes a dictionary. The dictionary contains the xyz file geometry information for each component, 

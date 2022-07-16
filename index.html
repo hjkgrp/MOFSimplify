@@ -4,7 +4,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 -->
 
 
-<!-- Import NGL, webGavrog, and Bootstrap libaries-->
+<!-- Import NGL, webGavrog, and Bootstrap libraries-->
 <script src="libraries/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="libraries/ngl.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/runtime.js"></script>
@@ -1605,7 +1605,7 @@ rel="stylesheet" type="text/css" />
             }
             else { // requested MOF was in the training data
 
-              // Storing information indicating that a prediction was made, but no neighbors are avaialable
+              // Storing information indicating that a prediction was made, but no neighbors are available
               document.getElementById('solvent_neighbors_holder').value = 1
 
               stability_field = document.getElementById('solvent_stability_prediction');
@@ -1780,7 +1780,7 @@ function setColor(element, color) {
             }
 
             else { // requested MOF was in the training data
-              // Storing information indicating that a prediction was made, but no neighbors are avaialable
+              // Storing information indicating that a prediction was made, but no neighbors are available
               document.getElementById('thermal_neighbors_holder').value = 1
 
               $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
@@ -1844,7 +1844,7 @@ function setColor(element, color) {
         return;
       }
       else if (my_sbu === '') {
-        alert("Must choose an sbu building block first.");
+        alert("Must choose a sbu building block first.");
         return;
       }
       else if (my_net === '') {
@@ -2579,7 +2579,7 @@ function setColor(element, color) {
           document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: '
           + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
           + '<br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
-            + response['doi'] // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+            + response['doi'] // <br /> for a new line in display. &#8451 is degrees Celsius in decimal
             + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
             + '&#8451';
             $('#thermal_neighbor_form').show()
@@ -3116,7 +3116,7 @@ function setColor(element, color) {
         console.log(response)
       })
 
-    // On start up, hide certain sections
+    // On startup, hide certain sections
     $('#pills-comp').hide()
     $('#pills-example').hide()
     $('#pills-bb').hide()

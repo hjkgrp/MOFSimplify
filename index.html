@@ -1161,6 +1161,17 @@ rel="stylesheet" type="text/css" />
   // ***** End of section with a lot of copied code. *****
 
 
+  // set default options that each ajax request will use
+  $.ajaxSetup({
+      type: "POST",
+      data: {},
+      dataType: 'json',
+      xhrFields: {
+         withCredentials: true
+      },
+      crossDomain: true
+  });
+
   // tags for changing the selection button colors, depending on if an operation is successfully completed or not
   failure_red = '#A33B20';
   success_green = '#18bc9c';
@@ -3108,12 +3119,6 @@ function setColor(element, color) {
 
         // In addition, populating the CSD MOF options for the Example MOF loading
         document.getElementById('MOFs_list').innerHTML = option_generator(my_MOFs); // populating the MOFs dropdown
-      })
-
-    $.get("/new_user").done(
-      function (response) {
-        // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
-        console.log(response)
       })
 
     // On startup, hide certain sections

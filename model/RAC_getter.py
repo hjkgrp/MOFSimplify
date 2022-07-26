@@ -8,17 +8,12 @@ def main():
 	name = sys.argv[2] # name of the MOF
 	RACs_folder = sys.argv[3]
 
-	print('RAC_getter debug')
-	print(cif_folder)
-	print(name)
-	print(RACs_folder)
-
 	# result log
 	f = open(RACs_folder + 'RAC_getter_log.txt', 'w')
 
 	try:
-		full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
 		# makes the linkers and sbus folders
+		full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif', 3, path = RACs_folder, xyzpath = RACs_folder + name + '.xyz');
 	except ValueError:
 		f.write('FAILED')
 		f.close()

@@ -146,7 +146,8 @@ def change_permission():
     """
     change_permission adjusts whether or not MOFSimplify stores information on the MOFs the user predicts on.
 
-    If the user clicks "No" before get_lists() finishes running on the website's startup in the browser, their input will not register for the session.
+    If the user clicks "Yes" or "No" before get_lists() finishes running upon the website's startup in the browser (~4 seconds), their "Yes" or "No" input will not register for the session and will register for another session (the most recently started one) instead.
+    TODO perhaps adjust for this down the line. Show the Yes and No options only after the user has a MOF queued up.
 
     :return: string, The boolean sent from the front end. We return this because we have to return something, but nothing is done with the returned value on the front end.
     """
@@ -1113,7 +1114,7 @@ def ss_predict():
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
     ### Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before. 
-    # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?  
+    # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify # The MOFSimplify collection in the history database.

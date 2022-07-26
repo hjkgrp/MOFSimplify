@@ -1039,10 +1039,10 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 def ss_predict():
     """
     ss_predict generates the solvent removal stability prediction for the selected MOF.
-        Or it will return a ground truth if the MOF is in the thermal stability ANN training data.
+        Or it will return a ground truth if the MOF is in the solvent stability ANN training data.
         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
-    Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
+    Then, Aditya's model is applied to make a prediction using run_solvent_ANN.
 
     If the structure is already in our history.MOFSimplify collection, we use information from the database to speed things up.
 

@@ -623,12 +623,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
 
     df_train = standard_labels(df_train, key="flag")
 
-    ### The normalize_data_solvent function is expecting a DataFrame with each MOF in a separate row, and features in columns
-    ### At this location, use get_MOF_descriptors to get features
-        # Look at the files that are generated: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
-    ### Then store those features in a usable form (df)
-    ### Need to merge with geometry features from Zeo++
-        # done in app.py
+    # The normalize_data_solvent function is expecting a DataFrame with each MOF in a separate row, and features in columns
 
     ### Utilize the function below to normalize the RACs + geos of the new MOF
     # newMOF refers to the MOF that has been uploaded to MOFSimplify, for which a prediction will be generated
@@ -886,6 +881,9 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 
         timeStarted = time.time() # save start time (debugging)
 
+        # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
+            # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
+
         cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
         cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
         cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
@@ -975,7 +973,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 
         timeStarted = time.time() # save start time
 
-        # Merging geometric information with get_MOF_descriptors files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+        # Merging geometric information with the RAC information that is in the get_MOF_descriptors-generated files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
         try:
             lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
             sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")

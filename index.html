@@ -961,7 +961,7 @@ rel="stylesheet" type="text/css" />
 
       // grab the current solvent neighbor MOF cif file
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('CoRE2019/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
@@ -1705,7 +1705,7 @@ function setColor(element, color) {
               thermal_pred_color = failure_red;
               $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
               $('#thermal_stability_prediction').text('')
-              return; // Do not update solvent removal stability prediction if prediction failed.
+              return; // Do not update thermal stability prediction if prediction failed.
             }
 
             $('#thermal_form').show()
@@ -2573,7 +2573,7 @@ function setColor(element, color) {
         return;
       }
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Get the latent space distance from the information returned from the prediction.
@@ -2624,7 +2624,7 @@ function setColor(element, color) {
         return;
       }
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Making the txt file with information about the neighbor

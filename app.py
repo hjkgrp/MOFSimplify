@@ -933,7 +933,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
                 for i, row in enumerate(surface_area_data):
                     if i == 0:
                         unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                        crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
+                        crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
                         VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                         GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
             with open(zeo_folder + name + '_pov.txt') as f:
@@ -954,7 +954,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
                   '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
             return 'FAILED'
         geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
-                    'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
+                    'rho': density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
                     'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
         dict_list.append(geo_dict)
         geo_df = pd.DataFrame(dict_list)

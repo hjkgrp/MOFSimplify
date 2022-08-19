@@ -1161,17 +1161,6 @@ rel="stylesheet" type="text/css" />
   // ***** End of section with a lot of copied code. *****
 
 
-  // set default options that each ajax request will use
-  $.ajaxSetup({
-      type: "POST",
-      data: {},
-      dataType: 'json',
-      xhrFields: {
-         withCredentials: true
-      },
-      crossDomain: true
-  });
-
   // tags for changing the selection button colors, depending on if an operation is successfully completed or not
   failure_red = '#A33B20';
   success_green = '#18bc9c';
@@ -2100,7 +2089,10 @@ function setColor(element, color) {
             }
 
             // Storing the linker and sbu data.
+            console.log('setting the components_holder value')
+            console.log(result)
             document.getElementById('components_holder').value = result;
+            console.log(document.getElementById('components_holder').value)
 
             $('#comp_MOF').text('MOF for which components are listed below: ' + name)
 

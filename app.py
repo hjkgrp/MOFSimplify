@@ -26,7 +26,7 @@ from flask import request, session
 # import flask_login
 # from flask_login import LoginManager, UserMixin, login_required, current_user
 from molSimplify.Informatics.MOF.MOF_descriptors import get_primitive, get_MOF_descriptors
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from datetime import datetime
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
@@ -130,7 +130,6 @@ def set_ID():
     return str(session['ID']) # return a string
 
 @app.route('/get_ID', methods=['GET'])
-@cross_origin(supports_credentials=True)
 def get_ID():
     """
     get_ID gets the session user ID. 
@@ -141,7 +140,6 @@ def get_ID():
     return str(session['ID']) # return a string
 
 @app.route('/permission', methods=['POST'])
-@cross_origin(supports_credentials=True)
 def change_permission():
     """
     change_permission adjusts whether or not MOFSimplify stores information on the MOFs the user predicts on.
@@ -161,7 +159,6 @@ def change_permission():
     return str(permission)
 
 @app.route('/list_getter', methods=['GET'])
-@cross_origin(supports_credentials=True)
 def get_lists():
     """
     get_lists gets the dropdown lists. 
@@ -176,28 +173,23 @@ def get_lists():
 
 # The send_from_directory functions that follow provide images from the MOFSimplify server to the website. The images are in a folder called images.
 @app.route('/TGA_graphic.png')
-@cross_origin(supports_credentials=True)
 def serve_TGA_graphic():
     return flask.send_from_directory('images', 'TGA_graphic.png')
 
 @app.route('/banner_light')
-@cross_origin(supports_credentials=True)
 def serve_banner_light():
     return flask.send_from_directory('images', 'MOF_light.webp') # Google's webp format. It is optimized for websites and loads quickly.
 
 @app.route('/banner_dark')
-@cross_origin(supports_credentials=True)
 def serve_banner_dark():
     return flask.send_from_directory('images', 'MOF_dark.webp') # Google's webp format. It is optimized for websites and loads quickly.
 
 @app.route('/MOF_logo.png')
-@cross_origin(supports_credentials=True)
 def serve_MOFSimplify_logo():
     return flask.send_from_directory('images', 'MOF_logo.png')
 
 ## Handle feedback
 @app.route('/process_feedback', methods=['POST'])
-@cross_origin(supports_credentials=True)
 def process_feedback():
     """
     process_feedback inserts MOFSimplify form feedback into the MongoDB feedback database. 
@@ -251,7 +243,6 @@ def process_feedback():
 
 ## Handle removal request
 @app.route('/process_removal', methods=['POST'])
-@cross_origin(supports_credentials=True)
 def process_removal():
     """
     process_removal emails mofsimplify@mit.edu when the removal form is filled out.
@@ -287,7 +278,6 @@ def process_removal():
 ## Splash page management. Splash page is currently disabled.
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/<path:path>', methods=['GET', 'POST'])
-@cross_origin(supports_credentials=True)
 def index(path='index.html'):
   if request.method == 'POST':
     username = 'user1'
@@ -312,7 +302,6 @@ def index(path='index.html'):
   return flask.send_from_directory('.', 'index.html')
 
 @app.route('/mof_examples/<path:path>') # needed for fetch
-@cross_origin(supports_credentials=True)
 def serve_example(path):
     """
     serve_example returns a file to MOFSimplify.
@@ -325,7 +314,6 @@ def serve_example(path):
     return flask.send_from_directory('mof_examples', path)
 
 @app.route('/how_to_cite.html')
-@cross_origin(supports_credentials=True)
 def serve_cite():
     """
     serve_cite serves the how to cite page.
@@ -336,7 +324,6 @@ def serve_cite():
     return flask.send_from_directory('.', 'how_to_cite.html')
 
 @app.route('/libraries/<path:path>')
-@cross_origin(supports_credentials=True)
 def serve_library_files(path):
     """
     serve_library_files returns a file to MOFSimplify.
@@ -348,7 +335,6 @@ def serve_library_files(path):
     return flask.send_from_directory('libraries', path)
 
 @app.route('/list_content/<path:path>')
-@cross_origin(supports_credentials=True)
 def serve_list_files(path):
     """
     serve_list_files returns a file to MOFSimplify.
@@ -360,7 +346,6 @@ def serve_list_files(path):
     return flask.send_from_directory('list_content', path)
 
 @app.route('/bbcif/<path:path>')
-@cross_origin(supports_credentials=True)
 def serve_bbcif(path):
     """
     serve_bbcif returns a file to MOFSimplify.
@@ -377,7 +362,6 @@ def serve_bbcif(path):
     return flask.send_from_directory('temp_file_creation_' + user_ID + '/tobacco_3.0/output_cifs', cif_name);
 
 @app.route('/CoRE2019/<path:path>') # needed for fetch
-@cross_origin(supports_credentials=True)
 def serve_CoRE_MOF(path):
     """
     serve_CoRE_MOF returns a file to MOFSimplify.
@@ -389,7 +373,6 @@ def serve_CoRE_MOF(path):
     return flask.send_from_directory('CoRE2019', path)
 
 @app.route('/ris_files/MOFSimplify_citation.ris')
-@cross_origin(supports_credentials=True)
 def serve_ris():
     """
     serve_bbcif returns a file to MOFSimplify.
@@ -425,7 +408,6 @@ def file_age_in_seconds(pathname):
     return time.time() - os.stat(pathname)[stat.ST_MTIME] # time since last modification
 
 @app.route('/curr_users', methods=['GET'])
-@cross_origin(supports_credentials=True)
 def curr_num_users():
     """
     curr_num_users returns the current number of users on MOFSimplify.
@@ -447,7 +429,6 @@ def curr_num_users():
     return str(sum+1)
 
 @app.route('/get_bb_generated_MOF', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def bb_generate():
     """
     bb_generated generates a MOF using the building blocks and net specified by the user. 
@@ -1059,7 +1040,6 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 ##### Note: the h5 model for the solvent removal stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14). #####
 
 @app.route('/predict_solvent_stability', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def ss_predict():
     """
     ss_predict generates the solvent removal stability prediction for the selected MOF.
@@ -1202,7 +1182,6 @@ def ss_predict():
     return results
 
 @app.route('/predict_thermal_stability', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def ts_predict():
     """
     ts_predict generates the thermal stability prediction for the selected MOF.
@@ -1470,7 +1449,6 @@ def db_push_lite(structure, prediction_type):
     return ('', 204) # 204 no content response
 
 @app.route('/plot_thermal_stability', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def plot_thermal_stability():
     """
     plot_thermal_stability returns a plot of the distribution of thermal breakdown temperatures of the MOFs our ANN was trained on.
@@ -1520,7 +1498,6 @@ def plot_thermal_stability():
     return mpld3.fig_to_html(fig)
 
 @app.route('/thermal_stability_percentile', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def thermal_stability_percentile():
     """
     thermal_stability_percentile returns what percentile the thermal breakdown temperature (prediction or ground truth) of the selected MOF lies in
@@ -1584,7 +1561,6 @@ def seg_intersect(a1,a2, b1,b2) :
 ### End of helper functions for TGA_plot. ###
 
 @app.route('/TGA_plot', methods=['POST'])
-@cross_origin(supports_credentials=True)
 def TGA_plot():
     """
     TGA_plot makes the TGA plot for the current thermal ANN nearest neighbor.
@@ -1653,7 +1629,6 @@ def TGA_plot():
     return file_html(graph,CDN,'my plot')
 
 @app.route('/get_components', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def get_components():
     """
     get_components uses Aditya's MOF code to get components (linkers and sbus).
@@ -1889,7 +1864,6 @@ def get_components():
     return json_object
 
 @app.route('/solvent_neighbor_flag', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def is_stable():
     """
     is_stable returns the flag (i.e. the stability upon solvent removal, yes or no) and DOI of the neighbor sent over from the front end.
@@ -1920,7 +1894,6 @@ def is_stable():
     return myDict
 
 @app.route('/thermal_neighbor_T', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def breakdown_T():
     """
     breakdown_T returns the thermal breakdown temperature and DOI of the neighbor sent over from the front end.
@@ -1954,7 +1927,6 @@ def breakdown_T():
     return myDict
 
 @app.route('/neighbor_writer', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def neighbor_writer():
     """
     neighbor_writer writes information to a txt file about the selected latent space nearest neighbor.
@@ -2028,7 +2000,6 @@ def neighbor_writer():
     return myDict
 
 @app.route('/get_descriptors', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def descriptor_getter():
     """
     descriptor_getter returns the contents of the csv with the descriptors of the desired MOF.
@@ -2051,7 +2022,6 @@ def descriptor_getter():
     return contents
 
 @app.route('/get_TGA', methods=['POST']) 
-@cross_origin(supports_credentials=True)
 def TGA_getter():
     """
     TGA_getter returns the contents of the csv with the simplified TGA data of the desired MOF.

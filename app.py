@@ -857,15 +857,12 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 
         print('TIME CHECK 3')
 
-        # At this point, have the RAC featurization. Need geometry information next.
-
-        # Run Zeo++
-
         timeStarted = time.time() # save start time (debugging)
 
         # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
             # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
 
+        # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
         cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
         cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
         cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'

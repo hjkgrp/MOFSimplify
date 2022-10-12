@@ -77,6 +77,7 @@ dependencies = {'precision':precision,'recall':recall,'f1':f1}
 tf_session = tf.Session()
 from tensorflow import keras as tf_keras
 tf_keras.backend.set_session(tf_session)
+##### Note: the h5 models for the solvent removal stability prediction ANN and the thermal stability prediction ANN should be based on the same version of TensorFlow (here, 1.14). #####
 solvent_model = keras.models.load_model(solvent_ANN_path + 'final_model_flag_few_epochs.h5',custom_objects=dependencies)
 thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
 
@@ -1034,8 +1035,6 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 
     return myResult 
     
-##### Note: the h5 model for the solvent removal stability prediction and the thermal stability prediction should be trained on the same version of TensorFlow (here, 1.14). #####
-
 @app.route('/predict_solvent_stability', methods=['POST']) 
 def ss_predict():
     """

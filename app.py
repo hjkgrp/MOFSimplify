@@ -2132,13 +2132,14 @@ def filter_MOFs():
     # Grab data
     filter_dictionary = json.loads(flask.request.get_data()); # This dictionary contains the filters to apply.
 
-    print(f'filter_dictionary is {filter_dictionary}')
+    # print(f'filter_dictionary is {filter_dictionary}')
 
     inorg_node_filter = filter_dictionary['inorg_node']
     org_node_filter = filter_dictionary['org_node']
     edge_filter = filter_dictionary['edge']
     metal_filter = filter_dictionary['metal']
     category_filter = filter_dictionary['category']
+    net_filter = filter_dictionary['net']
 
     # Applying the category filter.
     if category_filter == 'Any' or len(category_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
@@ -2168,9 +2169,11 @@ def filter_MOFs():
         suitable_SBU_aliases = [bb_mapping[SBU] for SBU in suitable_SBUs]
 
         filtered_MOFs = [i for i in filtered_MOFs if any(j in i for j in suitable_SBU_aliases)] # See if any of the SBUs with the requested metal in it are in the assessed MOF i. If so, keep.
+    if net_filter != 'Any' and len(net_filter) != 0:
+        filtered_MOFs = [i for i in filtered_MOFs if f'net-{net_filter}_node1' in i]
 
     response_dict = {'filtered_MOFs': filtered_MOFs} # List is not a valid return type, but dictionary is.
-    print(f'response_dict is {response_dict}')
+    # print(f'response_dict is {response_dict}')
     # TODO account for MOF stability. Ask Aditya; solvent stability over 0.5? Thermal stability one stdev above average?
 
     return response_dict
@@ -2192,6 +2195,46 @@ def category_determination(MOF_name):
         raise Exception('CIF name is unexpected. Not in any of the MOF lists.')
 
     return category
+
+@app.route('/data_pull', methods=['POST'])
+def grab_data():
+    """
+    grab_data returns a dictionary of information on the MOF whose name is sent from the front end.
+
+    :return: dict data_dict, TODO.
+    """
+
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is the MOF about which to gather data.    
+    category = category_determination(name + '.cif')
+    if category == '1inorganic_1edge':
+        category_abbrev = '1inor_1edge'
+    elif category == '1inorganic_1organic_1edge':
+        category_abbrev = '1inor_1org_1edge'
+    elif category == '2inorganic_1edge':
+        category_abbrev = '2inor_1edge'
+
+    df = pd.read_csv(f'stable_building_blocks/predictions/{category_abbrev}_predictions.csv')
+    adjusted_name = name.replace('optimized_', '') + '.cif' # To match the format of entries in the predictions excel files.
+
+    try:
+        desired_row = df[df['filename'] == adjusted_name]
+        predicted_solvent_removal_stability = desired_row['predicted_solvent_removal_stability'].iloc[0]
+        predicted_thermal_stability = desired_row['predicted_thermal_stability'].iloc[0]
+
+        # Reducing decimal places. 2 for solvent removal stability, 1 for thermal stability.
+        predicted_solvent_removal_stability = predicted_solvent_removal_stability.round(2)
+        predicted_thermal_stability = predicted_thermal_stability.round(1)
+
+    except IndexError: # adjusted_name is not present in the CSV
+        predicted_solvent_removal_stability = None
+        predicted_thermal_stability = None
+
+    data_dict = {'solvent_removal_stability': predicted_solvent_removal_stability, 'thermal_stability': predicted_thermal_stability}
+    print(data_dict)
+
+    return data_dict
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

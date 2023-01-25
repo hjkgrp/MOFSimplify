@@ -66,7 +66,7 @@
     <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
       <ul class="navbar-nav">
           <li class="nav-item" style='padding-left: 30px;'>
-            <a class="nav-link" href="building_blocks.html">Stable SBUs</a>
+            <a class="nav-link" href="stable_building_blocks.html">Stable SBUs</a>
           </li>            
           <li class="nav-item" style='padding-left: 30px;'>
             <a class="nav-link" href="how_to_cite.html">How to Cite</a>
@@ -88,7 +88,8 @@
 
     <h3> Select building blocks from our hypothetical MOF database here! </h3>
 
-    Naming for the building blocks (inorganic node, organic node, edge) reflects the CoRE MOF from which the building block was taken.
+    Naming for the building blocks (inorganic node, organic node, edge) reflects the CoRE MOF from which the building block was taken.<br>
+    Data is from the <a href='https://zenodo.org/record/7091192'>Zenodo repository</a> associated with <a href='https://arxiv.org/abs/2210.14191'>this paper</a>.
 
     <h4 style='margin-top: 1cm; font-weight: bold;'>Choose filters</h4>
 
@@ -105,6 +106,19 @@
           <option value="2, 0, 1">2, 0, 1</option>          
         </select>
       </div>
+    </div>
+
+    <!-- Option to filter building blocks by net -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Filter by net
+      </div>
+      <div class='col-lg-8'>
+        <input autocomplete="off" id='net_option' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="Any" list='net_list' onmousedown="value = '';" />
+      </div>
+      <datalist id='net_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>  
     </div>
 
     <!-- Option to filter building blocks by metal -->
@@ -217,8 +231,10 @@
       <button style='display:inline-block; width:50%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF' type='button'>Download selected MOF</button>
     </div>
 
-    TODO display stats on selected MOF here
-    TODO predicted breakdown T and solvent removal stability. Also if available: mechanical properties, and adsorption 
+    <p id='selected_MOF_data' style='text-align:left; margin-top: 0.5cm;'>
+    </p>
+
+    TODO display if available: mechanical properties, and adsorption; have the nearest medoid for unstable? Or maybe just restrict whole thing to ultrastable (> 0.5, >359+87)
 
   </div>
 
@@ -250,6 +266,9 @@
   data = {};  
 
   // Hardcoding these lists based on https://zenodo.org/record/7091192
+  // TODO if restrict only to ultrastable MOFs, can delete some entries of some of these lists
+
+  nets = ['acs', 'acs-a', 'acs-f', 'acs-g', 'acs-h', 'acs-i', 'afi', 'afw', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'ant', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcs-a', 'bcu', 'bcu-b', 'bcu-f', 'bcu-g', 'bcu-h', 'bcu-i', 'bcu-j', 'bcu-k', 'bcu-l', 'bmn', 'bnn', 'bor-e', 'bpr', 'bsn', 'bto', 'bva', 'bwt', 'cab', 'cag', 'can', 'cbo', 'cdl', 'cds', 'cds-f', 'cdt', 'cha', 'cml', 'cor', 'crb', 'crr', 'crs', 'crs-a', 'csq', 'ctn', 'ctn-e', 'dag', 'deh', 'dei', 'dft', 'dia', 'dia-a', 'dia-f', 'dia-g', 'dia-j', 'dmp', 'ecb', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'est', 'eta', 'eta-c', 'etb', 'etd', 'etf', 'fau', 'fca', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fcx', 'fda', 'fdc', 'fee', 'fgl', 'flu-e', 'fna', 'fnc', 'fnd', 'fne', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fny', 'fnz', 'fob', 'fst', 'ftb', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'icc', 'ict', 'ilc', 'irl', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llj', 'llk', 'lll', 'loh', 'lon', 'lta', 'lvt', 'lvt-a', 'mdf', 'mer', 'mmt', 'mok', 'mon', 'msp', 'msw', 'myd', 'nbo', 'nbo-a', 'nbo-h', 'ncb', 'neb', 'nfa', 'nfb', 'nfc', 'nia', 'nia-e', 'nom', 'noo', 'nov', 'noy', 'noz', 'npo', 'ocu', 'ocu-e', 'ofo', 'ooa', 'oob', 'oof', 'osc', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pts-e', 'pyc', 'pyr', 'pyr-e', 'qdl', 'qtz', 'qtz-a', 'qtz-e', 'qtz-f', 'qtz-g', 'qtz-h', 'qtz-x', 'qzd', 'rac', 'reo', 'reo-e', 'rgd', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sev', 'sgn', 'sin', 'sit', 'skb', 'skc', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smi', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smt', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'soe', 'sof', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'sqp', 'sra', 'srs', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'ssc', 'sst', 'sth', 'sva', 'svb', 'svc', 'sve', 'svf', 'svh', 'svi', 'svj', 'svk', 'svm', 'svo', 'svv', 'svx', 'svy', 'svz', 'swa', 'swd', 'swe', 'swf', 'swi', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxk', 'sxm', 'sxp', 'sxq', 'sxt', 'tbo', 'teo', 'tes', 'tfs', 'the', 'thp-x', 'ths', 'toc-e', 'tph', 'tsi', 'tsx', 'ttw', 'twf-e', 'twt', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vbx', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vcp', 'vcq', 'vcr', 'vcu', 'vda', 'vdb', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgw', 'wgz', 'whb', 'whc', 'whd', 'whe', 'whh', 'whj', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wif', 'wig', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkh', 'wkj', 'wkl', 'wko', 'wkp', 'wkq', 'wkr', 'wkt', 'wku', 'wkw', 'wkx', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmb', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmx', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wng', 'wnh', 'wni', 'wnj', 'wnm', 'wnn', 'wno', 'wnr', 'wns', 'wnt', 'wnx', 'wny', 'wnz', 'wse', 'wuy', 'xbj', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfk', 'xfp', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'yfa', 'yfb', 'yfc', 'yfd', 'yff', 'yfg', 'yfh', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfx', 'yfy', 'yfz', 'yyz', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
 
   metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Hf', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Na', 'Nd', 'Pr', 'Sc', 'Sm', 'Sr', 'Tb', 'U', 'Zn', 'Zr']
 
@@ -313,39 +332,20 @@
     }
   });
 
-  // When the "Filter by inorganic node" field is clicked
-  $('#inorg_node_option').click(function () {
-    $('#inorg_node_option').change() // Trigger a change event
-      // I force trigger a change event in case the user clicks off the input element without selecting anything, in which case 'Any' will be selected.
-  })
-
-  // When the "Filter by organic node" field is clicked
-  $('#org_node_option').click(function () {
-    $('#org_node_option').change() // Trigger a change event
-  })
-
-  // When the "Filter by edge" field is clicked
-  $('#edge_option').click(function () {
-    $('#edge_option').change() // Trigger a change event
-  })
-
-  // When the "Filter by metal" field is clicked
-  $('#metal_option').click(function () {
-    $('#metal_option').change() // Trigger a change event
-  })
-
-  // When any filter is changed
-  $('.filter_option').change(function () {
+  // When any filter is clicked or changed
+  $('.filter_option').on("click change", function () {
     component_viewer.clear(); // clear any building block visualization
-    console.log('Filter change hit!')
     $('#stable_MOF_option').mousedown() // clear the stable MOF option section
+    $('#selected_MOF_data').hide()
     recolor("Reset")
 
     filter_dictionary = { 'inorg_node': $('#inorg_node_option').val(), 
     'org_node': $('#org_node_option').val(), 
     'edge': $('#edge_option').val(), 
     'metal': $('#metal_option').val(), 
-    'category': $('#category_option').val()} // TODO expand this later to include net?
+    'category': $('#category_option').val(),
+    'net': $('#net_option').val()
+  } 
 
     $.post("/filter_MOFs", JSON.stringify(filter_dictionary)).done(
       function (response) {
@@ -521,16 +521,40 @@
     else {
       selected_MOF = $('#stable_MOF_option').val()
 
-      window.location = 'stable_building_blocks/' + selected_MOF + '.cif'; // download cif file
+      window.location = 'stable_building_blocks/' + selected_MOF + '.cif'; // download cif file. See serve_stable_MOF in app.py
 
-
-      // $.post("/get_category", JSON.stringify(selected_MOF)).done(
-      //   function (response) {
-      //     MOF_category = response
-      //     console.log(response)
-      //     console.log(selected_MOF)
-      //   })
     }
+  })
+
+  // This function is called when a new stable MOF is selected in the "Select a stable MOF" dropdown.
+  // Displays information on the selected MOF.
+  $('#stable_MOF_option').on("click change", function (){ // Triggered by either a click or a change.
+    if ($('#stable_MOF_option').val() === ''){ // No MOF selected.
+      $('#selected_MOF_data').hide()
+      return // exit function
+    }
+    else {
+      $('#selected_MOF_data').show() 
+    }
+
+    MOF_name = $('#stable_MOF_option').val()
+    // Getting data on the selected MOF from the backend.
+    $.post("/data_pull", JSON.stringify(MOF_name)).done(
+      function (response) {
+        solvent_prediction = response['solvent_removal_stability']
+        thermal_prediction = response['thermal_stability']
+
+        if (solvent_prediction == null && thermal_prediction == null) {
+          return // exit the function
+        } else {
+          // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+          data_on_MOF = "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
+          + "The thermal stability prediction for the selected MOF is " + thermal_prediction + "&#8451."
+        }
+
+        document.getElementById('selected_MOF_data').innerHTML = data_on_MOF
+      })
+
   })
 
   // When the "Dark mode" button is clicked:
@@ -590,6 +614,9 @@
 
   // Populating dropdowns in this next section
 
+  // Populating the net dropdown
+  document.getElementById('net_list').innerHTML = option_generator(nets);
+
   // Populating the metal dropdown
   document.getElementById('metal_list').innerHTML = option_generator(metals);
 
@@ -604,6 +631,7 @@
 
   // The code below runs when this webpage is opened.
   $('#category_option').val("Any") // Setting the default value
+  $('#net_option').val("Any") // Setting the default value
   $('#metal_option').val("Any") // Setting the default value
   $('#inorg_node_option').val("Any") // Setting the default value
   $('#org_node_option').val("Any") // Setting the default value

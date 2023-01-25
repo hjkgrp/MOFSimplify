@@ -17,6 +17,7 @@ import json
 import smtplib
 import glob
 import uuid
+import pickle as pkl
 from sklearn.metrics import pairwise_distances
 from bokeh.plotting import figure
 from bokeh.resources import CDN
@@ -81,7 +82,7 @@ solvent_model = keras.models.load_model(solvent_ANN_path + 'final_model_flag_few
 thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
 
 
-# global variable dictionary for stable building block aliases
+# global variable dictionary for stable building block aliases. See https://zenodo.org/record/7091192
 bb_mapping = {'XUDNAN_clean_linker_2': 'E0', 'MIFKUJ_clean_linker_0': 'E1', 'AJUNOK_clean_linker_0': 'E2', 'OJICUG_clean_linker_0': 'E3',
  'FUNLAD_clean_linker_1': 'E4', 'CIFDUS_clean_linker_0': 'E5', 'EYOCIG_clean_linker_4': 'E6', 'TEMPAE_clean_linker_10': 'E7',
  'KIFKEQ_clean_linker_1': 'E8', 'FUNLAD_clean_linker_0': 'E9', 'EZIPEK_clean_linker_0': 'E10', 'UKIBIB_clean_linker_0': 'E11',
@@ -116,6 +117,14 @@ bb_mapping = {'XUDNAN_clean_linker_2': 'E0', 'MIFKUJ_clean_linker_0': 'E1', 'AJU
  'TAGTUT_clean_sbu_1': 'N76', 'TAGTUT_clean_sbu_3': 'N77', 'TATPOV_clean_sbu_0': 'N78', 'UXUYUI_clean_sbu_0': 'N79',
  'VETTIZ_charged_sbu_0': 'N80', 'VOLQOD_clean_sbu_1': 'N81', 'WAQDOJ_charged_sbu_0': 'N82', 'WUSLED_clean_sbu_0': 'N83',
  'XADDAJ01_clean_sbu_3': 'N84', 'XOMCOT_clean_sbu_0': 'N85', 'XOMCOT_clean_sbu_1': 'N86', 'XUDNAN_clean_sbu_1': 'N87'}
+
+# Loading the names of possible ultrastable MOFs
+with open('pickle_files/1inorganic_1edge_cifs_list.pkl', 'rb') as f:
+    list_1inorganic_1edge_MOFs = pkl.load(f)
+with open('pickle_files/1inorganic_1organic_1edge_cifs_list.pkl', 'rb') as f:
+    list_1inorganic_1organic_1edge_MOFs = pkl.load(f)
+with open('pickle_files/2inorganic_1edge_cifs_list.pkl', 'rb') as f:
+    list_2inorganic_1edge_MOFs = pkl.load(f)
 
 def conditional_diminish(counter):
     """
@@ -412,7 +421,7 @@ def serve_CoRE_MOF(path):
     """ 
     return flask.send_from_directory('CoRE2019', path)
 
-@app.route('/stable_MOFs/<path:path>')
+@app.route('/stable_building_blocks/<path:path>')
 def serve_stable_MOF(path):
     """
     serve_stable_MOF returns a file to MOFSimplify.
@@ -421,7 +430,10 @@ def serve_stable_MOF(path):
     :param path: The path to the desired MOF in the stable_MOFs folder.
     :return: The cif file for the stable MOF.
     """ 
-    return flask.send_from_directory(f'stable_MOFs/{path}', path + '.cif')
+
+    MOF_category = category_determination(path)
+
+    return flask.send_from_directory(f'stable_building_blocks/optimized_structures/{MOF_category}', path)
 
 @app.route('/ris_files/MOFSimplify_citation.ris')
 def serve_ris():
@@ -2103,7 +2115,7 @@ def stable_bb_getter():
     # Grab data
     name = json.loads(flask.request.get_data()); # This is the building block to get.
 
-    bb_file = open(MOFSIMPLIFY_PATH + 'stable_building_blocks/bbs/' + name + '.xyz', 'r');
+    bb_file = open(MOFSIMPLIFY_PATH + 'stable_building_blocks/building_blocks/' + name + '.xyz', 'r');
     bb_info = bb_file.read();
     bb_file.close();
 
@@ -2122,24 +2134,64 @@ def filter_MOFs():
 
     print(f'filter_dictionary is {filter_dictionary}')
 
-    stable_MOFs = filter_dictionary['stable_MOFs']
-    filtered_stable_MOFs = stable_MOFs.copy()
-
     inorg_node_filter = filter_dictionary['inorg_node']
     org_node_filter = filter_dictionary['org_node']
     edge_filter = filter_dictionary['edge']
+    metal_filter = filter_dictionary['metal']
+    category_filter = filter_dictionary['category']
+
+    # Applying the category filter.
+    if category_filter == 'Any' or len(category_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+        MOF_list =  list_1inorganic_1edge_MOFs + list_1inorganic_1organic_1edge_MOFs + list_2inorganic_1edge_MOFs
+    elif category_filter == '1, 0, 1':
+        MOF_list = list_1inorganic_1edge_MOFs
+    elif category_filter == '1, 1, 1':
+        MOF_list = list_1inorganic_1organic_1edge_MOFs
+    elif category_filter == '2, 0, 1':
+        MOF_list = list_2inorganic_1edge_MOFs
+
+    MOF_list = [i.replace('.cif', '') for i in MOF_list] # Getting rid of '.cif' from each string.
+    filtered_MOFs = MOF_list.copy()
+
+    # Dictionary that indicates which SBUs contain which metals.
+    metal_dict = {'Gd': ['PORLAL_clean_sbu_0', 'MAKGOX_clean_sbu_0', 'INOVEN_clean_sbu_0', 'KUMBOL_clean_sbu_0', 'KUMBOL_clean_sbu_1'], 'Tb': ['MAKGUD_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'NUHQIS_clean_sbu_0', 'NUHQUE_clean_sbu_2', 'ZALLEG_clean_sbu_0', 'NUHRAL_clean_sbu_3', 'CUKXOW_clean_sbu_0', 'XUDNAN_clean_sbu_1', 'BETDIP_clean_sbu_0', 'XADDAJ01_clean_sbu_3', 'PAMTUU_clean_sbu_0'], 'Mn': ['BELTOD_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'CIFDUS_clean_sbu_1', 'ICIZOL_clean_sbu_0'], 'Dy': ['BETDEL_clean_sbu_0', 'PAMTOO_clean_sbu_0'], 'Co': ['CEKHIL_clean_sbu_0', 'JUFBIX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'BEQFEK_clean_sbu_0', 'OLANAS_clean_sbu_2', 'EBIMEJ_clean_sbu_0', 'KOZSID_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'OLANEW_clean_sbu_3', 'XOMCOT_clean_sbu_0', 'ICAMEG_clean_sbu_1', 'OLANEW_clean_sbu_0', 'LIZSOE_clean_sbu_0'], 'Nd': ['GEDQOX_clean_sbu_0'], 'U': ['WUSLED_clean_sbu_0'], 'Zn': ['QEWDON_clean_sbu_0', 'NAHDIM_clean_sbu_0', 'NAWXER_clean_sbu_0', 'NAHDIM_clean_sbu_2', 'FANWIC_clean_sbu_0', 'HICVOG_clean_sbu_0', 'TATPOV_clean_sbu_0', 'VOLQOD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'OLANAS_clean_sbu_1', 'FUNLAD_clean_sbu_0', 'UKALOJ_clean_sbu_0', 'MIFKUJ_clean_sbu_0'], 'Sm': ['BETFAJ_clean_sbu_0'], 'Eu': ['HISSIN_clean_sbu_1', 'HISSIN_clean_sbu_0', 'NUHQIS_clean_sbu_0', 'KUMJIN_clean_sbu_1', 'NUHQUE_clean_sbu_2', 'CUWYAW_clean_sbu_0', 'KUMJIN_clean_sbu_0', 'EYACOX_clean_sbu_1', 'EYACOX_clean_sbu_0', 'NUHRAL_clean_sbu_3', 'SARMOO_clean_sbu_0', 'IYUCEM_clean_sbu_0', 'EZIPEK_clean_sbu_0'], 'Mg': ['TAGTUT_clean_sbu_1', 'AZAVOO_clean_sbu_0', 'TAGTUT_clean_sbu_3', 'WAQDOJ_charged_sbu_0', 'LEVNOQ01_clean_sbu_1', 'EQERAU_clean_sbu_0', 'MUDLON_clean_sbu_0'], 'La': ['BETGAK_clean_sbu_0'], 'Fe': ['VETTIZ_charged_sbu_0', 'IZENUY_clean_sbu_0'], 'Na': ['OLANAS_clean_sbu_1'], 'Cd': ['AJUNOK_clean_sbu_0', 'OLANEW_clean_sbu_2', 'OLANEW_clean_sbu_3', 'QUQFOY_clean_sbu_3', 'QUQFOY_clean_sbu_1', 'OLANEW_clean_sbu_1', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_4'], 'Pr': ['BETFEN_clean_sbu_0'], 'Zr': ['ENOWUB_clean_sbu_0'], 'Hf': ['UKIBUN_clean_sbu_0'], 'Ho': ['BETDAH_clean_sbu_0'], 'Cu': ['BOTCEU_clean_sbu_0', 'ESEHIV_clean_sbu_0'], 'Sc': ['OJICUG_clean_sbu_0'], 'Sr': ['KAKCAD_clean_sbu_0'], 'Li': ['UXUYUI_clean_sbu_0'], 'In': ['GALJAG_clean_sbu_0']}
 
     # Applying the filters
-    if inorg_node_filter != 'All' and len(inorg_node_filter) != 0: # No filter applied in the 'All' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything   
-        filtered_stable_MOFs = [i for i in filtered_stable_MOFs if (bb_mapping[inorg_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
-    if org_node_filter != 'All' and len(org_node_filter) != 0:
-        filtered_stable_MOFs = [i for i in filtered_stable_MOFs if (bb_mapping[org_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
-    if edge_filter != 'All' and len(edge_filter) != 0:
-        filtered_stable_MOFs = [i for i in filtered_stable_MOFs if i.endswith(bb_mapping[edge_filter])]
+    if inorg_node_filter != 'Any' and len(inorg_node_filter) != 0: # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything   
+        filtered_MOFs = [i for i in filtered_MOFs if (bb_mapping[inorg_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
+    if org_node_filter != 'Any' and len(org_node_filter) != 0:
+        filtered_MOFs = [i for i in filtered_MOFs if (bb_mapping[org_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
+    if edge_filter != 'Any' and len(edge_filter) != 0:
+        filtered_MOFs = [i for i in filtered_MOFs if i.endswith(bb_mapping[edge_filter])]
+    if metal_filter != 'Any' and len(metal_filter) != 0:
+        suitable_SBUs = metal_dict[metal_filter]
+        suitable_SBU_aliases = [bb_mapping[SBU] for SBU in suitable_SBUs]
 
-    response_dict = {'filtered_stable_MOFs': filtered_stable_MOFs} # List is not a valid return type, but dictionary is.
+        filtered_MOFs = [i for i in filtered_MOFs if any(j in i for j in suitable_SBU_aliases)] # See if any of the SBUs with the requested metal in it are in the assessed MOF i. If so, keep.
+
+    response_dict = {'filtered_MOFs': filtered_MOFs} # List is not a valid return type, but dictionary is.
+    print(f'response_dict is {response_dict}')
+    # TODO account for MOF stability. Ask Aditya; solvent stability over 0.5? Thermal stability one stdev above average?
 
     return response_dict
+
+def category_determination(MOF_name):
+    """
+    category_determination returns a string indicating the type of the MOF passed from the front end. Either 1,0,1; 1,1,1; or 2,0,1 for #inorganic nodes, #organic nodes, #edges 
+
+    :param MOF_name: str, the name of the MOF for which the category will be ascertained.
+    :return: str category, the category of the MOF in question.
+    """
+    if MOF_name in list_1inorganic_1edge_MOFs:
+        category = '1inorganic_1edge'
+    elif MOF_name in list_1inorganic_1organic_1edge_MOFs:
+        category = '1inorganic_1organic_1edge'
+    elif MOF_name in list_2inorganic_1edge_MOFs:
+        category = '2inorganic_1edge'
+    else:
+        raise Exception('CIF name is unexpected. Not in any of the MOF lists.')
+
+    return category
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

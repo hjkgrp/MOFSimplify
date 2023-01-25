@@ -84,13 +84,13 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container zebra">
 
     <h3> Select building blocks from our hypothetical MOF database here! </h3>
 
     Naming for the building blocks (inorganic node, organic node, edge) reflects the CoRE MOF from which the building block was taken.
 
-    <h4 style='margin-top: 1cm; font-weight: bold;'>Apply filters</h4>
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Choose filters</h4>
 
     <!-- Option to filter MOFs by category -->
     <div class = 'row' style='margin-top: 0.5cm;'>
@@ -98,8 +98,8 @@
         Filter by category (number of inorganic nodes, number of organic nodes, number of edges)
       </div>
       <div class='col-lg-8'>
-        <select style='font-size: 22px;' class='form-control filter_option' id='category_filter'>
-          <option value="All">All</option>
+        <select style='font-size: 22px;' class='form-control filter_option' id='category_option' placeholder="Any" >
+          <option value="Any">Any</option>
           <option value="1, 0, 1">1, 0, 1</option>
           <option value="1, 1, 1">1, 1, 1</option>
           <option value="2, 0, 1">2, 0, 1</option>          
@@ -113,13 +113,11 @@
         Filter by metal
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" id='metal_filter' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="All" list='metal_list' onmousedown="value = '';" />
-        <datalist id='metal_list'>
-          <option value="All">
-          <option value="Fe">
-          <option value="Co">
-        </datalist>   
+        <input autocomplete="off" id='metal_option' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="Any" list='metal_list' onmousedown="value = '';" />
       </div>
+      <datalist id='metal_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>  
     </div>
 
     <!-- Selection box for the inorganic node -->
@@ -128,7 +126,7 @@
         Filter by inorganic node
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="inorg_node_option" class='form-control locksMetrics filter_option' placeholder="All" list='inorg_node_list'
+        <input autocomplete="off" style='font-size: 22px;' id="inorg_node_option" class='form-control locksMetrics filter_option' placeholder="Any" list='inorg_node_list'
         onmousedown="value = '';" />
       </div>
 
@@ -144,7 +142,7 @@
         Filter by organic node
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="org_node_option" class='form-control locksMetrics filter_option' placeholder="All" list='org_node_list'
+        <input autocomplete="off" style='font-size: 22px;' id="org_node_option" class='form-control locksMetrics filter_option' placeholder="Any" list='org_node_list'
         onmousedown="value = '';" />
       </div>
 
@@ -160,7 +158,7 @@
         Filter by edge
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="edge_option" class='form-control locksMetrics filter_option' placeholder="All" list='edge_list'
+        <input autocomplete="off" style='font-size: 22px;' id="edge_option" class='form-control locksMetrics filter_option' placeholder="Any" list='edge_list'
         onmousedown="value = '';" />
       </div>
 
@@ -220,6 +218,7 @@
     </div>
 
     TODO display stats on selected MOF here
+    TODO predicted breakdown T and solvent removal stability. Also if available: mechanical properties, and adsorption 
 
   </div>
 
@@ -250,8 +249,11 @@
   let component_viewer = $3Dmol.createViewer(element, config);
   data = {};  
 
-  // Hardcoding this in, based on the CSV Aditya gave me
-  inorg_nodes = ['All', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BELTOD_clean_sbu_0', 'BEQFEK_clean_sbu_0',
+  // Hardcoding these lists based on https://zenodo.org/record/7091192
+
+  metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Hf', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Na', 'Nd', 'Pr', 'Sc', 'Sm', 'Sr', 'Tb', 'U', 'Zn', 'Zr']
+
+  inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BELTOD_clean_sbu_0', 'BEQFEK_clean_sbu_0',
   'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0',
   'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'BOTCEU_clean_sbu_0', 'CEKHIL_clean_sbu_0',
   'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0',
@@ -274,8 +276,7 @@
   'VOLQOD_clean_sbu_1', 'WAQDOJ_charged_sbu_0', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3',
   'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'XUDNAN_clean_sbu_1', 'ZALLEG_clean_sbu_0']
 
-  // Hardcoding this in, based on the CSV Aditya gave me
-  org_nodes = ['All', 'APAZEY_clean_linker_0', 'AZAVOO_clean_linker_0',
+  org_nodes = ['Any', 'APAZEY_clean_linker_0', 'AZAVOO_clean_linker_0',
   'BELTOD_clean_linker_0', 'BEQFEK_clean_linker_11', 'BETDAH_clean_linker_0', 'BETDEL_clean_linker_0',
   'BETDIP_clean_linker_0', 'CEKHIL_clean_linker_0', 'CUKXOW_clean_linker_0', 'CUQRIR_clean_linker_1',
   'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IYUCEM_clean_linker_1',
@@ -285,21 +286,11 @@
   'QUQFOY_clean_linker_2', 'TATPOV_clean_linker_0', 'UFIREI_clean_linker_0', 'UWAGAB01_clean_linker_0',
   'VETTIZ_charged_linker_0', 'WOSHET_clean_linker_1']
 
-  // Hardcoding this in, based on the CSV Aditya gave me
-  edges = ['All', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
+  edges = ['Any', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
  'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1',
  'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10',
  'UKIBIB_clean_linker_0', 'UKIBUN_clean_linker_0', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0',
  'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
-
- // Hardcoding this in; TODO expand later
- stable_MOFs = ['MOF_net-ech_node1-N77_edge1-E11', 
- 'MOF_net-uod_node1-N18_edge1-E6',
- 'MOF_net-snz_node1-N46_edge1-E7',
- 'MOF_net-snz_node1-N46_edge1-E8',
- 'MOF_net-cha_node1-N4_edge1-E14', 
- 'MOF_net-snz_node1-N46_edge1-E9', 
- 'MOF_net-uod_node1-N18_edge1-E7']
 
   success_green = '#18bc9c';
   original_blue = '#2c3e50';
@@ -309,9 +300,9 @@
   edge_color = original_blue;
 
   // When the Filter by category selection is changed
-  $('#category_filter').change(function() {
-    category = $('#category_filter').val()
-    if (category === 'All') { // Organic nodes permitted, since no restriction of category.
+  $('#category_option').change(function() {
+    category = $('#category_option').val()
+    if (category === 'Any') { // Organic nodes permitted, since no restriction of category.
       $('.organic').show()
     }
     else if (category === '1, 1, 1') { // This category has an organic node
@@ -325,48 +316,44 @@
   // When the "Filter by inorganic node" field is clicked
   $('#inorg_node_option').click(function () {
     $('#inorg_node_option').change() // Trigger a change event
-      // I force trigger a change event in case the user clicks off the input element without selecting anything, in which case 'All' will be selected
-    // document.getElementById("inorg_node_option").value = 'All' // Default to 'All'
+      // I force trigger a change event in case the user clicks off the input element without selecting anything, in which case 'Any' will be selected.
   })
-
-  // $('#inorg_node_option').change(function () {
-  //   console.log('inorg node change!')
-  // })
 
   // When the "Filter by organic node" field is clicked
   $('#org_node_option').click(function () {
     $('#org_node_option').change() // Trigger a change event
-    // $('#org_node_option').val('All') // Default to 'All'
   })
 
   // When the "Filter by edge" field is clicked
   $('#edge_option').click(function () {
     $('#edge_option').change() // Trigger a change event
-    // $('#edge_option').val('All') // Default to 'All'
+  })
+
+  // When the "Filter by metal" field is clicked
+  $('#metal_option').click(function () {
+    $('#metal_option').change() // Trigger a change event
   })
 
   // When any filter is changed
-  $('.filter_option').click(function () {
+  $('.filter_option').change(function () {
     component_viewer.clear(); // clear any building block visualization
+    console.log('Filter change hit!')
+    $('#stable_MOF_option').mousedown() // clear the stable MOF option section
     recolor("Reset")
-  })
-
-  // When the "Filter by inorganic node" field is changed
-  $('#inorg_node_option').change(function () {
 
     filter_dictionary = { 'inorg_node': $('#inorg_node_option').val(), 
     'org_node': $('#org_node_option').val(), 
     'edge': $('#edge_option').val(), 
-    'stable_MOFs': stable_MOFs} // TODO expand this later to include net? metal?
+    'metal': $('#metal_option').val(), 
+    'category': $('#category_option').val()} // TODO expand this later to include net?
 
     $.post("/filter_MOFs", JSON.stringify(filter_dictionary)).done(
       function (response) {
-        filtered_stable_MOFs = response['filtered_stable_MOFs']
+        filtered_stable_MOFs = response['filtered_MOFs']
         document.getElementById('stable_MOF_list').innerHTML = option_generator(filtered_stable_MOFs)
       })
 
   })
-
 
   // Recolors the building block selection buttons based on the string `bb_type`
   function recolor(bb_type) {
@@ -403,7 +390,7 @@
   // When the "Inorganic node" button is clicked
   $('#toggle_inorg_node').click(function () {
     console.log($('#inorg_node_option').val())
-    if ($('#inorg_node_option').val() === 'All' || $('#inorg_node_option').val() === '') {
+    if ($('#inorg_node_option').val() === 'Any' || $('#inorg_node_option').val() === '') {
       // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
       alert('Must select a specific inorganic node for filtering, if you want to download and visualize an inorganic node')
     }
@@ -424,7 +411,7 @@
 
   // When the "Organic node" button is clicked
   $('#toggle_org_node').click(function () {
-    if ($('#org_node_option').val() === 'All' || $('#org_node_option').val() === '') {
+    if ($('#org_node_option').val() === 'Any' || $('#org_node_option').val() === '') {
       // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
       alert('Must select a specific organic node for filtering, if you want to download and visualize an organic node')
     }
@@ -445,7 +432,7 @@
 
   // When the "Edge" button is clicked
   $('#toggle_edge').click(function () {
-    if ($('#edge_option').val() === 'All' || $('#edge_option').val() === '') {
+    if ($('#edge_option').val() === 'Any' || $('#edge_option').val() === '') {
       // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
       alert('Must select a specific edge for filtering, if you want to download and visualize an edge')
     }
@@ -497,7 +484,7 @@
       download(bb_name + '.xyz', $('#bb_holder').val())
     }
     else {
-      alert('You must select a building block in order to download')
+      alert('You must select a building block in order to download.')
       return // Leave the function
     }
   })
@@ -505,12 +492,18 @@
   // This function is called when the "Visualize" button is clicked
   // Visualizes the building block structure
   $('#visualize_bb').click(function () {
-    $('#container-01-note').text('');
-    component_viewer.clear();
-    component_viewer.addModel($('#bb_holder').val(), "xyz"); // $('#bb_holder').val() contains the geometry
-    component_viewer.setStyle({}, { stick: { radius: 0.25 } });
-    component_viewer.zoomTo();
-    component_viewer.render();    
+    if (inorg_node_color === success_green || org_node_color === success_green || edge_color === success_green) { // A component has chosen in the filter section and has been indicated with the corresponding button press.
+      $('#container-01-note').text('');
+      component_viewer.clear();
+      component_viewer.addModel($('#bb_holder').val(), "xyz"); // $('#bb_holder').val() contains the geometry
+      component_viewer.setStyle({}, { stick: { radius: 0.25 } });
+      component_viewer.zoomTo();
+      component_viewer.render();  
+    }  
+    else {
+      alert('You must select a building block in order to visualize.')
+      return // Leave the function      
+    }
   })  
 
   // This function is called when the "Reset zoom" button is clicked
@@ -528,7 +521,15 @@
     else {
       selected_MOF = $('#stable_MOF_option').val()
 
-      window.location = '/stable_MOFs/' + selected_MOF; // download cif file from the stable_MOFs folder
+      window.location = 'stable_building_blocks/' + selected_MOF + '.cif'; // download cif file
+
+
+      // $.post("/get_category", JSON.stringify(selected_MOF)).done(
+      //   function (response) {
+      //     MOF_category = response
+      //     console.log(response)
+      //     console.log(selected_MOF)
+      //   })
     }
   })
 
@@ -589,6 +590,9 @@
 
   // Populating dropdowns in this next section
 
+  // Populating the metal dropdown
+  document.getElementById('metal_list').innerHTML = option_generator(metals);
+
   // Populating the inorganic node dropdown
   document.getElementById('inorg_node_list').innerHTML = option_generator(inorg_nodes);
 
@@ -598,13 +602,13 @@
   // Populating the edge dropdown
   document.getElementById('edge_list').innerHTML = option_generator(edges)
 
-  // Populating the MOF dropdown
-  document.getElementById('stable_MOF_list').innerHTML = option_generator(stable_MOFs)
-
   // The code below runs when this webpage is opened.
-  $('#category_filter').val("All") // Setting the default value
-  $('#inorg_node_option').val("All") // Setting the default value
-  $('#org_node_option').val("All") // Setting the default value
-  $('#edge_option').val("All") // Setting the default value
+  $('#category_option').val("Any") // Setting the default value
+  $('#metal_option').val("Any") // Setting the default value
+  $('#inorg_node_option').val("Any") // Setting the default value
+  $('#org_node_option').val("Any") // Setting the default value
+  $('#edge_option').val("Any") // Setting the default value
+
+  $('#metal_option').change() // Trigger a change event, in order to force execution of /filter_MOFs
 
 </script>

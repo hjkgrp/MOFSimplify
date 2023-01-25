@@ -2132,8 +2132,6 @@ def filter_MOFs():
     # Grab data
     filter_dictionary = json.loads(flask.request.get_data()); # This dictionary contains the filters to apply.
 
-    # print(f'filter_dictionary is {filter_dictionary}')
-
     inorg_node_filter = filter_dictionary['inorg_node']
     org_node_filter = filter_dictionary['org_node']
     edge_filter = filter_dictionary['edge']
@@ -2173,7 +2171,6 @@ def filter_MOFs():
         filtered_MOFs = [i for i in filtered_MOFs if f'net-{net_filter}_node1' in i]
 
     response_dict = {'filtered_MOFs': filtered_MOFs} # List is not a valid return type, but dictionary is.
-    # print(f'response_dict is {response_dict}')
     # TODO account for MOF stability. Ask Aditya; solvent stability over 0.5? Thermal stability one stdev above average?
 
     return response_dict
@@ -2201,7 +2198,7 @@ def grab_data():
     """
     grab_data returns a dictionary of information on the MOF whose name is sent from the front end.
 
-    :return: dict data_dict, TODO.
+    :return: dict data_dict, a dictionary with stability and uptake information on the selected MOF.
     """
 
     # Grab data
@@ -2214,6 +2211,7 @@ def grab_data():
     elif category == '2inorganic_1edge':
         category_abbrev = '2inor_1edge'
 
+    # First, getting ANN solvent removal and thermal stabilities
     df = pd.read_csv(f'stable_building_blocks/predictions/{category_abbrev}_predictions.csv')
     adjusted_name = name.replace('optimized_', '') + '.cif' # To match the format of entries in the predictions excel files.
 
@@ -2230,7 +2228,35 @@ def grab_data():
         predicted_solvent_removal_stability = None
         predicted_thermal_stability = None
 
-    data_dict = {'solvent_removal_stability': predicted_solvent_removal_stability, 'thermal_stability': predicted_thermal_stability}
+    # Next, getting mechanical moduli
+    df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/moduli_{category_abbrev}.csv')
+    try:
+        desired_row = df[df['name'] == name] # Don't need to use adjusted_name, since the moduli CSV files have a slightly different format for the name column.
+        moduli_info = {} # Dictionary to be populated.
+        moduli_properties = ['KR', 'KV', 'KVRH', 'GR', 'GV', 'GVRH']
+        for prop in moduli_properties:
+            moduli_info[prop] = desired_row[prop].iloc[0].round(4) # Round to four decimal places.
+    except IndexError: # adjusted_name is not present in the CSV
+        moduli_info = None
+
+    # Last, getting uptake information
+    df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/uptake_{category_abbrev}.csv')
+    try:
+        desired_row = df[df['filename'] == adjusted_name]
+        uptake_info = {} # Dictionary to be populated.
+        uptake_properties = ['uptake_low_p (cm3 methane/g framework)', 'uptake_low_p (cm3 methane/cm3 framework)', 'uptake_high_p (cm3 methane/g framework)', 'uptake_high_p (cm3 methane/cm3 framework)']
+        for prop in uptake_properties:
+            uptake_info[prop] = desired_row[prop].iloc[0].round(2) # Round to two decimal places.
+    except IndexError: # adjusted_name is not present in the CSV
+        uptake_info = None
+
+    data_dict = {
+    'solvent_removal_stability': predicted_solvent_removal_stability, 
+    'thermal_stability': predicted_thermal_stability,
+    'moduli_info': moduli_info,
+    'uptake_info': uptake_info
+    }
+    
     print(data_dict)
 
     return data_dict

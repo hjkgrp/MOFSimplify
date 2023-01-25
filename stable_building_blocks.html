@@ -543,6 +543,8 @@
       function (response) {
         solvent_prediction = response['solvent_removal_stability']
         thermal_prediction = response['thermal_stability']
+        moduli_info = response['moduli_info']
+        uptake_info = response['uptake_info']
 
         if (solvent_prediction == null && thermal_prediction == null) {
           return // exit the function
@@ -550,7 +552,27 @@
           // <br /> for a new line in display. &#8451 is degrees celsius in decimal
           data_on_MOF = "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
           + "The thermal stability prediction for the selected MOF is " + thermal_prediction + "&#8451."
+
+          // Check if we have moduli information.
+          if (moduli_info != null) {
+            data_on_MOF += "<br /><b>Moduli Information</b><br /> KR is " + moduli_info["KR"] + "<br />" // <b> for bold
+            + "KV is " + moduli_info["KV"] + "<br />"
+            + "KVRH is " + moduli_info["KVRH"] + "<br />"
+            + "GR is " + moduli_info["GR"] + "<br />"
+            + "GV is " + moduli_info["GV"] + "<br />"
+            + "GVRH is " + moduli_info["GVRH"] + "<br />"
+          }
+
+          // Check if we have uptake information.
+          if (uptake_info != null) {
+            data_on_MOF += "<br /><b>Uptake Information</b><br /> uptake_low_p (cm³ methane/g framework) is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + "<br />"
+            + "uptake_low_p (cm³ methane/cm³ framework) is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + "<br />"
+            + "uptake_high_p (cm³ methane/g framework) is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + "<br />"
+            + "uptake_high_p (cm³ methane/cm³ framework) is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + "<br />"
+          }
+
         }
+        // TODO do for stable only
 
         document.getElementById('selected_MOF_data').innerHTML = data_on_MOF
       })

@@ -362,15 +362,15 @@ def serve_cite():
     """ 
     return flask.send_from_directory('.', 'how_to_cite.html')
 
-@app.route('/stable_building_blocks.html')
+@app.route('/stable_MOFs.html')
 def serve_stable_bb_page():
     """
-    serve_cite serves the stable building blocks page.
-    So the user is redirected to the stable building blocks page.
+    serve_cite serves the stable MOFs page.
+    So the user is redirected to the stable MOFs page.
 
-    :return: The stable building blocks page.
+    :return: The stable MOFs page.
     """ 
-    return flask.send_from_directory('.', 'stable_building_blocks.html')
+    return flask.send_from_directory('.', 'stable_MOFs.html')
 
 @app.route('/libraries/<path:path>')
 def serve_library_files(path):

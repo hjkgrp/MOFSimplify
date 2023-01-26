@@ -43,6 +43,10 @@
     font-size: 22px;
   }
 
+  .filter {
+    color: #BF1A2F;
+  }
+
 </style>
 
 
@@ -86,24 +90,41 @@
 
   <div class="container zebra">
 
-    <h3> Select building blocks from our hypothetical MOF database here! </h3>
+    <h3> Interact with our hypothetical MOF database here! </h3>
 
-    Naming for the building blocks (inorganic node, organic node, edge) reflects the CoRE MOF from which the building block was taken.<br>
+    Namings for the building blocks (inorganic node, organic node, edge) reflect the CoRE MOF from which the building block was taken.<br>
     Data is from the <a href='https://zenodo.org/record/7091192'>Zenodo repository</a> associated with <a href='https://arxiv.org/abs/2210.14191'>this paper</a>.
 
-    <h4 style='margin-top: 1cm; font-weight: bold;'>Choose filters</h4>
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Choose <span class='filter'>filters</span></h4>
 
-    <!-- Option to filter MOFs by category -->
+    <!-- &#8451 is degrees celsius in decimal . &#8805 is the greater than or equal sign in decimal. -->
+    <p style='font-size:18px;'> For example, if you select acs as a net, only MOFs in our database with the acs net will appear in the dropdown at the bottom of the page. <br> If you select Cd as the metal, only MOFs in our database with Cd in them will appear in the dropdown.<br>We define an ultrastable MOF as one with a predicted solvent removal stability &#8805 0.5 and a predicted thermal stability &#8805 446&#8451. 
+    </p> 
+
+    <!-- Option to filter MOFs by whether they are ultrastable or not -->
     <div class = 'row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
-        Filter by category (number of inorganic nodes, number of organic nodes, number of edges)
+        Only ultrastable MOFs?
       </div>
       <div class='col-lg-8'>
-        <select style='font-size: 22px;' class='form-control filter_option' id='category_option' placeholder="Any" >
+        <select style='font-size: 22px;' class='form-control filter_option' id='ultrastable_option' placeholder="Yes" >
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>          
+        </select>
+      </div>
+    </div>
+
+    <!-- Option to filter MOFs by type -->
+    <div class = 'row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-4'>
+        Type (number of distinct inorganic nodes, organic nodes, and edges)
+      </div>
+      <div class='col-lg-8'>
+        <select style='font-size: 22px;' class='form-control filter_option' id='type_option' placeholder="Any" >
           <option value="Any">Any</option>
-          <option value="1, 0, 1">1, 0, 1</option>
-          <option value="1, 1, 1">1, 1, 1</option>
-          <option value="2, 0, 1">2, 0, 1</option>          
+          <option value="1, 0, 1">1 inorg node, 0 org node, 1 edge</option>
+          <option value="1, 1, 1">1 inorg node, 1 org node, 1 edge</option>
+          <option value="2, 0, 1">2 inorg node, 0 org node, 1 edge</option>          
         </select>
       </div>
     </div>
@@ -111,7 +132,7 @@
     <!-- Option to filter building blocks by net -->
     <div class = 'row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
-        Filter by net
+        Net
       </div>
       <div class='col-lg-8'>
         <input autocomplete="off" id='net_option' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="Any" list='net_list' onmousedown="value = '';" />
@@ -124,7 +145,7 @@
     <!-- Option to filter building blocks by metal -->
     <div class = 'row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
-        Filter by metal
+        Metal
       </div>
       <div class='col-lg-8'>
         <input autocomplete="off" id='metal_option' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="Any" list='metal_list' onmousedown="value = '';" />
@@ -137,7 +158,7 @@
     <!-- Selection box for the inorganic node -->
     <div class = 'row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
-        Filter by inorganic node
+        Inorganic node
       </div>
       <div class='col-lg-8'>
         <input autocomplete="off" style='font-size: 22px;' id="inorg_node_option" class='form-control locksMetrics filter_option' placeholder="Any" list='inorg_node_list'
@@ -153,7 +174,7 @@
     <!-- Selection box for the organic node -->
     <div class = 'row organic' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
-        Filter by organic node
+        Organic node
       </div>
       <div class='col-lg-8'>
         <input autocomplete="off" style='font-size: 22px;' id="org_node_option" class='form-control locksMetrics filter_option' placeholder="Any" list='org_node_list'
@@ -169,7 +190,7 @@
     <!-- Selection box for the edge -->
     <div class = 'row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
-        Filter by edge
+        Edge
       </div>
       <div class='col-lg-8'>
         <input autocomplete="off" style='font-size: 22px;' id="edge_option" class='form-control locksMetrics filter_option' placeholder="Any" list='edge_list'
@@ -182,7 +203,7 @@
 
     </div>
 
-    <h4 style='margin-top: 1cm; font-weight: bold;'>Download and visualize your selected filter criteria building blocks</h4>
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Download and visualize your selected <span class='filter'>filter</span> criteria building blocks</h4>
 
     <div style='text-align:center; margin-top: 0.5cm;'>
       <button class='btn btn-primary round_button toggle_button' id='toggle_inorg_node' type='button'>Inorganic node</button>
@@ -210,14 +231,11 @@
     </div>    
 
 
-    <h4 style='margin-top: 1cm; font-weight: bold;'>Select stable MOF (filtered by the category, metal, nodes, and edge selected above)</h4>
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Select MOF (dropdown options are <span class='filter'>filtered</span>)</h4>
     <!-- Selection box for the stable MOF -->
     <div class = 'row' style='margin-top: 0.5cm;'>
-      <div class='col-lg-4'>
-        Select a stable MOF
-      </div>
-      <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="stable_MOF_option" class='form-control locksMetrics' list='stable_MOF_list'
+      <div class='col-lg-12'>
+        <input autocomplete="off" style='font-size: 22px;' id="MOF_option" class='form-control locksMetrics' list='stable_MOF_list'
         onmousedown="value = '';" />
       </div>
 
@@ -228,13 +246,18 @@
     </div>
 
     <div style='text-align:center; margin-top: 0.5cm;'>
-      <button style='display:inline-block; width:50%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF' type='button'>Download selected MOF</button>
+      <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF_initial' type='button'>Download selected MOF (unoptimized)</button>
+      <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF_optimized' type='button'>Download selected MOF (optimized)</button>
     </div>
+
+    <p style='text-align:center; margin-top: 0.25cm;'> Inital structures (.CIF) are generated with PORMAKE.<br> 
+    Optimized structures (.CIF) are optimized with the UFF4MOF force field in LAMMPS.</p>
 
     <p id='selected_MOF_data' style='text-align:left; margin-top: 0.5cm;'>
     </p>
 
-    TODO display if available: mechanical properties, and adsorption; have the nearest medoid for unstable? Or maybe just restrict whole thing to ultrastable (> 0.5, >359+87)
+
+    TODO show temperature in distribution
 
   </div>
 
@@ -266,7 +289,6 @@
   data = {};  
 
   // Hardcoding these lists based on https://zenodo.org/record/7091192
-  // TODO if restrict only to ultrastable MOFs, can delete some entries of some of these lists
 
   nets = ['acs', 'acs-a', 'acs-f', 'acs-g', 'acs-h', 'acs-i', 'afi', 'afw', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'ant', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcs-a', 'bcu', 'bcu-b', 'bcu-f', 'bcu-g', 'bcu-h', 'bcu-i', 'bcu-j', 'bcu-k', 'bcu-l', 'bmn', 'bnn', 'bor-e', 'bpr', 'bsn', 'bto', 'bva', 'bwt', 'cab', 'cag', 'can', 'cbo', 'cdl', 'cds', 'cds-f', 'cdt', 'cha', 'cml', 'cor', 'crb', 'crr', 'crs', 'crs-a', 'csq', 'ctn', 'ctn-e', 'dag', 'deh', 'dei', 'dft', 'dia', 'dia-a', 'dia-f', 'dia-g', 'dia-j', 'dmp', 'ecb', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'est', 'eta', 'eta-c', 'etb', 'etd', 'etf', 'fau', 'fca', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fcx', 'fda', 'fdc', 'fee', 'fgl', 'flu-e', 'fna', 'fnc', 'fnd', 'fne', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fny', 'fnz', 'fob', 'fst', 'ftb', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'icc', 'ict', 'ilc', 'irl', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llj', 'llk', 'lll', 'loh', 'lon', 'lta', 'lvt', 'lvt-a', 'mdf', 'mer', 'mmt', 'mok', 'mon', 'msp', 'msw', 'myd', 'nbo', 'nbo-a', 'nbo-h', 'ncb', 'neb', 'nfa', 'nfb', 'nfc', 'nia', 'nia-e', 'nom', 'noo', 'nov', 'noy', 'noz', 'npo', 'ocu', 'ocu-e', 'ofo', 'ooa', 'oob', 'oof', 'osc', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pts-e', 'pyc', 'pyr', 'pyr-e', 'qdl', 'qtz', 'qtz-a', 'qtz-e', 'qtz-f', 'qtz-g', 'qtz-h', 'qtz-x', 'qzd', 'rac', 'reo', 'reo-e', 'rgd', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sev', 'sgn', 'sin', 'sit', 'skb', 'skc', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smi', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smt', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'soe', 'sof', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'sqp', 'sra', 'srs', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'ssc', 'sst', 'sth', 'sva', 'svb', 'svc', 'sve', 'svf', 'svh', 'svi', 'svj', 'svk', 'svm', 'svo', 'svv', 'svx', 'svy', 'svz', 'swa', 'swd', 'swe', 'swf', 'swi', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxk', 'sxm', 'sxp', 'sxq', 'sxt', 'tbo', 'teo', 'tes', 'tfs', 'the', 'thp-x', 'ths', 'toc-e', 'tph', 'tsi', 'tsx', 'ttw', 'twf-e', 'twt', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vbx', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vcp', 'vcq', 'vcr', 'vcu', 'vda', 'vdb', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgw', 'wgz', 'whb', 'whc', 'whd', 'whe', 'whh', 'whj', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wif', 'wig', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkh', 'wkj', 'wkl', 'wko', 'wkp', 'wkq', 'wkr', 'wkt', 'wku', 'wkw', 'wkx', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmb', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmx', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wng', 'wnh', 'wni', 'wnj', 'wnm', 'wnn', 'wno', 'wnr', 'wns', 'wnt', 'wnx', 'wny', 'wnz', 'wse', 'wuy', 'xbj', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfk', 'xfp', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'yfa', 'yfb', 'yfc', 'yfd', 'yff', 'yfg', 'yfh', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfx', 'yfy', 'yfz', 'yyz', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
 
@@ -318,13 +340,13 @@
   org_node_color = original_blue;
   edge_color = original_blue;
 
-  // When the Filter by category selection is changed
-  $('#category_option').change(function() {
-    category = $('#category_option').val()
-    if (category === 'Any') { // Organic nodes permitted, since no restriction of category.
+  // When the Type selection is changed
+  $('#type_option').change(function() {
+    type = $('#type_option').val()
+    if (type === 'Any') { // Organic nodes permitted, since no restriction of type.
       $('.organic').show()
     }
-    else if (category === '1, 1, 1') { // This category has an organic node
+    else if (type === '1, 1, 1') { // This type has an organic node
       $('.organic').show()
     }
     else { // The other two categories do not have an organic node.
@@ -335,7 +357,7 @@
   // When any filter is clicked or changed
   $('.filter_option').on("click change", function () {
     component_viewer.clear(); // clear any building block visualization
-    $('#stable_MOF_option').mousedown() // clear the stable MOF option section
+    $('#MOF_option').mousedown() // clear the stable MOF option section
     $('#selected_MOF_data').hide()
     recolor("Reset")
 
@@ -343,8 +365,9 @@
     'org_node': $('#org_node_option').val(), 
     'edge': $('#edge_option').val(), 
     'metal': $('#metal_option').val(), 
-    'category': $('#category_option').val(),
-    'net': $('#net_option').val()
+    'type': $('#type_option').val(),
+    'net': $('#net_option').val(),
+    'ultrastable': $('#ultrastable_option').val()
   } 
 
     $.post("/filter_MOFs", JSON.stringify(filter_dictionary)).done(
@@ -512,24 +535,45 @@
     component_viewer.zoomTo();
   })
 
-  // This function is called when the "Download selected MOF" button is clicked.
+  // This function is called when the "Download selected MOF (unoptimized)" button is clicked.
   // Downloads the selected MOF.
-  $('#download_MOF').click(function () {
-    if ($('#stable_MOF_option').val() === '') {
-      alert('Must select a stable MOF to be downloaded')
+  $('#download_MOF_initial').click(function () {
+    if ($('#MOF_option').val() === '') {
+      alert('Must select a MOF to be downloaded')
     }
     else {
-      selected_MOF = $('#stable_MOF_option').val()
+      selected_MOF = $('#MOF_option').val()
 
-      window.location = 'stable_building_blocks/' + selected_MOF + '.cif'; // download cif file. See serve_stable_MOF in app.py
+      window.location = 'unoptimized_geo/' + selected_MOF + '.cif'; // download cif file. See serve_unoptimized_MOF in app.py
 
+    }
+  })
+
+  // This function is called when the "Download selected MOF (optimized)" button is clicked.
+  // Downloads the selected MOF.
+  $('#download_MOF_optimized').click(function () {
+    if ($('#MOF_option').val() === '') {
+      alert('Must select a MOF to be downloaded')
+    }
+    else {
+      selected_MOF = $('#MOF_option').val()
+
+      // Check if the optimized geometry exists. If not, generate an alert.
+      $.post("/opt_geo_existence_check", JSON.stringify(MOF_name)).done(
+        function (response) {
+          if (response === 'No') {
+            alert("No optimized geometry available for the selected MOF.")
+          } else { // The optimized geometry is available.
+            window.location = 'optimized_geo/' + selected_MOF + '.cif'; // download cif file. See serve_optimized_MOF in app.py
+          } 
+        })
     }
   })
 
   // This function is called when a new stable MOF is selected in the "Select a stable MOF" dropdown.
   // Displays information on the selected MOF.
-  $('#stable_MOF_option').on("click change", function (){ // Triggered by either a click or a change.
-    if ($('#stable_MOF_option').val() === ''){ // No MOF selected.
+  $('#MOF_option').on("click change", function (){ // Triggered by either a click or a change.
+    if ($('#MOF_option').val() === ''){ // No MOF selected.
       $('#selected_MOF_data').hide()
       return // exit function
     }
@@ -537,21 +581,29 @@
       $('#selected_MOF_data').show() 
     }
 
-    MOF_name = $('#stable_MOF_option').val()
+    MOF_name = $('#MOF_option').val()
     // Getting data on the selected MOF from the backend.
     $.post("/data_pull", JSON.stringify(MOF_name)).done(
       function (response) {
+        is_ultrastable = response['is_ultrastable']
         solvent_prediction = response['solvent_removal_stability']
         thermal_prediction = response['thermal_stability']
         moduli_info = response['moduli_info']
         uptake_info = response['uptake_info']
 
+        if (is_ultrastable) {
+          data_on_MOF = "Ultrastable MOF!<br />" // <br /> for a new line in display.
+        }
+        else {
+          data_on_MOF = ""
+        }
+
         if (solvent_prediction == null && thermal_prediction == null) {
           return // exit the function
         } else {
           // <br /> for a new line in display. &#8451 is degrees celsius in decimal
-          data_on_MOF = "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
-          + "The thermal stability prediction for the selected MOF is " + thermal_prediction + "&#8451."
+          data_on_MOF += "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
+          + "The thermal stability prediction for the selected MOF is " + thermal_prediction + "&#8451. That is the breakdown temperature."
 
           // Check if we have moduli information.
           if (moduli_info != null) {
@@ -572,7 +624,6 @@
           }
 
         }
-        // TODO do for stable only
 
         document.getElementById('selected_MOF_data').innerHTML = data_on_MOF
       })
@@ -652,7 +703,8 @@
   document.getElementById('edge_list').innerHTML = option_generator(edges)
 
   // The code below runs when this webpage is opened.
-  $('#category_option').val("Any") // Setting the default value
+  $('#ultrastable_option').val("Yes") // Setting the default value
+  $('#type_option').val("Any") // Setting the default value
   $('#net_option').val("Any") // Setting the default value
   $('#metal_option').val("Any") // Setting the default value
   $('#inorg_node_option').val("Any") // Setting the default value

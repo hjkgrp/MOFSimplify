@@ -118,13 +118,23 @@ bb_mapping = {'XUDNAN_clean_linker_2': 'E0', 'MIFKUJ_clean_linker_0': 'E1', 'AJU
  'VETTIZ_charged_sbu_0': 'N80', 'VOLQOD_clean_sbu_1': 'N81', 'WAQDOJ_charged_sbu_0': 'N82', 'WUSLED_clean_sbu_0': 'N83',
  'XADDAJ01_clean_sbu_3': 'N84', 'XOMCOT_clean_sbu_0': 'N85', 'XOMCOT_clean_sbu_1': 'N86', 'XUDNAN_clean_sbu_1': 'N87'}
 
-# Loading the names of possible ultrastable MOFs
-with open('pickle_files/1inorganic_1edge_cifs_list.pkl', 'rb') as f:
+# Loading the names of MOFs from our hypothetical database. Constructed with ultrastable building blocks.
+with open('pickle_files/MOF_names/1inorganic_1edge_cifs_list.pkl', 'rb') as f:
     list_1inorganic_1edge_MOFs = pkl.load(f)
-with open('pickle_files/1inorganic_1organic_1edge_cifs_list.pkl', 'rb') as f:
+with open('pickle_files/MOF_names/1inorganic_1organic_1edge_cifs_list.pkl', 'rb') as f:
     list_1inorganic_1organic_1edge_MOFs = pkl.load(f)
-with open('pickle_files/2inorganic_1edge_cifs_list.pkl', 'rb') as f:
+with open('pickle_files/MOF_names/2inorganic_1edge_cifs_list.pkl', 'rb') as f:
     list_2inorganic_1edge_MOFs = pkl.load(f)
+
+# Loading the names of the ultrastable MOFs from our hypothetical database.
+with open('pickle_files/ultrastable_MOFs/1inor_1edge_cifs_list_ultrastable.pkl', 'rb') as f:
+    list_1inorganic_1edge_MOFs_ultrastable = pkl.load(f)
+with open('pickle_files/ultrastable_MOFs/1inor_1org_1edge_cifs_list_ultrastable.pkl', 'rb') as f:
+    list_1inorganic_1organic_1edge_MOFs_ultrastable = pkl.load(f)
+with open('pickle_files/ultrastable_MOFs/2inor_1edge_cifs_list_ultrastable.pkl', 'rb') as f:
+    list_2inorganic_1edge_MOFs_ultrastable = pkl.load(f)
+
+ultrastable_MOFs = list_1inorganic_1edge_MOFs_ultrastable + list_1inorganic_1organic_1edge_MOFs_ultrastable + list_2inorganic_1edge_MOFs_ultrastable
 
 def conditional_diminish(counter):
     """
@@ -421,19 +431,33 @@ def serve_CoRE_MOF(path):
     """ 
     return flask.send_from_directory('CoRE2019', path)
 
-@app.route('/stable_building_blocks/<path:path>')
-def serve_stable_MOF(path):
+@app.route('/unoptimized_geo/<path:path>')
+def serve_unoptimized_MOF(path):
     """
-    serve_stable_MOF returns a file to MOFSimplify.
-    The file is intended to be a cif file. It should be a stable MOF.
+    serve_unoptimized_MOF returns a file to MOFSimplify.
+    The file is intended to be a cif file. It should be a MOF.
 
-    :param path: The path to the desired MOF in the stable_MOFs folder.
-    :return: The cif file for the stable MOF.
+    :param path: The path to the desired MOF in the stable_building_blocks folder.
+    :return: The cif file for the non geometry optimized MOF.
     """ 
 
-    MOF_category = category_determination(path)
+    MOF_type = type_determination(path)
 
-    return flask.send_from_directory(f'stable_building_blocks/optimized_structures/{MOF_category}', path)
+    return flask.send_from_directory(f'stable_building_blocks/initial_structures/{MOF_type}', path)
+
+@app.route('/optimized_geo/<path:path>')
+def serve_optimized_MOF(path):
+    """
+    serve_optimized_MOF returns a file to MOFSimplify.
+    The file is intended to be a cif file. It should be a MOF.
+
+    :param path: The path to the desired MOF in the stable_building_blocks folder.
+    :return: The cif file for the geometry optimized MOF.
+    """ 
+
+    MOF_type = type_determination(path)
+
+    return flask.send_from_directory(f'stable_building_blocks/optimized_structures/{MOF_type}', 'optimized_' + path)
 
 @app.route('/ris_files/MOFSimplify_citation.ris')
 def serve_ris():
@@ -2131,31 +2155,47 @@ def filter_MOFs():
 
     # Grab data
     filter_dictionary = json.loads(flask.request.get_data()); # This dictionary contains the filters to apply.
+    print(f'check, filter_dictionary is {filter_dictionary}')
 
+    ultrastable_filter = filter_dictionary['ultrastable']
     inorg_node_filter = filter_dictionary['inorg_node']
     org_node_filter = filter_dictionary['org_node']
     edge_filter = filter_dictionary['edge']
     metal_filter = filter_dictionary['metal']
-    category_filter = filter_dictionary['category']
+    type_filter = filter_dictionary['type']
     net_filter = filter_dictionary['net']
 
-    # Applying the category filter.
-    if category_filter == 'Any' or len(category_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
-        MOF_list =  list_1inorganic_1edge_MOFs + list_1inorganic_1organic_1edge_MOFs + list_2inorganic_1edge_MOFs
-    elif category_filter == '1, 0, 1':
-        MOF_list = list_1inorganic_1edge_MOFs
-    elif category_filter == '1, 1, 1':
-        MOF_list = list_1inorganic_1organic_1edge_MOFs
-    elif category_filter == '2, 0, 1':
-        MOF_list = list_2inorganic_1edge_MOFs
+    # Applying the type and ultrastable filter filter.
+    if ultrastable_filter == 'No':
+        if type_filter == 'Any' or len(type_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+            MOF_list =  list_1inorganic_1edge_MOFs + list_1inorganic_1organic_1edge_MOFs + list_2inorganic_1edge_MOFs
+        elif type_filter == '1, 0, 1':
+            MOF_list = list_1inorganic_1edge_MOFs
+        elif type_filter == '1, 1, 1':
+            MOF_list = list_1inorganic_1organic_1edge_MOFs
+        elif type_filter == '2, 0, 1':
+            MOF_list = list_2inorganic_1edge_MOFs
+    elif ultrastable_filter == 'Yes':
+        if type_filter == 'Any' or len(type_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+            MOF_list =  list_1inorganic_1edge_MOFs_ultrastable + list_1inorganic_1organic_1edge_MOFs_ultrastable + list_2inorganic_1edge_MOFs_ultrastable
+        elif type_filter == '1, 0, 1':
+            MOF_list = list_1inorganic_1edge_MOFs_ultrastable
+        elif type_filter == '1, 1, 1':
+            MOF_list = list_1inorganic_1organic_1edge_MOFs_ultrastable
+        elif type_filter == '2, 0, 1':
+            MOF_list = list_2inorganic_1edge_MOFs_ultrastable
+    else:
+        raise Exception('Unexpected value of ultrastable_filter')
 
-    MOF_list = [i.replace('.cif', '') for i in MOF_list] # Getting rid of '.cif' from each string.
     filtered_MOFs = MOF_list.copy()
+
+    # Getting rid of '.cif' from each string. For nicer display on the front end (MOF name without .cif).
+    filtered_MOFs = [i.replace('.cif', '') for i in filtered_MOFs]
 
     # Dictionary that indicates which SBUs contain which metals.
     metal_dict = {'Gd': ['PORLAL_clean_sbu_0', 'MAKGOX_clean_sbu_0', 'INOVEN_clean_sbu_0', 'KUMBOL_clean_sbu_0', 'KUMBOL_clean_sbu_1'], 'Tb': ['MAKGUD_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'NUHQIS_clean_sbu_0', 'NUHQUE_clean_sbu_2', 'ZALLEG_clean_sbu_0', 'NUHRAL_clean_sbu_3', 'CUKXOW_clean_sbu_0', 'XUDNAN_clean_sbu_1', 'BETDIP_clean_sbu_0', 'XADDAJ01_clean_sbu_3', 'PAMTUU_clean_sbu_0'], 'Mn': ['BELTOD_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'CIFDUS_clean_sbu_1', 'ICIZOL_clean_sbu_0'], 'Dy': ['BETDEL_clean_sbu_0', 'PAMTOO_clean_sbu_0'], 'Co': ['CEKHIL_clean_sbu_0', 'JUFBIX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'BEQFEK_clean_sbu_0', 'OLANAS_clean_sbu_2', 'EBIMEJ_clean_sbu_0', 'KOZSID_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'OLANEW_clean_sbu_3', 'XOMCOT_clean_sbu_0', 'ICAMEG_clean_sbu_1', 'OLANEW_clean_sbu_0', 'LIZSOE_clean_sbu_0'], 'Nd': ['GEDQOX_clean_sbu_0'], 'U': ['WUSLED_clean_sbu_0'], 'Zn': ['QEWDON_clean_sbu_0', 'NAHDIM_clean_sbu_0', 'NAWXER_clean_sbu_0', 'NAHDIM_clean_sbu_2', 'FANWIC_clean_sbu_0', 'HICVOG_clean_sbu_0', 'TATPOV_clean_sbu_0', 'VOLQOD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'OLANAS_clean_sbu_1', 'FUNLAD_clean_sbu_0', 'UKALOJ_clean_sbu_0', 'MIFKUJ_clean_sbu_0'], 'Sm': ['BETFAJ_clean_sbu_0'], 'Eu': ['HISSIN_clean_sbu_1', 'HISSIN_clean_sbu_0', 'NUHQIS_clean_sbu_0', 'KUMJIN_clean_sbu_1', 'NUHQUE_clean_sbu_2', 'CUWYAW_clean_sbu_0', 'KUMJIN_clean_sbu_0', 'EYACOX_clean_sbu_1', 'EYACOX_clean_sbu_0', 'NUHRAL_clean_sbu_3', 'SARMOO_clean_sbu_0', 'IYUCEM_clean_sbu_0', 'EZIPEK_clean_sbu_0'], 'Mg': ['TAGTUT_clean_sbu_1', 'AZAVOO_clean_sbu_0', 'TAGTUT_clean_sbu_3', 'WAQDOJ_charged_sbu_0', 'LEVNOQ01_clean_sbu_1', 'EQERAU_clean_sbu_0', 'MUDLON_clean_sbu_0'], 'La': ['BETGAK_clean_sbu_0'], 'Fe': ['VETTIZ_charged_sbu_0', 'IZENUY_clean_sbu_0'], 'Na': ['OLANAS_clean_sbu_1'], 'Cd': ['AJUNOK_clean_sbu_0', 'OLANEW_clean_sbu_2', 'OLANEW_clean_sbu_3', 'QUQFOY_clean_sbu_3', 'QUQFOY_clean_sbu_1', 'OLANEW_clean_sbu_1', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_4'], 'Pr': ['BETFEN_clean_sbu_0'], 'Zr': ['ENOWUB_clean_sbu_0'], 'Hf': ['UKIBUN_clean_sbu_0'], 'Ho': ['BETDAH_clean_sbu_0'], 'Cu': ['BOTCEU_clean_sbu_0', 'ESEHIV_clean_sbu_0'], 'Sc': ['OJICUG_clean_sbu_0'], 'Sr': ['KAKCAD_clean_sbu_0'], 'Li': ['UXUYUI_clean_sbu_0'], 'In': ['GALJAG_clean_sbu_0']}
 
-    # Applying the filters
+    # Applying the rest of the filters.
     if inorg_node_filter != 'Any' and len(inorg_node_filter) != 0: # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything   
         filtered_MOFs = [i for i in filtered_MOFs if (bb_mapping[inorg_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
     if org_node_filter != 'Any' and len(org_node_filter) != 0:
@@ -2171,27 +2211,26 @@ def filter_MOFs():
         filtered_MOFs = [i for i in filtered_MOFs if f'net-{net_filter}_node1' in i]
 
     response_dict = {'filtered_MOFs': filtered_MOFs} # List is not a valid return type, but dictionary is.
-    # TODO account for MOF stability. Ask Aditya; solvent stability over 0.5? Thermal stability one stdev above average?
 
     return response_dict
 
-def category_determination(MOF_name):
+def type_determination(MOF_name):
     """
-    category_determination returns a string indicating the type of the MOF passed from the front end. Either 1,0,1; 1,1,1; or 2,0,1 for #inorganic nodes, #organic nodes, #edges 
+    type_determination returns a string indicating the type of the MOF passed from the front end. Either 1,0,1; 1,1,1; or 2,0,1 for #inorganic nodes, #organic nodes, #edges 
 
-    :param MOF_name: str, the name of the MOF for which the category will be ascertained.
-    :return: str category, the category of the MOF in question.
+    :param MOF_name: str, the name of the MOF for which the type will be ascertained.
+    :return: str MOF_type, the type of the MOF in question.
     """
     if MOF_name in list_1inorganic_1edge_MOFs:
-        category = '1inorganic_1edge'
+        MOF_type = '1inorganic_1edge'
     elif MOF_name in list_1inorganic_1organic_1edge_MOFs:
-        category = '1inorganic_1organic_1edge'
+        MOF_type = '1inorganic_1organic_1edge'
     elif MOF_name in list_2inorganic_1edge_MOFs:
-        category = '2inorganic_1edge'
+        MOF_type = '2inorganic_1edge'
     else:
         raise Exception('CIF name is unexpected. Not in any of the MOF lists.')
 
-    return category
+    return MOF_type
 
 @app.route('/data_pull', methods=['POST'])
 def grab_data():
@@ -2203,16 +2242,16 @@ def grab_data():
 
     # Grab data
     name = json.loads(flask.request.get_data()); # This is the MOF about which to gather data.    
-    category = category_determination(name + '.cif')
-    if category == '1inorganic_1edge':
-        category_abbrev = '1inor_1edge'
-    elif category == '1inorganic_1organic_1edge':
-        category_abbrev = '1inor_1org_1edge'
-    elif category == '2inorganic_1edge':
-        category_abbrev = '2inor_1edge'
+    MOF_type = type_determination(name + '.cif')
+    if MOF_type == '1inorganic_1edge':
+        type_abbrev = '1inor_1edge'
+    elif MOF_type == '1inorganic_1organic_1edge':
+        type_abbrev = '1inor_1org_1edge'
+    elif MOF_type == '2inorganic_1edge':
+        type_abbrev = '2inor_1edge'
 
     # First, getting ANN solvent removal and thermal stabilities
-    df = pd.read_csv(f'stable_building_blocks/predictions/{category_abbrev}_predictions.csv')
+    df = pd.read_csv(f'stable_building_blocks/predictions/{type_abbrev}_predictions.csv')
     adjusted_name = name.replace('optimized_', '') + '.cif' # To match the format of entries in the predictions excel files.
 
     try:
@@ -2229,7 +2268,7 @@ def grab_data():
         predicted_thermal_stability = None
 
     # Next, getting mechanical moduli
-    df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/moduli_{category_abbrev}.csv')
+    df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/moduli_{type_abbrev}.csv')
     try:
         desired_row = df[df['name'] == name] # Don't need to use adjusted_name, since the moduli CSV files have a slightly different format for the name column.
         moduli_info = {} # Dictionary to be populated.
@@ -2239,8 +2278,8 @@ def grab_data():
     except IndexError: # adjusted_name is not present in the CSV
         moduli_info = None
 
-    # Last, getting uptake information
-    df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/uptake_{category_abbrev}.csv')
+    # Next, getting uptake information
+    df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/uptake_{type_abbrev}.csv')
     try:
         desired_row = df[df['filename'] == adjusted_name]
         uptake_info = {} # Dictionary to be populated.
@@ -2250,17 +2289,40 @@ def grab_data():
     except IndexError: # adjusted_name is not present in the CSV
         uptake_info = None
 
+    # Lastly, assessing whether MOF is ultrastable
+    is_ultrastable = adjusted_name in ultrastable_MOFs
+
     data_dict = {
     'solvent_removal_stability': predicted_solvent_removal_stability, 
     'thermal_stability': predicted_thermal_stability,
     'moduli_info': moduli_info,
-    'uptake_info': uptake_info
+    'uptake_info': uptake_info,
+    'is_ultrastable': is_ultrastable
     }
     
     print(data_dict)
 
     return data_dict
 
+@app.route('/opt_geo_existence_check', methods=['POST'])
+def existence_check():
+    """
+    existence_check returns a string indicating whether the optimized geometry for the requested MOF exists.
+
+    :return: str exists, a string indicating whether the optimized CIF file is available for download.
+    """
+
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is the MOF about which to gather data.    
+    MOF_type = type_determination(name + '.cif')
+
+    exists = os.path.isfile(f'stable_building_blocks/optimized_structures/{MOF_type}/optimized_{name}.cif')
+    if exists:
+        exists = 'Yes'
+    else:
+        exists = 'No'
+
+    return exists
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

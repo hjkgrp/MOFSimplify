@@ -1739,7 +1739,7 @@ function setColor(element, color) {
                 setColor(thermal_form, response_color)
               })
 
-              myDict = { 'prediction': true, 'temperature': prediction }
+              myDict = { 'prediction': true, 'temperature': prediction, 'temperature_data_type': 'string' }
               $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
                 $('#chart').html(response);
               })
@@ -1813,7 +1813,7 @@ function setColor(element, color) {
 
               })
 
-              myDict = { 'prediction': false, 'temperature': response['truth'] }
+              myDict = { 'prediction': false, 'temperature': response['truth'], 'temperature_data_type': 'string' }
               $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { // making the thermal breakdown temperatures plot
                 $('#chart').html(response);
               })

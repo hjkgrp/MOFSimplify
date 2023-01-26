@@ -1545,8 +1545,9 @@ def plot_thermal_stability():
     # Grab data
     info = json.loads(flask.request.get_data()) 
     my_data = info['temperature'] # this is the current MOF's predicted thermal breakdown temperature
-    my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
-    my_data = float(my_data)
+    if info['temperature_data_type'] == 'string':
+        my_data = my_data[:-3] # getting rid of the celsius symbol, left with just the number
+        my_data = float(my_data)
 
     # Getting the temperature data
     temps_df = pd.read_csv(MOFSIMPLIFY_PATH + "model/thermal/ANN/adjusted_TSD_df_all.csv")
@@ -2270,7 +2271,7 @@ def grab_data():
     # Next, getting mechanical moduli
     df = pd.read_csv(f'stable_building_blocks/computed_properties/stable/moduli_{type_abbrev}.csv')
     try:
-        desired_row = df[df['name'] == name] # Don't need to use adjusted_name, since the moduli CSV files have a slightly different format for the name column.
+        desired_row = df[df['name'] == 'optimized_'+name] # Don't need to use adjusted_name, since the moduli CSV files have a slightly different format for the name column.
         moduli_info = {} # Dictionary to be populated.
         moduli_properties = ['KR', 'KV', 'KVRH', 'GR', 'GV', 'GVRH']
         for prop in moduli_properties:

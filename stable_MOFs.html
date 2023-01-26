@@ -47,6 +47,12 @@
     color: #BF1A2F;
   }
 
+  #chart {
+    /* thermal breakdown plot is centered */
+    width: 100%;
+    text-align: center;
+  }  
+
 </style>
 
 
@@ -256,8 +262,7 @@
     <p id='selected_MOF_data' style='text-align:left; margin-top: 0.5cm;'>
     </p>
 
-
-    TODO show temperature in distribution
+    <div class='col-12' id='chart'></div>
 
   </div>
 
@@ -360,6 +365,7 @@
     $('#MOF_option').mousedown() // clear the stable MOF option section
     $('#selected_MOF_data').hide()
     recolor("Reset")
+    $('#chart').text(''); // clear the breakdown temperature plot
 
     filter_dictionary = { 'inorg_node': $('#inorg_node_option').val(), 
     'org_node': $('#org_node_option').val(), 
@@ -592,7 +598,8 @@
         uptake_info = response['uptake_info']
 
         if (is_ultrastable) {
-          data_on_MOF = "Ultrastable MOF!<br />" // <br /> for a new line in display.
+          data_on_MOF = "<span style='color:#D5B942; font-weight: bold'>Ultrastable MOF!</span><br />" // <br /> for a new line in display.
+          // Using coolors.co website. #2D3D50, #1ABB9C, #BE1A2F --> #D5B942
         }
         else {
           data_on_MOF = ""
@@ -603,7 +610,7 @@
         } else {
           // <br /> for a new line in display. &#8451 is degrees celsius in decimal
           data_on_MOF += "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
-          + "The thermal stability prediction for the selected MOF is " + thermal_prediction + "&#8451. That is the breakdown temperature."
+          + "The thermal stability prediction (breakdown temperature) for the selected MOF is " + thermal_prediction + "&#8451.<br />"
 
           // Check if we have moduli information.
           if (moduli_info != null) {
@@ -626,6 +633,13 @@
         }
 
         document.getElementById('selected_MOF_data').innerHTML = data_on_MOF
+
+        // making the thermal breakdown temperatures plot
+        myDict = { 'prediction': true, 'temperature': thermal_prediction, 'temperature_data_type': 'float' }
+        $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { 
+          console.log('entered the plot_thermal_stability post')
+          $('#chart').html(response);
+        })        
       })
 
   })

@@ -256,7 +256,7 @@
       <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF_optimized' type='button'>Download selected MOF (optimized)</button>
     </div>
 
-    <p style='text-align:center; margin-top: 0.25cm;'> Inital structures (.CIF) are generated with PORMAKE.<br> 
+    <p style='text-align:center; margin-top: 0.25cm;'> Initial structures (.CIF) are generated with PORMAKE.<br> 
     Optimized structures (.CIF) are optimized with the UFF4MOF force field in LAMMPS.</p>
 
     <p id='selected_MOF_data' style='text-align:left; margin-top: 0.5cm;'>
@@ -295,9 +295,15 @@
 
   // Hardcoding these lists based on https://zenodo.org/record/7091192
 
-  nets = ['acs', 'acs-a', 'acs-f', 'acs-g', 'acs-h', 'acs-i', 'afi', 'afw', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'ant', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcs-a', 'bcu', 'bcu-b', 'bcu-f', 'bcu-g', 'bcu-h', 'bcu-i', 'bcu-j', 'bcu-k', 'bcu-l', 'bmn', 'bnn', 'bor-e', 'bpr', 'bsn', 'bto', 'bva', 'bwt', 'cab', 'cag', 'can', 'cbo', 'cdl', 'cds', 'cds-f', 'cdt', 'cha', 'cml', 'cor', 'crb', 'crr', 'crs', 'crs-a', 'csq', 'ctn', 'ctn-e', 'dag', 'deh', 'dei', 'dft', 'dia', 'dia-a', 'dia-f', 'dia-g', 'dia-j', 'dmp', 'ecb', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'est', 'eta', 'eta-c', 'etb', 'etd', 'etf', 'fau', 'fca', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fcx', 'fda', 'fdc', 'fee', 'fgl', 'flu-e', 'fna', 'fnc', 'fnd', 'fne', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fny', 'fnz', 'fob', 'fst', 'ftb', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'icc', 'ict', 'ilc', 'irl', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llj', 'llk', 'lll', 'loh', 'lon', 'lta', 'lvt', 'lvt-a', 'mdf', 'mer', 'mmt', 'mok', 'mon', 'msp', 'msw', 'myd', 'nbo', 'nbo-a', 'nbo-h', 'ncb', 'neb', 'nfa', 'nfb', 'nfc', 'nia', 'nia-e', 'nom', 'noo', 'nov', 'noy', 'noz', 'npo', 'ocu', 'ocu-e', 'ofo', 'ooa', 'oob', 'oof', 'osc', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pts-e', 'pyc', 'pyr', 'pyr-e', 'qdl', 'qtz', 'qtz-a', 'qtz-e', 'qtz-f', 'qtz-g', 'qtz-h', 'qtz-x', 'qzd', 'rac', 'reo', 'reo-e', 'rgd', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sev', 'sgn', 'sin', 'sit', 'skb', 'skc', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smi', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smt', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'soe', 'sof', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'sqp', 'sra', 'srs', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'ssc', 'sst', 'sth', 'sva', 'svb', 'svc', 'sve', 'svf', 'svh', 'svi', 'svj', 'svk', 'svm', 'svo', 'svv', 'svx', 'svy', 'svz', 'swa', 'swd', 'swe', 'swf', 'swi', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxk', 'sxm', 'sxp', 'sxq', 'sxt', 'tbo', 'teo', 'tes', 'tfs', 'the', 'thp-x', 'ths', 'toc-e', 'tph', 'tsi', 'tsx', 'ttw', 'twf-e', 'twt', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vbx', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vcp', 'vcq', 'vcr', 'vcu', 'vda', 'vdb', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgw', 'wgz', 'whb', 'whc', 'whd', 'whe', 'whh', 'whj', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wif', 'wig', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkh', 'wkj', 'wkl', 'wko', 'wkp', 'wkq', 'wkr', 'wkt', 'wku', 'wkw', 'wkx', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmb', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmx', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wng', 'wnh', 'wni', 'wnj', 'wnm', 'wnn', 'wno', 'wnr', 'wns', 'wnt', 'wnx', 'wny', 'wnz', 'wse', 'wuy', 'xbj', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfk', 'xfp', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'yfa', 'yfb', 'yfc', 'yfd', 'yff', 'yfg', 'yfh', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfx', 'yfy', 'yfz', 'yyz', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
+  nets = ['Any', 'acs', 'acs-a', 'acs-f', 'acs-g', 'acs-h', 'acs-i', 'afi', 'afw', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'ant', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcs-a', 'bcu', 'bcu-b', 'bcu-f', 'bcu-g', 'bcu-h', 'bcu-i', 'bcu-j', 'bcu-k', 'bcu-l', 'bmn', 'bnn', 'bor-e', 'bpr', 'bsn', 'bto', 'bva', 'bwt', 'cab', 'cag', 'can', 'cbo', 'cdl', 'cds', 'cds-f', 'cdt', 'cha', 'cml', 'cor', 'crb', 'crr', 'crs', 'crs-a', 'csq', 'ctn', 'ctn-e', 'dag', 'deh', 'dei', 'dft', 'dia', 'dia-a', 'dia-f', 'dia-g', 'dia-j', 'dmp', 'ecb', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'est', 'eta', 'eta-c', 'etb', 'etd', 'etf', 'fau', 'fca', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fcx', 'fda', 'fdc', 'fee', 'fgl', 'flu-e', 'fna', 'fnc', 'fnd', 'fne', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fny', 'fnz', 'fob', 'fst', 'ftb', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'icc', 'ict', 'ilc', 'irl', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llj', 'llk', 'lll', 'loh', 'lon', 'lta', 'lvt', 'lvt-a', 'mdf', 'mer', 'mmt', 'mok', 'mon', 'msp', 'msw', 'myd', 'nbo', 'nbo-a', 'nbo-h', 'ncb', 'neb', 'nfa', 'nfb', 'nfc', 'nia', 'nia-e', 'nom', 'noo', 'nov', 'noy', 'noz', 'npo', 'ocu', 'ocu-e', 'ofo', 'ooa', 'oob', 'oof', 'osc', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pts-e', 'pyc', 'pyr', 'pyr-e', 'qdl', 'qtz', 'qtz-a', 'qtz-e', 'qtz-f', 'qtz-g', 'qtz-h', 'qtz-x', 'qzd', 'rac', 'reo', 'reo-e', 'rgd', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sev', 'sgn', 'sin', 'sit', 'skb', 'skc', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smi', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smt', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'soe', 'sof', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'sqp', 'sra', 'srs', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'ssc', 'sst', 'sth', 'sva', 'svb', 'svc', 'sve', 'svf', 'svh', 'svi', 'svj', 'svk', 'svm', 'svo', 'svv', 'svx', 'svy', 'svz', 'swa', 'swd', 'swe', 'swf', 'swi', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxk', 'sxm', 'sxp', 'sxq', 'sxt', 'tbo', 'teo', 'tes', 'tfs', 'the', 'thp-x', 'ths', 'toc-e', 'tph', 'tsi', 'tsx', 'ttw', 'twf-e', 'twt', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vbx', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vcp', 'vcq', 'vcr', 'vcu', 'vda', 'vdb', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgw', 'wgz', 'whb', 'whc', 'whd', 'whe', 'whh', 'whj', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wif', 'wig', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkh', 'wkj', 'wkl', 'wko', 'wkp', 'wkq', 'wkr', 'wkt', 'wku', 'wkw', 'wkx', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmb', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmx', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wng', 'wnh', 'wni', 'wnj', 'wnm', 'wnn', 'wno', 'wnr', 'wns', 'wnt', 'wnx', 'wny', 'wnz', 'wse', 'wuy', 'xbj', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfk', 'xfp', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'yfa', 'yfb', 'yfc', 'yfd', 'yff', 'yfg', 'yfh', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfx', 'yfy', 'yfz', 'yyz', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
+
+  // Nets that are present in the ultrastable set of MOFs:
+  ultrastable_nets = ['Any', 'acs', 'afi', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcu', 'bcu-b', 'bcu-f', 'bcu-h', 'bcu-i', 'bcu-k', 'bcu-l', 'bmn', 'bpr', 'bsn', 'bva', 'bwt', 'cag', 'can', 'cbo', 'cds-f', 'cha', 'cml', 'cor', 'crs', 'crs-a', 'csq', 'ctn', 'dag', 'deh', 'dei', 'dia-a', 'dia-j', 'dmp', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'etb', 'etf', 'fau', 'fca', 'fcd', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fdc', 'fgl', 'flu-e', 'fnc', 'fnd', 'fng', 'fnh', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fns', 'fob', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'ict', 'ilc', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llk', 'lll', 'lta', 'lvt-a', 'mdf', 'mer', 'mok', 'mon', 'msp', 'myd', 'nbo-h', 'neb', 'nfa', 'nfb', 'nfc', 'nom', 'ocu', 'oof', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pyc', 'pyr', 'pyr-e', 'qtz-e', 'qtz-x', 'reo', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sin', 'sit', 'skb', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'sst', 'sth', 'svb', 'svc', 'svm', 'svo', 'svx', 'svy', 'swa', 'swf', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxt', 'tbo', 'tes', 'tfs', 'thp-x', 'toc-e', 'tph', 'tsi', 'tsx', 'twf-e', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umc', 'umd', 'ume', 'umh', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umx', 'umy', 'umz', 'una', 'unb', 'und', 'une', 'unf', 'ung', 'unh', 'unl', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uoa', 'uob', 'uod', 'uoe', 'uof', 'uoh', 'uoi', 'uol', 'uon', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uow', 'uox', 'uoy', 'uoz', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utc', 'utj', 'utm', 'utn', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vck', 'vcl', 'vcu', 'vda', 'vdb', 'vmf', 'vmg', 'vmh', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wfx', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgw', 'whh', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wig', 'wil', 'wim', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wji', 'wjr', 'wjz', 'wkf', 'wkh', 'wkj', 'wkl', 'wkp', 'wkq', 'wkr', 'wku', 'wkw', 'wla', 'wlb', 'wle', 'wlf', 'wlg', 'wlh', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wnh', 'wnm', 'wno', 'wns', 'wnz', 'wse', 'xfc', 'xfe', 'xff', 'xfg', 'xfh', 'xfs', 'xfz', 'yfc', 'yfd', 'yfj', 'yfl', 'yfm', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfy', 'zfc', 'zfd', 'zfe', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
 
   metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Hf', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Na', 'Nd', 'Pr', 'Sc', 'Sm', 'Sr', 'Tb', 'U', 'Zn', 'Zr']
+
+  // Metals that are present in the ultrastable set of MOFs:
+  ultrastable_metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Nd', 'Pr', 'Sc', 'Sm', 'Tb', 'U', 'Zn']
 
   inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BELTOD_clean_sbu_0', 'BEQFEK_clean_sbu_0',
   'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0',
@@ -322,6 +328,9 @@
   'VOLQOD_clean_sbu_1', 'WAQDOJ_charged_sbu_0', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3',
   'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'XUDNAN_clean_sbu_1', 'ZALLEG_clean_sbu_0']
 
+  // Inorganic nodes that are present in the ultrastable set of MOFs:
+  ultrastable_inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BEQFEK_clean_sbu_0', 'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0', 'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'CEKHIL_clean_sbu_0', 'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0', 'ESEHIV_clean_sbu_0', 'EYACOX_clean_sbu_0', 'EZIPEK_clean_sbu_0', 'FUNLAD_clean_sbu_0', 'GALJAG_clean_sbu_0', 'GEDQOX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'HICVOG_clean_sbu_0', 'HISSIN_clean_sbu_0', 'HISSIN_clean_sbu_1', 'ICAMEG_clean_sbu_1', 'INOVEN_clean_sbu_0', 'IZENUY_clean_sbu_0', 'JUFBIX_clean_sbu_0', 'KOZSID_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'KUMBOL_clean_sbu_0', 'KUMBOL_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'KUMJIN_clean_sbu_0', 'KUMJIN_clean_sbu_1', 'LEVNOQ01_clean_sbu_1', 'LIZSOE_clean_sbu_0', 'MAKGUD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'MIFKUJ_clean_sbu_0', 'MUDLON_clean_sbu_0', 'NAHDIM_clean_sbu_0', 'NAWXER_clean_sbu_0', 'NUHQIS_clean_sbu_0', 'NUHQUE_clean_sbu_2', 'NUHRAL_clean_sbu_3', 'OJICUG_clean_sbu_0', 'OLANAS_clean_sbu_2', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_2', 'OLANEW_clean_sbu_3', 'PAMTOO_clean_sbu_0', 'PAMTUU_clean_sbu_0', 'QEWDON_clean_sbu_0', 'QUQFOY_clean_sbu_1', 'QUQFOY_clean_sbu_3', 'TAGTUT_clean_sbu_1', 'TAGTUT_clean_sbu_3', 'TATPOV_clean_sbu_0', 'UKALOJ_clean_sbu_0', 'UXUYUI_clean_sbu_0', 'VETTIZ_charged_sbu_0', 'VOLQOD_clean_sbu_1', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3', 'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'ZALLEG_clean_sbu_0']
+
   org_nodes = ['Any', 'APAZEY_clean_linker_0', 'AZAVOO_clean_linker_0',
   'BELTOD_clean_linker_0', 'BEQFEK_clean_linker_11', 'BETDAH_clean_linker_0', 'BETDEL_clean_linker_0',
   'BETDIP_clean_linker_0', 'CEKHIL_clean_linker_0', 'CUKXOW_clean_linker_0', 'CUQRIR_clean_linker_1',
@@ -332,11 +341,17 @@
   'QUQFOY_clean_linker_2', 'TATPOV_clean_linker_0', 'UFIREI_clean_linker_0', 'UWAGAB01_clean_linker_0',
   'VETTIZ_charged_linker_0', 'WOSHET_clean_linker_1']
 
-  edges = ['Any', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
+  // Organic nodes that are present in the ultrastable set of MOFs:
+  ultrastable_org_nodes = ['Any', 'AZAVOO_clean_linker_0', 'BELTOD_clean_linker_0', 'BETDAH_clean_linker_0', 'BETDIP_clean_linker_0', 'CUQRIR_clean_linker_1', 'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IZENUY_clean_linker_0', 'KAKCAD_clean_linker_0', 'KUFVIS_clean_linker_0', 'MIDCAF_clean_linker_0', 'MIFKUJ_clean_linker_1', 'MUDLON_clean_linker_0', 'NAHDIM_clean_linker_0', 'NAWXER_clean_linker_0', 'PAMTOO_clean_linker_0', 'QEWDON_clean_linker_0', 'VETTIZ_charged_linker_0']
+
+  edges = ['Any', 'none', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
  'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1',
  'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10',
  'UKIBIB_clean_linker_0', 'UKIBUN_clean_linker_0', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0',
  'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
+
+  // Edges that are present in the ultrastable set of MOFs:
+  ultrastable_edges = ['Any', 'none', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0', 'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1', 'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0', 'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
 
   success_green = '#18bc9c';
   original_blue = '#2c3e50';
@@ -382,6 +397,16 @@
         document.getElementById('stable_MOF_list').innerHTML = option_generator(filtered_stable_MOFs)
       })
 
+  })
+
+  // When the Only ultrastable MOFs? filter is changed
+  $('#ultrastable_option').change(function() {
+    current_option = $('#ultrastable_option').val()
+    if (current_option === 'Yes') {
+      dropdown_populator_ultrastable()
+    } else if (current_option === 'No') {
+      dropdown_populator()
+    }
   })
 
   // Recolors the building block selection buttons based on the string `bb_type`
@@ -699,22 +724,36 @@
   });
 
 
-  // Populating dropdowns in this next section
+  // Populating dropdowns in this next section. This happens when the browser is opened.
+  dropdown_populator_ultrastable()
 
-  // Populating the net dropdown
-  document.getElementById('net_list').innerHTML = option_generator(nets);
+  // This function is used for populating dropdowns with the full range of options.
+  function dropdown_populator() {
+    // Populating the net dropdown
+    document.getElementById('net_list').innerHTML = option_generator(nets);
 
-  // Populating the metal dropdown
-  document.getElementById('metal_list').innerHTML = option_generator(metals);
+    // Populating the metal dropdown
+    document.getElementById('metal_list').innerHTML = option_generator(metals);
 
-  // Populating the inorganic node dropdown
-  document.getElementById('inorg_node_list').innerHTML = option_generator(inorg_nodes);
+    // Populating the inorganic node dropdown
+    document.getElementById('inorg_node_list').innerHTML = option_generator(inorg_nodes);
 
-  // Populating the organic node dropdown
-  document.getElementById('org_node_list').innerHTML = option_generator(org_nodes)
+    // Populating the organic node dropdown
+    document.getElementById('org_node_list').innerHTML = option_generator(org_nodes)
 
-  // Populating the edge dropdown
-  document.getElementById('edge_list').innerHTML = option_generator(edges)
+    // Populating the edge dropdown
+    document.getElementById('edge_list').innerHTML = option_generator(edges)
+  }
+
+  // This function is used for populating dropdowns with the ultrastable range of options.
+  function dropdown_populator_ultrastable() {
+    document.getElementById('net_list').innerHTML = option_generator(ultrastable_nets);
+    document.getElementById('metal_list').innerHTML = option_generator(ultrastable_metals);
+    document.getElementById('inorg_node_list').innerHTML = option_generator(ultrastable_inorg_nodes);
+    document.getElementById('org_node_list').innerHTML = option_generator(ultrastable_org_nodes)
+    document.getElementById('edge_list').innerHTML = option_generator(ultrastable_edges)
+  }
+
 
   // The code below runs when this webpage is opened.
   $('#ultrastable_option').val("Yes") // Setting the default value
@@ -725,6 +764,6 @@
   $('#org_node_option').val("Any") // Setting the default value
   $('#edge_option').val("Any") // Setting the default value
 
-  $('#metal_option').change() // Trigger a change event, in order to force execution of /filter_MOFs
+  $('#metal_option').change() // Trigger a change event, in order to force execution of /filter_MOFs at the beginning.
 
 </script>

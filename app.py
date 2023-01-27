@@ -2207,7 +2207,10 @@ def filter_MOFs():
     if org_node_filter != 'Any' and len(org_node_filter) != 0:
         filtered_MOFs = [i for i in filtered_MOFs if (bb_mapping[org_node_filter]+'_') in i] # The underscore helps distinguish between N4 and N46, for example
     if edge_filter != 'Any' and len(edge_filter) != 0:
-        filtered_MOFs = [i for i in filtered_MOFs if i.endswith(bb_mapping[edge_filter])]
+        if edge_filter == 'none':
+            filtered_MOFs = [i for i in filtered_MOFs if i.endswith('none')]
+        else: # In this case, we need to de-alias using the mapping.
+            filtered_MOFs = [i for i in filtered_MOFs if i.endswith(bb_mapping[edge_filter])]
     if metal_filter != 'Any' and len(metal_filter) != 0:
         suitable_SBUs = metal_dict[metal_filter]
         suitable_SBU_aliases = [bb_mapping[SBU] for SBU in suitable_SBUs]

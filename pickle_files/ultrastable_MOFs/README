@@ -1,0 +1,3 @@
+The names of all of the ultrastable MOFs.
+As determined by the CSV files in stable_building_blocks/predictions.
+Only MOFs with >=0.5 for predicted solvent removal stability, >=(359+87°C) for predicted thermal stability.

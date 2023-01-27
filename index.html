@@ -4,7 +4,7 @@ Then, to open the website, run python app.py in the terminal. Copy and paste htt
 -->
 
 
-<!-- Import NGL, webGavrog, and Bootstrap libaries-->
+<!-- Import NGL, webGavrog, and Bootstrap libraries-->
 <script src="libraries/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="libraries/ngl.js"></script>
 <script type="text/javascript" src="libraries/webGavrog/runtime.js"></script>
@@ -962,7 +962,7 @@ rel="stylesheet" type="text/css" />
 
       // grab the current solvent neighbor MOF cif file
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       fetch('CoRE2019/' + my_neighbor + '.cif').then(response => { // grabbing the MOF from local host
@@ -1606,7 +1606,7 @@ rel="stylesheet" type="text/css" />
             }
             else { // requested MOF was in the training data
 
-              // Storing information indicating that a prediction was made, but no neighbors are avaialable
+              // Storing information indicating that a prediction was made, but no neighbors are available
               document.getElementById('solvent_neighbors_holder').value = 1
 
               stability_field = document.getElementById('solvent_stability_prediction');
@@ -1695,7 +1695,7 @@ function setColor(element, color) {
               thermal_pred_color = failure_red;
               $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
               $('#thermal_stability_prediction').text('')
-              return; // Do not update solvent removal stability prediction if prediction failed.
+              return; // Do not update thermal stability prediction if prediction failed.
             }
 
             $('#thermal_form').show()
@@ -1781,7 +1781,7 @@ function setColor(element, color) {
             }
 
             else { // requested MOF was in the training data
-              // Storing information indicating that a prediction was made, but no neighbors are avaialable
+              // Storing information indicating that a prediction was made, but no neighbors are available
               document.getElementById('thermal_neighbors_holder').value = 1
 
               $('#thermal_stability_prediction').text('This MOF is in the training data and is reported to have a thermal breakdown temperature of ' + response['truth']);
@@ -1845,7 +1845,7 @@ function setColor(element, color) {
         return;
       }
       else if (my_sbu === '') {
-        alert("Must choose an sbu building block first.");
+        alert("Must choose a sbu building block first.");
         return;
       }
       else if (my_net === '') {
@@ -2563,7 +2563,7 @@ function setColor(element, color) {
         return;
       }
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Get the latent space distance from the information returned from the prediction.
@@ -2580,7 +2580,7 @@ function setColor(element, color) {
           document.getElementById('t_neighbor_info').innerHTML = 'Current nearest neighbor: '
           + my_neighbor + ' <br />Current nearest neighbor\'s latent distance: ' + latent_distance
           + '<br />Circle in TGA plot marks the breakdown temperature.<br />Nearest neighbor DOI: '
-            + response['doi'] // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+            + response['doi'] // <br /> for a new line in display. &#8451 is degrees Celsius in decimal
             + '<br />Experimentally observed thermal breakdown temperature: ' + response['T']
             + '&#8451';
             $('#thermal_neighbor_form').show()
@@ -2614,7 +2614,7 @@ function setColor(element, color) {
         return;
       }
 
-      my_neighbor = $('#thermal_neighbors').val(); // select the solvent removal stability ANN nearest neighbor selected in the dropdown
+      my_neighbor = $('#thermal_neighbors').val(); // select the thermal stability ANN nearest neighbor selected in the dropdown
       my_neighbor = my_neighbor.substring(3) // hack off the list-y number part
 
       // Making the txt file with information about the neighbor
@@ -3111,13 +3111,7 @@ function setColor(element, color) {
         document.getElementById('MOFs_list').innerHTML = option_generator(my_MOFs); // populating the MOFs dropdown
       })
 
-    $.get("/new_user").done(
-      function (response) {
-        // Purpose of this is just to make a user ID for the new browser that has accessed MOFSimplify, so I don't care about the response
-        console.log(response)
-      })
-
-    // On start up, hide certain sections
+    // On startup, hide certain sections
     $('#pills-comp').hide()
     $('#pills-example').hide()
     $('#pills-bb').hide()

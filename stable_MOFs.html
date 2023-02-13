@@ -635,25 +635,47 @@
         } else {
           // <br /> for a new line in display. &#8451 is degrees celsius in decimal
           data_on_MOF += "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
+          // preparing the human-interpretable solvent removal stability prediction
+          if (solvent_prediction <= 0.2) {
+            verdict = 'ANN is very confident the MOF is unstable upon solvent removal.';
+          }
+          else if (solvent_prediction <= 0.4) {
+            verdict = 'ANN is fairly confident the MOF is unstable upon solvent removal.';
+          }
+          else if (solvent_prediction <= 0.5) {
+            verdict = 'ANN is uncertain, but predicts the MOF is unstable upon solvent removal.';
+          }
+          else if (solvent_prediction <= 0.6) {
+            verdict = 'ANN is uncertain, but predicts the MOF is stable upon solvent removal.';
+          }
+          else if (solvent_prediction <= 0.8) {
+            verdict = 'ANN is fairly confident the MOF is stable upon solvent removal.';
+          }
+          else {
+            verdict = 'ANN is very confident the MOF is stable upon solvent removal.';
+          }
+          
+          data_on_MOF += "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + verdict + "<br />" // &nbsp is a space
           + "The thermal stability prediction (breakdown temperature) for the selected MOF is " + thermal_prediction + "&#8451.<br />"
 
           // Check if we have moduli information.
           if (moduli_info != null) {
             data_on_MOF += "<br /><b>Moduli Information</b><br />" // <b> for bold 
-            + "Elastic Voight (K<sub>V</sub>) is " + moduli_info["KV"] + "<br />"
-            + "Elastic Reuss (K<sub>R</sub>) is " + moduli_info["KR"] + "<br />" 
-            + "Voight-Reuss-Hill elastic average (K<sub>VRH</sub>) is " + moduli_info["KVRH"] + "<br />"
-            + "Shear Voight (G<sub>V</sub>) is " + moduli_info["GV"] + "<br />"
-            + "Shear Reuss (G<sub>R</sub>) is " + moduli_info["GR"] + "<br />"
-            + "Voight-Reuss-Hill shear average (G<sub>VRH</sub>) is " + moduli_info["GVRH"] + "<br />"
+            + "Elastic Voight (K<sub>V</sub>) is " + moduli_info["KV"] + " GPa<br />"
+            + "Elastic Reuss (K<sub>R</sub>) is " + moduli_info["KR"] + " GPa<br />" 
+            + "Voight-Reuss-Hill elastic average (K<sub>VRH</sub>) is " + moduli_info["KVRH"] + " GPa<br />"
+            + "Shear Voight (G<sub>V</sub>) is " + moduli_info["GV"] + " GPa<br />"
+            + "Shear Reuss (G<sub>R</sub>) is " + moduli_info["GR"] + " GPa<br />"
+            + "Voight-Reuss-Hill shear average (G<sub>VRH</sub>) is " + moduli_info["GVRH"] + " GPa<br />"
           } // <sub></sub> is for subscript text.
 
           // Check if we have uptake information.
           if (uptake_info != null) {
-            data_on_MOF += "<br /><b>Uptake Information</b><br /> Low P uptake (cm³ methane/g framework) is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + "<br />"
-            + "Low P uptake (cm³ methane/cm³ framework) is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + "<br />"
-            + "High P uptake (cm³ methane/g framework) is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + "<br />"
-            + "High P uptake (cm³ methane/cm³ framework) is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + "<br />"
+            data_on_MOF += "<br /><b>Uptake Information</b><br />"
+            + "Low P (5.8 bar) uptake is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + " cm³ methane/g framework<br />"
+            + "Equivalently, low P (5.8 bar) uptake is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + " cm³ methane/cm³ framework<br />"
+            + "High P (65 bar) uptake is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + " cm³ methane/g framework<br />"
+            + "Equivalently, high P (65 bar) uptake is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + " cm³ methane/cm³ framework<br />"
           }
 
         }

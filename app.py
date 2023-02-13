@@ -2283,7 +2283,7 @@ def grab_data():
         moduli_info = {} # Dictionary to be populated.
         moduli_properties = ['KR', 'KV', 'KVRH', 'GR', 'GV', 'GVRH']
         for prop in moduli_properties:
-            moduli_info[prop] = desired_row[prop].iloc[0].round(2) # Round to two decimal places.
+            moduli_info[prop] = desired_row[prop].iloc[0].round(1) # Round to one decimal place.
     except IndexError: # adjusted_name is not present in the CSV
         moduli_info = None
 

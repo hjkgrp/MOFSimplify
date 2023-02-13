@@ -639,20 +639,21 @@
 
           // Check if we have moduli information.
           if (moduli_info != null) {
-            data_on_MOF += "<br /><b>Moduli Information</b><br /> KR is " + moduli_info["KR"] + "<br />" // <b> for bold
-            + "KV is " + moduli_info["KV"] + "<br />"
-            + "KVRH is " + moduli_info["KVRH"] + "<br />"
-            + "GR is " + moduli_info["GR"] + "<br />"
-            + "GV is " + moduli_info["GV"] + "<br />"
-            + "GVRH is " + moduli_info["GVRH"] + "<br />"
-          }
+            data_on_MOF += "<br /><b>Moduli Information</b><br />" // <b> for bold 
+            + "Elastic Voight (K<sub>V</sub>) is " + moduli_info["KV"] + "<br />"
+            + "Elastic Reuss (K<sub>R</sub>) is " + moduli_info["KR"] + "<br />" 
+            + "Voight-Reuss-Hill elastic average (K<sub>VRH</sub>) is " + moduli_info["KVRH"] + "<br />"
+            + "Shear Voight (G<sub>V</sub>) is " + moduli_info["GV"] + "<br />"
+            + "Shear Reuss (G<sub>R</sub>) is " + moduli_info["GR"] + "<br />"
+            + "Voight-Reuss-Hill shear average (G<sub>VRH</sub>) is " + moduli_info["GVRH"] + "<br />"
+          } // <sub></sub> is for subscript text.
 
           // Check if we have uptake information.
           if (uptake_info != null) {
-            data_on_MOF += "<br /><b>Uptake Information</b><br /> uptake_low_p (cm³ methane/g framework) is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + "<br />"
-            + "uptake_low_p (cm³ methane/cm³ framework) is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + "<br />"
-            + "uptake_high_p (cm³ methane/g framework) is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + "<br />"
-            + "uptake_high_p (cm³ methane/cm³ framework) is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + "<br />"
+            data_on_MOF += "<br /><b>Uptake Information</b><br /> Low P uptake (cm³ methane/g framework) is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + "<br />"
+            + "Low P uptake (cm³ methane/cm³ framework) is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + "<br />"
+            + "High P uptake (cm³ methane/g framework) is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + "<br />"
+            + "High P uptake (cm³ methane/cm³ framework) is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + "<br />"
           }
 
         }

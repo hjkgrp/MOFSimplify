@@ -1632,7 +1632,7 @@ rel="stylesheet" type="text/css" />
             solvent_pred_color = failure_red;
             $('#predict_s').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#solvent_stability_prediction').text('');
-            alert(errorThrown)
+            alert(errorThrown.concat("; MOF may be too large for web-based analysis"))
           })
         })
 });
@@ -1826,7 +1826,7 @@ function setColor(element, color) {
             thermal_pred_color = failure_red;
             $('#predict_t').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
             $('#thermal_stability_prediction').text('')
-            alert(errorThrown)
+            alert(errorThrown.concat("; MOF may be too large for web-based analysis")) // errorThrown will likely look like "Gateway Time-out"
           })
         })
 });
@@ -2099,7 +2099,7 @@ function setColor(element, color) {
             document.getElementById('components_holder').value = undefined; // clearing the value, so no component visualization is possible
             component_color = failure_red;
             $('#get_components').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-            alert(errorThrown)
+            alert(errorThrown.concat("; MOF may be too large for web-based analysis"))
           })
         })
     });

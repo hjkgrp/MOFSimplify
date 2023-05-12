@@ -981,7 +981,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
         volumetric pore volume (VPOV) and gravimetric pore volume (GPOV). 
         Also, we include cell volume as a descriptor.
 
-        All Zeo++ calculations use a pore radius of 1.86 angstrom, and zeo++ is called by subprocess.
+        All Zeo++ calculations use a probe radius of 1.86 angstrom, and zeo++ is called by subprocess.
         '''
 
         dict_list = []

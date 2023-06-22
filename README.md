@@ -9,7 +9,7 @@ Tested on Chrome Version 93.0.4577.82, Safari Version 15.0, Firefox 92.0, and Ed
 - Run `python app.py` to start a server instance.
   - Will need to comment out MongoClient code in `app.py` if you don't have permission to access the MOFSimplify databases. 
 - Go to `http://localhost:8000/` in your browser (or whatever address `app.py` prints).
-- Quit and re-run `python app.py` every time you make changes to the frontend or backend.
+- Refresh the page, or quit and re-run `python app.py`, every time you make changes to the frontend or backend.
 
 ### Structure of MOFSimplify:
 - Backend: `app.py`

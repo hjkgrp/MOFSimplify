@@ -987,8 +987,8 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
         dict_list = []
         cif_file = name + '_primitive.cif' 
         basename = cif_file.strip('.cif')
-        largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path  = np.nan, np.nan, np.nan
-        unit_cell_volume, crystal_density, VSA, GSA  = np.nan, np.nan, np.nan, np.nan
+        largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path = np.nan, np.nan, np.nan
+        unit_cell_volume, crystal_density, VSA, GSA = np.nan, np.nan, np.nan, np.nan
         VPOV, GPOV = np.nan, np.nan
         POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
@@ -1973,7 +1973,7 @@ def is_stable():
     this_neighbor = solvent_flags_df[solvent_flags_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
 
     this_neighbor_flag = this_neighbor['flag'] # getting the flag value
-    this_neighbor_flag =  str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
+    this_neighbor_flag = str(this_neighbor_flag.iloc[0]) # extract the flag value and return it as a string
 
     # next, getting DOI
     this_neighbor_doi = this_neighbor['doi'] # getting the doi
@@ -2003,7 +2003,7 @@ def breakdown_T():
     breakdown_T_df = pd.read_csv(ANN_folder + 'train.csv')
     this_neighbor = breakdown_T_df[breakdown_T_df['CoRE_name'] == my_data] # getting the row with the MOF of interest
     this_neighbor_T = this_neighbor['T'] # getting the breakdown temperature value
-    this_neighbor_T =  str(round(this_neighbor_T.iloc[0], 1)) # extract the breakdown temperature value and return it as a string. Want just one decimal place
+    this_neighbor_T = str(round(this_neighbor_T.iloc[0], 1)) # extract the breakdown temperature value and return it as a string. Want just one decimal place
 
 
     TGA_folder = MOFSIMPLIFY_PATH + 'TGA/'
@@ -2174,7 +2174,7 @@ def filter_MOFs():
     # Applying the type and ultrastable filter filter.
     if ultrastable_filter == 'No':
         if type_filter == 'Any' or len(type_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
-            MOF_list =  list_1inorganic_1edge_MOFs + list_1inorganic_1organic_1edge_MOFs + list_2inorganic_1edge_MOFs
+            MOF_list = list_1inorganic_1edge_MOFs + list_1inorganic_1organic_1edge_MOFs + list_2inorganic_1edge_MOFs
         elif type_filter == '1, 0, 1':
             MOF_list = list_1inorganic_1edge_MOFs
         elif type_filter == '1, 1, 1':
@@ -2183,7 +2183,7 @@ def filter_MOFs():
             MOF_list = list_2inorganic_1edge_MOFs
     elif ultrastable_filter == 'Yes':
         if type_filter == 'Any' or len(type_filter) == 0: # # No filter applied in the 'Any' case. The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
-            MOF_list =  list_1inorganic_1edge_MOFs_ultrastable + list_1inorganic_1organic_1edge_MOFs_ultrastable + list_2inorganic_1edge_MOFs_ultrastable
+            MOF_list = list_1inorganic_1edge_MOFs_ultrastable + list_1inorganic_1organic_1edge_MOFs_ultrastable + list_2inorganic_1edge_MOFs_ultrastable
         elif type_filter == '1, 0, 1':
             MOF_list = list_1inorganic_1edge_MOFs_ultrastable
         elif type_filter == '1, 1, 1':

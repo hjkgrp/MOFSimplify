@@ -13,7 +13,6 @@ import stat
 import keras
 import keras.backend as K
 import sklearn
-import json
 import smtplib
 import glob
 import uuid

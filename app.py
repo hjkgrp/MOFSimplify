@@ -1196,7 +1196,8 @@ def ss_predict():
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
-    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
+        # The collection client.history.MOFSimplify, or db.MOFSimplify, was for a prior version, where the cell_v feature was erroneously called rho
     my_documents = collection.find({'structure':structure})
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
     print(f'is_entry is {is_entry}')
@@ -1331,7 +1332,7 @@ def ts_predict():
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs? 
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
-    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
     my_documents = collection.find({'structure':structure})
     is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
     if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
@@ -1431,7 +1432,7 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
-    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
     # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
     fields = ['structure', 's_intrain', 's_result', 's_neighbornames', 's_neighbordists', 't_intrain', 't_result', 't_neighbornames', 't_neighbordists', 'failure', 'csv_content', 's_times', 't_times'] 
         # s_times and t_times indicate the number of times this structure has had its solvent removal stability or thermal stability predicted
@@ -1510,7 +1511,7 @@ def db_push_lite(structure, prediction_type):
     client = MongoClient('18.18.63.68',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
-    collection = db.MOFSimplify # The MOFSimplify collection in the history database.
+    collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
     final_dict = {}
 
     # https://docs.mongodb.com/manual/reference/method/db.collection.update/

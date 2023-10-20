@@ -31,3 +31,12 @@ Tested on Chrome Version 93.0.4577.82, Safari Version 15.0, Firefox 92.0, and Ed
   - Interactive elements: Look at the Javascript code inside the `<script>` tag at the bottom of the file.
 
 So, the most important files are `index.html` and `app.py`
+
+### Updates
+In the 2021 and 2022 papers describing the activation and thermal stability models on MOFSimplify, MOF density $\rho$ was listed as one of the fourteen Zeo++ geometric features fed to models. This was a minor error. Cell volume (in units of $Å^3$), not $\rho$, is the fourteenth Zeo++ feature used.
+
+### References
+- [MOFSimplify, machine learning models with extracted stability data of three thousand metal–organic frameworks](https://www.nature.com/articles/s41597-022-01181-0),
+Sci. Data 2022, 9, 1, 74. This paper covers MOFSimplify and the data set behind its models.
+- [Using Machine Learning and Data Mining to Leverage Community Knowledge for the Engineering of Stable Metal–Organic Frameworks](https://pubs.acs.org/doi/full/10.1021/jacs.1c07217),
+J. Am. Chem. Soc. 2021, 143, 42, 17535–17547. This paper covers in detail the models hosted on MOFSimplify and insights gained from them.

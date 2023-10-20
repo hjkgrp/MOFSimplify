@@ -685,7 +685,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
      'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-chi-0-all', 'mc-chi-1-all',
      'mc-chi-2-all', 'mc-chi-3-all']
     geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
-      'PONAV','PONAV_vol_frac','VPOV','VSA','rho']
+      'PONAV','PONAV_vol_frac','VPOV','VSA','cell_v']
      
     other = ['cif_file','name','filename']
 
@@ -830,7 +830,7 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
      'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-chi-0-all', 'mc-chi-1-all',
      'mc-chi-2-all', 'mc-chi-3-all']
     geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
-      'PONAV','PONAV_vol_frac','VPOV','VSA','rho']
+      'PONAV','PONAV_vol_frac','VPOV','VSA','cell_v']
      
     other = ['cif_file','name','filename']
 
@@ -974,11 +974,22 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
 
         # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
-        ''' The geometric descriptors are largest included sphere (Di), 
-        largest free sphere (Df), largest included sphere along free path (Dif),
-        crystal density (rho), volumetric surface area (VSA), gravimetric surface (GSA), 
-        volumetric pore volume (VPOV) and gravimetric pore volume (GPOV). 
-        Also, we include cell volume as a descriptor.
+        ''' 
+        The geometric descriptors are:
+        - the maximum included sphere (Di)
+        - maximum free sphere (Df)
+        - maximum included sphere in the free sphere path (Dif)
+        - gravimetric pore volume (GPOV)
+        - volumetric pore volume (VPOV)
+        - gravimetric surface area (GSA)
+        - volumetric surface area (VSA)
+        - cell volume (cell_v)
+        - gravimetric pore accessible volume (GPOAV)
+        - gravimetric pore non-accessible volume (GPONAV)
+        - pore-accessible volume (POAV)
+        - pore non-accessible volume (PONAV)
+        - pore accessible void fraction (POAVF)
+        - pore nonaccessible void fraction (PONAVF)
 
         All Zeo++ calculations use a probe radius of 1.86 angstrom, and zeo++ is called by subprocess.
         '''
@@ -1004,7 +1015,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
                 for i, row in enumerate(surface_area_data):
                     if i == 0:
                         unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                        crystal_density = float(row.split('Unitcell_volume:')[1].split()[0]) # crystal density
+                        crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
                         VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
                         GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
             with open(zeo_folder + name + '_pov.txt') as f:
@@ -1025,7 +1036,7 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
                   '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
             return 'FAILED'
         geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
-                    'rho': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
+                    'cell_v': crystal_density, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
                     'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
         dict_list.append(geo_dict)
         geo_df = pd.DataFrame(dict_list)

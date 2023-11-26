@@ -1,5 +1,7 @@
 # MOFSimplify 
 
+[![DOI](https://www.nature.com/articles/s41597-022-01181-0)](https://doi.org/10.1038/s41597-022-01181-0)
+
 The MOF website for property prediction and community engagement. Available at [https://mofsimplify.mit.edu/](https://mofsimplify.mit.edu/)
 
 Tested on Chrome Version 93.0.4577.82, Safari Version 15.0, Firefox 92.0, and Edge 94.0.992.37. 

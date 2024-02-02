@@ -1,0 +1,60 @@
+cff-version: "1.0.0"
+authors:
+- family-names: Nandy
+  given-names: Aditya
+  orcid: "https://orcid.org/0000-0001-7137-5449"
+- family-names: Terrones
+  given-names: Gianmarco
+  orcid: "https://orcid.org/0000-0001-5360-165X"
+- family-names: Arunachalam
+  given-names: Naveen
+  orcid: "https://orcid.org/0000-0001-9318-3595"
+- family-names: Duan
+  given-names: Chenru
+  orcid: "https://orcid.org/0000-0003-2592-4237"
+- family-names: Kastner
+  given-names: David W.
+  orcid: "https://orcid.org/0000-0002-7766-4249"
+- family-names: Kulik
+  given-names: Heather J.
+  orcid: "https://orcid.org/0000-0001-9342-0191"
+title: "MOFSimplify"
+url: "https://github.com/hjkgrp/MOFSimplify"
+version: 1.0.0
+message: If you use this software, please cite our article in Scientific Data.
+preferred-citation:
+  type: article
+  authors:
+  - family-names: Nandy
+    given-names: Aditya
+    orcid: "https://orcid.org/0000-0001-7137-5449"
+  - family-names: Terrones
+    given-names: Gianmarco
+    orcid: "https://orcid.org/0000-0001-5360-165X"
+  - family-names: Arunachalam
+    given-names: Naveen
+    orcid: "https://orcid.org/0000-0001-9318-3595"
+  - family-names: Duan
+    given-names: Chenru
+    orcid: "https://orcid.org/0000-0003-2592-4237"
+  - family-names: Kastner
+    given-names: David W.
+    orcid: "https://orcid.org/0000-0002-7766-4249"
+  - family-names: Kulik
+    given-names: Heather J.
+    orcid: "https://orcid.org/0000-0001-9342-0191"
+  contact:
+  - family-names: Kulik
+    given-names: Heather J.
+    orcid: "https://orcid.org/0000-0001-9342-0191"
+  date-published: 2022-03-11
+  doi: 10.1038/s41597-022-01181-0
+  issn: 2052-4463
+  journal: Scientific Data
+  publisher:
+    name: Nature Portfolio
+  start: 74
+  volume: 9
+  title: "MOFSimplify, machine learning models with extracted stability data of three thousand metal–organic frameworks"
+  url: "https://www.nature.com/articles/s41597-022-01181-0"
+title: "MOFSimplify, machine learning models with extracted stability data of three thousand metal–organic frameworks"

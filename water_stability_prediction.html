@@ -1,0 +1,841 @@
+<!-- Import NGL, webGavrog, and Bootstrap libraries-->
+<!DOCTYPE html>
+<html>
+<head>
+
+  <script src="libraries/jquery-3.4.1.min.js">
+  </script>
+  <script src="libraries/ngl.js" type="text/javascript">
+  </script>
+  <script src="libraries/webGavrog/runtime.js" type="text/javascript">
+  </script>
+  <script src="libraries/webGavrog/vendors.js" type="text/javascript">
+  </script>
+  <script src="libraries/webGavrog/main.js" type="text/javascript">
+  </script>
+  <script src="libraries/3Dmol-min.js">
+  </script>
+  <script src="libraries/bootstrap.min.js">
+  </script>
+  <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.1.min.js">
+  </script><!-- Import CSS -->
+  <link href="libraries/bootstrap.min.css" rel="stylesheet">
+  <link href="libraries/bootstrap_custom.min.css" rel="stylesheet"><!-- Imports related to star rating -->
+  <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/css/star-rating.min.css" media="all" rel="stylesheet" type="text/css">
+  <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/js/star-rating.min.js" type="text/javascript">
+  </script>
+  <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/themes/krajee-svg/theme.css" media="all" rel="stylesheet" type="text/css">
+  <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-star-rating@4.1.0/themes/krajee-svg/theme.js">
+  </script><!-- Custom CSS code is placed within the <style> tag: -->
+
+  <style>
+      .btn {
+        margin-top: 3px;
+      }
+
+      .mol-container {
+        /* For component visualization */
+        height: 400px;
+        position: relative;
+      }
+
+      .form-control {
+        margin-bottom: 0.1cm;
+      }
+
+      .round_button {
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        min-width: 130px;
+      }
+
+      .selection_button {
+        display: inline-block;
+        width: 33%;
+      }
+
+      .link {
+        /* hyperlinks are blue */
+        color: #279AF1;
+      }
+
+      .dropdown-item {
+        font-size: 18px;
+      }
+
+      #viewportwrapper {
+        /* For MOF visualization */
+        grid-area: viz;
+      }  
+
+      #header_background {
+        background-image: url('banner_light');
+        background-position: center; /* Keeps the banner centered even when window is shrunken */
+        background-size: cover; /* Makes the banner the appropriate size */
+      }
+
+      body {
+        /* The font to be used everywhere */
+        font-family: Arial, Helvetica, sans-serif;
+        color: black;
+        font-size: 16px;
+      }
+
+      .perm {
+        background: none;
+        border: none;
+      }
+
+      .pill-custom {
+        border-radius: 0px 0px 0px 0px !important;
+        border: 0px;
+        color: black !important;
+        background-color: white !important;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+
+      .pill-custom.active {
+        background-color: #f7f7f7 !important;
+        border-bottom: 5px solid black !important;
+      }
+
+      .pill-custom:hover {
+        color: #18bc9c !important;
+      }
+  </style><!-- Global site tag (gtag.js) - Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-7B1L0P0FXV">
+  </script>
+  <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-7B1L0P0FXV');
+  </script><!--   End of Google Analytics stuff -->
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <title>MOFSimplify</title>
+</head>
+<body>
+  <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
+  <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="../" style='font-size: 30px; padding-right: 30px;'>MOFSimplify</a> <button aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbarResponsive" data-toggle="collapse" type='button'><span class="navbar-toggler-icon"><!-- Toggle navbar --></span></button>
+      <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown" style='padding-right: 30px;'>
+            <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbarDropdownMenuLink" role="button">Stability prediction</a>
+            <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
+              <a class="dropdown-item" href="../">Solvent/Thermal</a> <a class="dropdown-item" href="water_stability_prediction.html">Water/Acid</a>
+            </div>
+          </li>
+          <li class="nav-item" style='padding-right: 30px;'>
+            <a class="nav-link" href="stable_MOFs.html">Stable MOFs</a>
+          </li>
+          <li class="nav-item" style='padding-right: 30px;'>
+            <a class="nav-link" href="how_to_cite.html">How to Cite</a>
+          </li>
+          <li class="nav-item dropdown" style='padding-right: 30px;'>
+            <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbarDropdownMenuLink">Code</a>
+            <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
+              <a class="dropdown-item" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a> <a class="dropdown-item" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF Code</a>
+            </div>
+          </li>
+        </ul>
+      </div><button class='btn btn-primary round_button' id='dark_mode' style='font-size:22px; width:20%;' type='button'>Dark mode</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="page-header" id="banner" style='padding-bottom:10px;'>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12" id='header_background'>
+          <!-- Title -->
+          <span style='position:relative;'><!-- The zebra class changes color depending if Dark mode is toggled on or not. --></span>
+          <p class='zebra' style="font-size: 27px; width:100%; text-align:center; font-style: italic; color: #2B3E50; margin-top: 6cm;"><span style='position:relative;'>The <a class="link" href="http://hjkgrp.mit.edu/">Kulik Group</a> at MIT<br>
+          Powered by <a class="link" href="https://molsimplify.readthedocs.io/en/latest/">molSimplify</a></span></p>
+        </div>
+      </div>
+
+    <div class="container" id="pills-main">      
+    <b class='zebra' style='font-size:22px;'>1) Select a MOF (metal-organic framework) for analysis</b> <!-- Create a section containing buttons -->
+    <div class='col-lg-12'>
+      <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+        <!-- Button for queuing up the example MOF cif file -->
+        <button class='btn btn-primary round_button selection_button' id='example-redirect' style='font-size:22px; width:40%; margin-right:40px;' type='button'>Example MOF</button> <!-- Button for uploading MOF cif file -->
+         <button class='btn btn-primary round_button selection_button' id='upload' style='font-size:22px; width:40%' type='button'>Custom (upload cif file)</button> <!-- Button for generating MOF cif file -->
+         <!--         <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'
+        style='font-size:22px;'>Building block assembly</button> -->
+        <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p>
+        <!-- <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p> -->
+        <!-- &nbsp is a space gap -->
+      </div>
+    </div>
+    <div id='predict_section' style='margin-top: 1cm;'>
+      <b class='zebra' style='font-size:22px;'>2) Predict properties of the selected MOF</b> <!-- Create a section containing buttons -->
+      <div class='col-lg-12'>
+        <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+          <!-- Button for predicting water stability of MOF -->
+          <button class='btn btn-primary round_button' id='predict_w' style='display:inline-block; width:49%; font-size:22px;' type='button'>2-class water stability</button> <!-- Button for predicting acid stability of MOF -->
+           <button class='btn btn-primary round_button' id='predict_a' style='display:inline-block; width:49%; font-size:22px;' type='button'>Acidic aqueous solution stability</button>
+        </div>
+      </div>
+    </div>
+    <div id='descriptor_section' style='margin-top: 1cm;'>
+      <b class='zebra' style='font-size:22px;'>3) Download descriptors of the selected MOF</b> <!-- Create a section containing buttons -->
+      <div class='col-lg-12'>
+        <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+          <!-- Button for downloading descriptors of MOF -->
+          <button class='btn btn-primary round_button' id='download_descriptors' style='display:inline-block; width:49%; font-size:22px;' type='button'>Download descriptors</button>
+        </div>
+      </div>
+    </div><!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
+    <div class='row' id='status_section' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
+      <b style='font-size:22px;'>Status messages and MOF predictions</b>
+      <div class='col-12' id='upload_status' style='font-size:22px;'></div>
+      <div class='col-12' style='font-size:22px;'>
+        Note, the acid model assumes a MOF is stable in water (high kinetic stability or thermodynamic stability).
+      </div>
+      <div class='col-12' id='water_stability_prediction' style='font-size:22px;'></div>
+      <div class='col-12' id='acid_stability_prediction' style='font-size:22px;'></div>
+    </div>
+</div>
+    <!-- The example MOF selection section of the website -->
+    <div class='zebra' id="pills-example" style='font-size: 20px;'>
+      Choose the default MOF HKUST-1 or any CoRE MOF. <!-- Selection box for the example MOF -->
+      <div class='zebra' style="padding-top: 30px; font-size: 22px;">
+        Example MOF options <input autocomplete="off" class='form-control locksMetrics' id="MOF_option" list='MOFs_list' onmousedown="value = '';" style='font-size: 22px;'>
+      </div><!-- Example MOFs -->
+      <datalist id='MOFs_list' style='font-size: 22px;'>
+        <!-- Defined near the end of the Javascript section below -->
+      </datalist>
+      <div style='width:100%; text-align:center; margin-top:0.5cm;'>
+        <button class='btn btn-primary round_button' id='select_example' style='display:inline-block; width:49%; font-size: 22px;' type='button'>Select example MOF</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
+    <div class="container">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT<br>
+          Contact: mofsimplify@mit.edu</a>
+        </li>
+      </ul>
+    </div>
+  </div><!-- For cif file upload -->
+  <form>
+    <input id="file_input" name="file_input" style="display:none" type="file"> <!-- This will never display anything. Just used to store a MOF cif file if the button "Custom (upload cif file)" is used. -->
+     <!-- For example MOF file -->
+  </form>
+  <p id="example_holder"></p><!-- This will never display anything. Just used to store a MOF cif file if the button "Example MOF" is used. -->
+  <!-- Beginning of JavaScript section -->
+  <script>
+
+    // tags for changing the selection button colors, depending on if an operation is successfully completed or not
+    failure_red = '#A33B20';
+    success_green = '#18bc9c';
+    inprogress_yellow = '#F7B801'
+    original_blue = '#2c3e50';
+
+    load_color = original_blue;
+    upload_color = original_blue;
+    water_pred_color = original_blue;
+    acid_pred_color = original_blue;
+
+    $(function () {
+
+
+      // Set up 3Dmol viewer 
+      let element = $('#container-01');
+      let config = { backgroundColor: 'white' };
+      let component_viewer = $3Dmol.createViewer(element, config);
+      data = {};
+
+      // Reset zoom level.
+      $('#reset_zoom').click(function () {
+        component_viewer.zoomTo();
+      })
+
+      // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
+      function renew(action) { // something else was already called reset, so we're calling this renew
+
+        // action will be either 'example', 'input', or 'bb'
+        if (action != 'example') {
+          document.getElementById('example_holder').value = null; // clears example cif
+        }
+        if (action != 'input') {
+          document.getElementById('file_input').value = null; // clearing any cifs loaded by the user
+        }
+
+        color_reset(); // resetting selection and prediction and visualize and component button colors 
+
+        w_stability_field = document.getElementById('water_stability_prediction');
+        setColor(w_stability_field, 'transparent') // color background, transparent                      
+
+        a_stability_field = document.getElementById('acid_stability_prediction');
+        setColor(a_stability_field, 'transparent') // color background, transparent                      
+
+        // hiding sections
+        $('#predict_section').hide()
+        $('#status_section').hide()
+        $('#descriptor_section').hide()
+        $('#cif_hint').hide()
+
+        // clearing previous predictions
+        $('#water_stability_prediction').text('');
+        $('#acid_stability_prediction').text('');
+
+        // Clearing everything in the Status messages and MOF predictions section of the website, and the holders.
+        $('#upload_status').text(''); // now nothing is uploaded
+      }
+
+      // Resets the colors of the selection and prediction and visualize and component buttons
+      function color_reset() { 
+        load_color = original_blue;
+        upload_color = original_blue;
+        water_pred_color = original_blue;
+        acid_pred_color = original_blue;
+        descriptor_color = original_blue;
+
+        $('#example-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
+        $('#upload').css({ 'background-color': original_blue, 'border-color': original_blue })
+        $('#bb-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
+        $('#predict_w').css({ 'background-color': original_blue, 'border-color': original_blue })
+        $('#predict_a').css({ 'background-color': original_blue, 'border-color': original_blue })
+        $('#download_descriptors').css({ 'background-color': original_blue, 'border-color': original_blue })
+
+      }
+
+      // Used for ensuring that only .cif files are uploaded.  
+      function getExtension(filename) {
+        var parts = filename.split('.');
+        return parts[parts.length - 1];
+      }
+
+      // Used for ensuring that only .cif files are uploaded.
+      function isCif(filename) {
+        var ext = getExtension(filename);
+        return ext == 'cif';
+      }
+
+      // Upload MOF cif file.  
+      $('#upload').on('click', function () { // button triggers upload
+        $('#file_input').trigger('click'); // OS file selection
+      });
+
+      // This function triggers once the user uploads a file.
+      $("#file_input").change(function () {
+        renew('input');
+
+        // Check if uploaded file is a .cif.
+        if (!isCif(this.value)) { // if the uploaded file is not a cif
+          this.value = null; // clear the non-cif file
+          upload_color = failure_red;
+          $('#upload').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          alert("Must be a cif file.");
+          return; // if not a cif, doesn't continue     
+        }
+
+        let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+        $('#upload_status').text('Selected MOF (uploaded): ' + myFile.name);
+        upload_color = success_green;
+        $('#upload').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+        $('#predict_section').show()
+        $('#status_section').show()
+        $('#cif_hint').show()
+      });
+
+      // Code that updates the file upload text in any input form (i.e. change "Upload file..." to "file.pdf")
+      $('input[type="file"]').change(function(e){
+        var fileName = e.target.files[0].name;
+        $(e.target).siblings('.custom-file-label').html(fileName);
+      });
+
+
+      // Generate water stability prediction when the "2-class water stability" button is clicked.
+      $('#predict_w').click(function () {
+        // check if a cif is uploaded
+        let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+        let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
+
+        // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
+        if (myFile == undefined) {
+          myFile = myFile2;
+          if (myFile2 == undefined) {
+            alert("Must select a MOF for analysis first.");
+
+            water_pred_color = failure_red;
+            $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+
+            return;
+          }
+        }
+
+        $('#water_stability_prediction').text('The 2-class water stability prediction is loading...');
+
+        water_pred_color = inprogress_yellow;
+        $('#predict_w').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress
+
+        // getting the name of the selected MOF
+        var name = document.getElementById('upload_status').innerHTML;
+        name = name.split(' ');
+        name = name.slice(-1)[0]; // getting the last element of the array
+
+        // myFile.text() is a promise
+        myFile.text().then(function (result) {
+          // result is the text of the loaded .cif file
+
+          myDict = { 'name': name, 'structure': result }
+
+          // The $ is jquery. The post stuff sends a command to the app.py code to execute the function that is routed to by /predict_water_stability
+          // It is a post request rather than a get request because information is sent to the backend (in a get request no information is sent)
+          $.post("/predict_water_stability", JSON.stringify(myDict)).done(
+            function (response) {
+
+              if (response == 'OVERLOAD') {
+                alert('Server is receiving high traffic, please try again later')
+                water_pred_color = failure_red;
+                $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                $('#water_stability_prediction').text('');
+
+                return; // Do not update water stability prediction if server is too busy.              
+              }
+              if (response == 'FAILED') {
+                alert('Failed to featurize')
+                water_pred_color = failure_red;
+                $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                $('#water_stability_prediction').text('');
+
+                return; // Do not update water stability prediction if prediction failed.
+              }
+
+              water_pred_color = success_green;
+              $('#predict_w').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+
+              $('#descriptor_section').show() // show section where can download descriptors
+
+                var prediction = response['prediction']
+
+                // preparing the human-interpretable water stability prediction
+                if (prediction <= 0.2) {
+                  verdict = 'Very confident the MOF is unstable or has low kinetic stability in water.';
+                  my_color = '#ffad97' // color background, light red
+                }
+                else if (prediction <= 0.4) {
+                  verdict = 'Fairly confident the MOF is unstable or has low kinetic stability in water.';
+                  my_color = '#ffcd97' // light orange
+                }
+                else if (prediction <= 0.5) {
+                  verdict = 'Uncertain, but predict the MOF is unstable or has low kinetic stability in water.';
+                  my_color = '#fffa97' // light yellow
+                }
+                else if (prediction <= 0.6) {
+                  verdict = 'Uncertain, but predict the MOF has high kinetic stability or thermodynamic stability in water.';
+                  my_color = '#fffa97' // light yellow
+                }
+                else if (prediction <= 0.8) {
+                  verdict = 'Fairly confident the MOF has high kinetic stability or thermodynamic stability in water.';
+                  my_color = '#e7ff97' // light lime
+                }
+                else {
+                  verdict = 'Very confident the MOF has high kinetic stability or thermodynamic stability in water.';
+                  my_color = '#90ee90' // light green
+                }
+
+                $('#water_stability_prediction').text('The 2-class water stability prediction is: ' + prediction.toString() + '. ' + verdict);
+
+                stability_field = document.getElementById('water_stability_prediction');
+                setColor(stability_field, my_color) // color background based on the prediction
+            })
+            .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
+              water_pred_color = failure_red;
+              $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+              $('#water_stability_prediction').text('');
+              alert(errorThrown.concat("; MOF may be too large for web-based analysis"))
+            })
+          })
+   });
+
+
+   function setColor(element, color) {
+    element.style.backgroundColor = color;
+   }
+
+      // Generate acidic aqueous solution stability prediction when the "Acidic aqueous solution stability" button is clicked.
+      $('#predict_a').click(function () {
+        // check if a cif is uploaded
+        let myFile = document.getElementById('file_input').files[0]; // the uploaded file
+        let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
+
+        // If neither the example MOF has been loaded, nor has the user uploaded nor generated a MOF, then an alert is raised and the function exits.
+        if (myFile == undefined) {
+          myFile = myFile2;
+          if (myFile2 == undefined) {
+            alert("Must select a MOF for analysis first.");
+            acid_pred_color = failure_red;
+            $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            return;
+          }
+        }
+
+        acid_pred_color = inprogress_yellow;
+        $('#predict_a').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress 
+        $('#acid_stability_prediction').text('The acid stability prediction is loading...'); // display prediction result
+
+        // getting the name of the selected MOF
+        var name = document.getElementById('upload_status').innerHTML;
+        name = name.split(' ');
+        name = name.slice(-1)[0]; // getting the last element of the array
+
+        // myFile.text() is a promise
+        myFile.text().then(function (result) {
+          // result is the text of the loaded .cif file
+
+          myDict = { 'name': name, 'structure': result }
+
+          $.post("/predict_acid_stability", JSON.stringify(myDict)).done(
+            function (response) {
+
+              if (response == 'OVERLOAD') {
+                alert('Server is receiving high traffic, please try again later')
+                acid_pred_color = failure_red;
+                $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                $('#acid_stability_prediction').text('')
+                return; // Do not update acid stability prediction if server is too busy.              
+              }
+
+              if (response == 'FAILED') {
+                alert('Failed to featurize')
+                acid_pred_color = failure_red;
+                $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                $('#acid_stability_prediction').text('')
+                return; // Do not update acid stability prediction if prediction failed.
+              }
+
+
+
+              acid_pred_color = success_green;
+              $('#predict_a').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+
+              $('#descriptor_section').show() // show section where can download descriptors
+
+                var prediction = response['prediction']
+
+                // preparing the human-interpretable water stability prediction
+                if (prediction <= 0.2) {
+                  verdict = 'Very confident the MOF is unstable in acid.';
+                  my_color = '#ffad97' // color background, light red
+                }
+                else if (prediction <= 0.4) {
+                  verdict = 'Fairly confident the MOF is unstable in acid.';
+                  my_color = '#ffcd97' // light orange
+                }
+                else if (prediction <= 0.5) {
+                  verdict = 'Uncertain, but predict the MOF is unstable in acid.';
+                  my_color = '#fffa97' // light yellow
+                }
+                else if (prediction <= 0.6) {
+                  verdict = 'Uncertain, but predict the MOF is stable in acid.';
+                  my_color = '#fffa97' // light yellow
+                }
+                else if (prediction <= 0.8) {
+                  verdict = 'Fairly confident the MOF is stable in acid.';
+                  my_color = '#e7ff97' // light lime
+                }
+                else {
+                  verdict = 'Very confident the MOF is stable in acid.';
+                  my_color = '#90ee90' // light green
+                }
+
+                $('#acid_stability_prediction').text('The acidic aqueous solution stability prediction is: ' + prediction.toString() + '. ' + verdict);
+
+                stability_field = document.getElementById('acid_stability_prediction');
+                setColor(stability_field, my_color) // color background based on the prediction
+            })
+            .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
+              acid_pred_color = failure_red;
+              $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+              $('#acid_stability_prediction').text('')
+              alert(errorThrown.concat("; MOF may be too large for web-based analysis")) // errorThrown will likely look like "Gateway Time-out"
+            })
+          })
+   });
+
+
+      // Load an example MOF when the "Select example MOF" button is clicked.
+      $('#select_example').click(function () {
+        my_MOF = $('#MOF_option').val() // Check which MOF is selected in the Example MOF options dropdown.
+
+        if (my_MOF === '') {
+          alert("Must choose a MOF first.");
+          return;
+        }
+
+        if (my_MOF === 'HKUST-1 (default)') {
+          default_loader()
+        }
+        else { // have a CSD MOF
+          csd_loader(my_MOF)
+        }
+
+        section_hider('#pills-main')
+      })
+
+      function default_loader() {
+        fetch('mof_examples/HKUST1.cif').then(response => { // grabbing the example MOF from local host
+          if (!response.ok) { // catching 404 and other issues
+            load_color = failure_red;
+            $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            throw Error(response.statusText);
+          }
+          return response.blob();
+        }).then(function (blob) {
+          renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
+          var myFile = new File([blob], "example.cif", { type: "", lastModified: Date.now() }) // making a cif file
+          document.getElementById('example_holder').value = myFile; // setting the value of example_holder
+          $('#upload_status').text('Selected MOF: HKUST-1'); // indicating that the example MOF has been uploaded
+          load_color = success_green;
+          $('#example-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+          $('#predict_section').show() // show the prediction button section
+          $('#status_section').show() // show the status section
+
+          alert('Example MOF loaded!')
+        }).catch(error => {
+          renew('example'); 
+          load_color = failure_red;
+          $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          $('#upload_status').text('Failed to upload example MOF');
+          console.error('There has been a problem with your fetch operation:', error);
+        })
+      };
+
+      function csd_loader(my_MOF) {
+        // my_MOF is the six letter refcode, plus stuff like _clean
+
+        fetch('CoRE2019/' + my_MOF + '.cif').then(response => { // grabbing the example MOF from local host
+          if (!response.ok) { // catching 404 and other issues
+            load_color = failure_red;
+            $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+            throw Error(response.statusText);
+          }
+          return response.blob();
+        }).then(function (blob) {
+          renew('example'); // note: I call renew here rather than at the beginning of the load function in order to prevent NGL.Stage from throwing a hissy fit
+          var myFile = new File([blob], "example.cif", { type: "", lastModified: Date.now() }) // making a cif file
+          document.getElementById('example_holder').value = myFile; // setting the value of example_holder
+          $('#upload_status').text('Selected MOF: ' + my_MOF); // indicating that the example MOF has been uploaded
+          load_color = success_green;
+          $('#example-redirect').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+          $('#predict_section').show() // show the prediction button section
+          $('#status_section').show() // show the status section
+
+          alert('Example MOF loaded!')
+        }).catch(error => {
+          renew('example');
+          load_color = failure_red;
+          $('#example-redirect').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          $('#upload_status').text('Failed to upload example MOF');
+          console.error('There has been a problem with your fetch operation:', error);
+        })
+
+      }
+
+
+      // This function is used for downloading information
+      // filename is the name of the file to be downloaded. text is the contents of the file.
+      function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+      }
+
+      // When the "Download descriptors" button is clicked, download the descriptors for the selected MOF
+      $('#download_descriptors').click(function () {
+        name = get_selected_MOF(false) // don't want the .cif extension
+
+        // Grab the contents of the descriptor csv
+        $.post("/get_descriptors_2", JSON.stringify(name)).done(
+          function (response) {
+            descriptor_color = success_green;
+            $('#download_descriptors').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+            download(name + '_descriptors.csv', response)
+          })
+      })
+
+
+      // Form check for file extensions
+      upload_extensions = ['pdf', 'jpg', 'png', 'tiff'] // ['jpg', 'jpeg', 'png', 'pdf', 'tiff', 'tif', 'eps'] // acceptable file types
+
+      // This function returns the name of the selected MOF
+      // If extension is true, keep the .cif at the end; else don't
+      function get_selected_MOF(extension = true) {
+        var name = document.getElementById('upload_status').innerHTML; // getting the name of the selected MOF
+        name = name.split(' ');
+        name = name.slice(-1)[0]; // getting the last element of the array
+        if (!extension) {
+          if (name.substring(name.length - 4) == '.cif') { // getting rid of the .cif part
+            name = name.substring(0, name.length - 4)
+          }
+        }
+
+        return name
+      }
+
+
+      // When the "Dark mode" button is clicked:
+      black = '#000000'
+      white = '#FFFFFF'
+      $('#dark_mode').click(function () { // change background and button text depending on button state
+        button_text = document.getElementById('dark_mode').textContent
+        if (button_text == 'Dark mode') { // make background dark and text white
+          $('body').css("background-color", black);
+          document.getElementById('dark_mode').textContent = 'Light mode';
+          $('.zebra').css('color', white)
+          $('#header_background').css('background-image', 'url(\'banner_dark\')')
+        }
+        else { // Button says Light mode; make background white and text black
+          $('body').css("background-color", white);
+          document.getElementById('dark_mode').textContent = 'Dark mode';
+          $('.zebra').css('color', black)
+          $('#header_background').css('background-image', 'url(\'banner_light\')')
+        }
+      })
+
+      // The code below that has a lot of hide and show operations is the tab functionality that allows the user to switch tabs.
+      // For example, when the Visualization tab is clicked, all website displays that don't have to do with visualization are hidden, and visualization functionality is shown
+
+      // Helper function for the code below. Hides the appropriate sections when a button is clicked.
+      function section_hider(current_section) {
+        // hide everything but current_section
+        sections = ['#pills-main', '#pills-example']
+        $(current_section).show()
+        for (var i = 0; i < sections.length; i++) {
+          if (sections[i] != current_section) {
+            $(sections[i]).hide()
+          }
+        }
+      }
+
+      $('#example-redirect').click(function () {
+        section_hider('#pills-example')
+        $('#MOF_option').val('HKUST-1 (default)') // setting the default value
+      })
+
+      // option_generator is a helper function for populating dropdowns on the website
+      var option_generator = function(my_list) {
+        var options = ''
+        for (var i = 0; i < my_list.length; i++) {
+          options += '<option value="' + my_list[i] + '" />';
+        }
+        return options
+      }
+
+      $.get("/list_getter").done(
+        function (response) {
+          // Purpose of this is to get lists for the code below
+          // my_linkers = response['my_linkers']
+          // my_sbus = response['my_sbus']
+          // my_nets = response['my_nets']
+          my_MOFs = response['my_MOFs']
+
+          // // Populating the linkers in the building block section
+          // document.getElementById('linkers_list').innerHTML = option_generator(my_linkers); // populating the linkers dropdown
+
+          // // Next, populating the nodes in the building block section.
+          // document.getElementById('sbus_list').innerHTML = option_generator(my_sbus); // populating the sbus dropdown
+
+          // // Populating the nets in the building block section
+          // document.getElementById('nets_list').innerHTML = option_generator(my_nets); // populating the nets dropdown
+
+          // In addition, populating the CSD MOF options for the Example MOF loading
+          document.getElementById('MOFs_list').innerHTML = option_generator(my_MOFs); // populating the MOFs dropdown
+        })
+
+      // On startup, hide certain sections
+      $('#pills-comp').hide()
+      $('#pills-example').hide()
+      $('#pills-data').hide()
+      $('#predict_section').hide()
+      $('#descriptor_section').hide()
+      $('#status_section').hide()
+      $('#cif_hint').hide()
+
+
+      // functions to handle the selection and prediction and visualize and component button color change upon mouse hover
+      // since we change the selection and prediction and visualize and component button colors and lose the default hover color change
+      $("#example-redirect").hover(function () {
+        $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+        $(this).css("border-color", "#1D2B37");
+      }, function () {
+        $(this).css("background-color", load_color);
+        $(this).css("border-color", load_color);
+      });
+
+      $("#upload").hover(function () {
+        $(this).css("background-color", "#1D2B37");
+        $(this).css("border-color", "#1D2B37");
+      }, function () {
+        $(this).css("background-color", upload_color);
+        $(this).css("border-color", upload_color);
+      });
+
+      $("#predict_s").hover(function () {
+        $(this).css("background-color", "#1D2B37");
+        $(this).css("border-color", "#1D2B37");
+      }, function () {
+        $(this).css("background-color", water_pred_color);
+        $(this).css("border-color", water_pred_color);
+      });
+
+      $("#predict_t").hover(function () {
+        $(this).css("background-color", "#1D2B37");
+        $(this).css("border-color", "#1D2B37");
+      }, function () {
+        $(this).css("background-color", acid_pred_color);
+        $(this).css("border-color", acid_pred_color);
+      });
+
+      $("#download_descriptors").hover(function () {
+        $(this).css("background-color", "#1D2B37");
+        $(this).css("border-color", "#1D2B37");
+      }, function () {
+        $(this).css("background-color", descriptor_color);
+        $(this).css("border-color", descriptor_color);
+      });
+
+      $(".link").hover(function () { // for hyperlinks
+        $(this).css("color", '#18bc9c');
+      }, function () {
+        $(this).css("color", '#279AF1');
+      });
+
+      // // When the "Yes" button is clicked for storage permission line
+      // $("#perm_yes").click(function () {
+      //   $('#permission_line').hide()
+      //   $.post("/permission", JSON.stringify(true)).done(function (response) {
+      //   })
+      // })
+
+      // // When the "No" button is clicked for storage permission line
+      // $("#perm_no").click(function () {
+      //   $('#permission_line').hide()
+      //   $.post("/permission", JSON.stringify(false)).done(function (response) {
+      //   })
+      // })
+
+    });
+
+
+  </script> <!-- End of Javascript section -->
+</body>
+</html>

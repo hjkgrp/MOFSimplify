@@ -1,792 +1,743 @@
-<!-- Import 3Dmol, jQuery, and Bootstrap libaries --> 
-<script src="libraries/3Dmol-min.js"></script>
-<script src="libraries/jquery-3.4.1.min.js"></script>
-<script src="libraries/bootstrap.min.js"></script>
-<script src="libraries/3Dmol-min.js"></script>
-
-<!-- Import CSS -->
-<link rel="stylesheet" href="libraries/bootstrap.min.css">
-<link rel="stylesheet" href="libraries/bootstrap_custom.min.css">
-
-<!-- Set up styles -->
-<!-- Custom CSS code is placed within the <style> tag: -->
-<style>
-  body {
-    /* The font to be used everywhere */
-    font-family: Arial, Helvetica, sans-serif;
-    color: black;
-    font-size: 22px;
-  }
-
-  .btn {
-    margin-top: 3px;
-  }  
-
-  .mol-container {
-    /* For building block visualization */
-    height: 400px;
-    position: relative;
-    margin:auto; 
-    width:50%
-  }
-
-  .round_button {
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: bold;
-    min-width: 130px;
-  }
-
-  .toggle_button {
-    display:inline-block; 
-    width:32%; 
-    font-size: 22px;
-  }
-
-  .filter {
-    color: #BF1A2F;
-  }
-
-  #chart {
-    /* thermal breakdown plot is centered */
-    width: 100%;
-    text-align: center;
-  }  
-
-</style>
-
-
-<!-- Empty head section: place meta tags and favicon here -->
+<!-- Import 3Dmol, jQuery, and Bootstrap libaries -->
+<!DOCTYPE html>
+<html>
 <head>
 
-<title>MOFSimplify</title>
+  <script src="libraries/3Dmol-min.js">
+  </script>
+  <script src="libraries/jquery-3.4.1.min.js">
+  </script>
+  <script src="libraries/bootstrap.min.js">
+  </script>
+  <script src="libraries/3Dmol-min.js">
+  </script><!-- Import CSS -->
+  <link href="libraries/bootstrap.min.css" rel="stylesheet">
+  <link href="libraries/bootstrap_custom.min.css" rel="stylesheet"><!-- Set up styles -->
+  <!-- Custom CSS code is placed within the <style> tag: -->
 
+  <style>
+   body {
+     /* The font to be used everywhere */
+     font-family: Arial, Helvetica, sans-serif;
+     color: black;
+     font-size: 22px;
+   }
+
+   .btn {
+     margin-top: 3px;
+   }  
+
+   .mol-container {
+     /* For building block visualization */
+     height: 400px;
+     position: relative;
+     margin:auto; 
+     width:50%
+   }
+
+   .round_button {
+     border-radius: 25px;
+     font-size: 16px;
+     font-weight: bold;
+     min-width: 130px;
+   }
+
+   .toggle_button {
+     display:inline-block; 
+     width:32%; 
+     font-size: 22px;
+   }
+
+   .filter {
+     color: #BF1A2F;
+   }
+
+   #chart {
+     /* thermal breakdown plot is centered */
+     width: 100%;
+     text-align: center;
+   }  
+
+   .dropdown-item {
+     font-size: 18px;
+   }
+   
+  </style><!-- Empty head section: place meta tags and favicon here -->
+  <title>MOFSimplify</title>
 </head>
-
-
 <body>
   <!-- The following code creates a navbar. Each navbar item is in a list entry of class "nav-item". -->
   <div class="navbar navbar-expand-lg fixed-top navbar-dark bg-primary">
     <div class="container">
-      <a href="../" class="navbar-brand" style='font-size: 30px;'>MOFSimplify</a>
-      <button class="navbar-toggler" type='button' data-toggle="collapse" data-target="#navbarResponsive"
-      aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"><!-- Toggle navbar --></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
-      <ul class="navbar-nav">
-          <li class="nav-item" style='padding-left: 30px;'>
+      <a class="navbar-brand" href="../" style='font-size: 30px; padding-right: 30px;'>MOFSimplify</a> <button aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbarResponsive" data-toggle="collapse" type='button'><span class="navbar-toggler-icon"><!-- Toggle navbar --></span></button>
+      <div class="collapse navbar-collapse" id="navbarResponsive" style='font-size: 20px;'>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown" style='padding-right: 30px;'>
+            <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbarDropdownMenuLink" role="button">Stability prediction</a>
+            <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
+              <a class="dropdown-item" href="../">Solvent/Thermal</a> <a class="dropdown-item" href="water_stability_prediction.html">Water/Acid</a>
+            </div>
+          </li>
+          <li class="nav-item" style='padding-right: 30px;'>
             <a class="nav-link" href="stable_MOFs.html">Stable MOFs</a>
-          </li>            
-          <li class="nav-item" style='padding-left: 30px;'>
+          </li>
+          <li class="nav-item" style='padding-right: 30px;'>
             <a class="nav-link" href="how_to_cite.html">How to Cite</a>
           </li>
-          <li class="nav-item" style='padding-left: 30px;'>
-            <a class="nav-link" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a>
-          </li>
-          <li class="nav-item" style='padding-left: 30px;'>
-            <a class="nav-link" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF Code</a>
+          <li class="nav-item dropdown" style='padding-right: 30px;'>
+            <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbarDropdownMenuLink">Code</a>
+            <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
+              <a class="dropdown-item" href="https://github.com/hjkgrp/MOFSimplify">Source Code</a> <a class="dropdown-item" href="https://github.com/hjkgrp/molSimplify/tree/master/molSimplify/Informatics/MOF">MOF Code</a>
+            </div>
           </li>
         </ul>
-
-      </div>
-      <button class='btn btn-primary round_button' id='dark_mode' type='button' style='font-size:22px; width:20%;'>Dark mode</button>
+      </div><button class='btn btn-primary round_button' id='dark_mode' style='font-size:22px; width:20%;' type='button'>Dark mode</button>
     </div>
   </div>
-
   <div class="container zebra">
-
-    <h3> Interact with our hypothetical MOF database here! </h3>
-
-    Namings for the building blocks (inorganic node, organic node, edge) reflect the CoRE MOF from which the building block was taken.<br>
+    <h3>Interact with our hypothetical MOF database here!</h3>Namings for the building blocks (inorganic node, organic node, edge) reflect the CoRE MOF from which the building block was taken.<br>
     Data is from the <a href='https://zenodo.org/record/7666081'>Zenodo repository</a> associated with <a href='https://arxiv.org/abs/2210.14191'>this paper</a>.
-
-    <h4 style='margin-top: 1cm; font-weight: bold;'>Choose <span class='filter'>filters</span></h4>
-
-    <!-- &#8451 is degrees celsius in decimal . &#8805 is the greater than or equal sign in decimal. -->
-    <p style='font-size:18px;'> For example, if you select acs as a net, only MOFs in our database with the acs net will appear in the dropdown at the bottom of the page. <br> If you select Cd as the metal, only MOFs in our database with Cd in them will appear in the dropdown.<br>We define an ultrastable MOF as one with a predicted solvent removal stability &#8805 0.5 and a predicted thermal stability &#8805 446&#8451. 
-    </p> 
-
-    <!-- Option to filter MOFs by whether they are ultrastable or not -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Choose <span class='filter'>filters</span></h4><!-- &#8451 is degrees celsius in decimal . &#8805 is the greater than or equal sign in decimal. -->
+    <p style='font-size:18px;'>For example, if you select acs as a net, only MOFs in our database with the acs net will appear in the dropdown at the bottom of the page.<br>
+    If you select Cd as the metal, only MOFs in our database with Cd in them will appear in the dropdown.<br>
+    We define an ultrastable MOF as one with a predicted solvent removal stability &#8805 0.5 and a predicted thermal stability &#8805 446&#8451.</p><!-- Option to filter MOFs by whether they are ultrastable or not -->
+    <div class='row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Only ultrastable MOFs?
       </div>
       <div class='col-lg-8'>
-        <select style='font-size: 22px;' class='form-control filter_option' id='ultrastable_option' placeholder="Yes" >
-          <option value="Yes">Yes</option>
-          <option value="No">No</option>          
+        <select class='form-control filter_option' id='ultrastable_option' style='font-size: 22px;'>
+          <option value="Yes">
+            Yes
+          </option>
+          <option value="No">
+            No
+          </option>
         </select>
       </div>
-    </div>
-
-    <!-- Option to filter MOFs by type -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
+    </div><!-- Option to filter MOFs by type -->
+    <div class='row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Type (number of distinct inorganic nodes, organic nodes, and edges)
       </div>
       <div class='col-lg-8'>
-        <select style='font-size: 22px;' class='form-control filter_option' id='type_option' placeholder="Any" >
-          <option value="Any">Any</option>
-          <option value="1, 0, 1">1 inorg node, 0 org node, 1 edge</option>
-          <option value="1, 1, 1">1 inorg node, 1 org node, 1 edge</option>
-          <option value="2, 0, 1">2 inorg node, 0 org node, 1 edge</option>          
+        <select class='form-control filter_option' id='type_option' style='font-size: 22px;'>
+          <option value="Any">
+            Any
+          </option>
+          <option value="1, 0, 1">
+            1 inorg node, 0 org node, 1 edge
+          </option>
+          <option value="1, 1, 1">
+            1 inorg node, 1 org node, 1 edge
+          </option>
+          <option value="2, 0, 1">
+            2 inorg node, 0 org node, 1 edge
+          </option>
         </select>
       </div>
-    </div>
-
-    <!-- Option to filter building blocks by net -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
+    </div><!-- Option to filter building blocks by net -->
+    <div class='row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Net
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" id='net_option' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="Any" list='net_list' onmousedown="value = '';" />
-      </div>
-      <datalist id='net_list' style='font-size: 22px;'>
+        <input autocomplete="off" class='form-control locksMetrics filter_option' id='net_option' list='net_list' onmousedown="value = '';" placeholder="Any" style='width:100%; font-size: 22px;'>
+      </div><datalist id='net_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
-      </datalist>  
-    </div>
-
-    <!-- Option to filter building blocks by metal -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
+      </datalist>
+    </div><!-- Option to filter building blocks by metal -->
+    <div class='row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Metal
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" id='metal_option' style='width:100%; font-size: 22px;' class='form-control locksMetrics filter_option' placeholder="Any" list='metal_list' onmousedown="value = '';" />
-      </div>
-      <datalist id='metal_list' style='font-size: 22px;'>
+        <input autocomplete="off" class='form-control locksMetrics filter_option' id='metal_option' list='metal_list' onmousedown="value = '';" placeholder="Any" style='width:100%; font-size: 22px;'>
+      </div><datalist id='metal_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
-      </datalist>  
-    </div>
-
-    <!-- Selection box for the inorganic node -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
+      </datalist>
+    </div><!-- Selection box for the inorganic node -->
+    <div class='row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Inorganic node
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="inorg_node_option" class='form-control locksMetrics filter_option' placeholder="Any" list='inorg_node_list'
-        onmousedown="value = '';" />
-      </div>
-
-      <datalist id='inorg_node_list' style='font-size: 22px;'>
+        <input autocomplete="off" class='form-control locksMetrics filter_option' id="inorg_node_option" list='inorg_node_list' onmousedown="value = '';" placeholder="Any" style='font-size: 22px;'>
+      </div><datalist id='inorg_node_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
-
-    </div>
-
-    <!-- Selection box for the organic node -->
-    <div class = 'row organic' style='margin-top: 0.5cm;'>
+    </div><!-- Selection box for the organic node -->
+    <div class='row organic' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Organic node
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="org_node_option" class='form-control locksMetrics filter_option' placeholder="Any" list='org_node_list'
-        onmousedown="value = '';" />
-      </div>
-
-      <datalist id='org_node_list' style='font-size: 22px;'>
+        <input autocomplete="off" class='form-control locksMetrics filter_option' id="org_node_option" list='org_node_list' onmousedown="value = '';" placeholder="Any" style='font-size: 22px;'>
+      </div><datalist id='org_node_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
-
-    </div>
-
-    <!-- Selection box for the edge -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
+    </div><!-- Selection box for the edge -->
+    <div class='row' style='margin-top: 0.5cm;'>
       <div class='col-lg-4'>
         Edge
       </div>
       <div class='col-lg-8'>
-        <input autocomplete="off" style='font-size: 22px;' id="edge_option" class='form-control locksMetrics filter_option' placeholder="Any" list='edge_list'
-        onmousedown="value = '';" />
-      </div>
-
-      <datalist id='edge_list' style='font-size: 22px;'>
+        <input autocomplete="off" class='form-control locksMetrics filter_option' id="edge_option" list='edge_list' onmousedown="value = '';" placeholder="Any" style='font-size: 22px;'>
+      </div><datalist id='edge_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
-
     </div>
-
     <h4 style='margin-top: 1cm; font-weight: bold;'>Download and visualize your selected <span class='filter'>filter</span> criteria building blocks</h4>
-
     <div style='text-align:center; margin-top: 0.5cm;'>
-      <button class='btn btn-primary round_button toggle_button' id='toggle_inorg_node' type='button'>Inorganic node</button>
-      <button class='btn btn-primary round_button toggle_button organic' id='toggle_org_node' type='button'>Organic node</button>
-      <button class='btn btn-primary round_button toggle_button' id='toggle_edge' type='button'>Edge</button>
+      <button class='btn btn-primary round_button toggle_button' id='toggle_inorg_node' type='button'>Inorganic node</button> <button class='btn btn-primary round_button toggle_button organic' id='toggle_org_node' type='button'>Organic node</button> <button class='btn btn-primary round_button toggle_button' id='toggle_edge' type='button'>Edge</button>
     </div>
-
     <div style='text-align:center; margin-top: 0.5cm;'>
-      <button class='btn btn-primary round_button toggle_button' id='download_bb' type='button'>Download</button>
-      <button class='btn btn-primary round_button toggle_button' id='visualize_bb' type='button'>Visualize</button>
+      <button class='btn btn-primary round_button toggle_button' id='download_bb' type='button'>Download</button> <button class='btn btn-primary round_button toggle_button' id='visualize_bb' type='button'>Visualize</button>
     </div>
-
     <div class='row' style='margin-top: 1cm;'>
-        <div id='container-01' class='mol-container'
-        style='border-style:solid;border-width:2px;background-color: white;'>
-        <div id='container-01-note'
-        style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px;'> MOF building blocks are visualized here. <br> Left click to rotate, scroll with mouse to zoom. </div>
+      <div class='mol-container' id='container-01' style='border-style:solid;border-width:2px;background-color: white;'>
+        <div id='container-01-note' style='position: relative; top: 7em; text-align: center; z-index: 2; font-size: 22px;'>
+          MOF building blocks are visualized here.<br>
+          Left click to rotate, scroll with mouse to zoom.
         </div>
-        <div style="margin-bottom:0.5cm;"></div>
-        <div style='width:100%; text-align:center;'>
-        <button style='display:inline-block; width:50%; font-size: 22px;' class='btn btn-primary round_button'
-        id='reset_zoom' type='button'>Reset zoom</button>
-        </div>
-
-    </div>    
-
-
-    <h4 style='margin-top: 1cm; font-weight: bold;'>Select MOF (dropdown options are <span class='filter'>filtered</span>)</h4>
-    <!-- Selection box for the stable MOF -->
-    <div class = 'row' style='margin-top: 0.5cm;'>
-      <div class='col-lg-12'>
-        <input autocomplete="off" style='font-size: 22px;' id="MOF_option" class='form-control locksMetrics' list='stable_MOF_list'
-        onmousedown="value = '';" />
       </div>
-
-      <datalist id='stable_MOF_list' style='font-size: 22px;'>
+      <div style="margin-bottom:0.5cm;"></div>
+      <div style='width:100%; text-align:center;'>
+        <button class='btn btn-primary round_button' id='reset_zoom' style='display:inline-block; width:50%; font-size: 22px;' type='button'>Reset zoom</button>
+      </div>
+    </div>
+    <h4 style='margin-top: 1cm; font-weight: bold;'>Select MOF (dropdown options are <span class='filter'>filtered</span>)</h4><!-- Selection box for the stable MOF -->
+    <div class='row' style='margin-top: 0.5cm;'>
+      <div class='col-lg-12'>
+        <input autocomplete="off" class='form-control locksMetrics' id="MOF_option" list='stable_MOF_list' onmousedown="value = '';" style='font-size: 22px;'>
+      </div><datalist id='stable_MOF_list' style='font-size: 22px;'>
         <!-- Defined near the end of the Javascript section below -->
       </datalist>
-
     </div>
-
     <div style='text-align:center; margin-top: 0.5cm;'>
-      <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF_initial' type='button'>Download selected MOF (unoptimized)</button>
-      <button style='display:inline-block; width:49%; font-size: 22px;' class='btn btn-primary round_button' id='download_MOF_optimized' type='button'>Download selected MOF (optimized)</button>
+      <button class='btn btn-primary round_button' id='download_MOF_initial' style='display:inline-block; width:49%; font-size: 22px;' type='button'>Download selected MOF (unoptimized)</button> <button class='btn btn-primary round_button' id='download_MOF_optimized' style='display:inline-block; width:49%; font-size: 22px;' type='button'>Download selected MOF (optimized)</button>
     </div>
-
-    <p style='text-align:center; margin-top: 0.25cm;'> Initial structures (.CIF) are generated with PORMAKE.<br> 
+    <p style='text-align:center; margin-top: 0.25cm;'>Initial structures (.CIF) are generated with PORMAKE.<br>
     Optimized structures (.CIF) are optimized with the UFF4MOF force field in LAMMPS.</p>
-
-    <p id='selected_MOF_data' style='text-align:left; margin-top: 0.5cm;'>
-    </p>
-
+    <p id='selected_MOF_data' style='text-align:left; margin-top: 0.5cm;'></p>
     <div class='col-12' id='chart'></div>
-
   </div>
-
-
   <div class="navbar navbar-expand-lg relative navbar-dark bg-primary" style="margin-top: 50px; font-size: 24px;">
     <div class="container">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT</br> Contact: mofsimplify@mit.edu</a>
+          <a class="nav-link disabled">Site developed and maintained by the Kulik Group at MIT<br>
+          Contact: mofsimplify@mit.edu</a>
         </li>
       </ul>
     </div>
-  </div>
+  </div><!-- For any selected building blocks -->
+  <p id="bb_holder"></p><!-- This will never display anything. Just used to store a building block XYZ file content if the button "Inorganic node", "Organic node", or "Edge" is used -->
+  <!-- Begin JavaScript section -->
+  <script>
+
+   // Set up 3Dmol viewer 
+   let element = $('#container-01');
+   let config = { backgroundColor: 'white' };
+   let component_viewer = $3Dmol.createViewer(element, config);
+   data = {};  
+
+   // Hardcoding these lists based on https://zenodo.org/record/7091192
+
+   nets = ['Any', 'acs', 'acs-a', 'acs-f', 'acs-g', 'acs-h', 'acs-i', 'afi', 'afw', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'ant', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcs-a', 'bcu', 'bcu-b', 'bcu-f', 'bcu-g', 'bcu-h', 'bcu-i', 'bcu-j', 'bcu-k', 'bcu-l', 'bmn', 'bnn', 'bor-e', 'bpr', 'bsn', 'bto', 'bva', 'bwt', 'cab', 'cag', 'can', 'cbo', 'cdl', 'cds', 'cds-f', 'cdt', 'cha', 'cml', 'cor', 'crb', 'crr', 'crs', 'crs-a', 'csq', 'ctn', 'ctn-e', 'dag', 'deh', 'dei', 'dft', 'dia', 'dia-a', 'dia-f', 'dia-g', 'dia-j', 'dmp', 'ecb', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'est', 'eta', 'eta-c', 'etb', 'etd', 'etf', 'fau', 'fca', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fcx', 'fda', 'fdc', 'fee', 'fgl', 'flu-e', 'fna', 'fnc', 'fnd', 'fne', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fny', 'fnz', 'fob', 'fst', 'ftb', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'icc', 'ict', 'ilc', 'irl', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llj', 'llk', 'lll', 'loh', 'lon', 'lta', 'lvt', 'lvt-a', 'mdf', 'mer', 'mmt', 'mok', 'mon', 'msp', 'msw', 'myd', 'nbo', 'nbo-a', 'nbo-h', 'ncb', 'neb', 'nfa', 'nfb', 'nfc', 'nia', 'nia-e', 'nom', 'noo', 'nov', 'noy', 'noz', 'npo', 'ocu', 'ocu-e', 'ofo', 'ooa', 'oob', 'oof', 'osc', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pts-e', 'pyc', 'pyr', 'pyr-e', 'qdl', 'qtz', 'qtz-a', 'qtz-e', 'qtz-f', 'qtz-g', 'qtz-h', 'qtz-x', 'qzd', 'rac', 'reo', 'reo-e', 'rgd', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sev', 'sgn', 'sin', 'sit', 'skb', 'skc', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smi', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smt', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'soe', 'sof', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'sqp', 'sra', 'srs', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'ssc', 'sst', 'sth', 'sva', 'svb', 'svc', 'sve', 'svf', 'svh', 'svi', 'svj', 'svk', 'svm', 'svo', 'svv', 'svx', 'svy', 'svz', 'swa', 'swd', 'swe', 'swf', 'swi', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxk', 'sxm', 'sxp', 'sxq', 'sxt', 'tbo', 'teo', 'tes', 'tfs', 'the', 'thp-x', 'ths', 'toc-e', 'tph', 'tsi', 'tsx', 'ttw', 'twf-e', 'twt', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vbx', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vcp', 'vcq', 'vcr', 'vcu', 'vda', 'vdb', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgw', 'wgz', 'whb', 'whc', 'whd', 'whe', 'whh', 'whj', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wif', 'wig', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkh', 'wkj', 'wkl', 'wko', 'wkp', 'wkq', 'wkr', 'wkt', 'wku', 'wkw', 'wkx', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmb', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmx', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wng', 'wnh', 'wni', 'wnj', 'wnm', 'wnn', 'wno', 'wnr', 'wns', 'wnt', 'wnx', 'wny', 'wnz', 'wse', 'wuy', 'xbj', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfk', 'xfp', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'yfa', 'yfb', 'yfc', 'yfd', 'yff', 'yfg', 'yfh', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfx', 'yfy', 'yfz', 'yyz', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
+
+   // Nets that are present in the ultrastable set of MOFs:
+   ultrastable_nets = ['Any', 'acs', 'afi', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcu', 'bcu-b', 'bcu-f', 'bcu-h', 'bcu-i', 'bcu-k', 'bcu-l', 'bmn', 'bpr', 'bsn', 'bva', 'bwt', 'cag', 'can', 'cbo', 'cds-f', 'cha', 'cml', 'cor', 'crs', 'crs-a', 'csq', 'ctn', 'dag', 'deh', 'dei', 'dia-a', 'dia-j', 'dmp', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'etb', 'etf', 'fau', 'fca', 'fcd', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fdc', 'fgl', 'flu-e', 'fnc', 'fnd', 'fng', 'fnh', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fns', 'fob', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'ict', 'ilc', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llk', 'lll', 'lta', 'lvt-a', 'mdf', 'mer', 'mok', 'mon', 'msp', 'myd', 'nbo-h', 'neb', 'nfa', 'nfb', 'nfc', 'nom', 'ocu', 'oof', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pyc', 'pyr', 'pyr-e', 'qtz-e', 'qtz-x', 'reo', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sin', 'sit', 'skb', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'sst', 'sth', 'svb', 'svc', 'svm', 'svo', 'svx', 'svy', 'swa', 'swf', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxt', 'tbo', 'tes', 'tfs', 'thp-x', 'toc-e', 'tph', 'tsi', 'tsx', 'twf-e', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umc', 'umd', 'ume', 'umh', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umx', 'umy', 'umz', 'una', 'unb', 'und', 'une', 'unf', 'ung', 'unh', 'unl', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uoa', 'uob', 'uod', 'uoe', 'uof', 'uoh', 'uoi', 'uol', 'uon', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uow', 'uox', 'uoy', 'uoz', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utc', 'utj', 'utm', 'utn', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vck', 'vcl', 'vcu', 'vda', 'vdb', 'vmf', 'vmg', 'vmh', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wfx', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgw', 'whh', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wig', 'wil', 'wim', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wji', 'wjr', 'wjz', 'wkf', 'wkh', 'wkj', 'wkl', 'wkp', 'wkq', 'wkr', 'wku', 'wkw', 'wla', 'wlb', 'wle', 'wlf', 'wlg', 'wlh', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wnh', 'wnm', 'wno', 'wns', 'wnz', 'wse', 'xfc', 'xfe', 'xff', 'xfg', 'xfh', 'xfs', 'xfz', 'yfc', 'yfd', 'yfj', 'yfl', 'yfm', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfy', 'zfc', 'zfd', 'zfe', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
+
+   metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Hf', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Na', 'Nd', 'Pr', 'Sc', 'Sm', 'Sr', 'Tb', 'U', 'Zn', 'Zr']
+
+   // Metals that are present in the ultrastable set of MOFs:
+   ultrastable_metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Nd', 'Pr', 'Sc', 'Sm', 'Tb', 'U', 'Zn']
+
+   inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BELTOD_clean_sbu_0', 'BEQFEK_clean_sbu_0',
+   'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0',
+   'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'BOTCEU_clean_sbu_0', 'CEKHIL_clean_sbu_0',
+   'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0',
+   'ENOWUB_clean_sbu_0', 'EQERAU_clean_sbu_0', 'ESEHIV_clean_sbu_0', 'EYACOX_clean_sbu_0',
+   'EYACOX_clean_sbu_1', 'EZIPEK_clean_sbu_0', 'FANWIC_clean_sbu_0', 'FUNLAD_clean_sbu_0',
+   'GALJAG_clean_sbu_0', 'GEDQOX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'HICVOG_clean_sbu_0',
+   'HISSIN_clean_sbu_0', 'HISSIN_clean_sbu_1', 'ICAMEG_clean_sbu_1', 'ICIZOL_clean_sbu_0',
+   'INOVEN_clean_sbu_0', 'IYUCEM_clean_sbu_0', 'IZENUY_clean_sbu_0', 'JUFBIX_clean_sbu_0',
+   'KAKCAD_clean_sbu_0', 'KOZSID_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'KUMBOL_clean_sbu_0',
+   'KUMBOL_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'KUMJIN_clean_sbu_0',
+   'KUMJIN_clean_sbu_1', 'LEVNOQ01_clean_sbu_1', 'LIZSOE_clean_sbu_0', 'MAKGOX_clean_sbu_0',
+   'MAKGUD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'MIFKUJ_clean_sbu_0', 'MUDLON_clean_sbu_0',
+   'NAHDIM_clean_sbu_0', 'NAHDIM_clean_sbu_2', 'NAWXER_clean_sbu_0', 'NUHQIS_clean_sbu_0',
+   'NUHQUE_clean_sbu_2', 'NUHRAL_clean_sbu_3', 'OJICUG_clean_sbu_0', 'OLANAS_clean_sbu_1',
+   'OLANAS_clean_sbu_2', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_1', 'OLANEW_clean_sbu_2',
+   'OLANEW_clean_sbu_3', 'OLANEW_clean_sbu_4', 'PAMTOO_clean_sbu_0', 'PAMTUU_clean_sbu_0',
+   'PORLAL_clean_sbu_0', 'QEWDON_clean_sbu_0', 'QUQFOY_clean_sbu_1', 'QUQFOY_clean_sbu_3',
+   'SARMOO_clean_sbu_0', 'TAGTUT_clean_sbu_1', 'TAGTUT_clean_sbu_3', 'TATPOV_clean_sbu_0',
+   'UKALOJ_clean_sbu_0', 'UKIBUN_clean_sbu_0', 'UXUYUI_clean_sbu_0', 'VETTIZ_charged_sbu_0',
+   'VOLQOD_clean_sbu_1', 'WAQDOJ_charged_sbu_0', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3',
+   'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'XUDNAN_clean_sbu_1', 'ZALLEG_clean_sbu_0']
+
+   // Inorganic nodes that are present in the ultrastable set of MOFs:
+   ultrastable_inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BEQFEK_clean_sbu_0', 'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0', 'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'CEKHIL_clean_sbu_0', 'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0', 'ESEHIV_clean_sbu_0', 'EYACOX_clean_sbu_0', 'EZIPEK_clean_sbu_0', 'FUNLAD_clean_sbu_0', 'GALJAG_clean_sbu_0', 'GEDQOX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'HICVOG_clean_sbu_0', 'HISSIN_clean_sbu_0', 'HISSIN_clean_sbu_1', 'ICAMEG_clean_sbu_1', 'INOVEN_clean_sbu_0', 'IZENUY_clean_sbu_0', 'JUFBIX_clean_sbu_0', 'KOZSID_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'KUMBOL_clean_sbu_0', 'KUMBOL_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'KUMJIN_clean_sbu_0', 'KUMJIN_clean_sbu_1', 'LEVNOQ01_clean_sbu_1', 'LIZSOE_clean_sbu_0', 'MAKGUD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'MIFKUJ_clean_sbu_0', 'MUDLON_clean_sbu_0', 'NAHDIM_clean_sbu_0', 'NAWXER_clean_sbu_0', 'NUHQIS_clean_sbu_0', 'NUHQUE_clean_sbu_2', 'NUHRAL_clean_sbu_3', 'OJICUG_clean_sbu_0', 'OLANAS_clean_sbu_2', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_2', 'OLANEW_clean_sbu_3', 'PAMTOO_clean_sbu_0', 'PAMTUU_clean_sbu_0', 'QEWDON_clean_sbu_0', 'QUQFOY_clean_sbu_1', 'QUQFOY_clean_sbu_3', 'TAGTUT_clean_sbu_1', 'TAGTUT_clean_sbu_3', 'TATPOV_clean_sbu_0', 'UKALOJ_clean_sbu_0', 'UXUYUI_clean_sbu_0', 'VETTIZ_charged_sbu_0', 'VOLQOD_clean_sbu_1', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3', 'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'ZALLEG_clean_sbu_0']
+
+   org_nodes = ['Any', 'APAZEY_clean_linker_0', 'AZAVOO_clean_linker_0',
+   'BELTOD_clean_linker_0', 'BEQFEK_clean_linker_11', 'BETDAH_clean_linker_0', 'BETDEL_clean_linker_0',
+   'BETDIP_clean_linker_0', 'CEKHIL_clean_linker_0', 'CUKXOW_clean_linker_0', 'CUQRIR_clean_linker_1',
+   'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IYUCEM_clean_linker_1',
+   'IZENUY_clean_linker_0', 'KAKCAD_clean_linker_0', 'KUFVIS_clean_linker_0', 'LEJCEK_clean_linker_0',
+   'MAKGUD_clean_linker_0', 'MIDCAF_clean_linker_0', 'MIFKUJ_clean_linker_1', 'MUDLON_clean_linker_0',
+   'NAHDIM_clean_linker_0', 'NAWXER_clean_linker_0', 'PAMTOO_clean_linker_0', 'QEWDON_clean_linker_0',
+   'QUQFOY_clean_linker_2', 'TATPOV_clean_linker_0', 'UFIREI_clean_linker_0', 'UWAGAB01_clean_linker_0',
+   'VETTIZ_charged_linker_0', 'WOSHET_clean_linker_1']
+
+   // Organic nodes that are present in the ultrastable set of MOFs:
+   ultrastable_org_nodes = ['Any', 'AZAVOO_clean_linker_0', 'BELTOD_clean_linker_0', 'BETDAH_clean_linker_0', 'BETDIP_clean_linker_0', 'CUQRIR_clean_linker_1', 'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IZENUY_clean_linker_0', 'KAKCAD_clean_linker_0', 'KUFVIS_clean_linker_0', 'MIDCAF_clean_linker_0', 'MIFKUJ_clean_linker_1', 'MUDLON_clean_linker_0', 'NAHDIM_clean_linker_0', 'NAWXER_clean_linker_0', 'PAMTOO_clean_linker_0', 'QEWDON_clean_linker_0', 'VETTIZ_charged_linker_0']
+
+   edges = ['Any', 'none', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
+  'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1',
+  'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10',
+  'UKIBIB_clean_linker_0', 'UKIBUN_clean_linker_0', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0',
+  'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
+
+   // Edges that are present in the ultrastable set of MOFs:
+   ultrastable_edges = ['Any', 'none', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0', 'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1', 'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0', 'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
+
+   success_green = '#18bc9c';
+   original_blue = '#2c3e50';
+
+   inorg_node_color = original_blue;
+   org_node_color = original_blue;
+   edge_color = original_blue;
+
+   // When the Type selection is changed
+   $('#type_option').change(function() {
+     type = $('#type_option').val()
+     if (type === 'Any') { // Organic nodes permitted, since no restriction of type.
+       $('.organic').show()
+     }
+     else if (type === '1, 1, 1') { // This type has an organic node
+       $('.organic').show()
+     }
+     else { // The other two categories do not have an organic node.
+       $('.organic').hide()
+     }
+   });
+
+   // When any filter is clicked or changed
+   $('.filter_option').on("click change", function () {
+     component_viewer.clear(); // clear any building block visualization
+     $('#MOF_option').mousedown() // clear the stable MOF option section
+     $('#selected_MOF_data').hide()
+     recolor("Reset")
+     $('#chart').text(''); // clear the breakdown temperature plot
+
+     filter_dictionary = { 'inorg_node': $('#inorg_node_option').val(), 
+     'org_node': $('#org_node_option').val(), 
+     'edge': $('#edge_option').val(), 
+     'metal': $('#metal_option').val(), 
+     'type': $('#type_option').val(),
+     'net': $('#net_option').val(),
+     'ultrastable': $('#ultrastable_option').val()
+   } 
+
+     $.post("/filter_MOFs", JSON.stringify(filter_dictionary)).done(
+       function (response) {
+         filtered_stable_MOFs = response['filtered_MOFs']
+         document.getElementById('stable_MOF_list').innerHTML = option_generator(filtered_stable_MOFs)
+       })
+
+   })
+
+   // When the Only ultrastable MOFs? filter is changed
+   $('#ultrastable_option').change(function() {
+     current_option = $('#ultrastable_option').val()
+     if (current_option === 'Yes') {
+       dropdown_populator_ultrastable()
+     } else if (current_option === 'No') {
+       dropdown_populator()
+     }
+   })
+
+   // Recolors the building block selection buttons based on the string `bb_type`
+   function recolor(bb_type) {
+     switch(bb_type) {
+       case 'Inorganic node':
+         inorg_node_color = success_green
+         org_node_color = original_blue
+         edge_color = original_blue
+         break;
+       case 'Organic node':
+         inorg_node_color = original_blue
+         org_node_color = success_green
+         edge_color = original_blue
+         break;
+       case 'Edge':
+         inorg_node_color = original_blue
+         org_node_color = original_blue
+         edge_color = success_green
+         break;
+       case 'Reset':
+         inorg_node_color = original_blue
+         org_node_color = original_blue
+         edge_color = original_blue
+         break;      
+     }
+
+     // Recoloring buttons
+     $('#toggle_inorg_node').css({ 'background-color': inorg_node_color, 'border-color': inorg_node_color });
+     $('#toggle_org_node').css({ 'background-color': org_node_color, 'border-color': org_node_color });
+     $('#toggle_edge').css({ 'background-color': edge_color, 'border-color': edge_color });
+
+   }
+
+   // When the "Inorganic node" button is clicked
+   $('#toggle_inorg_node').click(function () {
+     console.log($('#inorg_node_option').val())
+     if ($('#inorg_node_option').val() === 'Any' || $('#inorg_node_option').val() === '') {
+       // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+       alert('Must select a specific inorganic node for filtering, if you want to download and visualize an inorganic node')
+     }
+     else if (! inorg_nodes.includes($('#inorg_node_option').val())) {
+       alert('Invalid inorganic node selection')
+     }
+     else {
+       // Getting the XYZ information for the selected inorganic node
+       selected_bb = $('#inorg_node_option').val()
+       $.post("/bb", JSON.stringify(selected_bb)).done(
+         function (response) {
+           document.getElementById('bb_holder').value = response
+         })
+
+       recolor("Inorganic node")
+     }
+   })
+
+   // When the "Organic node" button is clicked
+   $('#toggle_org_node').click(function () {
+     if ($('#org_node_option').val() === 'Any' || $('#org_node_option').val() === '') {
+       // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+       alert('Must select a specific organic node for filtering, if you want to download and visualize an organic node')
+     }
+     else if (! org_nodes.includes($('#org_node_option').val())) {
+       alert('Invalid inorganic node selection')
+     }
+     else {
+       // Getting the XYZ information for the selected organic node
+       selected_bb = $('#org_node_option').val()
+       $.post("/bb", JSON.stringify(selected_bb)).done(
+         function (response) {
+           document.getElementById('bb_holder').value = response
+         })
+
+       recolor("Organic node")
+     }
+   })
+
+   // When the "Edge" button is clicked
+   $('#toggle_edge').click(function () {
+     if ($('#edge_option').val() === 'Any' || $('#edge_option').val() === '') {
+       // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
+       alert('Must select a specific edge for filtering, if you want to download and visualize an edge')
+     }
+     else if (! edges.includes($('#edge_option').val())) {
+       alert('Invalid edge selection')
+     }    
+     else {
+       // Getting the XYZ information for the selected edge
+       selected_bb = $('#edge_option').val()
+       $.post("/bb", JSON.stringify(selected_bb)).done(
+         function (response) {
+           document.getElementById('bb_holder').value = response
+         })
+
+       recolor("Edge")
+     }
+   })
+
+   // This function is used for downloading xyz's of components
+   // filename is the name of the file to be downloaded. text is the contents of the file.
+   function download(filename, text) {
+     var element = document.createElement('a');
+     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+     element.setAttribute('download', filename);
+
+     element.style.display = 'none';
+     document.body.appendChild(element);
+
+     element.click();
+
+     document.body.removeChild(element);
+   }
+
+   // This function is called when the "Download" button is clicked
+   // Downloads an xyz file
+   $('#download_bb').click(function () {
+
+     // Check which building block is selected, if any
+     if (inorg_node_color === success_green) {
+       bb_name = $('#inorg_node_option').val()
+       download(bb_name + '.xyz', $('#bb_holder').val())
+     }
+     else if (org_node_color === success_green) {
+       bb_name = $('#org_node_option').val()
+       download(bb_name + '.xyz', $('#bb_holder').val())
+     }
+     else if (edge_color === success_green) {
+       bb_name = $('#edge_option').val()
+       download(bb_name + '.xyz', $('#bb_holder').val())
+     }
+     else {
+       alert('You must select a building block in order to download.')
+       return // Leave the function
+     }
+   })
+
+   // This function is called when the "Visualize" button is clicked
+   // Visualizes the building block structure
+   $('#visualize_bb').click(function () {
+     if (inorg_node_color === success_green || org_node_color === success_green || edge_color === success_green) { // A component has chosen in the filter section and has been indicated with the corresponding button press.
+       $('#container-01-note').text('');
+       component_viewer.clear();
+       component_viewer.addModel($('#bb_holder').val(), "xyz"); // $('#bb_holder').val() contains the geometry
+       component_viewer.setStyle({}, { stick: { radius: 0.25 } });
+       component_viewer.zoomTo();
+       component_viewer.render();  
+     }  
+     else {
+       alert('You must select a building block in order to visualize.')
+       return // Leave the function      
+     }
+   })  
+
+   // This function is called when the "Reset zoom" button is clicked
+   // Resets the zoom level of the 3Dmol viewer.
+   $('#reset_zoom').click(function () {
+     component_viewer.zoomTo();
+   })
+
+   // This function is called when the "Download selected MOF (unoptimized)" button is clicked.
+   // Downloads the selected MOF.
+   $('#download_MOF_initial').click(function () {
+     if ($('#MOF_option').val() === '') {
+       alert('Must select a MOF to be downloaded')
+     }
+     else {
+       selected_MOF = $('#MOF_option').val()
+
+       window.location = 'unoptimized_geo/' + selected_MOF + '.cif'; // download cif file. See serve_unoptimized_MOF in app.py
+
+     }
+   })
+
+   // This function is called when the "Download selected MOF (optimized)" button is clicked.
+   // Downloads the selected MOF.
+   $('#download_MOF_optimized').click(function () {
+     if ($('#MOF_option').val() === '') {
+       alert('Must select a MOF to be downloaded')
+     }
+     else {
+       selected_MOF = $('#MOF_option').val()
+
+       // Check if the optimized geometry exists. If not, generate an alert.
+       $.post("/opt_geo_existence_check", JSON.stringify(MOF_name)).done(
+         function (response) {
+           if (response === 'No') {
+             alert("No optimized geometry available for the selected MOF.")
+           } else { // The optimized geometry is available.
+             window.location = 'optimized_geo/' + selected_MOF + '.cif'; // download cif file. See serve_optimized_MOF in app.py
+           } 
+         })
+     }
+   })
+
+   // This function is called when a new stable MOF is selected in the "Select a stable MOF" dropdown.
+   // Displays information on the selected MOF.
+   $('#MOF_option').on("click change", function (){ // Triggered by either a click or a change.
+     if ($('#MOF_option').val() === ''){ // No MOF selected.
+       $('#selected_MOF_data').hide()
+       return // exit function
+     }
+     else {
+       $('#selected_MOF_data').show() 
+     }
+
+     MOF_name = $('#MOF_option').val()
+     // Getting data on the selected MOF from the backend.
+     $.post("/data_pull", JSON.stringify(MOF_name)).done(
+       function (response) {
+         is_ultrastable = response['is_ultrastable']
+         solvent_prediction = response['solvent_removal_stability']
+         thermal_prediction = response['thermal_stability']
+         moduli_info = response['moduli_info']
+         uptake_info = response['uptake_info']
+
+         if (is_ultrastable) {
+           data_on_MOF = "<span style='color:#D5B942; font-weight: bold'>Ultrastable MOF!<\/span><br />" // <br /> for a new line in display.
+           // Using coolors.co website. #2D3D50, #1ABB9C, #BE1A2F --> #D5B942
+         }
+         else {
+           data_on_MOF = ""
+         }
+
+         if (solvent_prediction == null && thermal_prediction == null) {
+           return // exit the function
+         } else {
+           // <br /> for a new line in display. &#8451 is degrees celsius in decimal
+           data_on_MOF += "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
+           // preparing the human-interpretable solvent removal stability prediction
+           if (solvent_prediction <= 0.2) {
+             verdict = 'ANN is very confident the MOF is unstable upon solvent removal.';
+           }
+           else if (solvent_prediction <= 0.4) {
+             verdict = 'ANN is fairly confident the MOF is unstable upon solvent removal.';
+           }
+           else if (solvent_prediction <= 0.5) {
+             verdict = 'ANN is uncertain, but predicts the MOF is unstable upon solvent removal.';
+           }
+           else if (solvent_prediction <= 0.6) {
+             verdict = 'ANN is uncertain, but predicts the MOF is stable upon solvent removal.';
+           }
+           else if (solvent_prediction <= 0.8) {
+             verdict = 'ANN is fairly confident the MOF is stable upon solvent removal.';
+           }
+           else {
+             verdict = 'ANN is very confident the MOF is stable upon solvent removal.';
+           }
+           
+           data_on_MOF += "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + verdict + "<br />" // &nbsp is a space
+           + "The thermal stability prediction (breakdown temperature) for the selected MOF is " + thermal_prediction + "&#8451.<br />"
+
+           // Check if we have moduli information.
+           if (moduli_info != null) {
+             data_on_MOF += "<br /><b>Moduli Information<\/b><br />" // <b> for bold 
+             + "Elastic Voight (K<sub>V<\/sub>) is " + moduli_info["KV"] + " GPa<br />"
+             + "Elastic Reuss (K<sub>R<\/sub>) is " + moduli_info["KR"] + " GPa<br />" 
+             + "Voight-Reuss-Hill elastic average (K<sub>VRH<\/sub>) is " + moduli_info["KVRH"] + " GPa<br />"
+             + "Shear Voight (G<sub>V<\/sub>) is " + moduli_info["GV"] + " GPa<br />"
+             + "Shear Reuss (G<sub>R<\/sub>) is " + moduli_info["GR"] + " GPa<br />"
+             + "Voight-Reuss-Hill shear average (G<sub>VRH<\/sub>) is " + moduli_info["GVRH"] + " GPa<br />"
+           } // <sub><\/sub> is for subscript text.
+
+           // Check if we have uptake information.
+           if (uptake_info != null) {
+             data_on_MOF += "<br /><b>Uptake Information<\/b><br />"
+             + "Low P (5.8 bar) uptake is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + " cm³ methane/g framework<br />"
+             + "Equivalently, low P (5.8 bar) uptake is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + " cm³ methane/cm³ framework<br />"
+             + "High P (65 bar) uptake is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + " cm³ methane/g framework<br />"
+             + "Equivalently, high P (65 bar) uptake is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + " cm³ methane/cm³ framework<br />"
+           }
+
+         }
+
+         document.getElementById('selected_MOF_data').innerHTML = data_on_MOF
+
+         // making the thermal breakdown temperatures plot
+         myDict = { 'prediction': true, 'temperature': thermal_prediction, 'temperature_data_type': 'float' }
+         $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { 
+           console.log('entered the plot_thermal_stability post')
+           $('#chart').html(response);
+         })        
+       })
+
+   })
+
+   // When the "Dark mode" button is clicked:
+   black = '#000000'
+   white = '#FFFFFF'
+   $('#dark_mode').click(function () { // change background and button text depending on button state
+     button_text = document.getElementById('dark_mode').textContent
+     if (button_text === 'Dark mode') { // make background dark and text white
+       $('body').css("background-color", black);
+       document.getElementById('dark_mode').textContent = 'Light mode';
+       $('.zebra').css('color', white)
+       $('#header_background').css('background-image', 'url(\'banner_dark\')')
+     }
+     else { // Button says Light mode; make background white and text black
+       $('body').css("background-color", white);
+       document.getElementById('dark_mode').textContent = 'Dark mode';
+       $('.zebra').css('color', black)
+       $('#header_background').css('background-image', 'url(\'banner_light\')')
+     }
+   })
+
+   // option_generator is a helper function for populating dropdowns on the website
+   var option_generator = function(my_list) {
+     var options = ''
+     for (var i = 0; i < my_list.length; i++) {
+       options += '<option value="' + my_list[i] + '" />';
+     }
+     return options
+   }
+
+   // functions to handle the button color change of certain buttons upon mouse hover
+   // since we change the colors of certain buttons and lose the default hover color change
+   $("#toggle_inorg_node").hover(function () {
+     $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+     $(this).css("border-color", "#1D2B37");
+   }, function () {
+     $(this).css("background-color", inorg_node_color);
+     $(this).css("border-color", inorg_node_color);
+   });
+
+   $("#toggle_org_node").hover(function () {
+     $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+     $(this).css("border-color", "#1D2B37");
+   }, function () {
+     $(this).css("background-color", org_node_color);
+     $(this).css("border-color", org_node_color);
+   });
+
+   $("#toggle_edge").hover(function () {
+     $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
+     $(this).css("border-color", "#1D2B37");
+   }, function () {
+     $(this).css("background-color", edge_color);
+     $(this).css("border-color", edge_color);
+   });
 
 
-  <!-- For any selected building blocks -->
-  <p id="bb_holder"> </p>
-  <!-- This will never display anything. Just used to store a building block XYZ file content if the button "Inorganic node", "Organic node", or "Edge" is used -->
+   // Populating dropdowns in this next section. This happens when the browser is opened.
+   dropdown_populator_ultrastable()
 
+   // This function is used for populating dropdowns with the full range of options.
+   function dropdown_populator() {
+     // Populating the net dropdown
+     document.getElementById('net_list').innerHTML = option_generator(nets);
+
+     // Populating the metal dropdown
+     document.getElementById('metal_list').innerHTML = option_generator(metals);
+
+     // Populating the inorganic node dropdown
+     document.getElementById('inorg_node_list').innerHTML = option_generator(inorg_nodes);
+
+     // Populating the organic node dropdown
+     document.getElementById('org_node_list').innerHTML = option_generator(org_nodes)
+
+     // Populating the edge dropdown
+     document.getElementById('edge_list').innerHTML = option_generator(edges)
+   }
+
+   // This function is used for populating dropdowns with the ultrastable range of options.
+   function dropdown_populator_ultrastable() {
+     document.getElementById('net_list').innerHTML = option_generator(ultrastable_nets);
+     document.getElementById('metal_list').innerHTML = option_generator(ultrastable_metals);
+     document.getElementById('inorg_node_list').innerHTML = option_generator(ultrastable_inorg_nodes);
+     document.getElementById('org_node_list').innerHTML = option_generator(ultrastable_org_nodes)
+     document.getElementById('edge_list').innerHTML = option_generator(ultrastable_edges)
+   }
+
+
+   // The code below runs when this webpage is opened.
+   $('#ultrastable_option').val("Yes") // Setting the default value
+   $('#type_option').val("Any") // Setting the default value
+   $('#net_option').val("Any") // Setting the default value
+   $('#metal_option').val("Any") // Setting the default value
+   $('#inorg_node_option').val("Any") // Setting the default value
+   $('#org_node_option').val("Any") // Setting the default value
+   $('#edge_option').val("Any") // Setting the default value
+
+   $('#metal_option').change() // Trigger a change event, in order to force execution of /filter_MOFs at the beginning.
+
+  </script>
 </body>
-
-<!-- Begin JavaScript section -->
-<script>
-
-  // Set up 3Dmol viewer 
-  let element = $('#container-01');
-  let config = { backgroundColor: 'white' };
-  let component_viewer = $3Dmol.createViewer(element, config);
-  data = {};  
-
-  // Hardcoding these lists based on https://zenodo.org/record/7091192
-
-  nets = ['Any', 'acs', 'acs-a', 'acs-f', 'acs-g', 'acs-h', 'acs-i', 'afi', 'afw', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'ant', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcs-a', 'bcu', 'bcu-b', 'bcu-f', 'bcu-g', 'bcu-h', 'bcu-i', 'bcu-j', 'bcu-k', 'bcu-l', 'bmn', 'bnn', 'bor-e', 'bpr', 'bsn', 'bto', 'bva', 'bwt', 'cab', 'cag', 'can', 'cbo', 'cdl', 'cds', 'cds-f', 'cdt', 'cha', 'cml', 'cor', 'crb', 'crr', 'crs', 'crs-a', 'csq', 'ctn', 'ctn-e', 'dag', 'deh', 'dei', 'dft', 'dia', 'dia-a', 'dia-f', 'dia-g', 'dia-j', 'dmp', 'ecb', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'est', 'eta', 'eta-c', 'etb', 'etd', 'etf', 'fau', 'fca', 'fcd', 'fce', 'fcf', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fcx', 'fda', 'fdc', 'fee', 'fgl', 'flu-e', 'fna', 'fnc', 'fnd', 'fne', 'fng', 'fnh', 'fni', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fnq', 'fnr', 'fns', 'fnt', 'fnu', 'fnv', 'fnw', 'fny', 'fnz', 'fob', 'fst', 'ftb', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'icc', 'ict', 'ilc', 'irl', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llj', 'llk', 'lll', 'loh', 'lon', 'lta', 'lvt', 'lvt-a', 'mdf', 'mer', 'mmt', 'mok', 'mon', 'msp', 'msw', 'myd', 'nbo', 'nbo-a', 'nbo-h', 'ncb', 'neb', 'nfa', 'nfb', 'nfc', 'nia', 'nia-e', 'nom', 'noo', 'nov', 'noy', 'noz', 'npo', 'ocu', 'ocu-e', 'ofo', 'ooa', 'oob', 'oof', 'osc', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pts-e', 'pyc', 'pyr', 'pyr-e', 'qdl', 'qtz', 'qtz-a', 'qtz-e', 'qtz-f', 'qtz-g', 'qtz-h', 'qtz-x', 'qzd', 'rac', 'reo', 'reo-e', 'rgd', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sev', 'sgn', 'sin', 'sit', 'skb', 'skc', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smi', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smt', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'soe', 'sof', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'soo', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'sqp', 'sra', 'srs', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'ssc', 'sst', 'sth', 'sva', 'svb', 'svc', 'sve', 'svf', 'svh', 'svi', 'svj', 'svk', 'svm', 'svo', 'svv', 'svx', 'svy', 'svz', 'swa', 'swd', 'swe', 'swf', 'swi', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxk', 'sxm', 'sxp', 'sxq', 'sxt', 'tbo', 'teo', 'tes', 'tfs', 'the', 'thp-x', 'ths', 'toc-e', 'tph', 'tsi', 'tsx', 'ttw', 'twf-e', 'twt', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'uku', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulf', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umb', 'umc', 'umd', 'ume', 'umf', 'umg', 'umh', 'umj', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umw', 'umx', 'umy', 'umz', 'una', 'unb', 'unc', 'und', 'une', 'unf', 'ung', 'unh', 'uni', 'unj', 'unl', 'unm', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uny', 'uoa', 'uob', 'uoc', 'uod', 'uoe', 'uof', 'uog', 'uoh', 'uoi', 'uoj', 'uol', 'uom', 'uon', 'uoo', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uov', 'uow', 'uox', 'uoy', 'uoz', 'upa', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utb', 'utc', 'utg', 'utj', 'utk', 'utm', 'utn', 'uto', 'utp', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbl', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vbx', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vcj', 'vck', 'vcl', 'vcm', 'vcn', 'vcp', 'vcq', 'vcr', 'vcu', 'vda', 'vdb', 'vma', 'vmb', 'vmc', 'vmd', 'vme', 'vmf', 'vmg', 'vmh', 'vmi', 'vmm', 'vmn', 'vmo', 'vmp', 'vmq', 'vmr', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wft', 'wfu', 'wfv', 'wfw', 'wfx', 'wfy', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgu', 'wgw', 'wgz', 'whb', 'whc', 'whd', 'whe', 'whh', 'whj', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wif', 'wig', 'wil', 'wim', 'win', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wix', 'wiy', 'wiz', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wjh', 'wji', 'wjk', 'wjl', 'wjm', 'wjn', 'wjo', 'wjp', 'wjq', 'wjr', 'wjs', 'wjt', 'wju', 'wjv', 'wjw', 'wjx', 'wjy', 'wjz', 'wka', 'wkb', 'wkc', 'wkd', 'wke', 'wkf', 'wkh', 'wkj', 'wkl', 'wko', 'wkp', 'wkq', 'wkr', 'wkt', 'wku', 'wkw', 'wkx', 'wla', 'wlb', 'wlc', 'wld', 'wle', 'wlf', 'wlg', 'wlh', 'wli', 'wlj', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmb', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmx', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wng', 'wnh', 'wni', 'wnj', 'wnm', 'wnn', 'wno', 'wnr', 'wns', 'wnt', 'wnx', 'wny', 'wnz', 'wse', 'wuy', 'xbj', 'xfa', 'xfb', 'xfc', 'xfd', 'xfe', 'xff', 'xfg', 'xfh', 'xfi', 'xfk', 'xfp', 'xfr', 'xfs', 'xft', 'xfu', 'xfw', 'xfx', 'xfy', 'xfz', 'yfa', 'yfb', 'yfc', 'yfd', 'yff', 'yfg', 'yfh', 'yfj', 'yfk', 'yfl', 'yfm', 'yfn', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfx', 'yfy', 'yfz', 'yyz', 'zfa', 'zfb', 'zfc', 'zfd', 'zfe', 'zff', 'zfg', 'zfh', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfr', 'zfs', 'zft', 'zfu', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
-
-  // Nets that are present in the ultrastable set of MOFs:
-  ultrastable_nets = ['Any', 'acs', 'afi', 'alb', 'ana', 'ana-e', 'ana-f', 'anh', 'apo', 'atn', 'ato', 'bcg', 'bcs', 'bcu', 'bcu-b', 'bcu-f', 'bcu-h', 'bcu-i', 'bcu-k', 'bcu-l', 'bmn', 'bpr', 'bsn', 'bva', 'bwt', 'cag', 'can', 'cbo', 'cds-f', 'cha', 'cml', 'cor', 'crs', 'crs-a', 'csq', 'ctn', 'dag', 'deh', 'dei', 'dia-a', 'dia-j', 'dmp', 'ecc', 'ecd', 'ecf', 'ech', 'eci', 'ecj', 'ecm', 'ecn', 'ecs', 'ecv', 'eea', 'etb', 'etf', 'fau', 'fca', 'fcd', 'fcg', 'fch', 'fci', 'fcj', 'fcl', 'fcm', 'fcn', 'fcp', 'fcq', 'fcr', 'fcs', 'fcu', 'fdc', 'fgl', 'flu-e', 'fnc', 'fnd', 'fng', 'fnh', 'fnj', 'fnk', 'fnl', 'fno', 'fnp', 'fns', 'fob', 'ftw', 'gan', 'gar', 'ghw', 'gie', 'gis', 'gme', 'gsi', 'hal', 'hbo', 'hcp', 'hex', 'hjm', 'hwx', 'iac', 'iac-e', 'ibd', 'ict', 'ilc', 'kag', 'kfi', 'lcs', 'lcs-a', 'lcs-e', 'lcs-f', 'lcv-a', 'lcv-e', 'lcv-f', 'lcx', 'lcy', 'lcy-a', 'lcy-a-x', 'lcy-e', 'lhb', 'lig', 'llk', 'lll', 'lta', 'lvt-a', 'mdf', 'mer', 'mok', 'mon', 'msp', 'myd', 'nbo-h', 'neb', 'nfa', 'nfb', 'nfc', 'nom', 'ocu', 'oof', 'pbg', 'pbp', 'pbz', 'pcb', 'pcl', 'pcu', 'pcu-g', 'pcu-h', 'pcu-i', 'pem', 'pry', 'pth', 'pto', 'ptr', 'pts', 'pyc', 'pyr', 'pyr-e', 'qtz-e', 'qtz-x', 'reo', 'rho', 'rhr', 'rhr-a', 'rkf', 'rob', 'rtl', 'scu', 'sin', 'sit', 'skb', 'ske', 'sma', 'smb', 'smc', 'smd', 'sme', 'smg', 'smk', 'sml', 'smm', 'smn', 'smq', 'sms', 'smu', 'smw', 'sne', 'sni', 'snk', 'snl', 'snp', 'snv-x', 'snw', 'snx', 'snz', 'soc', 'sod-a', 'sod-e', 'sod-f', 'sod-g', 'sod-h', 'sog', 'soh', 'soi', 'sol', 'som', 'son', 'sop', 'soq', 'sor', 'sou', 'sow', 'sqc', 'srs-a', 'srs-f', 'srs-g', 'ssa', 'ssb', 'sst', 'sth', 'svb', 'svc', 'svm', 'svo', 'svx', 'svy', 'swa', 'swf', 'swl', 'sxa', 'sxb', 'sxc', 'sxe', 'sxf', 'sxg', 'sxh', 'sxi', 'sxt', 'tbo', 'tes', 'tfs', 'thp-x', 'toc-e', 'tph', 'tsi', 'tsx', 'twf-e', 'tzs', 'ubt', 'uka', 'ukb', 'ukc', 'ukd', 'uke', 'ukf', 'ukg', 'ukh', 'uki', 'ukj', 'ukk', 'ukl', 'ukm', 'ukn', 'uko', 'ukp', 'ukr', 'uks', 'ukt', 'ukv', 'ukw', 'ukx', 'uky', 'ula', 'ulg', 'ulh', 'uli', 'ulj', 'ull', 'uma', 'umc', 'umd', 'ume', 'umh', 'umk', 'uml', 'umm', 'umn', 'umo', 'umq', 'umr', 'ums', 'umu', 'umv', 'umx', 'umy', 'umz', 'una', 'unb', 'und', 'une', 'unf', 'ung', 'unh', 'unl', 'unn', 'uno', 'unp', 'unr', 'uns', 'unt', 'unu', 'unv', 'unw', 'unx', 'uoa', 'uob', 'uod', 'uoe', 'uof', 'uoh', 'uoi', 'uol', 'uon', 'uop', 'uoq', 'uos', 'uot', 'uou', 'uow', 'uox', 'uoy', 'uoz', 'upb', 'upc', 'upd', 'ure', 'usf', 'uta', 'utc', 'utj', 'utm', 'utn', 'utq', 'vab', 'vba', 'vbb', 'vbc', 'vbd', 'vbe', 'vbf', 'vbg', 'vbh', 'vbi', 'vbj', 'vbk', 'vbm', 'vbn', 'vbp', 'vbr', 'vbv', 'vbw', 'vby', 'vcb', 'vcc', 'vcd', 'vce', 'vcf', 'vch', 'vci', 'vck', 'vcl', 'vcu', 'vda', 'vdb', 'vmf', 'vmg', 'vmh', 'vmv', 'vmx', 'vmz', 'wbl', 'wfa', 'wfe', 'wfj', 'wfs', 'wfx', 'wfz', 'wga', 'wgb', 'wgc', 'wgd', 'wge', 'wgf', 'wgh', 'wgi', 'wgj', 'wgl', 'wgm', 'wgn', 'wgo', 'wgp', 'wgq', 'wgr', 'wgs', 'wgt', 'wgw', 'whh', 'whk', 'whm', 'whp', 'whq', 'whr', 'wht', 'whv', 'whw', 'why', 'whz', 'wia', 'wib', 'wig', 'wil', 'wim', 'wio', 'wip', 'wiq', 'wir', 'wiu', 'wiv', 'wiw', 'wjb', 'wjc', 'wjd', 'wje', 'wjf', 'wjg', 'wji', 'wjr', 'wjz', 'wkf', 'wkh', 'wkj', 'wkl', 'wkp', 'wkq', 'wkr', 'wku', 'wkw', 'wla', 'wlb', 'wle', 'wlf', 'wlg', 'wlh', 'wlk', 'wll', 'wlm', 'wln', 'wlp', 'wlq', 'wlr', 'wls', 'wlt', 'wlu', 'wmc', 'wme', 'wmg', 'wmi', 'wmn', 'wmp', 'wmt', 'wmv', 'wmy', 'wmz', 'wna', 'wnd', 'wne', 'wnh', 'wnm', 'wno', 'wns', 'wnz', 'wse', 'xfc', 'xfe', 'xff', 'xfg', 'xfh', 'xfs', 'xfz', 'yfc', 'yfd', 'yfj', 'yfl', 'yfm', 'yfo', 'yfq', 'yfr', 'yfs', 'yft', 'yfu', 'yfw', 'yfy', 'zfc', 'zfd', 'zfe', 'zfi', 'zfj', 'zfk', 'zfl', 'zfm', 'zfn', 'zfo', 'zfp', 'zfq', 'zfv', 'zfw', 'zfx', 'zfy', 'zga', 'zni', 'zzz']
-
-  metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Hf', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Na', 'Nd', 'Pr', 'Sc', 'Sm', 'Sr', 'Tb', 'U', 'Zn', 'Zr']
-
-  // Metals that are present in the ultrastable set of MOFs:
-  ultrastable_metals = ['Any', 'Cd', 'Co', 'Cu', 'Dy', 'Eu', 'Fe', 'Gd', 'Ho', 'In', 'La', 'Li', 'Mg', 'Mn', 'Nd', 'Pr', 'Sc', 'Sm', 'Tb', 'U', 'Zn']
-
-  inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BELTOD_clean_sbu_0', 'BEQFEK_clean_sbu_0',
-  'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0',
-  'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'BOTCEU_clean_sbu_0', 'CEKHIL_clean_sbu_0',
-  'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0',
-  'ENOWUB_clean_sbu_0', 'EQERAU_clean_sbu_0', 'ESEHIV_clean_sbu_0', 'EYACOX_clean_sbu_0',
-  'EYACOX_clean_sbu_1', 'EZIPEK_clean_sbu_0', 'FANWIC_clean_sbu_0', 'FUNLAD_clean_sbu_0',
-  'GALJAG_clean_sbu_0', 'GEDQOX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'HICVOG_clean_sbu_0',
-  'HISSIN_clean_sbu_0', 'HISSIN_clean_sbu_1', 'ICAMEG_clean_sbu_1', 'ICIZOL_clean_sbu_0',
-  'INOVEN_clean_sbu_0', 'IYUCEM_clean_sbu_0', 'IZENUY_clean_sbu_0', 'JUFBIX_clean_sbu_0',
-  'KAKCAD_clean_sbu_0', 'KOZSID_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'KUMBOL_clean_sbu_0',
-  'KUMBOL_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'KUMJIN_clean_sbu_0',
-  'KUMJIN_clean_sbu_1', 'LEVNOQ01_clean_sbu_1', 'LIZSOE_clean_sbu_0', 'MAKGOX_clean_sbu_0',
-  'MAKGUD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'MIFKUJ_clean_sbu_0', 'MUDLON_clean_sbu_0',
-  'NAHDIM_clean_sbu_0', 'NAHDIM_clean_sbu_2', 'NAWXER_clean_sbu_0', 'NUHQIS_clean_sbu_0',
-  'NUHQUE_clean_sbu_2', 'NUHRAL_clean_sbu_3', 'OJICUG_clean_sbu_0', 'OLANAS_clean_sbu_1',
-  'OLANAS_clean_sbu_2', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_1', 'OLANEW_clean_sbu_2',
-  'OLANEW_clean_sbu_3', 'OLANEW_clean_sbu_4', 'PAMTOO_clean_sbu_0', 'PAMTUU_clean_sbu_0',
-  'PORLAL_clean_sbu_0', 'QEWDON_clean_sbu_0', 'QUQFOY_clean_sbu_1', 'QUQFOY_clean_sbu_3',
-  'SARMOO_clean_sbu_0', 'TAGTUT_clean_sbu_1', 'TAGTUT_clean_sbu_3', 'TATPOV_clean_sbu_0',
-  'UKALOJ_clean_sbu_0', 'UKIBUN_clean_sbu_0', 'UXUYUI_clean_sbu_0', 'VETTIZ_charged_sbu_0',
-  'VOLQOD_clean_sbu_1', 'WAQDOJ_charged_sbu_0', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3',
-  'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'XUDNAN_clean_sbu_1', 'ZALLEG_clean_sbu_0']
-
-  // Inorganic nodes that are present in the ultrastable set of MOFs:
-  ultrastable_inorg_nodes = ['Any', 'AJUNOK_clean_sbu_0', 'AZAVOO_clean_sbu_0', 'BEQFEK_clean_sbu_0', 'BETDAH_clean_sbu_0', 'BETDEL_clean_sbu_0', 'BETDIP_clean_sbu_0', 'BETFAJ_clean_sbu_0', 'BETFEN_clean_sbu_0', 'BETGAK_clean_sbu_0', 'CEKHIL_clean_sbu_0', 'CIFDUS_clean_sbu_1', 'CUKXOW_clean_sbu_0', 'CUWYAW_clean_sbu_0', 'EBIMEJ_clean_sbu_0', 'ESEHIV_clean_sbu_0', 'EYACOX_clean_sbu_0', 'EZIPEK_clean_sbu_0', 'FUNLAD_clean_sbu_0', 'GALJAG_clean_sbu_0', 'GEDQOX_clean_sbu_0', 'GIZVER_clean_sbu_0', 'HICVOG_clean_sbu_0', 'HISSIN_clean_sbu_0', 'HISSIN_clean_sbu_1', 'ICAMEG_clean_sbu_1', 'INOVEN_clean_sbu_0', 'IZENUY_clean_sbu_0', 'JUFBIX_clean_sbu_0', 'KOZSID_clean_sbu_0', 'KUFVIS_clean_sbu_0', 'KUMBOL_clean_sbu_0', 'KUMBOL_clean_sbu_1', 'KUMBUR_clean_sbu_0', 'KUMBUR_clean_sbu_1', 'KUMJIN_clean_sbu_0', 'KUMJIN_clean_sbu_1', 'LEVNOQ01_clean_sbu_1', 'LIZSOE_clean_sbu_0', 'MAKGUD_clean_sbu_1', 'MIDCAF_clean_sbu_0', 'MIFKUJ_clean_sbu_0', 'MUDLON_clean_sbu_0', 'NAHDIM_clean_sbu_0', 'NAWXER_clean_sbu_0', 'NUHQIS_clean_sbu_0', 'NUHQUE_clean_sbu_2', 'NUHRAL_clean_sbu_3', 'OJICUG_clean_sbu_0', 'OLANAS_clean_sbu_2', 'OLANEW_clean_sbu_0', 'OLANEW_clean_sbu_2', 'OLANEW_clean_sbu_3', 'PAMTOO_clean_sbu_0', 'PAMTUU_clean_sbu_0', 'QEWDON_clean_sbu_0', 'QUQFOY_clean_sbu_1', 'QUQFOY_clean_sbu_3', 'TAGTUT_clean_sbu_1', 'TAGTUT_clean_sbu_3', 'TATPOV_clean_sbu_0', 'UKALOJ_clean_sbu_0', 'UXUYUI_clean_sbu_0', 'VETTIZ_charged_sbu_0', 'VOLQOD_clean_sbu_1', 'WUSLED_clean_sbu_0', 'XADDAJ01_clean_sbu_3', 'XOMCOT_clean_sbu_0', 'XOMCOT_clean_sbu_1', 'ZALLEG_clean_sbu_0']
-
-  org_nodes = ['Any', 'APAZEY_clean_linker_0', 'AZAVOO_clean_linker_0',
-  'BELTOD_clean_linker_0', 'BEQFEK_clean_linker_11', 'BETDAH_clean_linker_0', 'BETDEL_clean_linker_0',
-  'BETDIP_clean_linker_0', 'CEKHIL_clean_linker_0', 'CUKXOW_clean_linker_0', 'CUQRIR_clean_linker_1',
-  'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IYUCEM_clean_linker_1',
-  'IZENUY_clean_linker_0', 'KAKCAD_clean_linker_0', 'KUFVIS_clean_linker_0', 'LEJCEK_clean_linker_0',
-  'MAKGUD_clean_linker_0', 'MIDCAF_clean_linker_0', 'MIFKUJ_clean_linker_1', 'MUDLON_clean_linker_0',
-  'NAHDIM_clean_linker_0', 'NAWXER_clean_linker_0', 'PAMTOO_clean_linker_0', 'QEWDON_clean_linker_0',
-  'QUQFOY_clean_linker_2', 'TATPOV_clean_linker_0', 'UFIREI_clean_linker_0', 'UWAGAB01_clean_linker_0',
-  'VETTIZ_charged_linker_0', 'WOSHET_clean_linker_1']
-
-  // Organic nodes that are present in the ultrastable set of MOFs:
-  ultrastable_org_nodes = ['Any', 'AZAVOO_clean_linker_0', 'BELTOD_clean_linker_0', 'BETDAH_clean_linker_0', 'BETDIP_clean_linker_0', 'CUQRIR_clean_linker_1', 'ESEHIV_clean_linker_0', 'GIZVER_clean_linker_0', 'INOVEN_clean_linker_0', 'IZENUY_clean_linker_0', 'KAKCAD_clean_linker_0', 'KUFVIS_clean_linker_0', 'MIDCAF_clean_linker_0', 'MIFKUJ_clean_linker_1', 'MUDLON_clean_linker_0', 'NAHDIM_clean_linker_0', 'NAWXER_clean_linker_0', 'PAMTOO_clean_linker_0', 'QEWDON_clean_linker_0', 'VETTIZ_charged_linker_0']
-
-  edges = ['Any', 'none', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0',
- 'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1',
- 'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10',
- 'UKIBIB_clean_linker_0', 'UKIBUN_clean_linker_0', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0',
- 'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
-
-  // Edges that are present in the ultrastable set of MOFs:
-  ultrastable_edges = ['Any', 'none', 'AJUNOK_clean_linker_0', 'CIFDUS_clean_linker_0', 'EYOCIG_clean_linker_4', 'EZIPEK_clean_linker_0', 'FUNLAD_clean_linker_0', 'FUNLAD_clean_linker_1', 'KIFKEQ_clean_linker_1', 'MIFKUJ_clean_linker_0', 'OJICUG_clean_linker_0', 'TEMPAE_clean_linker_10', 'UVAHIK_clean_linker_0', 'XIVTED_clean_linker_0', 'XUDNAN_clean_linker_2', 'ZUJKAS_clean_linker_0']
-
-  success_green = '#18bc9c';
-  original_blue = '#2c3e50';
-
-  inorg_node_color = original_blue;
-  org_node_color = original_blue;
-  edge_color = original_blue;
-
-  // When the Type selection is changed
-  $('#type_option').change(function() {
-    type = $('#type_option').val()
-    if (type === 'Any') { // Organic nodes permitted, since no restriction of type.
-      $('.organic').show()
-    }
-    else if (type === '1, 1, 1') { // This type has an organic node
-      $('.organic').show()
-    }
-    else { // The other two categories do not have an organic node.
-      $('.organic').hide()
-    }
-  });
-
-  // When any filter is clicked or changed
-  $('.filter_option').on("click change", function () {
-    component_viewer.clear(); // clear any building block visualization
-    $('#MOF_option').mousedown() // clear the stable MOF option section
-    $('#selected_MOF_data').hide()
-    recolor("Reset")
-    $('#chart').text(''); // clear the breakdown temperature plot
-
-    filter_dictionary = { 'inorg_node': $('#inorg_node_option').val(), 
-    'org_node': $('#org_node_option').val(), 
-    'edge': $('#edge_option').val(), 
-    'metal': $('#metal_option').val(), 
-    'type': $('#type_option').val(),
-    'net': $('#net_option').val(),
-    'ultrastable': $('#ultrastable_option').val()
-  } 
-
-    $.post("/filter_MOFs", JSON.stringify(filter_dictionary)).done(
-      function (response) {
-        filtered_stable_MOFs = response['filtered_MOFs']
-        document.getElementById('stable_MOF_list').innerHTML = option_generator(filtered_stable_MOFs)
-      })
-
-  })
-
-  // When the Only ultrastable MOFs? filter is changed
-  $('#ultrastable_option').change(function() {
-    current_option = $('#ultrastable_option').val()
-    if (current_option === 'Yes') {
-      dropdown_populator_ultrastable()
-    } else if (current_option === 'No') {
-      dropdown_populator()
-    }
-  })
-
-  // Recolors the building block selection buttons based on the string `bb_type`
-  function recolor(bb_type) {
-    switch(bb_type) {
-      case 'Inorganic node':
-        inorg_node_color = success_green
-        org_node_color = original_blue
-        edge_color = original_blue
-        break;
-      case 'Organic node':
-        inorg_node_color = original_blue
-        org_node_color = success_green
-        edge_color = original_blue
-        break;
-      case 'Edge':
-        inorg_node_color = original_blue
-        org_node_color = original_blue
-        edge_color = success_green
-        break;
-      case 'Reset':
-        inorg_node_color = original_blue
-        org_node_color = original_blue
-        edge_color = original_blue
-        break;      
-    }
-
-    // Recoloring buttons
-    $('#toggle_inorg_node').css({ 'background-color': inorg_node_color, 'border-color': inorg_node_color });
-    $('#toggle_org_node').css({ 'background-color': org_node_color, 'border-color': org_node_color });
-    $('#toggle_edge').css({ 'background-color': edge_color, 'border-color': edge_color });
-
-  }
-
-  // When the "Inorganic node" button is clicked
-  $('#toggle_inorg_node').click(function () {
-    console.log($('#inorg_node_option').val())
-    if ($('#inorg_node_option').val() === 'Any' || $('#inorg_node_option').val() === '') {
-      // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
-      alert('Must select a specific inorganic node for filtering, if you want to download and visualize an inorganic node')
-    }
-    else if (! inorg_nodes.includes($('#inorg_node_option').val())) {
-      alert('Invalid inorganic node selection')
-    }
-    else {
-      // Getting the XYZ information for the selected inorganic node
-      selected_bb = $('#inorg_node_option').val()
-      $.post("/bb", JSON.stringify(selected_bb)).done(
-        function (response) {
-          document.getElementById('bb_holder').value = response
-        })
-
-      recolor("Inorganic node")
-    }
-  })
-
-  // When the "Organic node" button is clicked
-  $('#toggle_org_node').click(function () {
-    if ($('#org_node_option').val() === 'Any' || $('#org_node_option').val() === '') {
-      // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
-      alert('Must select a specific organic node for filtering, if you want to download and visualize an organic node')
-    }
-    else if (! org_nodes.includes($('#org_node_option').val())) {
-      alert('Invalid inorganic node selection')
-    }
-    else {
-      // Getting the XYZ information for the selected organic node
-      selected_bb = $('#org_node_option').val()
-      $.post("/bb", JSON.stringify(selected_bb)).done(
-        function (response) {
-          document.getElementById('bb_holder').value = response
-        })
-
-      recolor("Organic node")
-    }
-  })
-
-  // When the "Edge" button is clicked
-  $('#toggle_edge').click(function () {
-    if ($('#edge_option').val() === 'Any' || $('#edge_option').val() === '') {
-      // The empty string occurs if the user clicks on the selection box, and then clicks off without selecting anything
-      alert('Must select a specific edge for filtering, if you want to download and visualize an edge')
-    }
-    else if (! edges.includes($('#edge_option').val())) {
-      alert('Invalid edge selection')
-    }    
-    else {
-      // Getting the XYZ information for the selected edge
-      selected_bb = $('#edge_option').val()
-      $.post("/bb", JSON.stringify(selected_bb)).done(
-        function (response) {
-          document.getElementById('bb_holder').value = response
-        })
-
-      recolor("Edge")
-    }
-  })
-
-  // This function is used for downloading xyz's of components
-  // filename is the name of the file to be downloaded. text is the contents of the file.
-  function download(filename, text) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
-
-    element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-  }
-
-  // This function is called when the "Download" button is clicked
-  // Downloads an xyz file
-  $('#download_bb').click(function () {
-
-    // Check which building block is selected, if any
-    if (inorg_node_color === success_green) {
-      bb_name = $('#inorg_node_option').val()
-      download(bb_name + '.xyz', $('#bb_holder').val())
-    }
-    else if (org_node_color === success_green) {
-      bb_name = $('#org_node_option').val()
-      download(bb_name + '.xyz', $('#bb_holder').val())
-    }
-    else if (edge_color === success_green) {
-      bb_name = $('#edge_option').val()
-      download(bb_name + '.xyz', $('#bb_holder').val())
-    }
-    else {
-      alert('You must select a building block in order to download.')
-      return // Leave the function
-    }
-  })
-
-  // This function is called when the "Visualize" button is clicked
-  // Visualizes the building block structure
-  $('#visualize_bb').click(function () {
-    if (inorg_node_color === success_green || org_node_color === success_green || edge_color === success_green) { // A component has chosen in the filter section and has been indicated with the corresponding button press.
-      $('#container-01-note').text('');
-      component_viewer.clear();
-      component_viewer.addModel($('#bb_holder').val(), "xyz"); // $('#bb_holder').val() contains the geometry
-      component_viewer.setStyle({}, { stick: { radius: 0.25 } });
-      component_viewer.zoomTo();
-      component_viewer.render();  
-    }  
-    else {
-      alert('You must select a building block in order to visualize.')
-      return // Leave the function      
-    }
-  })  
-
-  // This function is called when the "Reset zoom" button is clicked
-  // Resets the zoom level of the 3Dmol viewer.
-  $('#reset_zoom').click(function () {
-    component_viewer.zoomTo();
-  })
-
-  // This function is called when the "Download selected MOF (unoptimized)" button is clicked.
-  // Downloads the selected MOF.
-  $('#download_MOF_initial').click(function () {
-    if ($('#MOF_option').val() === '') {
-      alert('Must select a MOF to be downloaded')
-    }
-    else {
-      selected_MOF = $('#MOF_option').val()
-
-      window.location = 'unoptimized_geo/' + selected_MOF + '.cif'; // download cif file. See serve_unoptimized_MOF in app.py
-
-    }
-  })
-
-  // This function is called when the "Download selected MOF (optimized)" button is clicked.
-  // Downloads the selected MOF.
-  $('#download_MOF_optimized').click(function () {
-    if ($('#MOF_option').val() === '') {
-      alert('Must select a MOF to be downloaded')
-    }
-    else {
-      selected_MOF = $('#MOF_option').val()
-
-      // Check if the optimized geometry exists. If not, generate an alert.
-      $.post("/opt_geo_existence_check", JSON.stringify(MOF_name)).done(
-        function (response) {
-          if (response === 'No') {
-            alert("No optimized geometry available for the selected MOF.")
-          } else { // The optimized geometry is available.
-            window.location = 'optimized_geo/' + selected_MOF + '.cif'; // download cif file. See serve_optimized_MOF in app.py
-          } 
-        })
-    }
-  })
-
-  // This function is called when a new stable MOF is selected in the "Select a stable MOF" dropdown.
-  // Displays information on the selected MOF.
-  $('#MOF_option').on("click change", function (){ // Triggered by either a click or a change.
-    if ($('#MOF_option').val() === ''){ // No MOF selected.
-      $('#selected_MOF_data').hide()
-      return // exit function
-    }
-    else {
-      $('#selected_MOF_data').show() 
-    }
-
-    MOF_name = $('#MOF_option').val()
-    // Getting data on the selected MOF from the backend.
-    $.post("/data_pull", JSON.stringify(MOF_name)).done(
-      function (response) {
-        is_ultrastable = response['is_ultrastable']
-        solvent_prediction = response['solvent_removal_stability']
-        thermal_prediction = response['thermal_stability']
-        moduli_info = response['moduli_info']
-        uptake_info = response['uptake_info']
-
-        if (is_ultrastable) {
-          data_on_MOF = "<span style='color:#D5B942; font-weight: bold'>Ultrastable MOF!</span><br />" // <br /> for a new line in display.
-          // Using coolors.co website. #2D3D50, #1ABB9C, #BE1A2F --> #D5B942
-        }
-        else {
-          data_on_MOF = ""
-        }
-
-        if (solvent_prediction == null && thermal_prediction == null) {
-          return // exit the function
-        } else {
-          // <br /> for a new line in display. &#8451 is degrees celsius in decimal
-          data_on_MOF += "The solvent removal stability prediction for the selected MOF is " + solvent_prediction + ".<br />"
-          // preparing the human-interpretable solvent removal stability prediction
-          if (solvent_prediction <= 0.2) {
-            verdict = 'ANN is very confident the MOF is unstable upon solvent removal.';
-          }
-          else if (solvent_prediction <= 0.4) {
-            verdict = 'ANN is fairly confident the MOF is unstable upon solvent removal.';
-          }
-          else if (solvent_prediction <= 0.5) {
-            verdict = 'ANN is uncertain, but predicts the MOF is unstable upon solvent removal.';
-          }
-          else if (solvent_prediction <= 0.6) {
-            verdict = 'ANN is uncertain, but predicts the MOF is stable upon solvent removal.';
-          }
-          else if (solvent_prediction <= 0.8) {
-            verdict = 'ANN is fairly confident the MOF is stable upon solvent removal.';
-          }
-          else {
-            verdict = 'ANN is very confident the MOF is stable upon solvent removal.';
-          }
-          
-          data_on_MOF += "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + verdict + "<br />" // &nbsp is a space
-          + "The thermal stability prediction (breakdown temperature) for the selected MOF is " + thermal_prediction + "&#8451.<br />"
-
-          // Check if we have moduli information.
-          if (moduli_info != null) {
-            data_on_MOF += "<br /><b>Moduli Information</b><br />" // <b> for bold 
-            + "Elastic Voight (K<sub>V</sub>) is " + moduli_info["KV"] + " GPa<br />"
-            + "Elastic Reuss (K<sub>R</sub>) is " + moduli_info["KR"] + " GPa<br />" 
-            + "Voight-Reuss-Hill elastic average (K<sub>VRH</sub>) is " + moduli_info["KVRH"] + " GPa<br />"
-            + "Shear Voight (G<sub>V</sub>) is " + moduli_info["GV"] + " GPa<br />"
-            + "Shear Reuss (G<sub>R</sub>) is " + moduli_info["GR"] + " GPa<br />"
-            + "Voight-Reuss-Hill shear average (G<sub>VRH</sub>) is " + moduli_info["GVRH"] + " GPa<br />"
-          } // <sub></sub> is for subscript text.
-
-          // Check if we have uptake information.
-          if (uptake_info != null) {
-            data_on_MOF += "<br /><b>Uptake Information</b><br />"
-            + "Low P (5.8 bar) uptake is " + uptake_info["uptake_low_p (cm3 methane/g framework)"] + " cm³ methane/g framework<br />"
-            + "Equivalently, low P (5.8 bar) uptake is " + uptake_info["uptake_low_p (cm3 methane/cm3 framework)"] + " cm³ methane/cm³ framework<br />"
-            + "High P (65 bar) uptake is " + uptake_info["uptake_high_p (cm3 methane/g framework)"] + " cm³ methane/g framework<br />"
-            + "Equivalently, high P (65 bar) uptake is " + uptake_info["uptake_high_p (cm3 methane/cm3 framework)"] + " cm³ methane/cm³ framework<br />"
-          }
-
-        }
-
-        document.getElementById('selected_MOF_data').innerHTML = data_on_MOF
-
-        // making the thermal breakdown temperatures plot
-        myDict = { 'prediction': true, 'temperature': thermal_prediction, 'temperature_data_type': 'float' }
-        $.post("/plot_thermal_stability", JSON.stringify(myDict)).done(function (response) { 
-          console.log('entered the plot_thermal_stability post')
-          $('#chart').html(response);
-        })        
-      })
-
-  })
-
-  // When the "Dark mode" button is clicked:
-  black = '#000000'
-  white = '#FFFFFF'
-  $('#dark_mode').click(function () { // change background and button text depending on button state
-    button_text = document.getElementById('dark_mode').textContent
-    if (button_text === 'Dark mode') { // make background dark and text white
-      $('body').css("background-color", black);
-      document.getElementById('dark_mode').textContent = 'Light mode';
-      $('.zebra').css('color', white)
-      $('#header_background').css('background-image', 'url(\'banner_dark\')')
-    }
-    else { // Button says Light mode; make background white and text black
-      $('body').css("background-color", white);
-      document.getElementById('dark_mode').textContent = 'Dark mode';
-      $('.zebra').css('color', black)
-      $('#header_background').css('background-image', 'url(\'banner_light\')')
-    }
-  })
-
-  // option_generator is a helper function for populating dropdowns on the website
-  var option_generator = function(my_list) {
-    var options = ''
-    for (var i = 0; i < my_list.length; i++) {
-      options += '<option value="' + my_list[i] + '" />';
-    }
-    return options
-  }
-
-  // functions to handle the button color change of certain buttons upon mouse hover
-  // since we change the colors of certain buttons and lose the default hover color change
-  $("#toggle_inorg_node").hover(function () {
-    $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
-    $(this).css("border-color", "#1D2B37");
-  }, function () {
-    $(this).css("background-color", inorg_node_color);
-    $(this).css("border-color", inorg_node_color);
-  });
-
-  $("#toggle_org_node").hover(function () {
-    $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
-    $(this).css("border-color", "#1D2B37");
-  }, function () {
-    $(this).css("background-color", org_node_color);
-    $(this).css("border-color", org_node_color);
-  });
-
-  $("#toggle_edge").hover(function () {
-    $(this).css("background-color", "#1D2B37"); // #1D2B37 is the dark blue that is the default hover color for the buttons 
-    $(this).css("border-color", "#1D2B37");
-  }, function () {
-    $(this).css("background-color", edge_color);
-    $(this).css("border-color", edge_color);
-  });
-
-
-  // Populating dropdowns in this next section. This happens when the browser is opened.
-  dropdown_populator_ultrastable()
-
-  // This function is used for populating dropdowns with the full range of options.
-  function dropdown_populator() {
-    // Populating the net dropdown
-    document.getElementById('net_list').innerHTML = option_generator(nets);
-
-    // Populating the metal dropdown
-    document.getElementById('metal_list').innerHTML = option_generator(metals);
-
-    // Populating the inorganic node dropdown
-    document.getElementById('inorg_node_list').innerHTML = option_generator(inorg_nodes);
-
-    // Populating the organic node dropdown
-    document.getElementById('org_node_list').innerHTML = option_generator(org_nodes)
-
-    // Populating the edge dropdown
-    document.getElementById('edge_list').innerHTML = option_generator(edges)
-  }
-
-  // This function is used for populating dropdowns with the ultrastable range of options.
-  function dropdown_populator_ultrastable() {
-    document.getElementById('net_list').innerHTML = option_generator(ultrastable_nets);
-    document.getElementById('metal_list').innerHTML = option_generator(ultrastable_metals);
-    document.getElementById('inorg_node_list').innerHTML = option_generator(ultrastable_inorg_nodes);
-    document.getElementById('org_node_list').innerHTML = option_generator(ultrastable_org_nodes)
-    document.getElementById('edge_list').innerHTML = option_generator(ultrastable_edges)
-  }
-
-
-  // The code below runs when this webpage is opened.
-  $('#ultrastable_option').val("Yes") // Setting the default value
-  $('#type_option').val("Any") // Setting the default value
-  $('#net_option').val("Any") // Setting the default value
-  $('#metal_option').val("Any") // Setting the default value
-  $('#inorg_node_option').val("Any") // Setting the default value
-  $('#org_node_option').val("Any") // Setting the default value
-  $('#edge_option').val("Any") // Setting the default value
-
-  $('#metal_option').change() // Trigger a change event, in order to force execution of /filter_MOFs at the beginning.
-
-</script>
+</html>

@@ -17,6 +17,7 @@ import smtplib
 import glob
 import uuid
 import pickle as pkl
+import joblib 
 from sklearn.metrics import pairwise_distances
 from bokeh.plotting import figure
 from bokeh.resources import CDN
@@ -31,7 +32,6 @@ from datetime import datetime
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 from list_content.list_content import my_linkers, my_sbus, my_nets, my_MOFs
-
 
 cmap_bokeh = Inferno256
 
@@ -81,6 +81,11 @@ tf_keras.backend.set_session(tf_session)
 solvent_model = keras.models.load_model(solvent_ANN_path + 'final_model_flag_few_epochs.h5',custom_objects=dependencies)
 thermal_model = keras.models.load_model(thermal_ANN_path + 'final_model_T_few_epochs.h5',custom_objects=dependencies)
 
+# These two models use scikit-learn 0.23.2
+water_model = joblib.load('model/water_and_acid/models/water_model.joblib')
+acid_model = joblib.load('model/water_and_acid/models/acid_model.joblib')
+water_scaler = joblib.load('model/water_and_acid/models/water_scaler.joblib')
+acid_scaler = joblib.load('model/water_and_acid/models/acid_scaler.joblib')
 
 # global variable dictionary for stable building block aliases. See https://zenodo.org/record/7091192
 bb_mapping = {'XUDNAN_clean_linker_2': 'E0', 'MIFKUJ_clean_linker_0': 'E1', 'AJUNOK_clean_linker_0': 'E2', 'OJICUG_clean_linker_0': 'E3',
@@ -378,10 +383,20 @@ def serve_cite():
     """ 
     return flask.send_from_directory('.', 'how_to_cite.html')
 
+@app.route('/water_stability_prediction.html')
+def serve_water_stability_page():
+    """
+    serve_water_stability_page serves the stable MOFs page.
+    So the user is redirected to the stable MOFs page.
+
+    :return: The stable MOFs page.
+    """     
+    return flask.send_from_directory('.', 'water_stability_prediction.html')
+
 @app.route('/stable_MOFs.html')
 def serve_stable_bb_page():
     """
-    serve_cite serves the stable MOFs page.
+    serve_stable_bb_page serves the stable MOFs page.
     So the user is redirected to the stable MOFs page.
 
     :return: The stable MOFs page.
@@ -468,7 +483,7 @@ def serve_optimized_MOF(path):
 @app.route('/ris_files/MOFSimplify_citation.ris')
 def serve_ris():
     """
-    serve_bbcif returns a file to MOFSimplify.
+    serve_ris returns a file to MOFSimplify.
     The file is intended the citation file for the MOFSimplify paper.
 
     :return: The rif citation file.
@@ -687,8 +702,6 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
     geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
       'PONAV','PONAV_vol_frac','VPOV','VSA','cell_v']
      
-    other = ['cif_file','name','filename']
-
     ANN_path = path + 'model/solvent/ANN/'
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
     df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')
@@ -832,8 +845,6 @@ def run_thermal_ANN(user_id, path, MOF_name, thermal_ANN):
     geo = ['Df','Di', 'Dif','GPOAV','GPONAV','GPOV','GSA','POAV','POAV_vol_frac',
       'PONAV','PONAV_vol_frac','VPOV','VSA','cell_v']
      
-    other = ['cif_file','name','filename']
-
     ANN_path = path + 'model/thermal/ANN/'
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
     df_train_all = pd.read_csv(ANN_path+"train.csv").append(pd.read_csv(ANN_path+"val.csv"))
@@ -926,8 +937,8 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
     cif_file.close()
 
     # There can be a RACs folder for solvent predictions and a RACs folder for thermal predictions. Same for Zeo++.
-    RACs_folder = temp_file_folder +  prediction_type + '_RACs/'
-    zeo_folder = temp_file_folder + prediction_type + '_zeo++/'
+    RACs_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_RACs/'
+    zeo_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_zeo++/'
 
     # Delete the RACs folder, then remake it (to start fresh for this prediction).
     shutil.rmtree(RACs_folder)
@@ -1035,9 +1046,9 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
             print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
                   '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
             return 'FAILED'
-        geo_dict = {'name':basename, 'cif_file':cif_file, 'Di':largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
-                    'cell_v': unit_cell_volume, 'VSA':VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV':GPOV, 'POAV_vol_frac':POAV_volume_fraction, 
-                    'PONAV_vol_frac':PONAV_volume_fraction, 'GPOAV':GPOAV,'GPONAV':GPONAV,'POAV':POAV,'PONAV':PONAV}
+        geo_dict = {'name': basename, 'cif_file': cif_file, 'Di': largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
+                    'cell_v': unit_cell_volume, 'VSA': VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV': GPOV, 'POAV_vol_frac': POAV_volume_fraction, 
+                    'PONAV_vol_frac': PONAV_volume_fraction, 'GPOAV': GPOAV,'GPONAV': GPONAV,'POAV': POAV,'PONAV':PONAV}
         dict_list.append(geo_dict)
         geo_df = pd.DataFrame(dict_list)
         geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
@@ -1177,7 +1188,6 @@ def ss_predict():
     operation_counter += 1
 
     print('TIME CHECK 1')
-    import time
     timeStarted = time.time() # save start time (debugging)
 
     # Grab data and tweak the MOF name.
@@ -1249,7 +1259,7 @@ def ss_predict():
 
             db_push(structure=structure, prediction_type='solvent_stability_prediction', in_train=True, result=output['truth'], neighbor_names='', neighbor_dists='', failure=False, csv_content=csv_contents)
         return output
-    else: # grabbing some variables (that aren't used lol). We will make a prediction
+    else: # grabbing some variables (that aren't used). We will make a prediction
         temp_file_folder = output[0]
         ANN_folder = output[1]
 
@@ -1379,7 +1389,7 @@ def ts_predict():
 
             db_push(structure=structure, prediction_type='thermal_stability_prediction', in_train=True, result=output['truth'], neighbor_names='', neighbor_dists='', failure=False, csv_content=csv_contents)
         return output
-    else: # grabbing some variables (that aren't used lol). We will make a prediction
+    else: # grabbing some variables (that aren't used). We will make a prediction
         temp_file_folder = output[0]
         ANN_folder = output[1]
 
@@ -2104,7 +2114,7 @@ def neighbor_writer():
 def descriptor_getter():
     """
     descriptor_getter returns the contents of the csv with the descriptors of the desired MOF.
-    These descriptors are RACs and Zeo++ descriptors. There are 188 total.
+    These descriptors are RACs and Zeo++ descriptors. There are 189 total.
 
     :return: str contents, the contents of the csv with the descriptor data. To be written to a csv in the front end for download.
     """ 
@@ -2343,6 +2353,354 @@ def existence_check():
         exists = 'No'
 
     return exists
+
+# Will not use the mongodb for water and acid stability predictions.
+
+@app.route('/predict_water_stability', methods=['POST']) 
+def ws_predict():
+    """
+    ws_predict generates the 2-class water stability prediction for the selected MOF.
+        Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_2.
+    Then, Gianmarco's model is applied to make a prediction using run_water_RF.
+
+    :return: dict results, contains the prediction.
+        May instead return a string 'FAILED' if descriptor generation fails.
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
+    """ 
+
+    global operation_counter # global variable
+    global last_operation_counter_clear
+
+    import time 
+    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
+        last_operation_counter_clear = time.time()
+        operation_counter = 0
+
+    if operation_counter >= MAX_OPERATIONS:
+        return 'OVERLOAD'
+
+    operation_counter += 1
+
+    # Grab data and tweak the MOF name.
+    my_data = json.loads(flask.request.get_data())
+    structure = my_data['structure']
+    name = my_data['name']
+    if name[-4:] == '.cif':
+        name = name[:-4] # remove the .cif part of the name
+
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
+    output = descriptor_generator_2(name, structure, 'water') # generate descriptors
+    if output == 'FAILED': # Description generation failure
+        operation_counter = conditional_diminish(operation_counter)
+        return 'FAILED'
+
+    # Applying the model next
+    prediction = run_water_RF(str(session['ID']), MOFSIMPLIFY_PATH, name)
+
+    results = {
+    'prediction': prediction,
+    }
+    
+    operation_counter = conditional_diminish(operation_counter)
+    return results
+
+@app.route('/predict_acid_stability', methods=['POST']) 
+def as_predict():
+    """
+    as_predict generates the acid stability prediction for the selected MOF.
+        Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_2.
+    Then, Gianmarco's model is applied to make a prediction using run_acid_RF.
+
+    :return: dict results, contains the prediction.
+        May instead return a string 'FAILED' if descriptor generation fails.
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
+    """ 
+
+    global operation_counter # global variable
+    global last_operation_counter_clear
+
+    import time 
+    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
+        last_operation_counter_clear = time.time()
+        operation_counter = 0
+
+    if operation_counter >= MAX_OPERATIONS:
+        return 'OVERLOAD'
+
+    operation_counter += 1
+
+    # Grab data and tweak the MOF name.
+    my_data = json.loads(flask.request.get_data())
+    structure = my_data['structure']
+    name = my_data['name']
+    if name[-4:] == '.cif':
+        name = name[:-4] # remove the .cif part of the name
+
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
+    output = descriptor_generator_2(name, structure, 'acid') # generate descriptors
+    if output == 'FAILED': # Description generation failure
+        operation_counter = conditional_diminish(operation_counter)
+        return 'FAILED'
+
+    # Applying the model next
+    prediction = run_acid_RF(str(session['ID']), MOFSIMPLIFY_PATH, name)
+
+    results = {
+    'prediction': prediction,
+    }
+    
+    operation_counter = conditional_diminish(operation_counter)
+    return results
+
+@app.route('/get_descriptors_2', methods=['POST']) 
+def descriptor_getter_2():
+    """
+    descriptor_getter returns the contents of the csv with the descriptors of the desired MOF.
+    These descriptors are RACs and Zeo++ descriptors. There are 189 total.
+    The Zeo++ features are slightly different than those from descriptor_getter.
+
+    :return: str contents, the contents of the csv with the descriptor data. To be written to a csv in the front end for download.
+    """ 
+
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is the selected MOF
+    if name[-4:] == '.cif':
+        name = name[:-4] # remove the .cif part of the name
+
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    descriptors_folder = temp_file_folder + "merged_descriptors/"
+
+    with open(descriptors_folder + name + '_descriptors_2.csv', 'r') as f:
+        contents = f.read()
+
+    return contents
+
+def descriptor_generator_2(name, structure, prediction_type):
+    """
+    # descriptor_generator is used by both ws_predict() and as_predict() to generate RACs and Zeo++ descriptors.
+    # These descriptors are subsequently used in ws_predict() and as_predict() for the RF models.
+    # Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
+    # The third input indicates the type of prediction (water or acid).
+
+    :param name: str, the name of the MOF being analyzed.
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :return: str, either the string 'FAILED' if descriptor generation fails, otherwise 'SUCCESS'
+    """ 
+
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    cif_folder = temp_file_folder + 'cifs/'
+
+    # Write the data back to a cif file.
+    try:
+        cif_file = open(cif_folder + name + '.cif', 'w')
+    except FileNotFoundError:
+        return 'FAILED'
+    cif_file.write(structure)
+    cif_file.close()
+
+    # There can be a RACs folder for water predictions and a RACs folder for acid predictions. Same for Zeo++.
+    RACs_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_RACs/'
+    zeo_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_zeo++/'
+
+    # Delete the RACs folder, then remake it (to start fresh for this prediction).
+    shutil.rmtree(RACs_folder)
+    os.mkdir(RACs_folder)
+
+    # Doing the same with the Zeo++ folder.
+    shutil.rmtree(zeo_folder)
+    os.mkdir(zeo_folder)
+
+    # Next, running MOF featurization
+    try:
+        get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
+    except ValueError:
+        return 'FAILED'
+
+    # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
+        # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
+
+    # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
+    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
+    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.4 1.4 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
+    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.4 1.4 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
+    cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+
+    # four parallelized Zeo++ and RAC commands
+    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
+    output1 = process1.communicate()[0]
+    output2 = process2.communicate()[0]
+    output3 = process3.communicate()[0]
+    output4 = process4.communicate()[0]
+
+    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
+
+    ''' 
+    The geometric descriptors are:
+    - the maximum included sphere (Di)
+    - maximum free sphere (Df)
+    - maximum included sphere in the free sphere path (Dif)
+    - gravimetric pore volume (GPOV)
+    - volumetric pore volume (VPOV)
+    - gravimetric surface area (GSA)
+    - volumetric surface area (VSA)
+    - cell volume (cell_v)
+    - gravimetric pore accessible volume (GPOAV)
+    - gravimetric pore non-accessible volume (GPONAV)
+    - pore-accessible volume (POAV)
+    - pore non-accessible volume (PONAV)
+    - pore accessible void fraction (POAVF)
+    - pore nonaccessible void fraction (PONAVF)
+
+    All Zeo++ calculations use a probe radius of 1.4 angstrom, and zeo++ is called by subprocess.
+    '''
+
+    dict_list = []
+    cif_file = name + '_primitive.cif' 
+    basename = cif_file.strip('.cif')
+    largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path = np.nan, np.nan, np.nan
+    unit_cell_volume, crystal_density, VSA, GSA = np.nan, np.nan, np.nan, np.nan
+    VPOV, GPOV = np.nan, np.nan
+    POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+
+    if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
+        os.path.exists(zeo_folder + name + '_pov.txt')):
+        with open(zeo_folder + name + '_pd.txt') as f:
+            pore_diameter_data = f.readlines()
+            for row in pore_diameter_data:
+                largest_included_sphere = float(row.split()[1]) # largest included sphere
+                largest_free_sphere = float(row.split()[2]) # largest free sphere
+                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+        with open(zeo_folder + name + '_sa.txt') as f:
+            surface_area_data = f.readlines()
+            for i, row in enumerate(surface_area_data):
+                if i == 0:
+                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
+                    crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
+                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
+                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+        with open(zeo_folder + name + '_pov.txt') as f:
+            pore_volume_data = f.readlines()
+            for i, row in enumerate(pore_volume_data):
+                if i == 0:
+                    density = float(row.split('Density:')[1].split()[0])
+                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
+                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
+                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
+                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
+                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
+                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                    VPOV = POAV_volume_fraction+PONAV_volume_fraction
+                    GPOV = VPOV/density
+    else:
+        print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
+              '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
+        return 'FAILED'
+    geo_dict = {'name': basename, 'cif_file': cif_file, 'Di': largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
+                'cell_v': unit_cell_volume, 'VSA': VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV': GPOV, 'POAV_vol_frac': POAV_volume_fraction, 
+                'PONAV_vol_frac': PONAV_volume_fraction, 'GPOAV': GPOAV,'GPONAV': GPONAV,'POAV': POAV,'PONAV':PONAV}
+    dict_list.append(geo_dict)
+    geo_df = pd.DataFrame(dict_list)
+    geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
+
+    # error handling for cmd4
+    with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
+        if f.readline() == 'FAILED':
+            print('RAC generation failed.')
+            return 'FAILED'
+
+    # Merging geometric information with the RAC information that is in the get_MOF_descriptors-generated files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+    try:
+        lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+        sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+        linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
+    except Exception: # csv files have been deleted
+        return 'FAILED' 
+
+    lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a DataFrame, then transpose
+    sbu_df = sbu_df.mean().to_frame().transpose()
+    linker_df = linker_df.mean().to_frame().transpose()
+
+    merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
+
+    merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors_2.csv',index=False) # written in /temp_file_creation_SESSIONID
+
+    return 'SUCCESS' 
+
+def run_water_RF(user_id, path, MOF_name):
+    """
+    run_water_RF runs the water stability RF with the desired MOF as input.
+    It returns a prediction between zero and one. This prediction corresponds to an assessment of MOF water stability.
+    The further the prediction is from 0.5, the more sure the ANN is.
+
+    :param user_id: str, the session ID of the user
+    :param path: str, the server's path to the MOFSimplify folder on the server
+    :param MOF_name: str, the name of the MOF for which a prediction is being generated
+    :return: str, the model water stability prediction 
+    """ 
+
+    rfa_2_class_water_features = [
+    'mc-Z-3-all', 
+    'D_mc-Z-3-all', 
+    'D_mc-Z-2-all', 
+    'D_mc-Z-1-all', 
+    'mc-chi-3-all', 
+    'mc-Z-1-all', 
+    'mc-Z-0-all', 
+    'D_mc-chi-2-all', 
+    'f-lig-Z-2', 
+    'GSA', 
+    'f-lig-I-0', 
+    'func-S-1-all',
+    ]
+     
+    temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_2.csv') # assumes that temp_file_creation/ is in parent folder
+    X_newMOF = df_newMOF[rfa_2_class_water_features].to_numpy()
+    X_newMOF = water_scaler.transform(X_newMOF)
+    water_pred = water_model.predict_proba(X_newMOF)[:,1][0]
+    water_pred = np.round(water_pred, 2) # round to 2 decimals
+
+    return str(water_pred)
+
+def run_acid_RF(user_id, path, MOF_name):
+    """
+    run_acid_RF runs the acid stability RF with the desired MOF as input.
+    It returns a prediction between zero and one. This prediction corresponds to an assessment of MOF acid stability.
+    The further the prediction is from 0.5, the more sure the ANN is.
+
+    :param user_id: str, the session ID of the user
+    :param path: str, the server's path to the MOFSimplify folder on the server
+    :param MOF_name: str, the name of the MOF for which a prediction is being generated
+    :return: str, the model acid stability prediction 
+    """ 
+
+    rfa_acid_features = [
+    'mc-chi-3-all', 
+    'Dif', 
+    'mc-Z-2-all', 
+    'Di', 
+    'f-T-2-all', 
+    'D_mc-chi-2-all', 
+    'lc-chi-3-all', 
+    'D_mc-S-1-all',
+    ]
+     
+    temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_2.csv') # assumes that temp_file_creation/ is in parent folder
+    X_newMOF = df_newMOF[rfa_acid_features].to_numpy()
+    X_newMOF = acid_scaler.transform(X_newMOF)
+    acid_pred = acid_model.predict_proba(X_newMOF)[:,1][0]
+    acid_pred = np.round(acid_pred, 2) # round to 2 decimals
+
+    return str(acid_pred)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

@@ -1,0 +1,8 @@
+train_acc: 1.0
+train_bal_acc: 1.0
+train_roc_auc: 1.0
+train_F1: 1.0
+test_acc: 0.771689497716895
+test_bal_acc: 0.7420194309507286
+test_roc_auc: 0.8025242886884109
+test_F1: 0.749634168648253

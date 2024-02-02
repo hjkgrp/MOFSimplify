@@ -1,0 +1,2 @@
+The features used are ['mc-chi-3-all', 'Dif', 'mc-Z-2-all', 'Di', 'f-T-2-all', 'D_mc-chi-2-all', 'lc-chi-3-all', 'D_mc-S-1-all']
+The best hyperparameters are {'max_depth': 5}

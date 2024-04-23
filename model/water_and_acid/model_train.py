@@ -115,7 +115,7 @@ def model_train(df, feature_names, label_name, rand_seed, four_class=False):
     if four_class and task_name == 'water':
         task_name = '4_class_' + task_name
 
-    X = df[['MOF_name'] + feature_names].to_numpy() # Use ['MOF_name'] to generate CSV fo train/test splits
+    X = df[['MOF_name'] + feature_names].to_numpy() # Use ['MOF_name'] to generate CSV of train/test splits
     y = df[label_name].to_numpy()
     X, y = preprocess(X, y, task_name, rand_seed)
     X_train, X_test, y_train, y_test, scaler, train_names, test_names = preprocess_2(X, y, rand_seed)

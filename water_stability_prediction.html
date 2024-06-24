@@ -203,8 +203,8 @@
         <div class='row' id='status_section' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
           <b style='font-size:22px;'>Status messages and MOF predictions</b>
           <div class='col-12' id='upload_status' style='font-size:22px;'></div>          
-          <div class='col-12' id='water_stability_prediction' style='font-size:22px;'></div>
-          <div class='col-12' id='acid_stability_prediction' style='font-size:22px;'></div>
+          <div class='col-12' id='water_stability_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
+          <div class='col-12' id='acid_stability_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
         </div>
       </div><!-- The example MOF selection section of the website -->
       <div class='zebra' id="pills-example" style='font-size: 20px;'>
@@ -426,27 +426,27 @@
 
                  // preparing the human-interpretable water stability prediction
                  if (prediction <= 0.2) {
-                   verdict = 'Very confident the MOF is water-unstable.<br>439/1,092 MOFs in WS24 are water-unstable.';
+                   verdict = 'Very confident the MOF is water-unstable.\n439/1,092 MOFs in WS24 are water-unstable.';
                    my_color = '#ffad97' // color background, light red
                  }
                  else if (prediction <= 0.4) {
-                   verdict = 'Fairly confident the MOF is water-unstable.<br>439/1,092 MOFs in WS24 are water-unstable.';
+                   verdict = 'Fairly confident the MOF is water-unstable.\n439/1,092 MOFs in WS24 are water-unstable.';
                    my_color = '#ffcd97' // light orange
                  }
                  else if (prediction <= 0.5) {
-                   verdict = 'Uncertain, but predict the MOF is water-unstable.<br>439/1,092 MOFs in WS24 are water-unstable.';
+                   verdict = 'Uncertain, but predict the MOF is water-unstable.\n439/1,092 MOFs in WS24 are water-unstable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.6) {
-                   verdict = 'Uncertain, but predict the MOF has water-stable.<br>653/1,092 MOFs in WS24 are water-stable.';
+                   verdict = 'Uncertain, but predict the MOF has water-stable.\n653/1,092 MOFs in WS24 are water-stable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.8) {
-                   verdict = 'Fairly confident the MOF has water-stable.<br>653/1,092 MOFs in WS24 are water-stable.';
+                   verdict = 'Fairly confident the MOF has water-stable.\n653/1,092 MOFs in WS24 are water-stable.';
                    my_color = '#e7ff97' // light lime
                  }
                  else {
-                   verdict = 'Very confident the MOF has water-stable.<br>653/1,092 MOFs in WS24 are water-stable.';
+                   verdict = 'Very confident the MOF has water-stable.\n653/1,092 MOFs in WS24 are water-stable.';
                    my_color = '#90ee90' // light green
                  }
 
@@ -529,27 +529,27 @@
 
                  // preparing the human-interpretable water stability prediction
                  if (prediction <= 0.2) {
-                   verdict = 'Very confident the MOF is acid-unstable.<br>565/653 water-stable MOFs in WS24 are acid-unstable.';
+                   verdict = 'Very confident the MOF is acid-unstable.\n565/653 water-stable MOFs in WS24 are acid-unstable.';
                    my_color = '#ffad97' // color background, light red
                  }
                  else if (prediction <= 0.4) {
-                   verdict = 'Fairly confident the MOF is acid-unstable.<br>565/653 water-stable MOFs in WS24 are acid-unstable.';
+                   verdict = 'Fairly confident the MOF is acid-unstable.\n565/653 water-stable MOFs in WS24 are acid-unstable.';
                    my_color = '#ffcd97' // light orange
                  }
                  else if (prediction <= 0.5) {
-                   verdict = 'Uncertain, but predict the MOF is acid-unstable.<br>565/653 water-stable MOFs in WS24 are acid-unstable.';
+                   verdict = 'Uncertain, but predict the MOF is acid-unstable.\n565/653 water-stable MOFs in WS24 are acid-unstable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.6) {
-                   verdict = 'Uncertain, but predict the MOF is acid-stable.<br>88/653 water-stable MOFs in WS24 are acid-stable.';
+                   verdict = 'Uncertain, but predict the MOF is acid-stable.\n88/653 water-stable MOFs in WS24 are acid-stable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.8) {
-                   verdict = 'Fairly confident the MOF is acid-stable.<br>88/653 water-stable MOFs in WS24 are acid-stable.';
+                   verdict = 'Fairly confident the MOF is acid-stable.\n88/653 water-stable MOFs in WS24 are acid-stable.';
                    my_color = '#e7ff97' // light lime
                  }
                  else {
-                   verdict = 'Very confident the MOF is acid-stable.<br>88/653 water-stable MOFs in WS24 are acid-stable.';
+                   verdict = 'Very confident the MOF is acid-stable.\n88/653 water-stable MOFs in WS24 are acid-stable.';
                    my_color = '#90ee90' // light green
                  }
 

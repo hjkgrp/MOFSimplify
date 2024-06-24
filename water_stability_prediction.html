@@ -176,6 +176,7 @@
         style='font-size:22px;'>Building block assembly</button> -->
             <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p><!-- <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p> -->
             <!-- &nbsp is a space gap -->
+          <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p><!-- &nbsp is a space gap -->
           </div>
         </div>
 
@@ -188,6 +189,7 @@
                <button class='btn btn-primary round_button' id='predict_a' style='display:inline-block; width:49%; font-size:22px;' type='button'>Acidic aqueous solution stability</button>
             </div>
           </div>
+          <p class='zebra' style='font-size:18px;text-align: center;'>The 2-class water stability model groups the four water stability classes U, LK, HK, and TS<br>into two classes: water-stable (HK+TS) and water-unstable (U+LK).<br>The acid model assumes a MOF is water-stable.</p>
         </div>
         <div id='descriptor_section' style='margin-top: 1cm;'>
           <b class='zebra' style='font-size:22px;'>3) Download descriptors of the selected MOF</b> <!-- Create a section containing buttons -->
@@ -200,10 +202,7 @@
         </div><!-- Section where the MOF predictions are placed once predictions are made. Also displays which MOF is currently queued up and ready for analysis. -->
         <div class='row' id='status_section' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
           <b style='font-size:22px;'>Status messages and MOF predictions</b>
-          <div class='col-12' id='upload_status' style='font-size:22px;'></div>
-          <div class='col-12' style='font-size:22px;'>
-            Note, the acid model assumes a MOF is stable in water (high kinetic stability or thermodynamic stability).
-          </div>
+          <div class='col-12' id='upload_status' style='font-size:22px;'></div>          
           <div class='col-12' id='water_stability_prediction' style='font-size:22px;'></div>
           <div class='col-12' id='acid_stability_prediction' style='font-size:22px;'></div>
         </div>
@@ -427,27 +426,27 @@
 
                  // preparing the human-interpretable water stability prediction
                  if (prediction <= 0.2) {
-                   verdict = 'Very confident the MOF is unstable or has low kinetic stability in water.';
+                   verdict = 'Very confident the MOF is water-unstable.<br>439/1,092 MOFs in WS24 are water-unstable.';
                    my_color = '#ffad97' // color background, light red
                  }
                  else if (prediction <= 0.4) {
-                   verdict = 'Fairly confident the MOF is unstable or has low kinetic stability in water.';
+                   verdict = 'Fairly confident the MOF is water-unstable.<br>439/1,092 MOFs in WS24 are water-unstable.';
                    my_color = '#ffcd97' // light orange
                  }
                  else if (prediction <= 0.5) {
-                   verdict = 'Uncertain, but predict the MOF is unstable or has low kinetic stability in water.';
+                   verdict = 'Uncertain, but predict the MOF is water-unstable.<br>439/1,092 MOFs in WS24 are water-unstable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.6) {
-                   verdict = 'Uncertain, but predict the MOF has high kinetic stability or thermodynamic stability in water.';
+                   verdict = 'Uncertain, but predict the MOF has water-stable.<br>653/1,092 MOFs in WS24 are water-stable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.8) {
-                   verdict = 'Fairly confident the MOF has high kinetic stability or thermodynamic stability in water.';
+                   verdict = 'Fairly confident the MOF has water-stable.<br>653/1,092 MOFs in WS24 are water-stable.';
                    my_color = '#e7ff97' // light lime
                  }
                  else {
-                   verdict = 'Very confident the MOF has high kinetic stability or thermodynamic stability in water.';
+                   verdict = 'Very confident the MOF has water-stable.<br>653/1,092 MOFs in WS24 are water-stable.';
                    my_color = '#90ee90' // light green
                  }
 
@@ -521,8 +520,6 @@
                  return; // Do not update acid stability prediction if prediction failed.
                }
 
-
-
                acid_pred_color = success_green;
                $('#predict_a').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
@@ -532,27 +529,27 @@
 
                  // preparing the human-interpretable water stability prediction
                  if (prediction <= 0.2) {
-                   verdict = 'Very confident the MOF is unstable in acid.';
+                   verdict = 'Very confident the MOF is acid-unstable.<br>565/653 water-stable MOFs in WS24 are acid-unstable.';
                    my_color = '#ffad97' // color background, light red
                  }
                  else if (prediction <= 0.4) {
-                   verdict = 'Fairly confident the MOF is unstable in acid.';
+                   verdict = 'Fairly confident the MOF is acid-unstable.<br>565/653 water-stable MOFs in WS24 are acid-unstable.';
                    my_color = '#ffcd97' // light orange
                  }
                  else if (prediction <= 0.5) {
-                   verdict = 'Uncertain, but predict the MOF is unstable in acid.';
+                   verdict = 'Uncertain, but predict the MOF is acid-unstable.<br>565/653 water-stable MOFs in WS24 are acid-unstable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.6) {
-                   verdict = 'Uncertain, but predict the MOF is stable in acid.';
+                   verdict = 'Uncertain, but predict the MOF is acid-stable.<br>88/653 water-stable MOFs in WS24 are acid-stable.';
                    my_color = '#fffa97' // light yellow
                  }
                  else if (prediction <= 0.8) {
-                   verdict = 'Fairly confident the MOF is stable in acid.';
+                   verdict = 'Fairly confident the MOF is acid-stable.<br>88/653 water-stable MOFs in WS24 are acid-stable.';
                    my_color = '#e7ff97' // light lime
                  }
                  else {
-                   verdict = 'Very confident the MOF is stable in acid.';
+                   verdict = 'Very confident the MOF is acid-stable.<br>88/653 water-stable MOFs in WS24 are acid-stable.';
                    my_color = '#90ee90' // light green
                  }
 
@@ -670,7 +667,7 @@
          name = get_selected_MOF(false) // don't want the .cif extension
 
          // Grab the contents of the descriptor csv
-         $.post("/get_descriptors_2", JSON.stringify(name)).done(
+         $.post("/get_descriptors_water", JSON.stringify(name)).done(
            function (response) {
              descriptor_color = success_green;
              $('#download_descriptors').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
@@ -825,19 +822,19 @@
          $(this).css("color", '#279AF1');
        });
 
-       // // When the "Yes" button is clicked for storage permission line
-       // $("#perm_yes").click(function () {
-       //   $('#permission_line').hide()
-       //   $.post("/permission", JSON.stringify(true)).done(function (response) {
-       //   })
-       // })
+       // When the "Yes" button is clicked for storage permission line
+       $("#perm_yes").click(function () {
+         $('#permission_line').hide()
+         $.post("/permission", JSON.stringify(true)).done(function (response) {
+         })
+       })
 
-       // // When the "No" button is clicked for storage permission line
-       // $("#perm_no").click(function () {
-       //   $('#permission_line').hide()
-       //   $.post("/permission", JSON.stringify(false)).done(function (response) {
-       //   })
-       // })
+       // When the "No" button is clicked for storage permission line
+       $("#perm_no").click(function () {
+         $('#permission_line').hide()
+         $.post("/permission", JSON.stringify(false)).done(function (response) {
+         })
+       })
 
      });
 

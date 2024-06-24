@@ -155,6 +155,14 @@ def conditional_diminish(counter):
 
     return counter
 
+def operation_counter_periodic_clear():
+    global operation_counter # global variable
+    global last_operation_counter_clear
+
+    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
+        last_operation_counter_clear = time.time()
+        operation_counter = 0
+
 # app.route takes jquery ($) requests from index.html and executes the associated function in app.py.
 # Output can then be returned to index.html.
 
@@ -514,6 +522,13 @@ def file_age_in_seconds(pathname):
     """ 
 
     return time.time() - os.stat(pathname)[stat.ST_MTIME] # time since last modification
+
+def extract_info(my_data):
+    structure = my_data['structure']
+    name = my_data['name']
+    if name[-4:] == '.cif':
+        name = name[:-4] # remove the .cif part of the name
+    return structure, name
 
 @app.route('/curr_users', methods=['GET'])
 def curr_num_users():
@@ -922,7 +937,6 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
     """ 
 
     print('TIME CHECK 2')
-    import time # debugging
     timeStarted = time.time() # save start time (debugging)
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
@@ -1158,7 +1172,7 @@ def ss_predict():
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
     Then, Aditya's model is applied to make a prediction using run_solvent_ANN.
 
-    If the structure is already in our history.MOFSimplify collection, we use information from the database to speed things up.
+    If the structure is already in our history.MOFSimplify_v2 collection, we use information from the database to speed things up.
 
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
@@ -1169,16 +1183,7 @@ def ss_predict():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time 
-    print('quick time check')
-    print(time.time())
-    print(last_operation_counter_clear)
-    print(time.time() - last_operation_counter_clear)
-    print('end of quick time check')
-    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
-        print(f'operation_counter cleared at {time.time()}')
-        last_operation_counter_clear = time.time()
-        operation_counter = 0
+    operation_counter_periodic_clear()
 
     print(f'Current operation_counter: {operation_counter}')
 
@@ -1192,17 +1197,14 @@ def ss_predict():
 
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data())
-    structure = my_data['structure']
-    name = my_data['name']
-    if name[-4:] == '.cif':
-        name = name[:-4] # remove the .cif part of the name
+    structure, name = extract_info(my_data)
 
     timeDelta = time.time() - timeStarted # get execution time
     print('Finished process in ' + str(timeDelta) + ' seconds')
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
-    ### Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before. 
+    ### Check in MongoDB history.MOFSimplify_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
@@ -1300,7 +1302,7 @@ def ts_predict():
     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator.
     Then, Aditya's model is applied to make a prediction using run_thermal_ANN.
 
-    If the structure is already in our history.MOFSimplify collection, we use information from the database to speed things up.
+    If the structure is already in our history.MOFSimplify_v2 collection, we use information from the database to speed things up.
 
     :return: dict results, contains the prediction and information on latent space nearest neighbors.
         May instead return a dictionary output if the MOF is in the training data, containing the ground truth and the name of the matching MOF in the training data
@@ -1311,16 +1313,7 @@ def ts_predict():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time 
-    print('quick time check')
-    print(time.time())
-    print(last_operation_counter_clear)
-    print(time.time() - last_operation_counter_clear)
-    print('end of quick time check')
-    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
-        print(f'operation_counter cleared at {time.time()}')
-        last_operation_counter_clear = time.time()
-        operation_counter = 0
+    operation_counter_periodic_clear()
 
     print(f'Current operation_counter: {operation_counter}')
 
@@ -1331,14 +1324,11 @@ def ts_predict():
 
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data()) # This is a dictionary.
-    structure = my_data['structure']
-    name = my_data['name']
-    if name[-4:] == '.cif':
-        name = name[:-4] # remove the .cif part of the name
+    structure, name = extract_info(my_data)
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
-    ### Check in MongoDB history.MOFSimplify collection to see if this structure has been predicted on before. 
+    ### Check in MongoDB history.MOFSimplify_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs? 
     client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
@@ -1424,7 +1414,7 @@ def ts_predict():
 
 def db_push(structure, prediction_type, in_train, result, neighbor_names, neighbor_dists, failure, csv_content):
     """
-    # db_push sends the structure of the MOF being predicted on, and other information, to the MOFSimplify collection in the MongoDB history database.
+    db_push sends the structure of the MOF being predicted on, and other information, to the MOFSimplify_v2 collection in the MongoDB history database.
 
     :param structure: str, the text of the cif file of the MOF being analyzed.
     :param prediction_type: str, the type of prediction being run. Can either be 'solvent_stability_prediction' or 'thermal_stability_prediction'.
@@ -1508,8 +1498,8 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
 
 def db_push_lite(structure, prediction_type):
     """
-    # db_push_lite increases either s_times or t_times in the document corresponding to structure, in the MOFSimplify collection in the MongoDB history database.
-    # The prediction_type determines whether s_times or t_times is increased by one.
+    db_push_lite increases either s_times or t_times in the document corresponding to structure, in the MOFSimplify_v2 collection in the MongoDB history database.
+    The prediction_type determines whether s_times or t_times is increased by one.
 
     :param structure: str, the text of the cif file of the MOF being analyzed.
     :param prediction_type: str, the type of prediction being run. Can either be 'solvent_stability_prediction' or 'thermal_stability_prediction'.
@@ -1527,7 +1517,7 @@ def db_push_lite(structure, prediction_type):
     # https://docs.mongodb.com/manual/reference/method/db.collection.update/
     my_documents = collection.find({'structure':structure})
 
-    # if db_push_lite is called, structure passed to it will already have a document in the history.MOFSimplify collection
+    # if db_push_lite is called, structure passed to it will already have a document in the history.MOFSimplify_v2 collection
 
     #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
     # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
@@ -1548,11 +1538,110 @@ def db_push_lite(structure, prediction_type):
     final_dict['csv_content'] = my_document['csv_content']
 
     if prediction_type == 'solvent_stability_prediction': 
-        print('db_push_lite solvent hit')
         final_dict['s_times'] += 1
     elif prediction_type == 'thermal_stability_prediction': 
-        print('db_push_lite solvent hit')
         final_dict['t_times'] += 1
+
+    collection.remove({'structure':structure}) # delete entry
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    return ('', 204) # 204 no content response
+
+def db_push_water(structure, prediction_type, result, failure, csv_content):
+    """
+    db_push_water sends the structure of the MOF being predicted on, and other information, to the MOFSimplify_water_v2 collection in the MongoDB history database.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
+    :param result: float, the ground truth or prediction for this structure.
+    :param failure: boolean, whether the featurization failed.
+    :param csv_content: string, the content of the csv of features.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
+    # w refers to a 2-class water prediction; a refers to an acid prediction
+    fields = ['structure', 'w_result', 'a_result', 'failure', 'csv_content', 'w_times', 'a_times'] 
+        # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
+    final_dict = {}
+    for field in fields:
+        final_dict[field] = '' # start with everything empty
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+
+    final_dict['structure'] = structure
+    final_dict['failure'] = failure
+    final_dict['csv_content'] = csv_content
+    if is_entry == 0: # structure has not been seen before. Make a new entry
+        # Populate certain fields
+        if prediction_type == 'water_stability_prediction':
+            final_dict['w_result'] = result
+            final_dict['w_times'] = 1
+            final_dict['a_times'] = 0
+        elif prediction_type == 'acid_stability_prediction':
+            final_dict['a_result'] = result
+            final_dict['w_times'] = 0
+            final_dict['a_times'] = 1
+
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+        my_document = my_documents[0]
+        final_dict['w_result'] = my_document['w_result']
+        final_dict['a_result'] = my_document['a_result']
+        final_dict['w_times'] = my_document['w_times']
+        final_dict['a_times'] = my_document['a_times']
+
+        if prediction_type == 'water_stability_prediction': # structure has had an acid prediction but not a water prediction
+            final_dict['w_result'] = result
+            final_dict['w_times'] = final_dict['w_times'] + 1
+        elif prediction_type == 'acid_stability_prediction': # structure has had a water prediction but not an acid prediction
+            final_dict['a_result'] = result
+            final_dict['a_times'] = final_dict['a_times'] + 1
+
+        collection.remove({'structure':structure}) # delete entry
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    return ('', 204) # 204 no content response
+
+def db_push_lite_water(structure, prediction_type):
+    """
+    # db_push_lite_water increases either w_times or a_times in the document corresponding to structure, in the MOFSimplify_water_v2 collection in the MongoDB history database.
+    # The prediction_type determines whether w_times or a_times is increased by one.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """ 
+
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
+    final_dict = {}
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure})
+
+    # if db_push_lite_water is called, structure passed to it will already have a document in the history.MOFSimplify_water_v2 collection
+
+    #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+    # w refers to a 2-class water stability prediction; a refers to an acid stability prediction
+    # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
+    my_document = my_documents[0]
+    final_dict['structure'] = structure
+    final_dict['w_result'] = my_document['w_result']
+    final_dict['a_result'] = my_document['a_result']
+    final_dict['w_times'] = my_document['w_times']
+    final_dict['a_times'] = my_document['a_times']
+    final_dict['failure'] = my_document['failure']
+    final_dict['csv_content'] = my_document['csv_content']
+
+    if prediction_type == 'water_stability_prediction': 
+        final_dict['w_times'] += 1
+    elif prediction_type == 'acid_stability_prediction': 
+        final_dict['a_times'] += 1
 
     collection.remove({'structure':structure}) # delete entry
     collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
@@ -1756,16 +1845,7 @@ def get_components():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time 
-    print('quick time check')
-    print(time.time())
-    print(last_operation_counter_clear)
-    print(time.time() - last_operation_counter_clear)
-    print('end of quick time check')
-    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
-        print(f'operation_counter cleared at {time.time()}')
-        last_operation_counter_clear = time.time()
-        operation_counter = 0
+    operation_counter_periodic_clear()
 
     print(f'Current operation_counter: {operation_counter}')
 
@@ -1776,11 +1856,7 @@ def get_components():
 
     # Grab data
     my_data = json.loads(flask.request.get_data());
-
-    structure = my_data['structure']
-    name = my_data['name']
-    if name[-4:] == '.cif':
-        name = name[:-4] # remove the .cif part of the name
+    structure, name = extract_info(my_data)
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
     cif_folder = temp_file_folder + 'cifs/'
@@ -2361,7 +2437,7 @@ def ws_predict():
     """
     ws_predict generates the 2-class water stability prediction for the selected MOF.
         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
-    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_2.
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_water.
     Then, Gianmarco's model is applied to make a prediction using run_water_RF.
 
     :return: dict results, contains the prediction.
@@ -2372,10 +2448,7 @@ def ws_predict():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time 
-    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
-        last_operation_counter_clear = time.time()
-        operation_counter = 0
+    operation_counter_periodic_clear()
 
     if operation_counter >= MAX_OPERATIONS:
         return 'OVERLOAD'
@@ -2384,16 +2457,44 @@ def ws_predict():
 
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data())
-    structure = my_data['structure']
-    name = my_data['name']
-    if name[-4:] == '.cif':
-        name = name[:-4] # remove the .cif part of the name
+    structure, name = extract_info(my_data)
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
-    output = descriptor_generator_2(name, structure, 'water') # generate descriptors
+    ### Check in MongoDB history.MOFSimplify_water_v2 collection to see if this structure has been predicted on before. 
+    # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
+        entry_data = my_documents[0]
+        if entry_data['failure'] == True: # MOF was not featurizable
+            if session['permission']:
+                db_push_lite_water(structure=structure, prediction_type='water_stability_prediction') # add 1 to the w_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return 'FAILED'
+        else: 
+            # Making the csv; can skip csv making in descriptor_generator with this
+            csv_content = entry_data['csv_content']
+            with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors_water.csv', 'w') as f:
+                f.write(csv_content)
+
+        if entry_data['w_times'] > 0:
+            my_dict = {'prediction':entry_data['w_result']}
+            if session['permission']:
+                db_push_lite_water(structure=structure, prediction_type='water_stability_prediction') # add 1 to the w_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return my_dict
+
+        # if haven't returned anything by now and entered the if is_entry statement, have a featurizable MOF for which a water prediction has not been run, but an acid prediction has
+
+    output = descriptor_generator_water(name, structure, 'water', is_entry) # generate descriptors
     if output == 'FAILED': # Description generation failure
         operation_counter = conditional_diminish(operation_counter)
+        if session['permission']:
+            db_push_water(structure=structure, prediction_type='water_stability_prediction', result='', failure=True, csv_content='')
         return 'FAILED'
 
     # Applying the model next
@@ -2403,6 +2504,14 @@ def ws_predict():
     'prediction': prediction,
     }
     
+    if session['permission']:
+        # Database push of MOF structure and ML results.
+        # Getting the contents of the CSV containing features.
+        descriptors_folder = temp_file_folder + "merged_descriptors/"
+        with open(descriptors_folder + name + '_descriptors_water.csv', 'r') as f:
+            csv_contents = f.read()
+        db_push_water(structure=structure, prediction_type='water_stability_prediction', result=prediction, failure=False, csv_content=csv_contents)
+
     operation_counter = conditional_diminish(operation_counter)
     return results
 
@@ -2411,7 +2520,7 @@ def as_predict():
     """
     as_predict generates the acid stability prediction for the selected MOF.
         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
-    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_2.
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_water.
     Then, Gianmarco's model is applied to make a prediction using run_acid_RF.
 
     :return: dict results, contains the prediction.
@@ -2422,10 +2531,7 @@ def as_predict():
     global operation_counter # global variable
     global last_operation_counter_clear
 
-    import time 
-    if time.time() - last_operation_counter_clear > 300: # 5 minutes or more since last time operation_counter was zero'd
-        last_operation_counter_clear = time.time()
-        operation_counter = 0
+    operation_counter_periodic_clear()
 
     if operation_counter >= MAX_OPERATIONS:
         return 'OVERLOAD'
@@ -2434,16 +2540,44 @@ def as_predict():
 
     # Grab data and tweak the MOF name.
     my_data = json.loads(flask.request.get_data())
-    structure = my_data['structure']
-    name = my_data['name']
-    if name[-4:] == '.cif':
-        name = name[:-4] # remove the .cif part of the name
+    structure, name = extract_info(my_data)
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
-    output = descriptor_generator_2(name, structure, 'acid') # generate descriptors
+    ### Check in MongoDB history.MOFSimplify_water_v2 collection to see if this structure has been predicted on before. 
+    # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
+        entry_data = my_documents[0]
+        if entry_data['failure'] == True: # MOF was not featurizable
+            if session['permission']:
+                db_push_lite_water(structure=structure, prediction_type='acid_stability_prediction') # add 1 to the a_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return 'FAILED'
+        else: 
+            # Making the csv; can skip csv making in descriptor_generator with this
+            csv_content = entry_data['csv_content']
+            with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors_water.csv', 'w') as f:
+                f.write(csv_content)
+
+        if entry_data['a_times'] > 0:
+            my_dict = {'prediction':entry_data['a_result']}
+            if session['permission']:
+                db_push_lite_water(structure=structure, prediction_type='acid_stability_prediction') # add 1 to the a_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return my_dict
+
+        # if haven't returned anything by now and entered the if is_entry statement, have a featurizable MOF for which an acid prediction has not been run, but a water prediction has
+
+    output = descriptor_generator_water(name, structure, 'acid', is_entry) # generate descriptors
     if output == 'FAILED': # Description generation failure
         operation_counter = conditional_diminish(operation_counter)
+        if session['permission']:
+            db_push_water(structure=structure, prediction_type='acid_stability_prediction', result='', failure=True, csv_content='')
         return 'FAILED'
 
     # Applying the model next
@@ -2453,13 +2587,21 @@ def as_predict():
     'prediction': prediction,
     }
     
+    if session['permission']:
+        # Database push of MOF structure and ML results.
+        # Getting the contents of the CSV containing features.
+        descriptors_folder = temp_file_folder + "merged_descriptors/"
+        with open(descriptors_folder + name + '_descriptors_water.csv', 'r') as f:
+            csv_contents = f.read()
+        db_push_water(structure=structure, prediction_type='acid_stability_prediction', result=prediction, failure=False, csv_content=csv_contents)
+
     operation_counter = conditional_diminish(operation_counter)
     return results
 
-@app.route('/get_descriptors_2', methods=['POST']) 
-def descriptor_getter_2():
+@app.route('/get_descriptors_water', methods=['POST']) 
+def descriptor_getter_water():
     """
-    descriptor_getter returns the contents of the csv with the descriptors of the desired MOF.
+    descriptor_getter_water returns the contents of the csv with the descriptors of the desired MOF.
     These descriptors are RACs and Zeo++ descriptors. There are 189 total.
     The Zeo++ features are slightly different than those from descriptor_getter.
 
@@ -2474,20 +2616,21 @@ def descriptor_getter_2():
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
     descriptors_folder = temp_file_folder + "merged_descriptors/"
 
-    with open(descriptors_folder + name + '_descriptors_2.csv', 'r') as f:
+    with open(descriptors_folder + name + '_descriptors_water.csv', 'r') as f:
         contents = f.read()
 
     return contents
 
-def descriptor_generator_2(name, structure, prediction_type):
+def descriptor_generator_water(name, structure, prediction_type, is_entry):
     """
-    # descriptor_generator is used by both ws_predict() and as_predict() to generate RACs and Zeo++ descriptors.
+    # descriptor_generator_water is used by both ws_predict() and as_predict() to generate RACs and Zeo++ descriptors.
     # These descriptors are subsequently used in ws_predict() and as_predict() for the RF models.
     # Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
     # The third input indicates the type of prediction (water or acid).
 
     :param name: str, the name of the MOF being analyzed.
     :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param is_entry: boolean, indicates whether the descriptor CSV has already been written.
     :return: str, either the string 'FAILED' if descriptor generation fails, otherwise 'SUCCESS'
     """ 
 
@@ -2514,11 +2657,18 @@ def descriptor_generator_2(name, structure, prediction_type):
     shutil.rmtree(zeo_folder)
     os.mkdir(zeo_folder)
 
+    # If is_entry is True, do not need to generate features, since we already have them.
+    if is_entry:
+        return 'SUCCESS'
+
     # Next, running MOF featurization
     try:
         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
     except ValueError:
-        return 'FAILED'
+        # return 'FAILED'
+
+        # Will proceed even if primitive unit cell not obtained by pymatgen
+        shutil.copy(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif')
 
     # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
         # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
@@ -2630,7 +2780,7 @@ def descriptor_generator_2(name, structure, prediction_type):
 
     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
 
-    merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors_2.csv',index=False) # written in /temp_file_creation_SESSIONID
+    merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors_water.csv',index=False) # written in /temp_file_creation_SESSIONID
 
     return 'SUCCESS' 
 
@@ -2662,7 +2812,7 @@ def run_water_RF(user_id, path, MOF_name):
     ]
      
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
-    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_2.csv') # assumes that temp_file_creation/ is in parent folder
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_water.csv') # assumes that temp_file_creation/ is in parent folder
     X_newMOF = df_newMOF[rfa_2_class_water_features].to_numpy()
     X_newMOF = water_scaler.transform(X_newMOF)
     water_pred = water_model.predict_proba(X_newMOF)[:,1][0]
@@ -2694,7 +2844,7 @@ def run_acid_RF(user_id, path, MOF_name):
     ]
      
     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
-    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_2.csv') # assumes that temp_file_creation/ is in parent folder
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_water.csv') # assumes that temp_file_creation/ is in parent folder
     X_newMOF = df_newMOF[rfa_acid_features].to_numpy()
     X_newMOF = acid_scaler.transform(X_newMOF)
     acid_pred = acid_model.predict_proba(X_newMOF)[:,1][0]

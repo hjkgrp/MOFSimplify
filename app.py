@@ -213,7 +213,6 @@ def change_permission():
     change_permission adjusts whether or not MOFSimplify stores information on the MOFs the user predicts on.
 
     If the user clicks "Yes" or "No" before get_lists() finishes running upon the website's startup in the browser (~4 seconds), their "Yes" or "No" input will not register for the session and will register for another session (the most recently started one) instead.
-    TODO perhaps adjust for this down the line. Show the Yes and No options only after the user has a MOF queued up.
 
     :return: string, The boolean sent from the front end. We return this because we have to return something, but nothing is done with the returned value on the front end.
     """
@@ -394,12 +393,22 @@ def serve_cite():
 @app.route('/water_stability_prediction.html')
 def serve_water_stability_page():
     """
-    serve_water_stability_page serves the stable MOFs page.
-    So the user is redirected to the stable MOFs page.
+    serve_water_stability_page serves the water stability page.
+    So the user is redirected to the water stability page.
 
-    :return: The stable MOFs page.
+    :return: The water stability page.
     """     
     return flask.send_from_directory('.', 'water_stability_prediction.html')
+
+@app.route('/C2_uptake_prediction.html')
+def serve_C2_uptake_page():
+    """
+    serve_C2_uptake_page serves the C2 uptake page.
+    So the user is redirected to the C2 uptake page.
+
+    :return: The C2 uptake page.
+    """     
+    return flask.send_from_directory('.', 'C2_uptake_prediction.html')
 
 @app.route('/stable_MOFs.html')
 def serve_stable_bb_page():
@@ -530,6 +539,13 @@ def extract_info(my_data):
         name = name[:-4] # remove the .cif part of the name
     return structure, name
 
+def extract_info_C2(my_data):
+    structure, name = extract_info(my_data)
+    temperature = my_data['T']
+    pressure = my_data['P']
+
+    return structure, name, temperature, pressure
+
 @app.route('/curr_users', methods=['GET'])
 def curr_num_users():
     """
@@ -616,7 +632,7 @@ def bb_generate():
     return json_object
 
 
-### Next, the prediction functions ### 
+### New section. The code for thermal and solvent stability. ### 
 
 
 def normalize_data_solvent(df_train, df_newMOF, fnames, lname, debug=False):
@@ -1546,107 +1562,6 @@ def db_push_lite(structure, prediction_type):
     collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
     return ('', 204) # 204 no content response
 
-def db_push_water(structure, prediction_type, result, failure, csv_content):
-    """
-    db_push_water sends the structure of the MOF being predicted on, and other information, to the MOFSimplify_water_v2 collection in the MongoDB history database.
-
-    :param structure: str, the text of the cif file of the MOF being analyzed.
-    :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
-    :param result: float, the ground truth or prediction for this structure.
-    :param failure: boolean, whether the featurization failed.
-    :param csv_content: string, the content of the csv of features.
-    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
-    """
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
-    # The first argument is the IP address. The second argument is the port.
-    db = client.history # The history database
-    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
-    # w refers to a 2-class water prediction; a refers to an acid prediction
-    fields = ['structure', 'w_result', 'a_result', 'failure', 'csv_content', 'w_times', 'a_times'] 
-        # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
-    final_dict = {}
-    for field in fields:
-        final_dict[field] = '' # start with everything empty
-
-    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
-    my_documents = collection.find({'structure':structure})
-    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
-
-    final_dict['structure'] = structure
-    final_dict['failure'] = failure
-    final_dict['csv_content'] = csv_content
-    if is_entry == 0: # structure has not been seen before. Make a new entry
-        # Populate certain fields
-        if prediction_type == 'water_stability_prediction':
-            final_dict['w_result'] = result
-            final_dict['w_times'] = 1
-            final_dict['a_times'] = 0
-        elif prediction_type == 'acid_stability_prediction':
-            final_dict['a_result'] = result
-            final_dict['w_times'] = 0
-            final_dict['a_times'] = 1
-
-        collection.insert(final_dict) # insert the dictionary into the mongodb collection
-    else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
-        my_document = my_documents[0]
-        final_dict['w_result'] = my_document['w_result']
-        final_dict['a_result'] = my_document['a_result']
-        final_dict['w_times'] = my_document['w_times']
-        final_dict['a_times'] = my_document['a_times']
-
-        if prediction_type == 'water_stability_prediction': # structure has had an acid prediction but not a water prediction
-            final_dict['w_result'] = result
-            final_dict['w_times'] = final_dict['w_times'] + 1
-        elif prediction_type == 'acid_stability_prediction': # structure has had a water prediction but not an acid prediction
-            final_dict['a_result'] = result
-            final_dict['a_times'] = final_dict['a_times'] + 1
-
-        collection.remove({'structure':structure}) # delete entry
-        collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
-    return ('', 204) # 204 no content response
-
-def db_push_lite_water(structure, prediction_type):
-    """
-    # db_push_lite_water increases either w_times or a_times in the document corresponding to structure, in the MOFSimplify_water_v2 collection in the MongoDB history database.
-    # The prediction_type determines whether w_times or a_times is increased by one.
-
-    :param structure: str, the text of the cif file of the MOF being analyzed.
-    :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
-    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
-    """ 
-
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
-    # The first argument is the IP address. The second argument is the port.
-    db = client.history # The history database
-    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
-    final_dict = {}
-
-    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
-    my_documents = collection.find({'structure':structure})
-
-    # if db_push_lite_water is called, structure passed to it will already have a document in the history.MOFSimplify_water_v2 collection
-
-    #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
-    # w refers to a 2-class water stability prediction; a refers to an acid stability prediction
-    # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
-    my_document = my_documents[0]
-    final_dict['structure'] = structure
-    final_dict['w_result'] = my_document['w_result']
-    final_dict['a_result'] = my_document['a_result']
-    final_dict['w_times'] = my_document['w_times']
-    final_dict['a_times'] = my_document['a_times']
-    final_dict['failure'] = my_document['failure']
-    final_dict['csv_content'] = my_document['csv_content']
-
-    if prediction_type == 'water_stability_prediction': 
-        final_dict['w_times'] += 1
-    elif prediction_type == 'acid_stability_prediction': 
-        final_dict['a_times'] += 1
-
-    collection.remove({'structure':structure}) # delete entry
-    collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
-    return ('', 204) # 204 no content response
-
 @app.route('/plot_thermal_stability', methods=['POST']) 
 def plot_thermal_stability():
     """
@@ -2430,7 +2345,108 @@ def existence_check():
 
     return exists
 
-# Will not use the mongodb for water and acid stability predictions.
+### New section. The code for water and acid stability. ### 
+
+def db_push_water(structure, prediction_type, result, failure, csv_content):
+    """
+    db_push_water sends the structure of the MOF being predicted on, and other information, to the MOFSimplify_water_v2 collection in the MongoDB history database.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
+    :param result: float, the ground truth or prediction for this structure.
+    :param failure: boolean, whether the featurization failed.
+    :param csv_content: string, the content of the csv of features.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
+    # w refers to a 2-class water prediction; a refers to an acid prediction
+    fields = ['structure', 'w_result', 'a_result', 'failure', 'csv_content', 'w_times', 'a_times'] 
+        # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
+    final_dict = {}
+    for field in fields:
+        final_dict[field] = '' # start with everything empty
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+
+    final_dict['structure'] = structure
+    final_dict['failure'] = failure
+    final_dict['csv_content'] = csv_content
+    if is_entry == 0: # structure has not been seen before. Make a new entry
+        # Populate certain fields
+        if prediction_type == 'water_stability_prediction':
+            final_dict['w_result'] = result
+            final_dict['w_times'] = 1
+            final_dict['a_times'] = 0
+        elif prediction_type == 'acid_stability_prediction':
+            final_dict['a_result'] = result
+            final_dict['w_times'] = 0
+            final_dict['a_times'] = 1
+
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+        my_document = my_documents[0]
+        final_dict['w_result'] = my_document['w_result']
+        final_dict['a_result'] = my_document['a_result']
+        final_dict['w_times'] = my_document['w_times']
+        final_dict['a_times'] = my_document['a_times']
+
+        if prediction_type == 'water_stability_prediction': # structure has had an acid prediction but not a water prediction
+            final_dict['w_result'] = result
+            final_dict['w_times'] = final_dict['w_times'] + 1
+        elif prediction_type == 'acid_stability_prediction': # structure has had a water prediction but not an acid prediction
+            final_dict['a_result'] = result
+            final_dict['a_times'] = final_dict['a_times'] + 1
+
+        collection.remove({'structure':structure}) # delete entry
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    return ('', 204) # 204 no content response
+
+def db_push_lite_water(structure, prediction_type):
+    """
+    # db_push_lite_water increases either w_times or a_times in the document corresponding to structure, in the MOFSimplify_water_v2 collection in the MongoDB history database.
+    # The prediction_type determines whether w_times or a_times is increased by one.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """ 
+
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
+    final_dict = {}
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure})
+
+    # if db_push_lite_water is called, structure passed to it will already have a document in the history.MOFSimplify_water_v2 collection
+
+    #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+    # w refers to a 2-class water stability prediction; a refers to an acid stability prediction
+    # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
+    my_document = my_documents[0]
+    final_dict['structure'] = structure
+    final_dict['w_result'] = my_document['w_result']
+    final_dict['a_result'] = my_document['a_result']
+    final_dict['w_times'] = my_document['w_times']
+    final_dict['a_times'] = my_document['a_times']
+    final_dict['failure'] = my_document['failure']
+    final_dict['csv_content'] = my_document['csv_content']
+
+    if prediction_type == 'water_stability_prediction': 
+        final_dict['w_times'] += 1
+    elif prediction_type == 'acid_stability_prediction': 
+        final_dict['a_times'] += 1
+
+    collection.remove({'structure':structure}) # delete entry
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    return ('', 204) # 204 no content response
 
 @app.route('/predict_water_stability', methods=['POST']) 
 def ws_predict():
@@ -2630,6 +2646,7 @@ def descriptor_generator_water(name, structure, prediction_type, is_entry):
 
     :param name: str, the name of the MOF being analyzed.
     :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param prediction_type: str, the code for the type of description (water or acid)
     :param is_entry: boolean, indicates whether the descriptor CSV has already been written.
     :return: str, either the string 'FAILED' if descriptor generation fails, otherwise 'SUCCESS'
     """ 
@@ -2851,6 +2868,364 @@ def run_acid_RF(user_id, path, MOF_name):
     acid_pred = np.round(acid_pred, 2) # round to 2 decimals
 
     return str(acid_pred)
+
+### New section. The code for C2 uptake prediction. ### 
+
+# @app.route('/get_descriptors_C2', methods=['POST']) 
+# def descriptor_getter_C2():
+#     """
+#     descriptor_getter_C2 returns the contents of the csv with the descriptors of the desired MOF.
+#     These descriptors are RACs and Zeo++ descriptors, plus temperature and pressure.
+
+#     :return: str contents, the contents of the csv with the descriptor data. To be written to a csv in the front end for download.
+#     """ 
+
+#     # Grab data
+#     name = json.loads(flask.request.get_data()); # This is the selected MOF
+#     if name[-4:] == '.cif':
+#         name = name[:-4] # remove the .cif part of the name
+
+#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+#     descriptors_folder = temp_file_folder + "merged_descriptors/"
+
+#     with open(descriptors_folder + name + '_descriptors_C2.csv', 'r') as f:
+#         contents = f.read()
+
+#     return contents
+
+# @app.route('/predict_ethane_uptake', methods=['POST']) 
+# def ethane_predict():
+#     """
+#     ethane_predict generates the ethane uptake prediction for the selected MOF.
+#         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
+#     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_C2.
+#     Then, Matt's model is applied to make a prediction using run_ethane_model.
+
+#     :return: dict results, contains the prediction.
+#         May instead return a string 'FAILED' if descriptor generation fails.
+#         May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
+#     """ 
+
+#     global operation_counter # global variable
+#     global last_operation_counter_clear
+
+#     operation_counter_periodic_clear()
+
+#     if operation_counter >= MAX_OPERATIONS:
+#         return 'OVERLOAD'
+
+#     operation_counter += 1
+
+#     # Grab data and tweak the MOF name.
+#     my_data = json.loads(flask.request.get_data())
+#     structure, name, temperature, pressure = extract_info_C2(my_data)
+
+#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
+#     output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethane') # generate descriptors
+#     if output == 'FAILED': # Description generation failure
+#         operation_counter = conditional_diminish(operation_counter)
+#         return 'FAILED'
+
+#     # Applying the model next
+#     prediction = run_ethane_model(str(session['ID']), MOFSIMPLIFY_PATH, name)
+
+#     results = {
+#     'prediction': prediction,
+#     }
+    
+#     operation_counter = conditional_diminish(operation_counter)
+#     return results
+
+# @app.route('/predict_ethylene_uptake', methods=['POST']) 
+# def ethylene_predict():
+#     """
+#     ethylene_predict generates the ethylene uptake prediction for the selected MOF.
+#         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
+#     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_C2.
+#     Then, Matt's model is applied to make a prediction using run_ethylene_model.
+
+#     :return: dict results, contains the prediction.
+#         May instead return a string 'FAILED' if descriptor generation fails.
+#         May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
+#     """ 
+
+#     global operation_counter # global variable
+#     global last_operation_counter_clear
+
+#     operation_counter_periodic_clear()
+
+#     if operation_counter >= MAX_OPERATIONS:
+#         return 'OVERLOAD'
+
+#     operation_counter += 1
+
+#     # Grab data and tweak the MOF name.
+#     my_data = json.loads(flask.request.get_data())
+#     structure, name, temperature, pressure = extract_info_C2(my_data)
+
+#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+
+#     output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethylene') # generate descriptors
+#     if output == 'FAILED': # Description generation failure
+#         operation_counter = conditional_diminish(operation_counter)
+#         return 'FAILED'
+
+#     # Applying the model next
+#     prediction = run_ethylene_model(str(session['ID']), MOFSIMPLIFY_PATH, name)
+
+#     results = {
+#     'prediction': prediction,
+#     }
+    
+#     operation_counter = conditional_diminish(operation_counter)
+#     return results
+
+# def channel_surface_area_extract(row):
+#     # The row will look like 
+#     # Number_of_channels: 2 Channel_surface_area_A^2: 712.983  709.065
+#     # or
+#     # Number_of_channels: 1 Channel_surface_area_A^2: 2038.46 
+#     # etc
+
+#     split_row = row.split()
+#     num_channels = int(split_row[1])
+
+#     if num_channels == 0:
+#         CSA_1, CSA_2 = 0, 0
+#     elif num_channels == 1:
+#         CSA_1, CSA_2 = float(split_row[3]), 0
+#     else: # There are 2+ channels
+#         CSA_1, CSA_2 = float(split_row[3]), float(split_row[4])
+
+#     return CSA_1, CSA_2
+
+# def descriptor_generator_C2(name, structure, temperature, pressure, prediction_type):
+#     """
+#     # descriptor_generator_C2 is used by both ethane_predict() and ethylene_predict() to generate RACs and Zeo++ descriptors.
+#     # These descriptors are subsequently used in ethane_predict() and ethylene_predict() for the ANN models.
+#     # First two inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
+#     # Next two inputs are the operating conditions.
+#     # The fifth input indicates the type of prediction (ethane or ethylene).
+
+#     :param name: str, the name of the MOF being analyzed.
+#     :param structure: str, the text of the cif file of the MOF being analyzed.
+#     :param temperature: str, temperature in Kelvin
+#     :param pressure: str, pressure in kPa
+#     :return: str, either the string 'FAILED' if descriptor generation fails, otherwise 'SUCCESS'
+#     """ 
+
+#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+#     cif_folder = temp_file_folder + 'cifs/'
+
+#     # Write the data back to a cif file.
+#     try:
+#         cif_file = open(cif_folder + name + '.cif', 'w')
+#     except FileNotFoundError:
+#         return 'FAILED'
+#     cif_file.write(structure)
+#     cif_file.close()
+
+#     # There can be a RACs folder for water predictions and a RACs folder for acid predictions. Same for Zeo++.
+#     RACs_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_RACs/'
+#     zeo_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_zeo++/'
+
+#     # Delete the RACs folder, then remake it (to start fresh for this prediction).
+#     shutil.rmtree(RACs_folder)
+#     os.mkdir(RACs_folder)
+
+#     # Doing the same with the Zeo++ folder.
+#     shutil.rmtree(zeo_folder)
+#     os.mkdir(zeo_folder)
+
+#     # If is_entry is True, do not need to generate features, since we already have them.
+#     if is_entry:
+#         return 'SUCCESS'
+
+#     # Next, running MOF featurization
+#     try:
+#         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
+#     except ValueError:
+#         return 'FAILED'
+
+#     # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
+#         # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
+
+#     # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
+#     cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
+#     cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
+#     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
+#     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+
+#     # four parallelized Zeo++ and RAC commands
+#     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+#     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+#     process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+#     process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
+#     output1 = process1.communicate()[0]
+#     output2 = process2.communicate()[0]
+#     output3 = process3.communicate()[0]
+#     output4 = process4.communicate()[0]
+
+#     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
+
+#     dict_list = []
+#     cif_file = name + '_primitive.cif' 
+#     basename = cif_file.strip('.cif')
+#     largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path = np.nan, np.nan, np.nan
+#     unit_cell_volume, crystal_density, VSA, GSA = np.nan, np.nan, np.nan, np.nan
+#     VPOV, GPOV = np.nan, np.nan
+#     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+
+#     if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
+#         os.path.exists(zeo_folder + name + '_pov.txt')):
+#         with open(zeo_folder + name + '_pd.txt') as f:
+#             pore_diameter_data = f.readlines()
+#             for row in pore_diameter_data:
+#                 largest_included_sphere = float(row.split()[1]) # largest included sphere
+#                 largest_free_sphere = float(row.split()[2]) # largest free sphere
+#                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+#         with open(zeo_folder + name + '_sa.txt') as f:
+#             surface_area_data = f.readlines()
+#             for i, row in enumerate(surface_area_data):
+#                 if i == 0:
+#                     unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
+#                     crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
+#                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
+#                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+#                 elif i == 1:
+#                     # Extracting channel surface areas
+#                     CSA_1, CSA_2 = channel_surface_area_extract(row)
+#         with open(zeo_folder + name + '_pov.txt') as f:
+#             pore_volume_data = f.readlines()
+#             for i, row in enumerate(pore_volume_data):
+#                 if i == 0:
+#                     density = float(row.split('Density:')[1].split()[0])
+#                     POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
+#                     PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
+#                     GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
+#                     GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
+#                     POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
+#                     PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+#                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
+#                     GPOV = VPOV/density
+#     else:
+#         print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
+#               '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
+#         return 'FAILED'
+#     geo_dict = {'name': basename, 'cif_file': cif_file, 'Di': largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
+#                 'cell_v': unit_cell_volume, 'VSA': VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV': GPOV, 'POAV_vol_frac': POAV_volume_fraction, 
+#                 'PONAV_vol_frac': PONAV_volume_fraction, 'GPOAV': GPOAV, 'GPONAV': GPONAV, 'POAV': POAV, 'PONAV': PONAV, 'density': crystal_density,
+#                 'CSA_1': CSA_1, 'CSA_2': CSA_2}
+#     dict_list.append(geo_dict)
+#     geo_df = pd.DataFrame(dict_list)
+#     geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
+
+#     # error handling for cmd4
+#     with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
+#         if f.readline() == 'FAILED':
+#             print('RAC generation failed.')
+#             return 'FAILED'
+
+#     # Merging geometric information with the RAC information that is in the get_MOF_descriptors-generated files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+#     try:
+#         lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+#         sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+#         linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
+#     except Exception: # csv files have been deleted
+#         return 'FAILED' 
+
+#     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a DataFrame, then transpose
+#     sbu_df = sbu_df.mean().to_frame().transpose()
+#     linker_df = linker_df.mean().to_frame().transpose()
+
+#     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
+
+#     # Adding temperature and pressure information
+#     merged_df['temperature'] = float(temperature)
+#     merged_df['pressure'] = float(pressure)
+
+#     merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors_C2.csv',index=False) # written in /temp_file_creation_SESSIONID
+
+#     return 'SUCCESS' 
+
+# def run_ethane_model(user_id, path, MOF_name, ethane_ANN):
+#     """
+#     run_ethane_ANN runs the ethane uptake ANN with the desired MOF as input.
+
+#     :param user_id: str, the session ID of the user
+#     :param path: str, the server's path to the MOFSimplify folder on the server
+#     :param MOF_name: str, the name of the MOF for which a prediction is being generated
+#     :param ethane_ANN: keras.engine.training.Model, the ANN itself
+#     :return: str str(new_MOF_pred[0][0]), the model ethane uptake prediction 
+#     """ 
+
+#     features = ['f-chi-0-all', 'f-chi-1-all', 'f-chi-2-all', 'f-chi-3-all', 'f-Z-0-all',
+#        'f-Z-1-all', 'f-Z-2-all', 'f-Z-3-all', 'f-I-0-all', 'f-I-1-all',
+#        'f-I-2-all', 'f-I-3-all', 'f-T-0-all', 'f-T-1-all', 'f-T-2-all',
+#        'f-T-3-all', 'f-S-0-all', 'f-S-1-all', 'f-S-2-all', 'f-S-3-all',
+#        'mc-chi-0-all', 'mc-chi-1-all', 'mc-chi-2-all', 'mc-chi-3-all',
+#        'mc-Z-0-all', 'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-I-0-all',
+#        'mc-I-1-all', 'mc-I-2-all', 'mc-I-3-all', 'mc-T-0-all', 'mc-T-1-all',
+#        'mc-T-2-all', 'mc-T-3-all', 'mc-S-0-all', 'mc-S-1-all', 'mc-S-2-all',
+#        'mc-S-3-all', 'D_mc-chi-0-all', 'D_mc-chi-1-all', 'D_mc-chi-2-all',
+#        'D_mc-chi-3-all', 'D_mc-Z-0-all', 'D_mc-Z-1-all', 'D_mc-Z-2-all',
+#        'D_mc-Z-3-all', 'D_mc-I-0-all', 'D_mc-I-1-all', 'D_mc-I-2-all',
+#        'D_mc-I-3-all', 'D_mc-T-0-all', 'D_mc-T-1-all', 'D_mc-T-2-all',
+#        'D_mc-T-3-all', 'D_mc-S-0-all', 'D_mc-S-1-all', 'D_mc-S-2-all',
+#        'D_mc-S-3-all', 'f-lig-chi-0', 'f-lig-chi-1', 'f-lig-chi-2',
+#        'f-lig-chi-3', 'f-lig-Z-0', 'f-lig-Z-1', 'f-lig-Z-2', 'f-lig-Z-3',
+#        'f-lig-I-0', 'f-lig-I-1', 'f-lig-I-2', 'f-lig-I-3', 'f-lig-T-0',
+#        'f-lig-T-1', 'f-lig-T-2', 'f-lig-T-3', 'f-lig-S-0', 'f-lig-S-1',
+#        'f-lig-S-2', 'f-lig-S-3', 'ASA_A2', 'ASA_m2/g',
+#        'CSA_1', 'CSA_2', 'density',
+#        'Df', 'Di',
+#        'Dif', 'POAV',
+#        'POAV_vol_frac', 'GPOAV', 'cell_v', 'temperature',
+#        'pressure']
+#        # CSA: channel surface area
+#        # Only taking the first two channels
+     
+#     # TODO
+#     ANN_path = path + 'model/solvent/ANN/'
+#     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+#     df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')
+#     df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
+#     df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_C2.csv')
+#     features = [val for val in df_train.columns.values if val in RACs+geo]
+
+#     df_train = standard_labels(df_train, key="flag")
+
+#     # The normalize_data_solvent function is expecting a DataFrame with each MOF in a separate row, and features in columns
+
+#     ### Utilize the function below to normalize the RACs + geos of the new MOF
+#     # newMOF refers to the MOF that has been uploaded to MOFSimplify, for which a prediction will be generated
+#     X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], debug=False)
+#     # Order of values in X_newMOF matters, but this is taken care of in normalize_data_solvent.
+#     X_train.shape, y_train.reshape(-1, ).shape
+#     model = solvent_ANN
+
+#     from tensorflow.python.keras.backend import set_session
+#     with tf_session.as_default(): # session stuff is needed because the model was loaded from h5 a while ago
+#         with tf_session.graph.as_default():
+#             ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
+#             new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
+
+#     return str(new_MOF_pred[0][0])
+
+# def run_ethylene_model(user_id, path, MOF_name, ethylene_ANN):
+#     """
+#     run_ethane_ANN runs the ethane uptake ANN with the desired MOF as input.
+
+#     :param user_id: str, the session ID of the user
+#     :param path: str, the server's path to the MOFSimplify folder on the server
+#     :param MOF_name: str, the name of the MOF for which a prediction is being generated
+#     :param ethylene_ANN: keras.engine.training.Model, the ANN itself
+#     :return: str str(new_MOF_pred[0][0]), the model ethane uptake prediction 
+#     """ 
+
+#     # TODO
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

@@ -129,7 +129,7 @@
             <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbarDropdownMenuLink" role="button">Property prediction</a>
             <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
               <a class="dropdown-item" href="../">Solvent/Thermal</a> 
-              <a class="dropdown-item" href="water_stability_prediction.html">Water/Acid</a>
+              <a class="dropdown-item" href="ethane_uptake_prediction.html">Water/Acid</a>
               <a class="dropdown-item" href="C2_uptake_prediction.html">C2 uptake</a>
             </div>
           </li>
@@ -161,36 +161,58 @@
       </div>
       <div class="container" id="pills-main">
 
-        <div style='text-align:center; margin-top: 20px; margin-bottom: 20px;'>
-          <b class='zebra' style='font-size:26px;'>Associated paper available <a href="https://pubs.acs.org/doi/full/10.1021/jacs.4c05879">here</a><br></b> 
+        <div style=text-align:center;>
+          <b class='zebra' style='font-size:26px;'>Coming soon!<br></b>
         </div>
-        <b class='zebra' style='font-size:22px;'>1) Select a MOF (metal-organic framework) for analysis</b> 
+        <!-- <b class='zebra' style='font-size:22px;'>1) Select a MOF (metal-organic framework) for analysis</b>  -->
         <!-- Create a section containing buttons -->
-        <div class='col-lg-12'>
-          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
+        <!-- <div class='col-lg-12'> -->
+          <!-- <div style='width:100%; text-align:center; margin-top:0.25cm;'> -->
             <!-- Button for queuing up the example MOF cif file -->
-            <button class='btn btn-primary round_button selection_button' id='example-redirect' style='font-size:22px; width:40%; margin-right:40px;' type='button'>Example MOF</button>
+            <!-- <button class='btn btn-primary round_button selection_button' id='example-redirect' style='font-size:22px; width:40%; margin-right:40px;' type='button'>Example MOF</button> -->
             <!-- Button for uploading MOF cif file --> 
-            <button class='btn btn-primary round_button selection_button' id='upload' style='font-size:22px; width:40%' type='button'>Custom (upload cif file)</button> 
-            <!-- Button for generating MOF cif file -->
-            <!--         <button class='btn btn-primary round_button selection_button' id='bb-redirect' type='button'
-        style='font-size:22px;'>Building block assembly</button> -->
-            <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p><!-- <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p> -->
+            <!-- <button class='btn btn-primary round_button selection_button' id='upload' style='font-size:22px; width:40%' type='button'>Custom (upload cif file)</button>  -->
+            <!-- <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p> -->
+              <!-- <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p> -->
             <!-- &nbsp is a space gap -->
-          <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p><!-- &nbsp is a space gap -->
-          </div>
-        </div>
+          <!-- </div> -->
+        <!-- </div> -->
 
         <div id='predict_section' style='margin-top: 1cm;'>
           <b class='zebra' style='font-size:22px;'>2) Predict properties of the selected MOF</b> <!-- Create a section containing buttons -->
+
           <div class='col-lg-12'>
             <div style='width:100%; text-align:center; margin-top:0.25cm;'>
-              <!-- Button for predicting water stability of MOF -->
-              <button class='btn btn-primary round_button' id='predict_w' style='display:inline-block; width:49%; font-size:22px;' type='button'>2-class water stability</button> <!-- Button for predicting acid stability of MOF -->
-               <button class='btn btn-primary round_button' id='predict_a' style='display:inline-block; width:49%; font-size:22px;' type='button'>Acidic aqueous solution stability</button>
+              <!-- Button for predicting ethane uptake of MOF -->
+              <button class='btn btn-primary round_button' id='predict_ethane' style='display:inline-block; width:49%; font-size:22px;' type='button'>Ethane uptake</button> <!-- Button for predicting ethylene uptake of MOF -->
+               <button class='btn btn-primary round_button' id='predict_ethylene' style='display:inline-block; width:49%; font-size:22px;' type='button'>Ethylene uptake</button>
             </div>
           </div>
-          <p class='zebra' style='font-size:18px;text-align: center;'>The 2-class water stability model groups the four water stability classes U, LK, HK, and TS<br>into two classes: water-stable (HK+TS) and water-unstable (U+LK).<br>The acid model assumes a MOF is water-stable.</p>
+
+          <!-- temperature input -->
+          <div class = 'row' style='margin-top: 0.25cm;'>
+            <div class='col-lg-4'>
+              <div class='zebra' style='font-size:22px;'>
+                Temperature (K)
+              </div>
+            </div>
+            <div class='col-lg-8'>
+              <input type="text" id="temperature_input" style='font-size: 22px; width:100%' class='form-control' placeholder="293">
+            </div>
+          </div>
+
+          <!-- pressure input -->
+          <div class = 'row' style='margin-top: 0.25cm;'>
+            <div class='col-lg-4'>
+              <div class='zebra' style='font-size:22px;'>
+                Pressure (kPa)
+              </div>
+            </div>
+            <div class='col-lg-8'>
+              <input type="text" id="pressure_input" style='font-size: 22px; width:100%' class='form-control' placeholder="100">
+            </div>
+          </div>
+
         </div>
         <div id='descriptor_section' style='margin-top: 1cm;'>
           <b class='zebra' style='font-size:22px;'>3) Download descriptors of the selected MOF</b> <!-- Create a section containing buttons -->
@@ -204,8 +226,8 @@
         <div class='row' id='status_section' style='margin-top: 1cm;border-left:5px solid gray;border-color:#2c3e50;padding-left:5px;background-color:#f7f7f7;'>
           <b style='font-size:22px;'>Status messages and MOF predictions</b>
           <div class='col-12' id='upload_status' style='font-size:22px;'></div>          
-          <div class='col-12' id='water_stability_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
-          <div class='col-12' id='acid_stability_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
+          <div class='col-12' id='ethane_uptake_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
+          <div class='col-12' id='ethylene_uptake_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
         </div>
       </div><!-- The example MOF selection section of the website -->
       <div class='zebra' id="pills-example" style='font-size: 20px;'>
@@ -248,8 +270,8 @@
 
      load_color = original_blue;
      upload_color = original_blue;
-     water_pred_color = original_blue;
-     acid_pred_color = original_blue;
+     ethane_pred_color = original_blue;
+     ethylene_pred_color = original_blue;
 
      $(function () {
 
@@ -278,10 +300,10 @@
 
          color_reset(); // resetting selection and prediction and visualize and component button colors 
 
-         w_stability_field = document.getElementById('water_stability_prediction');
+         w_stability_field = document.getElementById('ethane_uptake_prediction');
          setColor(w_stability_field, 'transparent') // color background, transparent                      
 
-         a_stability_field = document.getElementById('acid_stability_prediction');
+         a_stability_field = document.getElementById('ethylene_uptake_prediction');
          setColor(a_stability_field, 'transparent') // color background, transparent                      
 
          // hiding sections
@@ -291,8 +313,8 @@
          $('#cif_hint').hide()
 
          // clearing previous predictions
-         $('#water_stability_prediction').text('');
-         $('#acid_stability_prediction').text('');
+         $('#ethane_uptake_prediction').text('');
+         $('#ethylene_uptake_prediction').text('');
 
          // Clearing everything in the Status messages and MOF predictions section of the website, and the holders.
          $('#upload_status').text(''); // now nothing is uploaded
@@ -302,15 +324,15 @@
        function color_reset() { 
          load_color = original_blue;
          upload_color = original_blue;
-         water_pred_color = original_blue;
-         acid_pred_color = original_blue;
+         ethane_pred_color = original_blue;
+         ethylene_pred_color = original_blue;
          descriptor_color = original_blue;
 
          $('#example-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
          $('#upload').css({ 'background-color': original_blue, 'border-color': original_blue })
          $('#bb-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
-         $('#predict_w').css({ 'background-color': original_blue, 'border-color': original_blue })
-         $('#predict_a').css({ 'background-color': original_blue, 'border-color': original_blue })
+         $('#predict_ethane').css({ 'background-color': original_blue, 'border-color': original_blue })
+         $('#predict_ethylene').css({ 'background-color': original_blue, 'border-color': original_blue })
          $('#download_descriptors').css({ 'background-color': original_blue, 'border-color': original_blue })
 
        }
@@ -361,8 +383,8 @@
        });
 
 
-       // Generate water stability prediction when the "2-class water stability" button is clicked.
-       $('#predict_w').click(function () {
+       // Generate ethane uptake prediction when the "Ethane uptake" button is clicked.
+       $('#predict_ethane').click(function () {
          // check if a cif is uploaded
          let myFile = document.getElementById('file_input').files[0]; // the uploaded file
          let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
@@ -373,93 +395,87 @@
            if (myFile2 == undefined) {
              alert("Must select a MOF for analysis first.");
 
-             water_pred_color = failure_red;
-             $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+             ethane_pred_color = failure_red;
+             $('#predict_ethane').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
 
              return;
            }
          }
 
-         $('#water_stability_prediction').text('The 2-class water stability prediction is loading...');
+         $('#ethane_uptake_prediction').text('The ethane uptake prediction is loading...');
 
-         water_pred_color = inprogress_yellow;
-         $('#predict_w').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress
+         ethane_pred_color = inprogress_yellow;
+         $('#predict_ethane').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress
 
          // getting the name of the selected MOF
          var name = document.getElementById('upload_status').innerHTML;
          name = name.split(' ');
          name = name.slice(-1)[0]; // getting the last element of the array
 
+         temperature = $('#temperature_input').val()
+         pressure = $('#pressure_input').val()
+         if (isNaN(temperature) || isNaN(pressure) || !temperature || !pressure) { // ! to check for empty values
+          alert("Temperature and pressure must be numbers.")
+          ethylene_pred_color = failure_red;
+          $('#predict_ethane').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          return;
+         }
+         if (temperature < 0 || pressure < 0) {
+          alert("Temperature and pressure must be non-negative.")
+          ethylene_pred_color = failure_red;
+          $('#predict_ethane').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          return;
+         }
+
+         // TODO
+         console.log('test test')
+         console.log(temperature)
+         console.log(pressure)
+
          // myFile.text() is a promise
          myFile.text().then(function (result) {
            // result is the text of the loaded .cif file
 
-           myDict = { 'name': name, 'structure': result }
+           myDict = { 'name': name, 'structure': result , 'T': temperature , 'P': pressure }
 
-           // The $ is jquery. The post stuff sends a command to the app.py code to execute the function that is routed to by /predict_water_stability
+           // The $ is jquery. The post stuff sends a command to the app.py code to execute the function that is routed to by /predict_ethane_uptake
            // It is a post request rather than a get request because information is sent to the backend (in a get request no information is sent)
-           $.post("/predict_water_stability", JSON.stringify(myDict)).done(
+           $.post("/predict_ethane_uptake", JSON.stringify(myDict)).done(
              function (response) {
 
                if (response == 'OVERLOAD') {
                  alert('Server is receiving high traffic, please try again later')
-                 water_pred_color = failure_red;
-                 $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-                 $('#water_stability_prediction').text('');
+                 ethane_pred_color = failure_red;
+                 $('#predict_ethane').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                 $('#ethane_uptake_prediction').text('');
 
-                 return; // Do not update water stability prediction if server is too busy.              
+                 return; // Do not update ethane uptake prediction if server is too busy.              
                }
                if (response == 'FAILED') {
                  alert('Failed to featurize')
-                 water_pred_color = failure_red;
-                 $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-                 $('#water_stability_prediction').text('');
+                 ethane_pred_color = failure_red;
+                 $('#predict_ethane').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                 $('#ethane_uptake_prediction').text('');
 
-                 return; // Do not update water stability prediction if prediction failed.
+                 return; // Do not update ethane uptake prediction if prediction failed.
                }
 
-               water_pred_color = success_green;
-               $('#predict_w').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+               ethane_pred_color = success_green;
+               $('#predict_ethane').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
                $('#descriptor_section').show() // show section where can download descriptors
 
                  var prediction = response['prediction']
 
-                 // preparing the human-interpretable water stability prediction
-                 if (prediction <= 0.2) {
-                   verdict = 'Very confident the MOF is water-unstable.\n439/1,092 MOFs in WS24 are water-unstable.';
-                   my_color = '#ffad97' // color background, light red
-                 }
-                 else if (prediction <= 0.4) {
-                   verdict = 'Fairly confident the MOF is water-unstable.\n439/1,092 MOFs in WS24 are water-unstable.';
-                   my_color = '#ffcd97' // light orange
-                 }
-                 else if (prediction <= 0.5) {
-                   verdict = 'Uncertain, but predict the MOF is water-unstable.\n439/1,092 MOFs in WS24 are water-unstable.';
-                   my_color = '#fffa97' // light yellow
-                 }
-                 else if (prediction <= 0.6) {
-                   verdict = 'Uncertain, but predict the MOF has water-stable.\n653/1,092 MOFs in WS24 are water-stable.';
-                   my_color = '#fffa97' // light yellow
-                 }
-                 else if (prediction <= 0.8) {
-                   verdict = 'Fairly confident the MOF has water-stable.\n653/1,092 MOFs in WS24 are water-stable.';
-                   my_color = '#e7ff97' // light lime
-                 }
-                 else {
-                   verdict = 'Very confident the MOF has water-stable.\n653/1,092 MOFs in WS24 are water-stable.';
-                   my_color = '#90ee90' // light green
-                 }
+                 $('#ethane_uptake_prediction').text('The ethane uptake prediction is: ' + prediction.toString() + 'mmol/g.');
 
-                 $('#water_stability_prediction').text('The 2-class water stability prediction is: ' + prediction.toString() + '. ' + verdict);
-
-                 stability_field = document.getElementById('water_stability_prediction');
+                 stability_field = document.getElementById('ethane_uptake_prediction');
                  setColor(stability_field, my_color) // color background based on the prediction
              })
              .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
-               water_pred_color = failure_red;
-               $('#predict_w').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-               $('#water_stability_prediction').text('');
+               ethane_pred_color = failure_red;
+               $('#predict_ethane').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+               $('#ethane_uptake_prediction').text('');
                alert(errorThrown.concat("; MOF may be too large for web-based analysis"))
              })
            })
@@ -470,8 +486,8 @@
      element.style.backgroundColor = color;
     }
 
-       // Generate acidic aqueous solution stability prediction when the "Acidic aqueous solution stability" button is clicked.
-       $('#predict_a').click(function () {
+       // Generate ethylene uptake prediction when the "Ethylene uptake" button is clicked.
+       $('#predict_ethylene').click(function () {
          // check if a cif is uploaded
          let myFile = document.getElementById('file_input').files[0]; // the uploaded file
          let myFile2 = document.getElementById('example_holder').value; // the example MOF, if Load example MOF has been used
@@ -481,88 +497,77 @@
            myFile = myFile2;
            if (myFile2 == undefined) {
              alert("Must select a MOF for analysis first.");
-             acid_pred_color = failure_red;
-             $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+             ethylene_pred_color = failure_red;
+             $('#predict_ethylene').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
              return;
            }
          }
 
-         acid_pred_color = inprogress_yellow;
-         $('#predict_a').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress 
-         $('#acid_stability_prediction').text('The acid stability prediction is loading...'); // display prediction result
+         ethylene_pred_color = inprogress_yellow;
+         $('#predict_ethylene').css({ 'background-color': inprogress_yellow, 'border-color': inprogress_yellow }); // setting button color to indicate in progress 
+         $('#ethylene_uptake_prediction').text('The ethylene uptake prediction is loading...'); // display prediction result
 
          // getting the name of the selected MOF
          var name = document.getElementById('upload_status').innerHTML;
          name = name.split(' ');
          name = name.slice(-1)[0]; // getting the last element of the array
 
+         temperature = $('#temperature_input').val()
+         pressure = $('#pressure_input').val()
+         if (isNaN(temperature) || isNaN(pressure) || !temperature || !pressure) { // ! to check for empty values
+          alert("Temperature and pressure must be numbers.")
+          ethylene_pred_color = failure_red;
+          $('#predict_ethylene').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          return;
+         }
+         if (temperature < 0 || pressure < 0) {
+          alert("Temperature and pressure must be non-negative.")
+          ethylene_pred_color = failure_red;
+          $('#predict_ethylene').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+          return;
+         }
+
          // myFile.text() is a promise
          myFile.text().then(function (result) {
            // result is the text of the loaded .cif file
 
-           myDict = { 'name': name, 'structure': result }
+           myDict = { 'name': name, 'structure': result , 'T': temperature , 'P': pressure }
 
-           $.post("/predict_acid_stability", JSON.stringify(myDict)).done(
+           $.post("/predict_ethylene_uptake", JSON.stringify(myDict)).done(
              function (response) {
 
                if (response == 'OVERLOAD') {
                  alert('Server is receiving high traffic, please try again later')
-                 acid_pred_color = failure_red;
-                 $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-                 $('#acid_stability_prediction').text('')
-                 return; // Do not update acid stability prediction if server is too busy.              
+                 ethylene_pred_color = failure_red;
+                 $('#predict_ethylene').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                 $('#ethylene_uptake_prediction').text('')
+                 return; // Do not update ethylene uptake prediction if server is too busy.              
                }
 
                if (response == 'FAILED') {
                  alert('Failed to featurize')
-                 acid_pred_color = failure_red;
-                 $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-                 $('#acid_stability_prediction').text('')
-                 return; // Do not update acid stability prediction if prediction failed.
+                 ethylene_pred_color = failure_red;
+                 $('#predict_ethylene').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+                 $('#ethylene_uptake_prediction').text('')
+                 return; // Do not update ethylene uptake prediction if prediction failed.
                }
 
-               acid_pred_color = success_green;
-               $('#predict_a').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
+               ethylene_pred_color = success_green;
+               $('#predict_ethylene').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
                $('#descriptor_section').show() // show section where can download descriptors
 
                  var prediction = response['prediction']
 
-                 // preparing the human-interpretable acid stability prediction
-                 if (prediction <= 0.2) {
-                   verdict = 'Very confident the MOF is acid-unstable.\n565/653 water-stable MOFs in WS24 are acid-unstable.';
-                   my_color = '#ffad97' // color background, light red
-                 }
-                 else if (prediction <= 0.4) {
-                   verdict = 'Fairly confident the MOF is acid-unstable.\n565/653 water-stable MOFs in WS24 are acid-unstable.';
-                   my_color = '#ffcd97' // light orange
-                 }
-                 else if (prediction <= 0.5) {
-                   verdict = 'Uncertain, but predict the MOF is acid-unstable.\n565/653 water-stable MOFs in WS24 are acid-unstable.';
-                   my_color = '#fffa97' // light yellow
-                 }
-                 else if (prediction <= 0.6) {
-                   verdict = 'Uncertain, but predict the MOF is acid-stable.\n88/653 water-stable MOFs in WS24 are acid-stable.';
-                   my_color = '#fffa97' // light yellow
-                 }
-                 else if (prediction <= 0.8) {
-                   verdict = 'Fairly confident the MOF is acid-stable.\n88/653 water-stable MOFs in WS24 are acid-stable.';
-                   my_color = '#e7ff97' // light lime
-                 }
-                 else {
-                   verdict = 'Very confident the MOF is acid-stable.\n88/653 water-stable MOFs in WS24 are acid-stable.';
-                   my_color = '#90ee90' // light green
-                 }
+                 $('#ethylene_uptake_prediction').text('The ethylene uptake prediction is: ' + prediction.toString() + 'mmol/g.');
 
-                 $('#acid_stability_prediction').text('The acidic aqueous solution stability prediction is: ' + prediction.toString() + '. ' + verdict);
-
-                 stability_field = document.getElementById('acid_stability_prediction');
+                 stability_field = document.getElementById('ethylene_uptake_prediction');
                  setColor(stability_field, my_color) // color background based on the prediction
              })
              .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
-               acid_pred_color = failure_red;
-               $('#predict_a').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
-               $('#acid_stability_prediction').text('')
+               ethylene_pred_color = failure_red;
+               $('#predict_ethylene').css({ 'background-color': failure_red, 'border-color': failure_red }); // setting button color to indicate failure
+               $('#ethylene_uptake_prediction').text('')
                alert(errorThrown.concat("; MOF may be too large for web-based analysis")) // errorThrown will likely look like "Gateway Time-out"
              })
            })
@@ -668,7 +673,7 @@
          name = get_selected_MOF(false) // don't want the .cif extension
 
          // Grab the contents of the descriptor csv
-         $.post("/get_descriptors_water", JSON.stringify(name)).done(
+         $.post("/get_descriptors_C2", JSON.stringify(name)).done(
            function (response) {
              descriptor_color = success_green;
              $('#download_descriptors').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
@@ -747,19 +752,7 @@
        $.get("/list_getter").done(
          function (response) {
            // Purpose of this is to get lists for the code below
-           // my_linkers = response['my_linkers']
-           // my_sbus = response['my_sbus']
-           // my_nets = response['my_nets']
            my_MOFs = response['my_MOFs']
-
-           // // Populating the linkers in the building block section
-           // document.getElementById('linkers_list').innerHTML = option_generator(my_linkers); // populating the linkers dropdown
-
-           // // Next, populating the nodes in the building block section.
-           // document.getElementById('sbus_list').innerHTML = option_generator(my_sbus); // populating the sbus dropdown
-
-           // // Populating the nets in the building block section
-           // document.getElementById('nets_list').innerHTML = option_generator(my_nets); // populating the nets dropdown
 
            // In addition, populating the CSD MOF options for the Example MOF loading
            document.getElementById('MOFs_list').innerHTML = option_generator(my_MOFs); // populating the MOFs dropdown
@@ -774,6 +767,9 @@
        $('#status_section').hide()
        $('#cif_hint').hide()
 
+       // Also setting some default values
+      $('#temperature_input').val('293') 
+      $('#pressure_input').val('100')       
 
        // functions to handle the selection and prediction and visualize and component button color change upon mouse hover
        // since we change the selection and prediction and visualize and component button colors and lose the default hover color change
@@ -797,16 +793,16 @@
          $(this).css("background-color", "#1D2B37");
          $(this).css("border-color", "#1D2B37");
        }, function () {
-         $(this).css("background-color", water_pred_color);
-         $(this).css("border-color", water_pred_color);
+         $(this).css("background-color", ethane_pred_color);
+         $(this).css("border-color", ethane_pred_color);
        });
 
        $("#predict_t").hover(function () {
          $(this).css("background-color", "#1D2B37");
          $(this).css("border-color", "#1D2B37");
        }, function () {
-         $(this).css("background-color", acid_pred_color);
-         $(this).css("border-color", acid_pred_color);
+         $(this).css("background-color", ethylene_pred_color);
+         $(this).css("border-color", ethylene_pred_color);
        });
 
        $("#download_descriptors").hover(function () {

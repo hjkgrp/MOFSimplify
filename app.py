@@ -87,6 +87,12 @@ acid_model = joblib.load('model/water_and_acid/models/acid_model.joblib')
 water_scaler = joblib.load('model/water_and_acid/models/water_scaler.joblib')
 acid_scaler = joblib.load('model/water_and_acid/models/acid_scaler.joblib')
 
+ethane_ANN_path = MOFSIMPLIFY_PATH + 'model/c2/ethane/'
+ethylene_ANN_path = MOFSIMPLIFY_PATH + 'model/c2/ethylene/'
+
+ethane_model = keras.models.load_model(ethane_ANN_path + 'ethane_model.h5')
+ethylene_model = keras.models.load_model(ethylene_ANN_path + 'ethylene_model.h5')
+
 # global variable dictionary for stable building block aliases. See https://zenodo.org/record/7091192
 bb_mapping = {'XUDNAN_clean_linker_2': 'E0', 'MIFKUJ_clean_linker_0': 'E1', 'AJUNOK_clean_linker_0': 'E2', 'OJICUG_clean_linker_0': 'E3',
  'FUNLAD_clean_linker_1': 'E4', 'CIFDUS_clean_linker_0': 'E5', 'EYOCIG_clean_linker_4': 'E6', 'TEMPAE_clean_linker_10': 'E7',
@@ -744,7 +750,7 @@ def run_solvent_ANN(user_id, path, MOF_name, solvent_ANN):
 
     # The normalize_data_solvent function is expecting a DataFrame with each MOF in a separate row, and features in columns
 
-    ### Utilize the function below to normalize the RACs + geos of the new MOF
+    ### Utilize the function below to normalize the RACs + geo features of the new MOF
     # newMOF refers to the MOF that has been uploaded to MOFSimplify, for which a prediction will be generated
     X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], debug=False)
     # Order of values in X_newMOF matters, but this is taken care of in normalize_data_solvent.
@@ -2643,6 +2649,7 @@ def descriptor_generator_water(name, structure, prediction_type, is_entry):
     # These descriptors are subsequently used in ws_predict() and as_predict() for the RF models.
     # Inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
     # The third input indicates the type of prediction (water or acid).
+    # Unlike in descriptor_generator, no check to see if the new MOF is in the training data.
 
     :param name: str, the name of the MOF being analyzed.
     :param structure: str, the text of the cif file of the MOF being analyzed.
@@ -2871,362 +2878,374 @@ def run_acid_RF(user_id, path, MOF_name):
 
 ### New section. The code for C2 uptake prediction. ### 
 
-# @app.route('/get_descriptors_C2', methods=['POST']) 
-# def descriptor_getter_C2():
-#     """
-#     descriptor_getter_C2 returns the contents of the csv with the descriptors of the desired MOF.
-#     These descriptors are RACs and Zeo++ descriptors, plus temperature and pressure.
+@app.route('/get_descriptors_C2', methods=['POST']) 
+def descriptor_getter_C2():
+    """
+    descriptor_getter_C2 returns the contents of the csv with the descriptors of the desired MOF.
+    These descriptors are RACs and Zeo++ descriptors, plus temperature and pressure.
 
-#     :return: str contents, the contents of the csv with the descriptor data. To be written to a csv in the front end for download.
-#     """ 
+    :return: str contents, the contents of the csv with the descriptor data. To be written to a csv in the front end for download.
+    """ 
 
-#     # Grab data
-#     name = json.loads(flask.request.get_data()); # This is the selected MOF
-#     if name[-4:] == '.cif':
-#         name = name[:-4] # remove the .cif part of the name
+    # Grab data
+    name = json.loads(flask.request.get_data()); # This is the selected MOF
+    if name[-4:] == '.cif':
+        name = name[:-4] # remove the .cif part of the name
 
-#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-#     descriptors_folder = temp_file_folder + "merged_descriptors/"
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    descriptors_folder = temp_file_folder + "merged_descriptors/"
 
-#     with open(descriptors_folder + name + '_descriptors_C2.csv', 'r') as f:
-#         contents = f.read()
+    with open(descriptors_folder + name + '_descriptors_C2.csv', 'r') as f:
+        contents = f.read()
 
-#     return contents
+    return contents
 
-# @app.route('/predict_ethane_uptake', methods=['POST']) 
-# def ethane_predict():
-#     """
-#     ethane_predict generates the ethane uptake prediction for the selected MOF.
-#         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
-#     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_C2.
-#     Then, Matt's model is applied to make a prediction using run_ethane_model.
+@app.route('/predict_ethane_uptake', methods=['POST']) 
+def ethane_predict():
+    """
+    ethane_predict generates the ethane uptake prediction for the selected MOF.
+        Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_C2.
+    Then, Matt's model is applied to make a prediction using run_C2_model.
 
-#     :return: dict results, contains the prediction.
-#         May instead return a string 'FAILED' if descriptor generation fails.
-#         May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
-#     """ 
+    :return: dict results, contains the prediction.
+        May instead return a string 'FAILED' if descriptor generation fails.
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
+    """ 
 
-#     global operation_counter # global variable
-#     global last_operation_counter_clear
+    global operation_counter # global variable
+    global last_operation_counter_clear
 
-#     operation_counter_periodic_clear()
+    operation_counter_periodic_clear()
 
-#     if operation_counter >= MAX_OPERATIONS:
-#         return 'OVERLOAD'
+    if operation_counter >= MAX_OPERATIONS:
+        return 'OVERLOAD'
 
-#     operation_counter += 1
+    operation_counter += 1
 
-#     # Grab data and tweak the MOF name.
-#     my_data = json.loads(flask.request.get_data())
-#     structure, name, temperature, pressure = extract_info_C2(my_data)
+    # Grab data and tweak the MOF name.
+    my_data = json.loads(flask.request.get_data())
+    structure, name, temperature, pressure = extract_info_C2(my_data)
 
-#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
-#     output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethane') # generate descriptors
-#     if output == 'FAILED': # Description generation failure
-#         operation_counter = conditional_diminish(operation_counter)
-#         return 'FAILED'
+    output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethane') # generate descriptors
+    if output == 'FAILED': # Description generation failure
+        operation_counter = conditional_diminish(operation_counter)
+        return 'FAILED'
 
-#     # Applying the model next
-#     prediction = run_ethane_model(str(session['ID']), MOFSIMPLIFY_PATH, name)
+    # Applying the model next
+    prediction = run_C2_model(str(session['ID']), MOFSIMPLIFY_PATH, name, 'ethane')
 
-#     results = {
-#     'prediction': prediction,
-#     }
+    results = {
+    'prediction': prediction,
+    }
     
-#     operation_counter = conditional_diminish(operation_counter)
-#     return results
+    operation_counter = conditional_diminish(operation_counter)
+    return results
 
-# @app.route('/predict_ethylene_uptake', methods=['POST']) 
-# def ethylene_predict():
-#     """
-#     ethylene_predict generates the ethylene uptake prediction for the selected MOF.
-#         Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
-#     RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_C2.
-#     Then, Matt's model is applied to make a prediction using run_ethylene_model.
+@app.route('/predict_ethylene_uptake', methods=['POST']) 
+def ethylene_predict():
+    """
+    ethylene_predict generates the ethylene uptake prediction for the selected MOF.
+        Or it will return a signal that descriptor generation failed and thus a prediction cannot be made. 
+    RAC featurization and Zeo++ geometry information for the selected MOF is generated, using descriptor_generator_C2.
+    Then, Matt's model is applied to make a prediction using run_C2_model.
 
-#     :return: dict results, contains the prediction.
-#         May instead return a string 'FAILED' if descriptor generation fails.
-#         May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
-#     """ 
+    :return: dict results, contains the prediction.
+        May instead return a string 'FAILED' if descriptor generation fails.
+        May instead return a string 'OVERLOAD' if the server is being asked too much of, in order to avoid 50X errors (like 504, aka Gateway Time-out).
+    """ 
 
-#     global operation_counter # global variable
-#     global last_operation_counter_clear
+    global operation_counter # global variable
+    global last_operation_counter_clear
 
-#     operation_counter_periodic_clear()
+    operation_counter_periodic_clear()
 
-#     if operation_counter >= MAX_OPERATIONS:
-#         return 'OVERLOAD'
+    if operation_counter >= MAX_OPERATIONS:
+        return 'OVERLOAD'
 
-#     operation_counter += 1
+    operation_counter += 1
 
-#     # Grab data and tweak the MOF name.
-#     my_data = json.loads(flask.request.get_data())
-#     structure, name, temperature, pressure = extract_info_C2(my_data)
+    # Grab data and tweak the MOF name.
+    my_data = json.loads(flask.request.get_data())
+    structure, name, temperature, pressure = extract_info_C2(my_data)
 
-#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
-#     output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethylene') # generate descriptors
-#     if output == 'FAILED': # Description generation failure
-#         operation_counter = conditional_diminish(operation_counter)
-#         return 'FAILED'
+    output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethylene') # generate descriptors
+    if output == 'FAILED': # Description generation failure
+        operation_counter = conditional_diminish(operation_counter)
+        return 'FAILED'
 
-#     # Applying the model next
-#     prediction = run_ethylene_model(str(session['ID']), MOFSIMPLIFY_PATH, name)
+    # Applying the model next
+    prediction = run_C2_model(str(session['ID']), MOFSIMPLIFY_PATH, name, 'ethylene')
 
-#     results = {
-#     'prediction': prediction,
-#     }
+    results = {
+    'prediction': prediction,
+    }
     
-#     operation_counter = conditional_diminish(operation_counter)
-#     return results
+    operation_counter = conditional_diminish(operation_counter)
+    return results
 
-# def channel_surface_area_extract(row):
-#     # The row will look like 
-#     # Number_of_channels: 2 Channel_surface_area_A^2: 712.983  709.065
-#     # or
-#     # Number_of_channels: 1 Channel_surface_area_A^2: 2038.46 
-#     # etc
+def channel_surface_area_extract(row):
+    # The row will look like 
+    # Number_of_channels: 2 Channel_surface_area_A^2: 712.983  709.065
+    # or
+    # Number_of_channels: 1 Channel_surface_area_A^2: 2038.46 
+    # etc
 
-#     split_row = row.split()
-#     num_channels = int(split_row[1])
+    split_row = row.split()
+    num_channels = int(split_row[1])
 
-#     if num_channels == 0:
-#         CSA_1, CSA_2 = 0, 0
-#     elif num_channels == 1:
-#         CSA_1, CSA_2 = float(split_row[3]), 0
-#     else: # There are 2+ channels
-#         CSA_1, CSA_2 = float(split_row[3]), float(split_row[4])
+    if num_channels == 0:
+        CSA_1, CSA_2 = 0, 0
+    elif num_channels == 1:
+        CSA_1, CSA_2 = float(split_row[3]), 0
+    else: # There are 2+ channels
+        CSA_1, CSA_2 = float(split_row[3]), float(split_row[4])
 
-#     return CSA_1, CSA_2
+    return CSA_1, CSA_2
 
-# def descriptor_generator_C2(name, structure, temperature, pressure, prediction_type):
-#     """
-#     # descriptor_generator_C2 is used by both ethane_predict() and ethylene_predict() to generate RACs and Zeo++ descriptors.
-#     # These descriptors are subsequently used in ethane_predict() and ethylene_predict() for the ANN models.
-#     # First two inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
-#     # Next two inputs are the operating conditions.
-#     # The fifth input indicates the type of prediction (ethane or ethylene).
+def descriptor_generator_C2(name, structure, temperature, pressure, prediction_type):
+    """
+    # descriptor_generator_C2 is used by both ethane_predict() and ethylene_predict() to generate RACs and Zeo++ descriptors.
+    # These descriptors are subsequently used in ethane_predict() and ethylene_predict() for the ANN models.
+    # First two inputs are the name of the MOF and the structure (cif file text) of the MOF for which descriptors are to be generated.
+    # Next two inputs are the operating conditions.
+    # The fifth input indicates the type of prediction (ethane or ethylene).
+    # Unlike in descriptor_generator, no check to see if the new MOF is in the training data.
 
-#     :param name: str, the name of the MOF being analyzed.
-#     :param structure: str, the text of the cif file of the MOF being analyzed.
-#     :param temperature: str, temperature in Kelvin
-#     :param pressure: str, pressure in kPa
-#     :return: str, either the string 'FAILED' if descriptor generation fails, otherwise 'SUCCESS'
-#     """ 
+    :param name: str, the name of the MOF being analyzed.
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param temperature: str, temperature in Kelvin
+    :param pressure: str, pressure in kPa
+    :param prediction_type: str, indicating whether descriptors are made for ethane or ethylene
+    :return: str, either the string 'FAILED' if descriptor generation fails, otherwise 'SUCCESS'
+    """ 
 
-#     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
-#     cif_folder = temp_file_folder + 'cifs/'
+    temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
+    cif_folder = temp_file_folder + 'cifs/'
 
-#     # Write the data back to a cif file.
-#     try:
-#         cif_file = open(cif_folder + name + '.cif', 'w')
-#     except FileNotFoundError:
-#         return 'FAILED'
-#     cif_file.write(structure)
-#     cif_file.close()
+    # Write the data back to a cif file.
+    try:
+        cif_file = open(cif_folder + name + '.cif', 'w')
+    except FileNotFoundError:
+        return 'FAILED'
+    cif_file.write(structure)
+    cif_file.close()
 
-#     # There can be a RACs folder for water predictions and a RACs folder for acid predictions. Same for Zeo++.
-#     RACs_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_RACs/'
-#     zeo_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_zeo++/'
+    # There can be a RACs folder for water predictions and a RACs folder for acid predictions. Same for Zeo++.
+    RACs_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_RACs/'
+    zeo_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_zeo++/'
 
-#     # Delete the RACs folder, then remake it (to start fresh for this prediction).
-#     shutil.rmtree(RACs_folder)
-#     os.mkdir(RACs_folder)
+    # Delete the RACs folder, then remake it (to start fresh for this prediction).
+    shutil.rmtree(RACs_folder)
+    os.mkdir(RACs_folder)
 
-#     # Doing the same with the Zeo++ folder.
-#     shutil.rmtree(zeo_folder)
-#     os.mkdir(zeo_folder)
+    # Doing the same with the Zeo++ folder.
+    shutil.rmtree(zeo_folder)
+    os.mkdir(zeo_folder)
 
-#     # If is_entry is True, do not need to generate features, since we already have them.
-#     if is_entry:
-#         return 'SUCCESS'
+    # # If is_entry is True, do not need to generate features, since we already have them.
+    # if is_entry:
+    #     return 'SUCCESS'
 
-#     # Next, running MOF featurization
-#     try:
-#         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
-#     except ValueError:
-#         return 'FAILED'
+    # Next, running MOF featurization
+    try:
+        get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
+    except ValueError:
+        # return 'FAILED'
 
-#     # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
-#         # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
+        # Will proceed even if primitive unit cell not obtained by pymatgen
+        shutil.copy(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif')
 
-#     # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
-#     cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
-#     cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
-#     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
-#     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+    # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
+        # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
 
-#     # four parallelized Zeo++ and RAC commands
-#     process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-#     process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-#     process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-#     process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+    # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
+    cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
+    cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
+    cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
+    cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
 
-#     output1 = process1.communicate()[0]
-#     output2 = process2.communicate()[0]
-#     output3 = process3.communicate()[0]
-#     output4 = process4.communicate()[0]
+    # four parallelized Zeo++ and RAC commands
+    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
 
-#     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
+    output1 = process1.communicate()[0]
+    output2 = process2.communicate()[0]
+    output3 = process3.communicate()[0]
+    output4 = process4.communicate()[0]
 
-#     dict_list = []
-#     cif_file = name + '_primitive.cif' 
-#     basename = cif_file.strip('.cif')
-#     largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path = np.nan, np.nan, np.nan
-#     unit_cell_volume, crystal_density, VSA, GSA = np.nan, np.nan, np.nan, np.nan
-#     VPOV, GPOV = np.nan, np.nan
-#     POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+    # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
-#     if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
-#         os.path.exists(zeo_folder + name + '_pov.txt')):
-#         with open(zeo_folder + name + '_pd.txt') as f:
-#             pore_diameter_data = f.readlines()
-#             for row in pore_diameter_data:
-#                 largest_included_sphere = float(row.split()[1]) # largest included sphere
-#                 largest_free_sphere = float(row.split()[2]) # largest free sphere
-#                 largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
-#         with open(zeo_folder + name + '_sa.txt') as f:
-#             surface_area_data = f.readlines()
-#             for i, row in enumerate(surface_area_data):
-#                 if i == 0:
-#                     unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-#                     crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
-#                     VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
-#                     GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-#                 elif i == 1:
-#                     # Extracting channel surface areas
-#                     CSA_1, CSA_2 = channel_surface_area_extract(row)
-#         with open(zeo_folder + name + '_pov.txt') as f:
-#             pore_volume_data = f.readlines()
-#             for i, row in enumerate(pore_volume_data):
-#                 if i == 0:
-#                     density = float(row.split('Density:')[1].split()[0])
-#                     POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
-#                     PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
-#                     GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
-#                     GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
-#                     POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
-#                     PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
-#                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
-#                     GPOV = VPOV/density
-#     else:
-#         print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
-#               '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
-#         return 'FAILED'
-#     geo_dict = {'name': basename, 'cif_file': cif_file, 'Di': largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
-#                 'cell_v': unit_cell_volume, 'VSA': VSA, 'GSA': GSA, 'VPOV': VPOV, 'GPOV': GPOV, 'POAV_vol_frac': POAV_volume_fraction, 
-#                 'PONAV_vol_frac': PONAV_volume_fraction, 'GPOAV': GPOAV, 'GPONAV': GPONAV, 'POAV': POAV, 'PONAV': PONAV, 'density': crystal_density,
-#                 'CSA_1': CSA_1, 'CSA_2': CSA_2}
-#     dict_list.append(geo_dict)
-#     geo_df = pd.DataFrame(dict_list)
-#     geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
+    dict_list = []
+    cif_file = name + '_primitive.cif' 
+    basename = cif_file.strip('.cif')
+    largest_included_sphere, largest_free_sphere, largest_included_sphere_along_free_sphere_path = np.nan, np.nan, np.nan
+    unit_cell_volume, crystal_density, VSA, GSA = np.nan, np.nan, np.nan, np.nan
+    VPOV, GPOV = np.nan, np.nan
+    POAV, PONAV, GPOAV, GPONAV, POAV_volume_fraction, PONAV_volume_fraction = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
 
-#     # error handling for cmd4
-#     with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
-#         if f.readline() == 'FAILED':
-#             print('RAC generation failed.')
-#             return 'FAILED'
+    if (os.path.exists(zeo_folder + name + '_pd.txt') & os.path.exists(zeo_folder + name + '_sa.txt') &
+        os.path.exists(zeo_folder + name + '_pov.txt')):
+        with open(zeo_folder + name + '_pd.txt') as f:
+            pore_diameter_data = f.readlines()
+            for row in pore_diameter_data:
+                largest_included_sphere = float(row.split()[1]) # largest included sphere
+                largest_free_sphere = float(row.split()[2]) # largest free sphere
+                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+        with open(zeo_folder + name + '_sa.txt') as f:
+            surface_area_data = f.readlines()
+            for i, row in enumerate(surface_area_data):
+                if i == 0:
+                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
+                    crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
+                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
+                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+                    ASA = float(row.split('ASA_A^2:')[1].split()[0]) # accessible surface area
+                elif i == 1:
+                    # Extracting channel surface areas
+                    CSA_1, CSA_2 = channel_surface_area_extract(row)
+        with open(zeo_folder + name + '_pov.txt') as f:
+            pore_volume_data = f.readlines()
+            for i, row in enumerate(pore_volume_data):
+                if i == 0:
+                    density = float(row.split('Density:')[1].split()[0])
+                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
+                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
+                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
+                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
+                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
+                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                    VPOV = POAV_volume_fraction+PONAV_volume_fraction
+                    GPOV = VPOV/density
+    else:
+        print('Not all 3 files exist, so at least one Zeo++ call failed!', 'sa: ',os.path.exists(zeo_folder + name + '_sa.txt'), 
+              '; pd: ',os.path.exists(zeo_folder + name + '_pd.txt'), '; pov: ', os.path.exists(zeo_folder + name + '_pov.txt'))
+        return 'FAILED'
+    geo_dict = {'name': basename, 'cif_file': cif_file, 'Di': largest_included_sphere, 'Df': largest_free_sphere, 'Dif': largest_included_sphere_along_free_sphere_path,
+                'cell_v': unit_cell_volume, 'VSA': VSA, 'GSA': GSA, 'ASA': ASA, 'VPOV': VPOV, 'GPOV': GPOV, 'POAV_vol_frac': POAV_volume_fraction, 
+                'PONAV_vol_frac': PONAV_volume_fraction, 'GPOAV': GPOAV, 'GPONAV': GPONAV, 'POAV': POAV, 'PONAV': PONAV, 'density': crystal_density,
+                'CSA_1': CSA_1, 'CSA_2': CSA_2}
+    dict_list.append(geo_dict)
+    geo_df = pd.DataFrame(dict_list)
+    geo_df.to_csv(zeo_folder + 'geometric_parameters.csv',index=False)
 
-#     # Merging geometric information with the RAC information that is in the get_MOF_descriptors-generated files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
-#     try:
-#         lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
-#         sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
-#         linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
-#     except Exception: # csv files have been deleted
-#         return 'FAILED' 
+    # error handling for cmd4
+    with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
+        if f.readline() == 'FAILED':
+            print('RAC generation failed.')
+            return 'FAILED'
 
-#     lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a DataFrame, then transpose
-#     sbu_df = sbu_df.mean().to_frame().transpose()
-#     linker_df = linker_df.mean().to_frame().transpose()
+    # Merging geometric information with the RAC information that is in the get_MOF_descriptors-generated files (lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv)
+    try:
+        lc_df = pd.read_csv(RACs_folder + "lc_descriptors.csv") 
+        sbu_df = pd.read_csv(RACs_folder + "sbu_descriptors.csv")
+        linker_df = pd.read_csv(RACs_folder + "linker_descriptors.csv")
+    except Exception: # csv files have been deleted
+        return 'FAILED' 
 
-#     merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
+    lc_df = lc_df.mean().to_frame().transpose() # averaging over all rows. Convert resulting Series into a DataFrame, then transpose
+    sbu_df = sbu_df.mean().to_frame().transpose()
+    linker_df = linker_df.mean().to_frame().transpose()
 
-#     # Adding temperature and pressure information
-#     merged_df['temperature'] = float(temperature)
-#     merged_df['pressure'] = float(pressure)
+    merged_df = pd.concat([geo_df, lc_df, sbu_df, linker_df], axis=1)
 
-#     merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors_C2.csv',index=False) # written in /temp_file_creation_SESSIONID
+    # Adding temperature and pressure information
+    merged_df['temperature'] = float(temperature)
+    merged_df['pressure'] = float(pressure)
 
-#     return 'SUCCESS' 
+    merged_df.to_csv(temp_file_folder + '/merged_descriptors/' + name + '_descriptors_C2.csv',index=False) # written in /temp_file_creation_SESSIONID
 
-# def run_ethane_model(user_id, path, MOF_name, ethane_ANN):
-#     """
-#     run_ethane_ANN runs the ethane uptake ANN with the desired MOF as input.
+    return 'SUCCESS' 
 
-#     :param user_id: str, the session ID of the user
-#     :param path: str, the server's path to the MOFSimplify folder on the server
-#     :param MOF_name: str, the name of the MOF for which a prediction is being generated
-#     :param ethane_ANN: keras.engine.training.Model, the ANN itself
-#     :return: str str(new_MOF_pred[0][0]), the model ethane uptake prediction 
-#     """ 
+def normalize_data_C2(df_train, df_newMOF, fnames):
+    """
+    normalize_data_C2 takes in two DataFrames df_train and df_newMOF, one for the training data (many rows) and one for the new MOF (one row) for which a prediction is to be generated.
+    This function also takes in fnames (the feature names).
+    This function normalizes the X values from the pandas DataFrames and returns them as X_train and X_newMOF.
+    The function also returns x_scaler (which scaled X_train).
 
-#     features = ['f-chi-0-all', 'f-chi-1-all', 'f-chi-2-all', 'f-chi-3-all', 'f-Z-0-all',
-#        'f-Z-1-all', 'f-Z-2-all', 'f-Z-3-all', 'f-I-0-all', 'f-I-1-all',
-#        'f-I-2-all', 'f-I-3-all', 'f-T-0-all', 'f-T-1-all', 'f-T-2-all',
-#        'f-T-3-all', 'f-S-0-all', 'f-S-1-all', 'f-S-2-all', 'f-S-3-all',
-#        'mc-chi-0-all', 'mc-chi-1-all', 'mc-chi-2-all', 'mc-chi-3-all',
-#        'mc-Z-0-all', 'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-I-0-all',
-#        'mc-I-1-all', 'mc-I-2-all', 'mc-I-3-all', 'mc-T-0-all', 'mc-T-1-all',
-#        'mc-T-2-all', 'mc-T-3-all', 'mc-S-0-all', 'mc-S-1-all', 'mc-S-2-all',
-#        'mc-S-3-all', 'D_mc-chi-0-all', 'D_mc-chi-1-all', 'D_mc-chi-2-all',
-#        'D_mc-chi-3-all', 'D_mc-Z-0-all', 'D_mc-Z-1-all', 'D_mc-Z-2-all',
-#        'D_mc-Z-3-all', 'D_mc-I-0-all', 'D_mc-I-1-all', 'D_mc-I-2-all',
-#        'D_mc-I-3-all', 'D_mc-T-0-all', 'D_mc-T-1-all', 'D_mc-T-2-all',
-#        'D_mc-T-3-all', 'D_mc-S-0-all', 'D_mc-S-1-all', 'D_mc-S-2-all',
-#        'D_mc-S-3-all', 'f-lig-chi-0', 'f-lig-chi-1', 'f-lig-chi-2',
-#        'f-lig-chi-3', 'f-lig-Z-0', 'f-lig-Z-1', 'f-lig-Z-2', 'f-lig-Z-3',
-#        'f-lig-I-0', 'f-lig-I-1', 'f-lig-I-2', 'f-lig-I-3', 'f-lig-T-0',
-#        'f-lig-T-1', 'f-lig-T-2', 'f-lig-T-3', 'f-lig-S-0', 'f-lig-S-1',
-#        'f-lig-S-2', 'f-lig-S-3', 'ASA_A2', 'ASA_m2/g',
-#        'CSA_1', 'CSA_2', 'density',
-#        'Df', 'Di',
-#        'Dif', 'POAV',
-#        'POAV_vol_frac', 'GPOAV', 'cell_v', 'temperature',
-#        'pressure']
-#        # CSA: channel surface area
-#        # Only taking the first two channels
-     
-#     # TODO
-#     ANN_path = path + 'model/solvent/ANN/'
-#     temp_file_path = path + 'temp_file_creation_' + user_id + '/'
-#     df_train = pd.read_csv(ANN_path+'dropped_connectivity_dupes/train.csv')
-#     df_train = df_train.loc[:, (df_train != df_train.iloc[0]).any()]
-#     df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_C2.csv')
-#     features = [val for val in df_train.columns.values if val in RACs+geo]
+    :param df_train: A pandas DataFrame of the training data.
+    :param df_newMOF: A pandas DataFrame of the new MOF being analyzed.
+    :param fnames: An array of column names of the descriptors.
+    :return: numpy.ndarray X_train, the descriptors of the training data. Its number of rows is the number of MOFs in the training data. Its number of columns is the number of descriptors.
+    :return: numpy.ndarray X_newMOF, the descriptors of the new MOF being analyzed by MOFSimplify. It contains only one row.
+    :return: sklearn.preprocessing._data.StandardScaler x_scaler, the scaler used to normalize the descriptor data to unit mean and a variance of 1.
+    """ 
+    X_train, X_newMOF = df_train.values, df_newMOF[fnames].values # takes care of ensuring ordering is same for both X
+    x_scaler = sklearn.preprocessing.StandardScaler()
+    x_scaler.fit(X_train)
+    X_train = x_scaler.transform(X_train)
+    X_newMOF = x_scaler.transform(X_newMOF)
+    return X_train, X_newMOF, x_scaler
 
-#     df_train = standard_labels(df_train, key="flag")
+def run_C2_model(user_id, path, MOF_name, gas='ethane'):
+    """
+    run_C2_ANN runs the ethane or ethylene uptake ANN with the desired MOF as input.
 
-#     # The normalize_data_solvent function is expecting a DataFrame with each MOF in a separate row, and features in columns
+    :param user_id: str, the session ID of the user
+    :param path: str, the server's path to the MOFSimplify folder on the server
+    :param MOF_name: str, the name of the MOF for which a prediction is being generated
+    :param gas: str, either "ethane" or "ethylene"
+    :return: str str(new_MOF_pred[0][0]), the model ethane uptake prediction 
+    """ 
 
-#     ### Utilize the function below to normalize the RACs + geos of the new MOF
-#     # newMOF refers to the MOF that has been uploaded to MOFSimplify, for which a prediction will be generated
-#     X_train, X_newMOF, y_train, x_scaler = normalize_data_solvent(df_train, df_newMOF, features, ["flag"], debug=False)
-#     # Order of values in X_newMOF matters, but this is taken care of in normalize_data_solvent.
-#     X_train.shape, y_train.reshape(-1, ).shape
-#     model = solvent_ANN
+    features = ['f-chi-0-all', 'f-chi-1-all', 'f-chi-2-all', 'f-chi-3-all', 'f-Z-0-all',
+       'f-Z-1-all', 'f-Z-2-all', 'f-Z-3-all', 'f-I-0-all', 'f-I-1-all',
+       'f-I-2-all', 'f-I-3-all', 'f-T-0-all', 'f-T-1-all', 'f-T-2-all',
+       'f-T-3-all', 'f-S-0-all', 'f-S-1-all', 'f-S-2-all', 'f-S-3-all',
+       'mc-chi-0-all', 'mc-chi-1-all', 'mc-chi-2-all', 'mc-chi-3-all',
+       'mc-Z-0-all', 'mc-Z-1-all', 'mc-Z-2-all', 'mc-Z-3-all', 'mc-I-0-all',
+       'mc-I-1-all', 'mc-I-2-all', 'mc-I-3-all', 'mc-T-0-all', 'mc-T-1-all',
+       'mc-T-2-all', 'mc-T-3-all', 'mc-S-0-all', 'mc-S-1-all', 'mc-S-2-all',
+       'mc-S-3-all', 'D_mc-chi-0-all', 'D_mc-chi-1-all', 'D_mc-chi-2-all',
+       'D_mc-chi-3-all', 'D_mc-Z-0-all', 'D_mc-Z-1-all', 'D_mc-Z-2-all',
+       'D_mc-Z-3-all', 'D_mc-I-0-all', 'D_mc-I-1-all', 'D_mc-I-2-all',
+       'D_mc-I-3-all', 'D_mc-T-0-all', 'D_mc-T-1-all', 'D_mc-T-2-all',
+       'D_mc-T-3-all', 'D_mc-S-0-all', 'D_mc-S-1-all', 'D_mc-S-2-all',
+       'D_mc-S-3-all', 'f-lig-chi-0', 'f-lig-chi-1', 'f-lig-chi-2',
+       'f-lig-chi-3', 'f-lig-Z-0', 'f-lig-Z-1', 'f-lig-Z-2', 'f-lig-Z-3',
+       'f-lig-I-0', 'f-lig-I-1', 'f-lig-I-2', 'f-lig-I-3', 'f-lig-T-0',
+       'f-lig-T-1', 'f-lig-T-2', 'f-lig-T-3', 'f-lig-S-0', 'f-lig-S-1',
+       'f-lig-S-2', 'f-lig-S-3', 'ASA', 'GSA',
+       'CSA_1', 'CSA_2', 'density',
+       'Df', 'Di',
+       'Dif', 'POAV',
+       'POAV_vol_frac', 'GPOAV', 'cell_v', 'temperature',
+       'pressure']
+       # CSA: channel surface area
+       # Only taking the first two channels
 
-#     from tensorflow.python.keras.backend import set_session
-#     with tf_session.as_default(): # session stuff is needed because the model was loaded from h5 a while ago
-#         with tf_session.graph.as_default():
-#             ### new_MOF_pred will be a decimal value between 0 and 1, below 0.5 is unstable, above 0.5 is stable
-#             new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
+    if gas == 'ethane':   
+        ANN_path = path + 'model/c2/ethane/'
+        model = ethane_model
+    elif gas == 'ethylene':
+        ANN_path = path + 'model/c2/ethylene/'
+        model = ethylene_model
+    else:
+        raise Exception('Invalid value of gas parameter.')
+    temp_file_path = path + 'temp_file_creation_' + user_id + '/'
+    df_train = pd.read_csv(ANN_path+'unnormalized_features/x_train.csv')
+    df_newMOF = pd.read_csv(temp_file_path + 'merged_descriptors/' + MOF_name + '_descriptors_C2.csv')
 
-#     return str(new_MOF_pred[0][0])
+    # The normalize_data_C2 function is expecting a DataFrame with each MOF in a separate row, and features in columns
 
-# def run_ethylene_model(user_id, path, MOF_name, ethylene_ANN):
-#     """
-#     run_ethane_ANN runs the ethane uptake ANN with the desired MOF as input.
+    ### Utilize the function below to normalize the features of the new MOF
+    # newMOF refers to the MOF that has been uploaded to MOFSimplify, for which a prediction will be generated
+    X_train, X_newMOF, x_scaler = normalize_data_C2(df_train, df_newMOF, features)
+    # Order of values in X_newMOF matters, but this is taken care of in normalize_data_C2.
 
-#     :param user_id: str, the session ID of the user
-#     :param path: str, the server's path to the MOFSimplify folder on the server
-#     :param MOF_name: str, the name of the MOF for which a prediction is being generated
-#     :param ethylene_ANN: keras.engine.training.Model, the ANN itself
-#     :return: str str(new_MOF_pred[0][0]), the model ethane uptake prediction 
-#     """ 
+    from tensorflow.python.keras.backend import set_session
+    with tf_session.as_default(): # session stuff is needed because the model was loaded from h5 a while ago
+        with tf_session.graph.as_default():
+            new_MOF_pred = np.round(model.predict(X_newMOF),2) # round to 2 decimals
 
-#     # TODO
+    return str(new_MOF_pred[0][0])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
-    #app.run(host='0.0.0.0', port=8000, threaded=False, processes=10)

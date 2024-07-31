@@ -161,22 +161,19 @@
       </div>
       <div class="container" id="pills-main">
 
-        <div style=text-align:center;>
-          <b class='zebra' style='font-size:26px;'>Coming soon!<br></b>
-        </div>
-        <!-- <b class='zebra' style='font-size:22px;'>1) Select a MOF (metal-organic framework) for analysis</b>  -->
+        <b class='zebra' style='font-size:22px;'>1) Select a MOF (metal-organic framework) for analysis</b> 
         <!-- Create a section containing buttons -->
-        <!-- <div class='col-lg-12'> -->
-          <!-- <div style='width:100%; text-align:center; margin-top:0.25cm;'> -->
+        <div class='col-lg-12'>
+          <div style='width:100%; text-align:center; margin-top:0.25cm;'>
             <!-- Button for queuing up the example MOF cif file -->
-            <!-- <button class='btn btn-primary round_button selection_button' id='example-redirect' style='font-size:22px; width:40%; margin-right:40px;' type='button'>Example MOF</button> -->
+            <button class='btn btn-primary round_button selection_button' id='example-redirect' style='font-size:22px; width:40%; margin-right:40px;' type='button'>Example MOF</button>
             <!-- Button for uploading MOF cif file --> 
-            <!-- <button class='btn btn-primary round_button selection_button' id='upload' style='font-size:22px; width:40%' type='button'>Custom (upload cif file)</button>  -->
-            <!-- <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must be disorder free and without floating solvent</p> -->
-              <!-- <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p> -->
+            <button class='btn btn-primary round_button selection_button' id='upload' style='font-size:22px; width:40%' type='button'>Custom (upload cif file)</button> 
+            <p class='zebra' id='cif_hint' style='display:inline-block; width:100%; font-size: 22px; margin-bottom: 0.25cm;'>Uploaded cif file must have P1 symmetry (all atom positions explicitly indicated) and be disorder free and without floating solvent</p>
+              <p class='zebra' id='permission_line' style='font-size:22px;'>May MOFSimplify store information on your MOFs? &nbsp;&nbsp;<button class='perm' id='perm_yes' style='color: green;'>Yes.</button>&nbsp;&nbsp;&nbsp;<button class='perm' id='perm_no' style='color: red;'>No.</button></p>
             <!-- &nbsp is a space gap -->
-          <!-- </div> -->
-        <!-- </div> -->
+          </div>
+        </div>
 
         <div id='predict_section' style='margin-top: 1cm;'>
           <b class='zebra' style='font-size:22px;'>2) Predict properties of the selected MOF</b> <!-- Create a section containing buttons -->
@@ -427,11 +424,6 @@
           return;
          }
 
-         // TODO
-         console.log('test test')
-         console.log(temperature)
-         console.log(pressure)
-
          // myFile.text() is a promise
          myFile.text().then(function (result) {
            // result is the text of the loaded .cif file
@@ -467,7 +459,7 @@
 
                  var prediction = response['prediction']
 
-                 $('#ethane_uptake_prediction').text('The ethane uptake prediction is: ' + prediction.toString() + 'mmol/g.');
+                 $('#ethane_uptake_prediction').text('The ethane uptake prediction is: ' + prediction.toString() + ' mmol/g.');
 
                  stability_field = document.getElementById('ethane_uptake_prediction');
                  setColor(stability_field, my_color) // color background based on the prediction
@@ -559,7 +551,7 @@
 
                  var prediction = response['prediction']
 
-                 $('#ethylene_uptake_prediction').text('The ethylene uptake prediction is: ' + prediction.toString() + 'mmol/g.');
+                 $('#ethylene_uptake_prediction').text('The ethylene uptake prediction is: ' + prediction.toString() + ' mmol/g.');
 
                  stability_field = document.getElementById('ethylene_uptake_prediction');
                  setColor(stability_field, my_color) // color background based on the prediction

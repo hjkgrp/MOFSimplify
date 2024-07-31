@@ -129,7 +129,7 @@
             <a aria-expanded="false" aria-haspopup="true" class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="navbarDropdownMenuLink" role="button">Property prediction</a>
             <div aria-labelledby="navbarDropdownMenuLink" class="dropdown-menu">
               <a class="dropdown-item" href="../">Solvent/Thermal</a> 
-              <a class="dropdown-item" href="ethane_uptake_prediction.html">Water/Acid</a>
+              <a class="dropdown-item" href="water_stability_prediction.html">Water/Acid</a>
               <a class="dropdown-item" href="C2_uptake_prediction.html">C2 uptake</a>
             </div>
           </li>
@@ -272,18 +272,6 @@
 
      $(function () {
 
-
-       // Set up 3Dmol viewer 
-       let element = $('#container-01');
-       let config = { backgroundColor: 'white' };
-       let component_viewer = $3Dmol.createViewer(element, config);
-       data = {};
-
-       // Reset zoom level.
-       $('#reset_zoom').click(function () {
-         component_viewer.zoomTo();
-       })
-
        // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
        function renew(action) { // something else was already called reset, so we're calling this renew
 
@@ -296,12 +284,6 @@
          }
 
          color_reset(); // resetting selection and prediction and visualize and component button colors 
-
-         w_stability_field = document.getElementById('ethane_uptake_prediction');
-         setColor(w_stability_field, 'transparent') // color background, transparent                      
-
-         a_stability_field = document.getElementById('ethylene_uptake_prediction');
-         setColor(a_stability_field, 'transparent') // color background, transparent                      
 
          // hiding sections
          $('#predict_section').hide()
@@ -462,7 +444,6 @@
                  $('#ethane_uptake_prediction').text('The ethane uptake prediction is: ' + prediction.toString() + ' mmol/g.');
 
                  stability_field = document.getElementById('ethane_uptake_prediction');
-                 setColor(stability_field, my_color) // color background based on the prediction
              })
              .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
                ethane_pred_color = failure_red;
@@ -554,7 +535,6 @@
                  $('#ethylene_uptake_prediction').text('The ethylene uptake prediction is: ' + prediction.toString() + ' mmol/g.');
 
                  stability_field = document.getElementById('ethylene_uptake_prediction');
-                 setColor(stability_field, my_color) // color background based on the prediction
              })
              .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
                ethylene_pred_color = failure_red;

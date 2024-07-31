@@ -275,28 +275,32 @@
        // Reset certain fields when a new MOF is uploaded (either the example MOF or a user-specified MOF) or generated with building blocks.
        function renew(action) { // something else was already called reset, so we're calling this renew
 
-         // action will be either 'example', 'input', or 'bb'
-         if (action != 'example') {
+         // action will be either 'example', 'input', or 'temp_pressure_text_entry'
+         if (action != 'example' && action != 'temp_pressure_text_entry') {
            document.getElementById('example_holder').value = null; // clears example cif
          }
-         if (action != 'input') {
+         if (action != 'input' && action != 'temp_pressure_text_entry') {
            document.getElementById('file_input').value = null; // clearing any cifs loaded by the user
          }
 
          color_reset(); // resetting selection and prediction and visualize and component button colors 
 
          // hiding sections
-         $('#predict_section').hide()
-         $('#status_section').hide()
-         $('#descriptor_section').hide()
-         $('#cif_hint').hide()
+         if (action != 'temp_pressure_text_entry') {
+           $('#predict_section').hide()
+           $('#status_section').hide()
+           $('#cif_hint').hide()
 
+           // Clearing everything in the Status messages and MOF predictions section of the website, and the holders.
+           $('#upload_status').text(''); // now nothing is uploaded
+         }
+
+         $('#descriptor_section').hide()
+  
          // clearing previous predictions
          $('#ethane_uptake_prediction').text('');
          $('#ethylene_uptake_prediction').text('');
 
-         // Clearing everything in the Status messages and MOF predictions section of the website, and the holders.
-         $('#upload_status').text(''); // now nothing is uploaded
        }
 
        // Resets the colors of the selection and prediction and visualize and component buttons
@@ -729,6 +733,14 @@
            // In addition, populating the CSD MOF options for the Example MOF loading
            document.getElementById('MOFs_list').innerHTML = option_generator(my_MOFs); // populating the MOFs dropdown
          })
+
+       $('#temperature_input').change(function() {
+        renew('temp_pressure_text_entry')
+       })
+
+       $('#pressure_input').change(function() {
+        renew('temp_pressure_text_entry')
+       })
 
        // On startup, hide certain sections
        $('#pills-comp').hide()

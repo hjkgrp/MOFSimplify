@@ -283,7 +283,7 @@
            document.getElementById('file_input').value = null; // clearing any cifs loaded by the user
          }
 
-         color_reset(); // resetting selection and prediction and visualize and component button colors 
+         color_reset(action); // resetting selection and prediction and visualize and component button colors 
 
          // hiding sections
          if (action != 'temp_pressure_text_entry') {
@@ -304,16 +304,17 @@
        }
 
        // Resets the colors of the selection and prediction and visualize and component buttons
-       function color_reset() { 
-         load_color = original_blue;
-         upload_color = original_blue;
+       function color_reset(action) { 
+         if (action != 'temp_pressure_text_entry') {
+           load_color = original_blue;
+           upload_color = original_blue;
+           $('#example-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
+           $('#upload').css({ 'background-color': original_blue, 'border-color': original_blue })          
+         }
+         
          ethane_pred_color = original_blue;
          ethylene_pred_color = original_blue;
          descriptor_color = original_blue;
-
-         $('#example-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
-         $('#upload').css({ 'background-color': original_blue, 'border-color': original_blue })
-         $('#bb-redirect').css({ 'background-color': original_blue, 'border-color': original_blue })
          $('#predict_ethane').css({ 'background-color': original_blue, 'border-color': original_blue })
          $('#predict_ethylene').css({ 'background-color': original_blue, 'border-color': original_blue })
          $('#download_descriptors').css({ 'background-color': original_blue, 'border-color': original_blue })

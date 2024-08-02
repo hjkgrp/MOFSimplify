@@ -1541,7 +1541,7 @@ def db_push_lite(structure, prediction_type):
 
     # if db_push_lite is called, structure passed to it will already have a document in the history.MOFSimplify_v2 collection
 
-    #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+    # Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
     # s refers to a solvent removal stability prediction; t refers to a thermal stability prediction
     # s_times and t_times indicate the number of times this structure has had its solvent removal stability or thermal stability predicted
     my_document = my_documents[0]
@@ -2359,7 +2359,7 @@ def db_push_water(structure, prediction_type, result, failure, csv_content):
 
     :param structure: str, the text of the cif file of the MOF being analyzed.
     :param prediction_type: str, the type of prediction being run. Can either be 'water_stability_prediction' or 'acid_stability_prediction'.
-    :param result: float, the ground truth or prediction for this structure.
+    :param result: float, the prediction for this structure.
     :param failure: boolean, whether the featurization failed.
     :param csv_content: string, the content of the csv of features.
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
@@ -2433,7 +2433,7 @@ def db_push_lite_water(structure, prediction_type):
 
     # if db_push_lite_water is called, structure passed to it will already have a document in the history.MOFSimplify_water_v2 collection
 
-    #Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+    # Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
     # w refers to a 2-class water stability prediction; a refers to an acid stability prediction
     # w_times and a_times indicate the number of times this structure has had its water stability or acid stability predicted
     my_document = my_documents[0]
@@ -2878,6 +2878,115 @@ def run_acid_RF(user_id, path, MOF_name):
 
 ### New section. The code for C2 uptake prediction. ### 
 
+def db_push_C2(structure, temperature, pressure, prediction_type, result, failure, csv_content):
+    """
+    db_push_C2 sends the structure of the MOF being predicted on, and other information, to the MOFSimplify_C2_v2 collection in the MongoDB history database.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param temperature: str, the temperature of the data point.
+    :param pressure: str, the pressure of the data point.
+    :param prediction_type: str, the type of prediction being run. Can either be 'ethane_uptake' or 'ethylene_uptake'.
+    :param result: float, the prediction for this structure.
+    :param failure: boolean, whether the featurization failed.
+    :param csv_content: string, the content of the csv of features.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
+    # ethane_result refers to an ethane uptake prediction; ethylene_result refers to an ethylene uptake prediction
+    fields = ['structure', 'temperature', 'pressure', 'ethane_result', 'ethylene_result', 'failure', 'csv_content', 'ethane_times', 'ethylene_times'] 
+        # ethane_times and ethylene_times indicate the number of times this structure has had its ethane or ethylene uptake predicted, at this temperature and pressure
+    final_dict = {}
+    for field in fields:
+        final_dict[field] = '' # start with everything empty
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure, 'temperature':temperature, 'pressure':pressure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+
+    final_dict['structure'] = structure
+    final_dict['temperature'] = temperature
+    final_dict['pressure'] = pressure
+    final_dict['failure'] = failure
+    final_dict['csv_content'] = csv_content
+
+    if is_entry == 0: # structure has not been seen before. Make a new entry
+        # Populate certain fields
+        if prediction_type == 'ethane_uptake':
+            final_dict['ethane_result'] = result
+            final_dict['ethane_times'] = 1
+            final_dict['ethylene_times'] = 0
+        elif prediction_type == 'ethylene_uptake':
+            final_dict['ethylene_result'] = result
+            final_dict['ethane_times'] = 0
+            final_dict['ethylene_times'] = 1
+
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    else:  # existing structure. Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+        my_document = my_documents[0]
+        final_dict['ethane_result'] = my_document['ethane_result']
+        final_dict['ethylene_result'] = my_document['ethylene_result']
+        final_dict['ethane_times'] = my_document['ethane_times']
+        final_dict['ethylene_times'] = my_document['ethylene_times']
+
+        if prediction_type == 'ethane_uptake': # structure has had an ethylene prediction but not an ethane prediction
+            final_dict['ethane_result'] = result
+            final_dict['ethane_times'] = final_dict['ethane_times'] + 1
+        elif prediction_type == 'ethylene_uptake': # structure has had an ethane prediction but not an ethylene prediction
+            final_dict['ethylene_result'] = result
+            final_dict['ethylene_times'] = final_dict['ethylene_times'] + 1
+
+        collection.remove({'structure':structure, 'temperature':temperature, 'pressure':pressure}) # delete entry
+        collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    return ('', 204) # 204 no content response
+
+def db_push_lite_C2(structure, temperature, pressure, prediction_type):
+    """
+    # db_push_lite_C2 increases either ethane_times or ethylene_times in the document corresponding to structure, in the MOFSimplify_C2_v2 collection in the MongoDB history database.
+    # The prediction_type determines whether ethane_times or ethylene_times is increased by one.
+
+    :param structure: str, the text of the cif file of the MOF being analyzed.
+    :param temperature: str, the temperature of the data point.
+    :param pressure: str, the pressure of the data point.
+    :param prediction_type: str, the type of prediction being run. Can either be 'ethane_uptake' or 'ethylene_uptake'.
+    :return: A 204 no content response, so the front end does not display a page different than the one it is on.
+    """ 
+
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    # The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
+    final_dict = {}
+
+    # https://docs.mongodb.com/manual/reference/method/db.collection.update/
+    my_documents = collection.find({'structure':structure, 'temperature':temperature, 'pressure':pressure})
+
+    # if db_push_lite_C2 is called, structure passed to it will already have a document in the history.MOFSimplify_C2_v2 collection
+    # for the given temperature and pressure
+
+    # Update existing document (couldn't get actual update function to work, so I delete entry and write a new one.)
+    my_document = my_documents[0]
+    final_dict['structure'] = structure
+    final_dict['temperature'] = temperature
+    final_dict['pressure'] = pressure
+    final_dict['ethane_result'] = my_document['ethane_result']
+    final_dict['ethylene_result'] = my_document['ethylene_result']
+    final_dict['ethane_times'] = my_document['ethane_times']
+    final_dict['ethylene_times'] = my_document['ethylene_times']
+    final_dict['failure'] = my_document['failure']
+    final_dict['csv_content'] = my_document['csv_content']
+
+    if prediction_type == 'ethane_uptake': 
+        final_dict['ethane_times'] += 1
+    elif prediction_type == 'ethylene_uptake': 
+        final_dict['ethylene_times'] += 1
+
+    collection.remove({'structure':structure, 'temperature':temperature, 'pressure':pressure}) # delete entry
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection (so, write new entry)
+    return ('', 204) # 204 no content response
+
 @app.route('/get_descriptors_C2', methods=['POST']) 
 def descriptor_getter_C2():
     """
@@ -2929,9 +3038,40 @@ def ethane_predict():
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
+    ### Check in MongoDB history.MOFSimplify_C2_v2 collection to see if this structure has been predicted on before. 
+    # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
+    my_documents = collection.find({'structure':structure, 'temperature':temperature, 'pressure':pressure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
+        entry_data = my_documents[0]
+        if entry_data['failure'] == True: # MOF was not featurizable
+            if session['permission']:
+                db_push_lite_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethane_uptake') # add 1 to the ethane_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return 'FAILED'
+        else: 
+            # Making the csv; can skip csv making in descriptor_generator with this
+            csv_content = entry_data['csv_content']
+            with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors_C2.csv', 'w') as f:
+                f.write(csv_content)
+
+        if entry_data['ethane_times'] > 0:
+            my_dict = {'prediction':entry_data['ethane_result']}
+            if session['permission']:
+                db_push_lite_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethane_uptake') # add 1 to the ethane_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return my_dict
+
+        # if haven't returned anything by now and entered the if is_entry statement, have a featurizable MOF for which an ethylene prediction has not been run, but an ethane prediction has
+
     output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethane') # generate descriptors
     if output == 'FAILED': # Description generation failure
         operation_counter = conditional_diminish(operation_counter)
+        if session['permission']:
+            db_push_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethane_uptake', result='', failure=True, csv_content='')
         return 'FAILED'
 
     # Applying the model next
@@ -2940,6 +3080,14 @@ def ethane_predict():
     results = {
     'prediction': prediction,
     }
+
+    if session['permission']:
+        # Database push of MOF structure and ML results.
+        # Getting the contents of the CSV containing features.
+        descriptors_folder = temp_file_folder + "merged_descriptors/"
+        with open(descriptors_folder + name + '_descriptors_C2.csv', 'r') as f:
+            csv_contents = f.read()
+        db_push_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethane_uptake', result=prediction, failure=False, csv_content=csv_contents)    
     
     operation_counter = conditional_diminish(operation_counter)
     return results
@@ -2973,9 +3121,40 @@ def ethylene_predict():
 
     temp_file_folder = MOFSIMPLIFY_PATH + "temp_file_creation_" + str(session['ID']) + '/'
 
+    ### Check in MongoDB history.MOFSimplify_C2_v2 collection to see if this structure has been predicted on before. 
+    # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    db = client.history # The history database
+    collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
+    my_documents = collection.find({'structure':structure, 'temperature':temperature, 'pressure':pressure})
+    is_entry = my_documents.count() # will be zero or one, depending if structure is in the database
+    if is_entry: # return statements in this if statement are of same form as those from the workflow if the structure isn't in the database. The frontend needs to receive information of the same form.
+        entry_data = my_documents[0]
+        if entry_data['failure'] == True: # MOF was not featurizable
+            if session['permission']:
+                db_push_lite_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethylene_uptake') # add 1 to the ethylene_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return 'FAILED'
+        else: 
+            # Making the csv; can skip csv making in descriptor_generator with this
+            csv_content = entry_data['csv_content']
+            with open(temp_file_folder + 'merged_descriptors/' + name + '_descriptors_C2.csv', 'w') as f:
+                f.write(csv_content)
+
+        if entry_data['ethylene_times'] > 0:
+            my_dict = {'prediction':entry_data['ethylene_result']}
+            if session['permission']:
+                db_push_lite_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethylene_uptake') # add 1 to the ethylene_times in the database
+            operation_counter = conditional_diminish(operation_counter)
+            return my_dict
+
+        # if haven't returned anything by now and entered the if is_entry statement, have a featurizable MOF for which an ethane prediction has not been run, but an ethylene prediction has
+
     output = descriptor_generator_C2(name, structure, temperature, pressure, 'ethylene') # generate descriptors
     if output == 'FAILED': # Description generation failure
         operation_counter = conditional_diminish(operation_counter)
+        if session['permission']:
+            db_push_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethylene_uptake', result='', failure=True, csv_content='')
         return 'FAILED'
 
     # Applying the model next
@@ -2985,6 +3164,14 @@ def ethylene_predict():
     'prediction': prediction,
     }
     
+    if session['permission']:
+        # Database push of MOF structure and ML results.
+        # Getting the contents of the CSV containing features.
+        descriptors_folder = temp_file_folder + "merged_descriptors/"
+        with open(descriptors_folder + name + '_descriptors_C2.csv', 'r') as f:
+            csv_contents = f.read()
+        db_push_C2(structure=structure, temperature=temperature, pressure=pressure, prediction_type='ethylene_uptake', result=prediction, failure=False, csv_content=csv_contents)  
+
     operation_counter = conditional_diminish(operation_counter)
     return results
 
@@ -3035,7 +3222,7 @@ def descriptor_generator_C2(name, structure, temperature, pressure, prediction_t
     cif_file.write(structure)
     cif_file.close()
 
-    # There can be a RACs folder for water predictions and a RACs folder for acid predictions. Same for Zeo++.
+    # There can be a RACs folder for ethane predictions and a RACs folder for ethylene predictions. Same for Zeo++.
     RACs_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_RACs/'
     zeo_folder = temp_file_folder + 'feature_generation/' + prediction_type + '_zeo++/'
 

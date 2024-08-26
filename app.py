@@ -314,6 +314,28 @@ def process_feedback():
     return ('', 204) # 204 no content response
     # return flask.send_from_directory('./splash_page/', 'success.html')
 
+## Handle feedback, for the 2-class water and acid models
+@app.route('/process_feedback_water', methods=['POST'])
+def process_feedback_water():
+    """
+    process_feedback_water inserts MOFSimplify form feedback into the MongoDB feedback database. 
+    """ 
+    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+        # The first argument is the IP address. The second argument is the port.
+    db = client.feedback
+    collection = db.MOFSimplify_water # The MOFSimplify_water collection in the feedback database.
+    fields = ['feedback_form_name', 'rating', 'email', 'reason', 'comments', 'cif_file_name', 'structure']
+    final_dict = {}
+    for field in fields:
+        final_dict[field] = request.form.get(field)
+
+    final_dict['ip'] = request.remote_addr
+    final_dict['timestamp'] = datetime.now().isoformat()
+    
+    print(final_dict)
+    collection.insert(final_dict) # insert the dictionary into the mongodb collection
+    return ('', 204) # 204 no content response
+
 ## Handle removal request
 @app.route('/process_removal', methods=['POST'])
 def process_removal():

@@ -206,7 +206,69 @@
           <b style='font-size:22px;'>Status messages and MOF predictions</b>
           <div class='col-12' id='upload_status' style='font-size:22px;'></div>          
           <div class='col-12' id='water_stability_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
+
+          <div class='col-12' id='water_form'>
+            <form action='/process_feedback' class='col-10' enctype="multipart/form-data" id='water_stability_feedback' method="post" name="water_stability_feedback" style='font-size:22px;margin-left:15px'>
+              <input name="feedback_form_name" type="hidden" value="water_stability"> <input name="cif_file_name" type="hidden" value=""> <input name="structure" type="hidden" value=""> <i id='rate_water'>Rate this prediction: *</i> <input class="rating" data-size="md" id="water_rating" name="rating" required="" type="text">
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="water_rating_email_desc">Email (.edu preferred) *</span>
+                </div><input aria-describedby="water_rating_email_desc" class="form-control" id="water_rating_email" name="email" required="" type="email">
+              </div><select class="form-control mt-2 mb-0" id="inputState_A" name="reason" required="">
+                <option value="">
+                  Reason for rating... *
+                </option>
+                <option>
+                  I've worked with this MOF before, the prediction is good
+                </option>
+                <option>
+                  I've worked with this MOF before, the prediction is bad (elaborate in Comments field)
+                </option>
+                <option>
+                  The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in Comments field)
+                </option>
+              </select>
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="water_rating_comments_desc">Comments</span>
+                </div><input aria-describedby="water_rating_comments_desc" class="form-control" id="water_rating_comments" name="comments" type="text">
+              </div>
+              <button class="btn btn-primary mt-2" id="submit_A" type="submit">Submit</button>
+            </form>
+          </div>
+
           <div class='col-12' id='acid_stability_prediction' style='font-size:22px;white-space: pre-wrap;'></div>
+
+          <div class='col-12' id='acid_form'>
+            <form action='/process_feedback' class='col-10' enctype="multipart/form-data" id='acid_stability_feedback' method="post" name="acid_stability_feedback" style='font-size:22px;margin-left:15px'>
+              <input name="feedback_form_name" type="hidden" value="acid_stability"> <input name="cif_file_name" type="hidden" value=""> <input name="structure" type="hidden" value=""> <i id='rate_acid'>Rate this prediction: *</i> <input class="rating" data-size="md" id="acid_rating" name="rating" required="" type="text">
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="acid_rating_email_desc">Email (.edu preferred) *</span>
+                </div><input aria-describedby="acid_rating_email_desc" class="form-control" id="acid_rating_email" name="email" required="" type="email">
+              </div><select class="form-control mt-2 mb-0" id="inputState_B" name="reason" required="">
+                <option value="">
+                  Reason for rating... *
+                </option>
+                <option>
+                  I've worked with this MOF before, the prediction is good
+                </option>
+                <option>
+                  I've worked with this MOF before, the prediction is bad (elaborate in Comments field)
+                </option>
+                <option>
+                  The literature contains counter examples of this prediction (provide DOI of papers with counterexamples in Comments field)
+                </option>
+              </select>
+              <div class="input-group mt-2" style="">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="acid_rating_comments_desc">Comments</span>
+                </div><input aria-describedby="acid_rating_comments_desc" class="form-control" id="acid_rating_comments" name="comments" type="text">
+              </div>
+              <button class="btn btn-primary mt-2" id="submit_B" type="submit">Submit</button>
+            </form>
+          </div>
+
         </div>
       </div><!-- The example MOF selection section of the website -->
       <div class='zebra' id="pills-example" style='font-size: 20px;'>
@@ -290,6 +352,8 @@
          $('#status_section').hide()
          $('#descriptor_section').hide()
          $('#cif_hint').hide()
+         $('#water_form').hide()
+         $('#acid_form').hide()         
 
          // clearing previous predictions
          $('#water_stability_prediction').text('');
@@ -419,6 +483,10 @@
                  return; // Do not update water stability prediction if prediction failed.
                }
 
+               $('#water_form').show()
+               $('#water_form input[name=cif_file_name]').val(myDict['name']);
+               $('#water_form input[name=structure]').val(myDict['structure']); // Populate the feedback form with metadata
+
                water_pred_color = success_green;
                $('#predict_w').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
@@ -456,6 +524,8 @@
 
                  stability_field = document.getElementById('water_stability_prediction');
                  setColor(stability_field, my_color) // color background based on the prediction
+                 water_form = document.getElementById('water_form');
+                 setColor(water_form, my_color)
              })
              .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
                water_pred_color = failure_red;
@@ -522,6 +592,10 @@
                  return; // Do not update acid stability prediction if prediction failed.
                }
 
+               $('#acid_form').show()
+               $('#acid_form input[name=cif_file_name]').val(myDict['name']);
+               $('#acid_form input[name=structure]').val(myDict['structure']); // Populate the feedback form with metadata
+
                acid_pred_color = success_green;
                $('#predict_a').css({ 'background-color': success_green, 'border-color': success_green }); // setting button color to indicate success
 
@@ -559,6 +633,8 @@
 
                  stability_field = document.getElementById('acid_stability_prediction');
                  setColor(stability_field, my_color) // color background based on the prediction
+                 acid_form = document.getElementById('acid_form');
+                 setColor(acid_form, my_color)
              })
              .fail(function(xhr, textStatus, errorThrown) { // for timeout error; triggers after 1 minute
                acid_pred_color = failure_red;
@@ -695,6 +771,55 @@
 
          return name
        }
+
+       // Functions for handling feedback
+       // When the "Submit" button is clicked for the water stability prediction feedback
+       $('#submit_A').click(function () {
+         // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
+
+         // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+         var rating = document.getElementById('water_rating').value;      
+         var email = document.getElementById('water_rating_email').value;
+         var reason = document.getElementById('inputState_A').value;
+
+         if (rating && email && reason) {
+           var data = new FormData($('#water_stability_feedback')[0])
+           document.getElementById('water_stability_feedback').reset() // reset the form
+           if (success) { // send form data to backend
+             var request = new XMLHttpRequest();
+             request.onreadystatechange = function() { return; } // Override the response behavior of the request
+             request.open("POST", 'process_feedback_water', true)
+             request.send(data)
+           }
+           alert('Thank you for your feedback!')
+         }
+           
+       })       
+
+       // When the "Submit" button is clicked for the acid stability prediction feedback
+       $('#submit_B').click(function () {
+         // Returns an alert to the user indicating whether their feedback was accepted. Sends form data to backend if form is filled out well.
+
+         // First, ensures that the required fields are filled out. If not, returns, and no alerts are shown.
+         var rating = document.getElementById('acid_rating').value;      
+         var email = document.getElementById('acid_rating_email').value;
+         var reason = document.getElementById('inputState_B').value;
+
+         alert('Thank you for your feedback!')
+  
+         if (rating && email && reason) {
+           var data = new FormData($('#acid_stability_feedback')[0])
+           document.getElementById('acid_stability_feedback').reset() // reset the form
+           if (success) { // send form data to backend
+             var request = new XMLHttpRequest();
+             request.onreadystatechange = function() { return; } // Override the response behavior of the request
+             request.open("POST", 'process_feedback_water', true)
+             request.send(data)
+           }
+           alert('Thank you for your feedback!')
+         }   
+
+       })    
 
 
        // When the "Dark mode" button is clicked:

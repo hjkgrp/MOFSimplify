@@ -785,12 +785,12 @@
          if (rating && email && reason) {
            var data = new FormData($('#water_stability_feedback')[0])
            document.getElementById('water_stability_feedback').reset() // reset the form
-           if (success) { // send form data to backend
-             var request = new XMLHttpRequest();
-             request.onreadystatechange = function() { return; } // Override the response behavior of the request
-             request.open("POST", 'process_feedback_water', true)
-             request.send(data)
-           }
+           // send form data to backend
+           var request = new XMLHttpRequest();
+           request.onreadystatechange = function() { return; } // Override the response behavior of the request
+           request.open("POST", 'process_feedback_water', true)
+           request.send(data)
+           
            alert('Thank you for your feedback!')
          }
            
@@ -808,12 +808,12 @@
          if (rating && email && reason) {
            var data = new FormData($('#acid_stability_feedback')[0])
            document.getElementById('acid_stability_feedback').reset() // reset the form
-           if (success) { // send form data to backend
-             var request = new XMLHttpRequest();
-             request.onreadystatechange = function() { return; } // Override the response behavior of the request
-             request.open("POST", 'process_feedback_water', true)
-             request.send(data)
-           }
+           // send form data to backend
+           var request = new XMLHttpRequest();
+           request.onreadystatechange = function() { return; } // Override the response behavior of the request
+           request.open("POST", 'process_feedback_water', true)
+           request.send(data)
+           
            alert('Thank you for your feedback!')
          }   
 

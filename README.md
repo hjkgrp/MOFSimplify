@@ -25,8 +25,8 @@ Tested on Chrome Version 93.0.4577.82, Safari Version 15.0, Firefox 92.0, and Ed
   - Contains the code that visualizes MOFs.
   - Dependencies: Contained in `libraries/` folder (including Bootswatch theme).
   - HTML: Any lines inside the `<body>` tag.
-  - JavaScript: Any lines inside the `<script>` tag.
   - CSS: Any lines inside the `<style>` tag.
+  - JavaScript: Any lines inside the `<script>` tag.
   - Interactive elements: Look at the Javascript code inside the `<script>` tag at the bottom of the file.
 
 So, the most important files are `index.html` and `app.py`

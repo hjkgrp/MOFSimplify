@@ -5,7 +5,7 @@ The MOF website for property prediction and community engagement. Available at [
 Tested on Chrome Version 93.0.4577.82, Safari Version 15.0, Firefox 92.0, and Edge 94.0.992.37. 
 
 ### How to run MOFSimplify locally (tested on Python 3.8.5):
-- Install Flask, molSimplify v1.6.0, and any other necessary dependencies (see [environments/environment.yml](environments/environment.yml)).
+- Install Flask, [https://github.com/hjkgrp/molSimplify](molSimplify) v1.6.0, and any other necessary dependencies (see [environments/environment.yml](environments/environment.yml)).
 - Run `python app.py` to start a server instance.
   - Will need to comment out MongoClient code in `app.py` if you don't have permission to access the MOFSimplify databases. 
 - Go to `http://localhost:8000/` in your browser (or whatever address `app.py` prints).

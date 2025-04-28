@@ -268,7 +268,7 @@ def process_feedback():
     process_feedback inserts MOFSimplify form feedback into the MongoDB feedback database. 
     If an uploaded file has an incorrect extension (i.e. is a disallowed file format), the user is directed to an error page.
     """ 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
         # The first argument is the IP address. The second argument is the port.
     db = client.feedback
     collection = db.MOFSimplify # The MOFSimplify collection in the feedback database.
@@ -320,7 +320,7 @@ def process_feedback_water():
     """
     process_feedback_water inserts MOFSimplify form feedback into the MongoDB feedback database. 
     """ 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
         # The first argument is the IP address. The second argument is the port.
     db = client.feedback
     collection = db.MOFSimplify_water # The MOFSimplify_water collection in the feedback database.
@@ -1250,7 +1250,7 @@ def ss_predict():
 
     ### Check in MongoDB history.MOFSimplify_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    client = MongoClient('localhost',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
         # The collection client.history.MOFSimplify, or db.MOFSimplify, was for a prior version, where the cell_v feature was erroneously called rho
@@ -1374,7 +1374,7 @@ def ts_predict():
 
     ### Check in MongoDB history.MOFSimplify_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs? 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    client = MongoClient('localhost',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
     my_documents = collection.find({'structure':structure})
@@ -1473,7 +1473,7 @@ def db_push(structure, prediction_type, in_train, result, neighbor_names, neighb
 
     print(f'Have entered the db_push function')
 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
@@ -1552,7 +1552,7 @@ def db_push_lite(structure, prediction_type):
 
     print('Entering db_push_lite!')
 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_v2 # The MOFSimplify_v2 collection in the history database.
@@ -2386,7 +2386,7 @@ def db_push_water(structure, prediction_type, result, failure, csv_content):
     :param csv_content: string, the content of the csv of features.
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
@@ -2444,7 +2444,7 @@ def db_push_lite_water(structure, prediction_type):
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """ 
 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
@@ -2507,7 +2507,7 @@ def ws_predict():
 
     ### Check in MongoDB history.MOFSimplify_water_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    client = MongoClient('localhost',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
     my_documents = collection.find({'structure':structure})
@@ -2590,7 +2590,7 @@ def as_predict():
 
     ### Check in MongoDB history.MOFSimplify_water_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    client = MongoClient('localhost',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_water_v2 # The MOFSimplify_water_v2 collection in the history database.
     my_documents = collection.find({'structure':structure})
@@ -2913,7 +2913,7 @@ def db_push_C2(structure, temperature, pressure, prediction_type, result, failur
     :param csv_content: string, the content of the csv of features.
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
@@ -2976,7 +2976,7 @@ def db_push_lite_C2(structure, temperature, pressure, prediction_type):
     :return: A 204 no content response, so the front end does not display a page different than the one it is on.
     """ 
 
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb
+    client = MongoClient('localhost',27017) # connect to mongodb
     # The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
@@ -3062,7 +3062,7 @@ def ethane_predict():
 
     ### Check in MongoDB history.MOFSimplify_C2_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    client = MongoClient('localhost',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
     my_documents = collection.find({'structure':structure, 'temperature':temperature, 'pressure':pressure})
@@ -3145,7 +3145,7 @@ def ethylene_predict():
 
     ### Check in MongoDB history.MOFSimplify_C2_v2 collection to see if this structure has been predicted on before. 
     # Comment out this section if you are running MOFSimplify on your computer, and define is_entry as False. Also select "No" for the question May MOFSimplify store information on your MOFs?
-    client = MongoClient('18.18.63.68',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
+    client = MongoClient('localhost',27017) # connect to mongodb. The first argument is the IP address. The second argument is the port.
     db = client.history # The history database
     collection = db.MOFSimplify_C2_v2 # The MOFSimplify_C2_v2 collection in the history database.
     my_documents = collection.find({'structure':structure, 'temperature':temperature, 'pressure':pressure})

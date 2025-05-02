@@ -1030,16 +1030,27 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
         cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
         cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
 
-        # four parallelized Zeo++ and RAC commands
-        process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+        try:
+            timeout = 45 # seconds
 
-        output1 = process1.communicate()[0]
-        output2 = process2.communicate()[0]
-        output3 = process3.communicate()[0]
-        output4 = process4.communicate()[0]
+            # four parallelized Zeo++ and RAC commands
+            process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+            process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+            process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+            process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
+            output1 = process1.communicate(timeout=timeout)[0]
+            output2 = process2.communicate(timeout=timeout)[0]
+            output3 = process3.communicate(timeout=timeout)[0]
+            output4 = process4.communicate(timeout=timeout)[0]
+        except subprocess.TimeoutExpired:
+            # Featurization was taking too long.
+            process1.kill()
+            process2.kill()
+            process3.kill()
+            process4.kill()
+
+            return 'FAILED'
 
         # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
@@ -1826,22 +1837,24 @@ def get_components():
         operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
+    cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+
     try:
-        full_names, full_descriptors = get_MOF_descriptors(cif_folder + name + '_primitive.cif',3,path= RACs_folder, xyzpath= RACs_folder + name + '.xyz');
-            # makes the linkers and sbus folders, complete with linkers and sbus. We don't care about full_names and full_descriptors in this function
-    except ValueError:
-        operation_counter = conditional_diminish(operation_counter)
-        return 'FAILED'
-    except NotImplementedError:
-        operation_counter = conditional_diminish(operation_counter)
-        return 'FAILED'
-    except AssertionError:
+        timeout = 45 # seconds
+        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+        output4 = process4.communicate(timeout=timeout)[0]
+    except subprocess.TimeoutExpired:
+        # Featurization was taking too long.
+        process4.kill()
         operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
-    if (len(full_names) <= 1) and (len(full_descriptors) <= 1): # this is a featurization check from MOF_descriptors.py
-        operation_counter = conditional_diminish(operation_counter)
-        return 'FAILED'
+    # error handling for cmd4
+    with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
+        if f.readline() == 'FAILED':
+            print('RAC generation failed.')
+            operation_counter = conditional_diminish(operation_counter)
+            return 'FAILED'
 
     # At this point, have the RAC featurization. 
 
@@ -2725,16 +2738,27 @@ def descriptor_generator_water(name, structure, prediction_type, is_entry):
     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.4 1.4 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
 
-    # four parallelized Zeo++ and RAC commands
-    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+    try:
+        timeout = 45 # seconds
 
-    output1 = process1.communicate()[0]
-    output2 = process2.communicate()[0]
-    output3 = process3.communicate()[0]
-    output4 = process4.communicate()[0]
+        # four parallelized Zeo++ and RAC commands
+        process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
+        output1 = process1.communicate(timeout=timeout)[0]
+        output2 = process2.communicate(timeout=timeout)[0]
+        output3 = process3.communicate(timeout=timeout)[0]
+        output4 = process4.communicate(timeout=timeout)[0]
+    except subprocess.TimeoutExpired:
+        # Featurization was taking too long.
+        process1.kill()
+        process2.kill()
+        process3.kill()
+        process4.kill()
+
+        return 'FAILED'
 
     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 
@@ -3278,16 +3302,27 @@ def descriptor_generator_C2(name, structure, temperature, pressure, prediction_t
     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
 
-    # four parallelized Zeo++ and RAC commands
-    process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-    process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+    try:
+        timeout = 45 # seconds
 
-    output1 = process1.communicate()[0]
-    output2 = process2.communicate()[0]
-    output3 = process3.communicate()[0]
-    output4 = process4.communicate()[0]
+        # four parallelized Zeo++ and RAC commands
+        process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
+        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
+
+        output1 = process1.communicate(timeout=timeout)[0]
+        output2 = process2.communicate(timeout=timeout)[0]
+        output3 = process3.communicate(timeout=timeout)[0]
+        output4 = process4.communicate(timeout=timeout)[0]
+    except subprocess.TimeoutExpired:
+        # Featurization was taking too long.
+        process1.kill()
+        process2.kill()
+        process3.kill()
+        process4.kill()
+
+        return 'FAILED'
 
     # Have written output of Zeo++ commands to files. Now, code below extracts information from those files.
 

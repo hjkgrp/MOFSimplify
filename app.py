@@ -1024,31 +1024,32 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
         # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
             # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
 
-        # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
+        # cmd1, cmd2, and cmd3 are for Zeo++. cmd4 is for RACs.
         cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
         cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
         cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
         cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+        cmd_list = [cmd1, cmd2, cmd3, cmd4]
+
+        # four parallelized Zeo++ and RAC commands
+        process_list = []
+        for cmd in cmd_list:
+            p = subprocess.Popen(
+                cmd.split(),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                )
+            process_list.append(p)
+
+        timeout = 45 # seconds
 
         try:
-            timeout = 45 # seconds
-
-            # four parallelized Zeo++ and RAC commands
-            process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-            process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-            process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-            process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
-
-            output1 = process1.communicate(timeout=timeout)[0]
-            output2 = process2.communicate(timeout=timeout)[0]
-            output3 = process3.communicate(timeout=timeout)[0]
-            output4 = process4.communicate(timeout=timeout)[0]
+            for p in process_list:
+                p.communicate(timeout=timeout)
         except subprocess.TimeoutExpired:
             # Featurization was taking too long.
-            process1.kill()
-            process2.kill()
-            process3.kill()
-            process4.kill()
+            for p in process_list:
+                p.kill()
 
             return 'FAILED'
 
@@ -1087,28 +1088,28 @@ def descriptor_generator(name, structure, prediction_type, is_entry):
             with open(zeo_folder + name + '_pd.txt') as f:
                 pore_diameter_data = f.readlines()
                 for row in pore_diameter_data:
-                    largest_included_sphere = float(row.split()[1]) # largest included sphere
-                    largest_free_sphere = float(row.split()[2]) # largest free sphere
-                    largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+                    largest_included_sphere = float(row.split()[1])                        # Largest included sphere
+                    largest_free_sphere = float(row.split()[2])                            # Largest free sphere
+                    largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # Largest included sphere along free sphere path
             with open(zeo_folder + name + '_sa.txt') as f:
                 surface_area_data = f.readlines()
                 for i, row in enumerate(surface_area_data):
                     if i == 0:
-                        unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                        crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
-                        VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
-                        GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+                        unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # Unit cell volume
+                        crystal_density = float(row.split('Density:')[1].split()[0])          # Crystal density
+                        VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0])                 # Volumetric surface area
+                        GSA = float(row.split('ASA_m^2/g:')[1].split()[0])                    # Gravimetric surface area
             with open(zeo_folder + name + '_pov.txt') as f:
                 pore_volume_data = f.readlines()
                 for i, row in enumerate(pore_volume_data):
                     if i == 0:
                         density = float(row.split('Density:')[1].split()[0])
-                        POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
-                        PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
-                        GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
-                        GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
-                        POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
-                        PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                        POAV = float(row.split('POAV_A^3:')[1].split()[0])                               # Probe accessible pore volume
+                        PONAV = float(row.split('PONAV_A^3:')[1].split()[0])                             # Probe non-accessible pore volume
+                        GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])                           # Gravimetric POAV
+                        GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])                         # Gravimetric PONAV
+                        POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0])   # Probe accessible volume fraction
+                        PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # Probe non accessible volume fraction
                         VPOV = POAV_volume_fraction+PONAV_volume_fraction
                         GPOV = VPOV/density
         else:
@@ -1837,19 +1838,19 @@ def get_components():
         operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
-    cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+    cmd = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+    timeout = 45 # seconds
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     try:
-        timeout = 45 # seconds
-        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
-        output4 = process4.communicate(timeout=timeout)[0]
+        process.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
         # Featurization was taking too long.
-        process4.kill()
+        process.kill()
         operation_counter = conditional_diminish(operation_counter)
         return 'FAILED'
 
-    # error handling for cmd4
+    # error handling for cmd
     with open(RACs_folder + 'RAC_getter_log.txt', 'r') as f:
         if f.readline() == 'FAILED':
             print('RAC generation failed.')
@@ -2732,31 +2733,32 @@ def descriptor_generator_water(name, structure, prediction_type, is_entry):
     # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
         # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
 
-    # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
+    # cmd1, cmd2, and cmd3 are for Zeo++. cmd4 is for RACs.
     cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
     cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.4 1.4 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.4 1.4 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+    cmd_list = [cmd1, cmd2, cmd3, cmd4]
+
+    # four parallelized Zeo++ and RAC commands
+    process_list = []
+    for cmd in cmd_list:
+        p = subprocess.Popen(
+            cmd.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            )
+        process_list.append(p)
+
+    timeout = 45 # seconds
 
     try:
-        timeout = 45 # seconds
-
-        # four parallelized Zeo++ and RAC commands
-        process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
-
-        output1 = process1.communicate(timeout=timeout)[0]
-        output2 = process2.communicate(timeout=timeout)[0]
-        output3 = process3.communicate(timeout=timeout)[0]
-        output4 = process4.communicate(timeout=timeout)[0]
+        for p in process_list:
+            p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
         # Featurization was taking too long.
-        process1.kill()
-        process2.kill()
-        process3.kill()
-        process4.kill()
+        for p in process_list:
+            p.kill()
 
         return 'FAILED'
 
@@ -2795,28 +2797,28 @@ def descriptor_generator_water(name, structure, prediction_type, is_entry):
         with open(zeo_folder + name + '_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
-                largest_included_sphere = float(row.split()[1]) # largest included sphere
-                largest_free_sphere = float(row.split()[2]) # largest free sphere
-                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+                largest_included_sphere = float(row.split()[1])                        # Largest included sphere
+                largest_free_sphere = float(row.split()[2])                            # Largest free sphere
+                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # Largest included sphere along free sphere path
         with open(zeo_folder + name + '_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
-                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                    crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
-                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
-                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
+                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # Unit cell volume
+                    crystal_density = float(row.split('Density:')[1].split()[0])          # Crystal density
+                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0])                 # Volumetric surface area
+                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0])                    # Gravimetric surface area
         with open(zeo_folder + name + '_pov.txt') as f:
             pore_volume_data = f.readlines()
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
                     density = float(row.split('Density:')[1].split()[0])
-                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
-                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
-                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
-                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
-                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
-                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                    POAV = float(row.split('POAV_A^3:')[1].split()[0])                               # Probe accessible pore volume
+                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0])                             # Probe non-accessible pore volume
+                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])                           # Gravimetric POAV
+                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])                         # Gravimetric PONAV
+                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0])   # Probe accessible volume fraction
+                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # Probe non accessible volume fraction
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
@@ -3280,10 +3282,6 @@ def descriptor_generator_C2(name, structure, temperature, pressure, prediction_t
     shutil.rmtree(zeo_folder)
     os.mkdir(zeo_folder)
 
-    # # If is_entry is True, do not need to generate features, since we already have them.
-    # if is_entry:
-    #     return 'SUCCESS'
-
     # Next, running MOF featurization
     try:
         get_primitive(cif_folder + name + '.cif', cif_folder + name + '_primitive.cif');
@@ -3296,31 +3294,32 @@ def descriptor_generator_C2(name, structure, temperature, pressure, prediction_t
     # get_MOF_descriptors is used in RAC_getter.py to get RAC features.
         # The files that are generated from RAC_getter.py: lc_descriptors.csv, sbu_descriptors.csv, linker_descriptors.csv
 
-    # cmd1, cmd2, and cmd3 are for Zeo++. cm4 is for RACs.
+    # cmd1, cmd2, and cmd3 are for Zeo++. cmd4 is for RACs.
     cmd1 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -ha -res ' + zeo_folder + name + '_pd.txt ' + cif_folder + name + '_primitive.cif'
     cmd2 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -sa 1.86 1.86 10000 ' + zeo_folder + name + '_sa.txt ' + cif_folder + name + '_primitive.cif'
     cmd3 = MOFSIMPLIFY_PATH + 'zeo++-0.3/network -volpo 1.86 1.86 10000 ' + zeo_folder + name + '_pov.txt '+ cif_folder + name + '_primitive.cif'
     cmd4 = 'python ' + MOFSIMPLIFY_PATH + 'model/RAC_getter.py %s %s %s' %(cif_folder, name, RACs_folder)
+    cmd_list = [cmd1, cmd2, cmd3, cmd4]
+
+    # four parallelized Zeo++ and RAC commands
+    process_list = []
+    for cmd in cmd_list:
+        p = subprocess.Popen(
+            cmd.split(),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            )
+        process_list.append(p)
+
+    timeout = 45 # seconds
 
     try:
-        timeout = 45 # seconds
-
-        # four parallelized Zeo++ and RAC commands
-        process1 = subprocess.Popen(cmd1, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process2 = subprocess.Popen(cmd2, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process3 = subprocess.Popen(cmd3, stdout=subprocess.PIPE, stderr=None, shell=True)
-        process4 = subprocess.Popen(cmd4, stdout=subprocess.PIPE, stderr=None, shell=True)
-
-        output1 = process1.communicate(timeout=timeout)[0]
-        output2 = process2.communicate(timeout=timeout)[0]
-        output3 = process3.communicate(timeout=timeout)[0]
-        output4 = process4.communicate(timeout=timeout)[0]
+        for p in process_list:
+            p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
         # Featurization was taking too long.
-        process1.kill()
-        process2.kill()
-        process3.kill()
-        process4.kill()
+        for p in process_list:
+            p.kill()
 
         return 'FAILED'
 
@@ -3339,18 +3338,18 @@ def descriptor_generator_C2(name, structure, temperature, pressure, prediction_t
         with open(zeo_folder + name + '_pd.txt') as f:
             pore_diameter_data = f.readlines()
             for row in pore_diameter_data:
-                largest_included_sphere = float(row.split()[1]) # largest included sphere
-                largest_free_sphere = float(row.split()[2]) # largest free sphere
-                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # largest included sphere along free sphere path
+                largest_included_sphere = float(row.split()[1])                        # Largest included sphere
+                largest_free_sphere = float(row.split()[2])                            # Largest free sphere
+                largest_included_sphere_along_free_sphere_path = float(row.split()[3]) # Largest included sphere along free sphere path
         with open(zeo_folder + name + '_sa.txt') as f:
             surface_area_data = f.readlines()
             for i, row in enumerate(surface_area_data):
                 if i == 0:
-                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # unit cell volume
-                    crystal_density = float(row.split('Density:')[1].split()[0]) # crystal density
-                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0]) # volumetric surface area
-                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0]) # gravimetric surface area
-                    ASA = float(row.split('ASA_A^2:')[1].split()[0]) # accessible surface area
+                    unit_cell_volume = float(row.split('Unitcell_volume:')[1].split()[0]) # Unit cell volume
+                    crystal_density = float(row.split('Density:')[1].split()[0])          # Crystal density
+                    VSA = float(row.split('ASA_m^2/cm^3:')[1].split()[0])                 # Volumetric surface area
+                    GSA = float(row.split('ASA_m^2/g:')[1].split()[0])                    # Gravimetric surface area
+                    ASA = float(row.split('ASA_A^2:')[1].split()[0])                      # Accessible surface area
                 elif i == 1:
                     # Extracting channel surface areas
                     CSA_1, CSA_2 = channel_surface_area_extract(row)
@@ -3359,12 +3358,12 @@ def descriptor_generator_C2(name, structure, temperature, pressure, prediction_t
             for i, row in enumerate(pore_volume_data):
                 if i == 0:
                     density = float(row.split('Density:')[1].split()[0])
-                    POAV = float(row.split('POAV_A^3:')[1].split()[0]) # Probe accessible pore volume
-                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0]) # Probe non-accessible probe volume
-                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])
-                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])
-                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0]) # probe accessible volume fraction
-                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # probe non accessible volume fraction
+                    POAV = float(row.split('POAV_A^3:')[1].split()[0])                               # Probe accessible pore volume
+                    PONAV = float(row.split('PONAV_A^3:')[1].split()[0])                             # Probe non-accessible pore volume
+                    GPOAV = float(row.split('POAV_cm^3/g:')[1].split()[0])                           # Gravimetric POAV
+                    GPONAV = float(row.split('PONAV_cm^3/g:')[1].split()[0])                         # Gravimetric PONAV
+                    POAV_volume_fraction = float(row.split('POAV_Volume_fraction:')[1].split()[0])   # Probe accessible volume fraction
+                    PONAV_volume_fraction = float(row.split('PONAV_Volume_fraction:')[1].split()[0]) # Probe non accessible volume fraction
                     VPOV = POAV_volume_fraction+PONAV_volume_fraction
                     GPOV = VPOV/density
     else:
